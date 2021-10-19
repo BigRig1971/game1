@@ -92,8 +92,6 @@ namespace StarterAssets
 		private const float _threshold = 0.01f;
 
 		private bool _hasAnimator;
-		public float _vertical = 0.0f;
-		public float up = 0f;
 		
 
 		private void Awake()
@@ -218,46 +216,36 @@ namespace StarterAssets
 				float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, RotationSmoothTime);
 				if (_customMovement._verticalMovement)
 				{
-					_vertical = _mainCamera.transform.eulerAngles.x;
-					up = 2;
-					/*	if (_mainCamera.transform.forward.y > 0)
-						{
-							_verticalVelocity = _speed;
+					if (_mainCamera.transform.forward.y > 0)
+					{
+						_verticalVelocity = _speed;
+						
 
-
-						}
-						else
-						{
-
-							_verticalVelocity = -_speed;
-						}*/
+					}
+					else
+					{
+						
+						_verticalVelocity = -_speed;
+					}
 					// rotate to face input direction relative to camera position
-					
 					transform.rotation = Quaternion.Euler(_mainCamera.transform.eulerAngles.x, rotation, 0.0f);/////
 				}
 				else
-				{
-					up = 0;
-					_vertical = 0.0f;
-					transform.rotation = Quaternion.Euler(_vertical, rotation, 0.0f);
+				{				
+					transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
 				}				
 			}
 			else
 			{
 				
 				transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
-
 			}
 
-			if (_customMovement._verticalMovement)
-			{
-
-			}
-				Vector3 targetDirection = Quaternion.Euler(_vertical, _targetRotation, 0.0f) * Vector3.forward;
+			Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
 			// move the player
-			_controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, up) * Time.deltaTime);
-			Debug.Log(_vertical);
+			_controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+
 			// update animator if using character
 			if (_hasAnimator)
 			{
