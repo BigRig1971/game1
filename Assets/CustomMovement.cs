@@ -61,7 +61,7 @@ namespace StarterAssets
 		{
 			if (_input.roll)
 			{
-				StartCoroutine(Roll());
+				StartCoroutine(OnRoll());
 			}
 
 		}
@@ -102,7 +102,6 @@ namespace StarterAssets
 		}
 		void Walking()
 		{
-			
 			_verticalMovement = false;
 			_animator.SetBool("Swim", false);
 			_tpc.Gravity = -15;
@@ -112,13 +111,14 @@ namespace StarterAssets
 
 
 		}
-		private IEnumerator Roll()
+		private IEnumerator OnRoll()
 		{
 			_animator.applyRootMotion = true;
 			_animator.SetTrigger(_animIDRoll);
 			_input.roll = false;
-		yield return new WaitForSeconds(.7f);
+			yield return new WaitForSeconds(.6f);
 			_animator.applyRootMotion = false;
+
 		}
 
 	}

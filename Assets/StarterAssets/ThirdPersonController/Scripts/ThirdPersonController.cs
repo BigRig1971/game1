@@ -216,31 +216,36 @@ namespace StarterAssets
 				float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, RotationSmoothTime);
 				if (_customMovement._verticalMovement)
 				{
+					if (_mainCamera.transform.forward.y > 0)
+					{
+						_verticalVelocity = _speed;
+						
 
-					_verticalVelocity = _speed * _mainCamera.transform.forward.y;
-
-
+					}
+					else
+					{
+						
+						_verticalVelocity = -_speed;
+					}
 					// rotate to face input direction relative to camera position
-					//float lerp = Mathf.Lerp(0,_mainCamera.transform.eulerAngles.x, .5f);
 					transform.rotation = Quaternion.Euler(_mainCamera.transform.eulerAngles.x, rotation, 0.0f);/////
 				}
 				else
-				{
-					float lerp = Mathf.Lerp(0f,_mainCamera.transform.eulerAngles.x, .001f);
+				{				
 					transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
 				}				
 			}
 			else
 			{
-				//float lerp = Mathf.Lerp(_mainCamera.transform.eulerAngles.x, 0, .001f);
-				transform.rotation = Quaternion.Euler(0.0f, transform.rotation.eulerAngles.y, 0.0f);
+				
+				transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
 			}
 
 			Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
 			// move the player
 			_controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-			
+
 			// update animator if using character
 			if (_hasAnimator)
 			{
