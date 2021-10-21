@@ -23,6 +23,8 @@ namespace StarterAssets
 		//   public RuntimeAnimatorController InWater;
 		private bool headAboveWater = true;
 		private bool buttAboveWater = true;
+		private bool headBelowWater = false;
+		private bool buttBelowWater = false;
 		public bool _verticalMovement = false;
 
 		void Start()
@@ -65,14 +67,23 @@ namespace StarterAssets
 			}
 
 		}
-	
+		public void ButtAboveWater()
+		{
+			buttAboveWater = true;
+		}
+		public void ButtBelowWater()
+		{
+			buttAboveWater = false;
+		}
+
 		public void HeadAboveWater()
 		{
-			if (_animator.GetBool("Grounded"))
+			headAboveWater = true;
+			if (_animator.GetBool("Grounded") ||buttAboveWater)
 			{
 				Walking();
 			}
-			if (!_animator.GetBool("Grounded"))
+			else
 			{
 				TreadingWater();
 			}
@@ -80,14 +91,14 @@ namespace StarterAssets
 		}
 		public void HeadBelowWater()
 		{
+			headAboveWater = false;
 			Swimming();
 		}
 
 		void TreadingWater()
 		{
 			_verticalMovement = false;
-			_animator.SetBool("Swim", true);
-		
+			_animator.SetBool("Swim", true);	
 			_tpc._verticalVelocity = 0f;
 			_tpc.Gravity = -10;
 			
@@ -104,7 +115,7 @@ namespace StarterAssets
 		{
 			_verticalMovement = false;
 			_animator.SetBool("Swim", false);
-			_tpc.Gravity = -15;
+			_tpc.Gravity = -15f;
 		
 			// _animator.runtimeAnimatorController = OnLand;
 

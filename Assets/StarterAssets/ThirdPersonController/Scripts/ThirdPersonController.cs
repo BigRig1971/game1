@@ -92,7 +92,7 @@ namespace StarterAssets
 		private const float _threshold = 0.01f;
 
 		private bool _hasAnimator;
-		
+
 
 		private void Awake()
 		{
@@ -120,7 +120,7 @@ namespace StarterAssets
 		private void Update()
 		{
 			_hasAnimator = TryGetComponent(out _animator);
-			
+
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
@@ -129,7 +129,7 @@ namespace StarterAssets
 		private void LateUpdate()
 		{
 			CameraRotation();
-			
+
 		}
 
 		private void AssignAnimationIDs()
@@ -216,28 +216,20 @@ namespace StarterAssets
 				float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, RotationSmoothTime);
 				if (_customMovement._verticalMovement)
 				{
-					if (_mainCamera.transform.forward.y > 0)
-					{
-						_verticalVelocity = _speed;
-						
 
-					}
-					else
-					{
-						
-						_verticalVelocity = -_speed;
-					}
+					_verticalVelocity = _mainCamera.transform.forward.y;
+
 					// rotate to face input direction relative to camera position
 					transform.rotation = Quaternion.Euler(_mainCamera.transform.eulerAngles.x, rotation, 0.0f);/////
 				}
 				else
-				{				
+				{
 					transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
-				}				
+				}
 			}
 			else
 			{
-				
+
 				transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
 			}
 
@@ -278,16 +270,16 @@ namespace StarterAssets
 				if (_input.jump && _jumpTimeoutDelta <= 0.0f)
 				{
 					// the square root of H * -2 * G = how much velocity needed to reach desired height
-					
+
 					StartCoroutine(JumpDelay());
 					// update animator if using character
 					if (_hasAnimator)
 					{
-						
+
 						_animator.SetBool(_animIDJump, true);
 					}
 				}
-				
+
 
 				// jump timeout
 				if (_jumpTimeoutDelta >= 0.0f)
@@ -323,7 +315,7 @@ namespace StarterAssets
 			{
 				_verticalVelocity += Gravity * Time.deltaTime;
 			}
-			
+
 		}
 		private IEnumerator JumpDelay()
 		{
@@ -345,7 +337,7 @@ namespace StarterAssets
 
 			if (Grounded) Gizmos.color = transparentGreen;
 			else Gizmos.color = transparentRed;
-			
+
 			// when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
 			Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z), GroundedRadius);
 		}
