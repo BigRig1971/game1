@@ -10,15 +10,16 @@ public class SpawnGameObjects : MonoBehaviour
 	private GameObject player;
 	[SerializeField]
 	private CinemachineVirtualCamera vcam;
+	public GameObject[] gameObjects;
 	private void Start()
 	{
 		PhotonNetwork.Instantiate(vcam.name, this.transform.position, Quaternion.identity);
 		PhotonNetwork.Instantiate(player.name, this.transform.position, Quaternion.identity);
-		if(vcam != null)
+		if (vcam != null)
 		{
 			vcam.m_Follow = GameObject.FindWithTag("CinemachineTarget").transform;
 			vcam.m_LookAt = GameObject.FindWithTag("CinemachineTarget").transform;
-			
 		}
 	}
+
 }
