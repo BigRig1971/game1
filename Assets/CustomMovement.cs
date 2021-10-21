@@ -107,7 +107,7 @@ namespace StarterAssets
 		{
 			_verticalMovement = true;
 			_animator.SetBool("Swim", true);
-			_tpc.Gravity = 1;
+			_tpc.Gravity = .5f;
 			_tpc._verticalVelocity = 0f;
 			
 		}
