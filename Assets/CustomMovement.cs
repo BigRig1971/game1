@@ -9,13 +9,11 @@ namespace StarterAssets
 	public class CustomMovement : MonoBehaviour
 	{
 		//custom inputs
-		
+
 		//custom movement
 		private int _animIDRoll;
 		private int _swim;
-		private Animator _animator;
 		private CharacterController _controller;
-		private StarterAssetsInputs _input;
 		private Camera _mainCamera;
 		private ThirdPersonController _tpc;
 		private Rigidbody _rb;
@@ -26,13 +24,15 @@ namespace StarterAssets
 		private bool headBelowWater = false;
 		private bool buttBelowWater = false;
 		public bool _verticalMovement = false;
+		//audio stuff
+		public AudioSource footStep;
+		public AudioSource stepInWater;
+		private bool inWater = false;
 
 		void Start()
 		{
 			_tpc = GetComponent<ThirdPersonController>();
-			_animator = GetComponent<Animator>();
 			_controller = GetComponent<CharacterController>();
-			_input = GetComponent<StarterAssetsInputs>();
 			_animIDRoll = Animator.StringToHash("Roll");
 			_swim = Animator.StringToHash("Swim");
 			_rb = GetComponent<Rigidbody>();
@@ -49,41 +49,49 @@ namespace StarterAssets
 		}
 		private void FixedUpdate()
 		{
-		
+
 		}
 		private IEnumerator Delay()
 		{
 			yield return new WaitForSeconds(.3f);
-			
-			
+
+
 
 		}
 
 		private void Movement()
 		{
-			if (_input.roll)
+			if (_tpc._input.roll)
 			{
+
 				StartCoroutine(OnRoll());
+
 			}
 
 		}
 		public void ButtAboveWater()
 		{
 			buttAboveWater = true;
+
+			Walking();
 		}
 		public void ButtBelowWater()
 		{
 			buttAboveWater = false;
+			if (headAboveWater)
+			{
+				TreadingWater();
+			}
 		}
 
 		public void HeadAboveWater()
 		{
 			headAboveWater = true;
-			if (_animator.GetBool("Grounded") ||buttAboveWater)
+			if (buttAboveWater)
 			{
 				Walking();
 			}
-			else
+			if (!buttAboveWater)
 			{
 				TreadingWater();
 			}
@@ -93,30 +101,36 @@ namespace StarterAssets
 		{
 			headAboveWater = false;
 			Swimming();
+
+
 		}
 
 		void TreadingWater()
 		{
+			_tpc.GroundedOffset = -1;
 			_verticalMovement = false;
-			_animator.SetBool("Swim", true);	
+			_tpc._animator.SetBool(_swim, true);
 			_tpc._verticalVelocity = 0f;
 			_tpc.Gravity = -10;
-			
+
 		}
 		void Swimming()
 		{
+			_tpc.GroundedOffset = -1;
 			_verticalMovement = true;
-			_animator.SetBool("Swim", true);
+			_tpc._animator.SetBool(_swim, true);
 			_tpc.Gravity = 1;
 			_tpc._verticalVelocity = 0f;
-			
+
+
 		}
 		void Walking()
 		{
+			_tpc.GroundedOffset = 0;
 			_verticalMovement = false;
-			_animator.SetBool("Swim", false);
+			_tpc._animator.SetBool(_swim, false);
 			_tpc.Gravity = -15f;
-		
+
 			// _animator.runtimeAnimatorController = OnLand;
 
 
@@ -124,13 +138,35 @@ namespace StarterAssets
 		}
 		private IEnumerator OnRoll()
 		{
-			_animator.applyRootMotion = true;
-			_animator.SetTrigger(_animIDRoll);
-			_input.roll = false;
-			yield return new WaitForSeconds(.6f);
-			_animator.applyRootMotion = false;
+			//_tpc._input.roll = false;
+			_tpc._animator.applyRootMotion = true;
+			_tpc._animator.SetBool(_animIDRoll, true);
+			yield return new WaitForSeconds(.7f);
+			_tpc._animator.SetBool(_animIDRoll, false);
+			_tpc._animator.applyRootMotion = false;
+
+		}
+		public void FootStepOnGround()
+		{
+			inWater = false;
+		}
+		public void FootStepInWater()
+		{
+			inWater = true;
+		}
+		public void FootStep()
+		{
+			if (inWater)
+			{
+				stepInWater?.Play();
+			}
+			else
+			{
+				footStep?.Play();
+			}
 
 		}
 
 	}
+
 }
