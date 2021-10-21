@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 449543710411830837}
   - component: {fileID: 449543710411830838}
   - component: {fileID: 4777407817586080828}
-  - component: {fileID: 924150438179003251}
   m_Layer: 12
   m_Name: AngelFish
   m_TagString: Leader
@@ -99,39 +98,6 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &924150438179003251
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 449543710411830834}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 233111b0b214e8e47b6a3594091fc702, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  navLength: 0.3
-  groupingFactor: 0
-  FuckItUpTime: 5
-  minSpeed: 2
-  maxSpeed: 3
-  Speed: 0
-  herdingVariables:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5169335561713056824}
-        m_TargetAssemblyTypeName: RoamingState, Assembly-CSharp
-        m_MethodName: FollowTheLeader
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1001 &449543708642777345
 PrefabInstance:
   m_ObjectHideFlags: 0
