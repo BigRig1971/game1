@@ -16,7 +16,7 @@ namespace StarterAssets
 		private CharacterController _controller;
 		private Camera _mainCamera;
 		private ThirdPersonController _tpc;
-		private Rigidbody _rb;
+	
 		//   public RuntimeAnimatorController OnLand;
 		//   public RuntimeAnimatorController InWater;
 		private bool headAboveWater = true;
@@ -35,7 +35,6 @@ namespace StarterAssets
 			_controller = GetComponent<CharacterController>();
 			_animIDRoll = Animator.StringToHash("Roll");
 			_swim = Animator.StringToHash("Swim");
-			_rb = GetComponent<Rigidbody>();
 			//  _animator.runtimeAnimatorController = OnLand;
 			_mainCamera = Camera.main;
 
@@ -87,10 +86,7 @@ namespace StarterAssets
 		public void HeadAboveWater()
 		{
 			headAboveWater = true;
-			if (buttAboveWater)
-			{
-				Walking();
-			}
+			
 			if (!buttAboveWater)
 			{
 				TreadingWater();

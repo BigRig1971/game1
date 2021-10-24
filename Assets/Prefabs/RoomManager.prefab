@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &7353921289047286324
+--- !u!1 &4056701196838169544
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,40 +8,38 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7353921289047286326}
-  - component: {fileID: 7353921289047286327}
+  - component: {fileID: 4056701196838169542}
+  - component: {fileID: 4056701196838169543}
   m_Layer: 0
-  m_Name: SpawnGameObjects
+  m_Name: RoomManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7353921289047286326
+--- !u!4 &4056701196838169542
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7353921289047286324}
+  m_GameObject: {fileID: 4056701196838169544}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 358.83572, y: 72.69057, z: 508.6953}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7353921289047286327
+--- !u!114 &4056701196838169543
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7353921289047286324}
+  m_GameObject: {fileID: 4056701196838169544}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1fbee496df489c1438bea6ea943ae960, type: 3}
+  m_Script: {fileID: 11500000, guid: e2a765b483a301645b687b3c29e1da00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 157568604268881697, guid: e3f8b4baf14cdf44a93eb63c5bc201ff, type: 3}
-  vcam: {fileID: 0}

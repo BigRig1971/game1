@@ -26,6 +26,7 @@ namespace StarterAssets
 		[Header("Mouse Cursor Settings")]
 		public bool cursorLocked = true;
 		public bool cursorInputForLook = true;
+
 #endif
 
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
@@ -59,21 +60,21 @@ namespace StarterAssets
 		}
 		public void OnCursor()
 		{
-			state = !state;
+			/*state = !state;
 			if (!state)
 			{
-				Cursor.lockState = CursorLockMode.None;
+				Cursor.lockState = CursorLockMode.Locked;
 				Cursor.visible = false;
 				cursorInputForLook = true;				
 			}
 			else
 			{
-				Cursor.lockState = CursorLockMode.Locked;
-				Cursor.lockState = CursorLockMode.Confined;
+				//Cursor.lockState = CursorLockMode.Locked;
+				Cursor.lockState = CursorLockMode.None;
 				Cursor.visible = true;
 				cursorInputForLook = false;
 				
-			}
+			}*/
 		}
 #else
 	// old input sys if we do decide to have it (most likely wont)...
@@ -109,6 +110,7 @@ namespace StarterAssets
 		private void OnApplicationFocus(bool hasFocus)
 		{
 			SetCursorState(cursorLocked);
+			Cursor.visible = false;
 		}
 
 		private void SetCursorState(bool newState)

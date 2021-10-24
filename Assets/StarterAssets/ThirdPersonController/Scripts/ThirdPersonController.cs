@@ -217,7 +217,7 @@ namespace StarterAssets
 				if (_customMovement._verticalMovement)
 				{
 
-					_verticalVelocity = _mainCamera.transform.forward.y;
+					_verticalVelocity = _mainCamera.transform.forward.y * 3;
 
 					// rotate to face input direction relative to camera position
 					transform.rotation = Quaternion.Euler(_mainCamera.transform.eulerAngles.x, rotation, 0.0f);/////

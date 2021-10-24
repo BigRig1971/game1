@@ -18,6 +18,6 @@ public class ServerConnect : MonoBehaviourPunCallbacks
 	}
 	public override void OnJoinedLobby()
 	{
-		SceneManager.LoadScene("Lobby");
+		SceneManager.LoadScene("NewLobby");
 	}
 }

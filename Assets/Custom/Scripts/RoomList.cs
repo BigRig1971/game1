@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
-public class CreateAndJoinRooms : MonoBehaviourPunCallbacks
+using Photon.Realtime;
+
+public class RoomList : MonoBehaviourPunCallbacks
 {
 
 	public InputField createInput;
 	public InputField joinInput;
+	[SerializeField]
+	private GameObject roomListing;
+	[SerializeField]
+	private Transform content;
 
 	public void CreateRoom()
 	{
@@ -20,5 +26,9 @@ public class CreateAndJoinRooms : MonoBehaviourPunCallbacks
 	public override void OnJoinedRoom()
 	{
 		PhotonNetwork.LoadLevel("Main");
+	}
+	public override void OnRoomListUpdate(List<RoomInfo> roomList)
+	{
+		base.OnRoomListUpdate(roomList);
 	}
 }
