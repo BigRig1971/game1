@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 8900000, guid: 619e305f5165a9946b7f72464e44ca4a, type: 3}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2819.0327, g: 1982.0645, b: 1807.3672, a: 1}
+  m_IndirectSpecularColor: {r: 2819.0405, g: 1982.0645, b: 1807.3711, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -527,7 +527,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1777808070702989389, guid: ddf71bfb72c45407fb8cea42d3aaeac4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 98
+      value: 97
       objectReference: {fileID: 0}
     - target: {fileID: 1830608650182181319, guid: ddf71bfb72c45407fb8cea42d3aaeac4, type: 3}
       propertyPath: m_IsActive
@@ -2868,6 +2868,18 @@ PrefabInstance:
     - target: {fileID: 101479131, guid: e3f8b4baf14cdf44a93eb63c5bc201ff, type: 3}
       propertyPath: stiffnessForce
       value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 118766719, guid: e3f8b4baf14cdf44a93eb63c5bc201ff, type: 3}
+      propertyPath: headWeight
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 118766719, guid: e3f8b4baf14cdf44a93eb63c5bc201ff, type: 3}
+      propertyPath: limitHeadAngle
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 118766720, guid: e3f8b4baf14cdf44a93eb63c5bc201ff, type: 3}
+      propertyPath: stareBackFactor
+      value: 0.75
       objectReference: {fileID: 0}
     - target: {fileID: 190217915, guid: e3f8b4baf14cdf44a93eb63c5bc201ff, type: 3}
       propertyPath: stiffnessForce
