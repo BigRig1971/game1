@@ -94,7 +94,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6463954851646446056}
   - component: {fileID: 6463954851646446236}
-  - component: {fileID: 1841981774}
   - component: {fileID: 4933520304887963551}
   m_Layer: 0
   m_Name: Vcam
@@ -163,27 +162,6 @@ MonoBehaviour:
         m_Calls: []
   m_LegacyBlendHint: 0
   m_ComponentOwner: {fileID: 6463954851646446063}
---- !u!114 &1841981774
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6463954851646447505}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71bb46eb2ca9de64cbfc92f6b61f6e2c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  input:
-    m_Name: Input
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 9c626f67-867b-4bd0-8419-0368f3ef355f
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-  cinInput: {fileID: 0}
 --- !u!114 &4933520304887963551
 MonoBehaviour:
   m_ObjectHideFlags: 0

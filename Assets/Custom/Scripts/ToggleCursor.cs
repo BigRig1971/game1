@@ -4,43 +4,37 @@ using UnityEngine;
 using Cinemachine;
 using UnityEngine.InputSystem;
 using Cameras;
-public class ToggleCursor : MonoBehaviour
+using StarterAssets;
+
+namespace StarterAssets
 {
-    bool state = false;
-   
-    public InputAction input;
-    public CustomCinemachineInputProvider cinInput;
-
-    private void Start()
-	{
-       
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.lockState = CursorLockMode.Confined;
-        Cursor.visible = false;
-        
-    }
-	void Update()
+    public class ToggleCursor : MonoBehaviour
     {
-        
-        if (Input.GetKeyDown(KeyCode.LeftControl))
+        bool state = false;
+		private ThirdPersonController _tpc;
+		private void Start()
 		{
-            state = !state;
-            if (!state)
-			{
-                Cursor.lockState = CursorLockMode.None;            
-                Cursor.visible = false;
-                
-                      
-            }
-			else
-			{
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.lockState = CursorLockMode.Confined;
-                Cursor.visible = true;
-                
-            }
+			_tpc = GetComponent<ThirdPersonController>();
 		}
-            
-    }
-
+		private void Update()
+		{
+			if (_tpc._input.cursor)
+			{
+				_tpc._input.cursor = false;
+				state = !state;
+				if (state)
+				{					
+					Cursor.visible = true;
+					Cursor.lockState = CursorLockMode.None;
+					_tpc._input.cursorInputForLook = false;
+				}
+				else
+				{
+					Cursor.visible = false;
+					Cursor.lockState = CursorLockMode.Locked;
+					_tpc._input.cursorInputForLook = true;				
+				}
+			}
+		}
+	}
 }

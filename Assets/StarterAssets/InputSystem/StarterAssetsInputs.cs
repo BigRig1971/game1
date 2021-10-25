@@ -15,7 +15,6 @@ namespace StarterAssets
 		public bool roll;
 		public bool swim;
 		public bool sprint;
-		public bool state = false;
 		[Header("Movement Settings")]
 		public bool analogMovement;
 	
@@ -26,6 +25,7 @@ namespace StarterAssets
 		[Header("Mouse Cursor Settings")]
 		public bool cursorLocked = true;
 		public bool cursorInputForLook = true;
+		public bool cursor;
 
 #endif
 
@@ -58,24 +58,11 @@ namespace StarterAssets
 		{
 			SprintInput(value.isPressed);
 		}
-		public void OnCursor()
+		public void OnCursor(InputValue value)
 		{
-			/*state = !state;
-			if (!state)
-			{
-				Cursor.lockState = CursorLockMode.Locked;
-				Cursor.visible = false;
-				cursorInputForLook = true;				
-			}
-			else
-			{
-				//Cursor.lockState = CursorLockMode.Locked;
-				Cursor.lockState = CursorLockMode.None;
-				Cursor.visible = true;
-				cursorInputForLook = false;
-				
-			}*/
+			CursorInput(value.isPressed);
 		}
+
 #else
 	// old input sys if we do decide to have it (most likely wont)...
 #endif
@@ -104,6 +91,11 @@ namespace StarterAssets
 		{
 			sprint = newSprintState;
 		}
+		public void CursorInput(bool newCursorState)
+		{
+			cursor = newCursorState;
+		}
+		
 
 #if !UNITY_IOS || !UNITY_ANDROID
 

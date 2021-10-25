@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine;
+using Cinemachine;
 
 
 namespace StarterAssets
@@ -35,6 +36,7 @@ namespace StarterAssets
 			_controller = GetComponent<CharacterController>();
 			_animIDRoll = Animator.StringToHash("Roll");
 			_swim = Animator.StringToHash("Swim");
+			
 			//  _animator.runtimeAnimatorController = OnLand;
 			_mainCamera = Camera.main;
 
@@ -45,6 +47,7 @@ namespace StarterAssets
 		void Update()
 		{
 			Movement();
+			
 		}
 		private void FixedUpdate()
 		{
@@ -53,22 +56,16 @@ namespace StarterAssets
 		private IEnumerator Delay()
 		{
 			yield return new WaitForSeconds(.3f);
-
-
-
 		}
-
 		private void Movement()
 		{
 			if (_tpc._input.roll)
 			{
 				_tpc._animator.SetBool(_animIDRoll, true);
-				//_tpc._animator.SetBool(_animIDRoll, false);
-				//StartCoroutine(OnRoll());
+				
 				_tpc._input.roll = false;
-
 			}
-
+			
 		}
 		public void ButtAboveWater()
 		{
@@ -84,7 +81,6 @@ namespace StarterAssets
 				TreadingWater();
 			}
 		}
-
 		public void HeadAboveWater()
 		{
 			headAboveWater = true;
@@ -93,16 +89,12 @@ namespace StarterAssets
 			{
 				TreadingWater();
 			}
-
 		}
 		public void HeadBelowWater()
 		{
 			headAboveWater = false;
 			Swimming();
-
-
 		}
-
 		void TreadingWater()
 		{
 			_tpc.GroundedOffset = -1;
@@ -110,7 +102,6 @@ namespace StarterAssets
 			_tpc._animator.SetBool(_swim, true);
 			_tpc._verticalVelocity = 0f;
 			_tpc.Gravity = -10;
-
 		}
 		void Swimming()
 		{
@@ -119,8 +110,6 @@ namespace StarterAssets
 			_tpc._animator.SetBool(_swim, true);
 			_tpc.Gravity = 1;
 			_tpc._verticalVelocity = 0f;
-
-
 		}
 		void Walking()
 		{
@@ -128,22 +117,8 @@ namespace StarterAssets
 			_verticalMovement = false;
 			_tpc._animator.SetBool(_swim, false);
 			_tpc.Gravity = -15f;
-
-			// _animator.runtimeAnimatorController = OnLand;
-
-
-
 		}
-		/*private IEnumerator OnRoll()
-		{
-			//_tpc._input.roll = false;
-			_tpc._animator.applyRootMotion = true;
-			_tpc._animator.SetBool(_animIDRoll, true);
-			yield return new WaitForSeconds(.7f);
-			_tpc._animator.SetBool(_animIDRoll, false);
-			_tpc._animator.applyRootMotion = false;
-
-		}*/
+	
 		public void FootStepOnGround()
 		{
 			inWater = false;
@@ -171,8 +146,7 @@ namespace StarterAssets
 		{
 			_tpc._animator.applyRootMotion = false;
 		}
-
-	}
 		
 
+	}
 }
