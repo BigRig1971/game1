@@ -62,8 +62,10 @@ namespace StarterAssets
 		{
 			if (_tpc._input.roll)
 			{
-
-				StartCoroutine(OnRoll());
+				_tpc._animator.SetBool(_animIDRoll, true);
+				//_tpc._animator.SetBool(_animIDRoll, false);
+				//StartCoroutine(OnRoll());
+				_tpc._input.roll = false;
 
 			}
 
@@ -132,7 +134,7 @@ namespace StarterAssets
 
 
 		}
-		private IEnumerator OnRoll()
+		/*private IEnumerator OnRoll()
 		{
 			//_tpc._input.roll = false;
 			_tpc._animator.applyRootMotion = true;
@@ -141,7 +143,7 @@ namespace StarterAssets
 			_tpc._animator.SetBool(_animIDRoll, false);
 			_tpc._animator.applyRootMotion = false;
 
-		}
+		}*/
 		public void FootStepOnGround()
 		{
 			inWater = false;
@@ -160,9 +162,17 @@ namespace StarterAssets
 			{
 				footStep?.Play();
 			}
-
+		}
+		public void OnApplyRootMotion()
+		{
+			_tpc._animator.applyRootMotion = true;
+		}
+		public void OnDisableRootMotion()
+		{
+			_tpc._animator.applyRootMotion = false;
 		}
 
 	}
+		
 
 }
