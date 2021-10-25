@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b2425a2284af743826c689403a4924, type: 3}
+  m_Name: Mud Mesh
+  m_EditorClassIdentifier: 
+  m_functionInfo: "// Made with Amplify Shader Editor\n// Available at the Unity
+    Asset Store - http://u3d.as/y3X \n/*ASEBEGIN\nVersion=18909\n-1640;186;1302;677;876.6563;642.1641;1.847512;True;False\nNode;AmplifyShaderEditor.VertexIdVariableNode;1;-160,0;Inherit;False;0;1;INT;0\nNode;AmplifyShaderEditor.RangedFloatNode;34;0,768;Inherit;False;Property;_Smoothness;Smoothness;3;1;[HideInInspector];Fetch;True;0;0;0;False;0;False;1;0;0;1;0;1;FLOAT;0\nNode;AmplifyShaderEditor.RangedFloatNode;49;0,-288;Inherit;False;Property;_IsMeshRenderMaterial;Is
+    Mesh Render Material;4;1;[HideInInspector];Create;True;0;0;0;False;0;False;1;1;0;0;0;1;FLOAT;0\nNode;AmplifyShaderEditor.ComponentMaskNode;14;768,64;Inherit;False;False;False;False;True;1;0;COLOR;0,0,0,0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;29;608,800;Inherit;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.ComponentMaskNode;42;384,352;Inherit;False;True;True;True;False;1;0;COLOR;0,0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.VertexToFragmentNode;7;384,864;Inherit;False;False;False;1;0;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.RangedFloatNode;37;0,640;Inherit;False;Property;_Metallic;Metallic;2;1;[HideInInspector];Fetch;True;0;0;0;False;0;False;0;0;0;1;0;1;FLOAT;0\nNode;AmplifyShaderEditor.ComponentMaskNode;39;384,160;Inherit;False;True;True;True;False;1;0;FLOAT4;0,0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;25;608,0;Inherit;False;3;3;0;FLOAT;0;False;1;COLOR;0,0,0,0;False;2;FLOAT4;0,0,0,0;False;1;COLOR;0\nNode;AmplifyShaderEditor.ColorNode;36;0,-192;Inherit;False;Property;_Color;Color;0;1;[HideInInspector];Fetch;True;0;0;0;False;0;False;1,1,1,1;0,0,0,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;28;608,576;Inherit;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.VertexToFragmentNode;8;384,640;Inherit;False;False;False;1;0;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionNode;50;608,-512;Inherit;False;World
+    To Screen;-1;;1;50b3ac8846f702445a58bf980e772412;0;1;8;FLOAT3;0,0,0;False;1;FLOAT2;0\nNode;AmplifyShaderEditor.VertexToFragmentNode;16;384,-512;Inherit;False;False;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.ComponentMaskNode;40;384,256;Inherit;False;False;False;False;True;1;0;FLOAT4;0,0,0,0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.CustomExpressionNode;4;0,0;Inherit;False;float4
+    positionWs@$float2 metallicSmoothness@$mudbun_mesh_vert(VertexID, positionWs,
+    PositionLs, NormalWs, NormalLs, TangentWs, TangentLs, Color, EmissionHash, metallicSmoothness,
+    TextureWeight, SdfValue, Outward2dNormalLs, Outward2dNormalWs)@$PositionWs =
+    positionWs.xyz@$Metallic = metallicSmoothness.x@$Smoothness = metallicSmoothness.y@$$#ifdef
+    MUDBUN_BUILT_IN_RP$#ifndef MUDBUN_VERTEX_SHADER$v.tangent = float4(TangentWs,
+    0.0f)@$#define MUDBUN_VERTEX_SHADER$#endif$#endif;7;Create;15;True;VertexID;INT;0;In;;Inherit;False;True;PositionWs;FLOAT3;0,0,0;Out;;Inherit;False;True;PositionLs;FLOAT3;0,0,0;Out;;Inherit;False;True;NormalWs;FLOAT3;0,0,0;Out;;Inherit;False;True;NormalLs;FLOAT3;0,0,0;Out;;Inherit;False;True;TangentWs;FLOAT3;0,0,0;Out;;Inherit;False;True;TangentLs;FLOAT3;0,0,0;Out;;Inherit;False;True;Color;FLOAT4;0,0,0,0;Out;;Inherit;False;True;EmissionHash;FLOAT4;0,0,0,0;Out;;Inherit;False;True;Metallic;FLOAT;0;Out;;Inherit;False;True;Smoothness;FLOAT;0;Out;;Inherit;False;True;TextureWeight;FLOAT4;1,0,0,0;Out;;Inherit;False;True;SdfValue;FLOAT;0;Out;;Inherit;False;True;Outward2dNormalLs;FLOAT3;0,0,0;Out;;Inherit;False;True;Outward2dNormalWs;FLOAT3;0,0,0;Out;;Inherit;False;MudBun
+    Mesh Point;False;False;0;;False;16;0;FLOAT;0;False;1;INT;0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;5;FLOAT3;0,0,0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT4;0,0,0,0;False;9;FLOAT4;0,0,0,0;False;10;FLOAT;0;False;11;FLOAT;0;False;12;FLOAT4;1,0,0,0;False;13;FLOAT;0;False;14;FLOAT3;0,0,0;False;15;FLOAT3;0,0,0;False;15;FLOAT;0;FLOAT3;3;FLOAT3;4;FLOAT3;5;FLOAT3;6;FLOAT3;7;FLOAT3;8;FLOAT4;9;FLOAT4;10;FLOAT;11;FLOAT;12;FLOAT4;13;FLOAT;14;FLOAT3;15;FLOAT3;16\nNode;AmplifyShaderEditor.ColorNode;35;0,448;Inherit;False;Property;_Emission;Emission;1;1;[HideInInspector];Fetch;True;0;0;0;False;0;False;1,1,1,1;0,0,0,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4\nNode;AmplifyShaderEditor.VertexToFragmentNode;5;384,64;Inherit;False;False;False;1;0;FLOAT4;0,0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;27;832,272;Inherit;False;2;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.VertexToFragmentNode;6;576,160;Inherit;False;False;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;0;384,-320;Inherit;False;True;-1;Vertex
+    Position (World);6;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;41;1024,384;Inherit;False;False;-1;Brush
+    Hash;16;False;1;0;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionOutput;2;384,-224;Inherit;False;False;-1;Vertex
+    Normal (World);8;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;45;384,1057.258;Inherit;False;False;-1;SDF
+    Value;14;False;1;0;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionOutput;31;688,-224;Inherit;False;False;-1;Vertex
+    Normal (Local);9;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;10;1024,256;Inherit;False;False;-1;Emission;2;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;13;992,64;Inherit;False;False;-1;Alpha;1;False;1;0;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionOutput;11;768,576;Inherit;False;False;-1;Metallic;3;False;1;0;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionOutput;12;768,800;Inherit;False;False;-1;Smoothness;4;False;1;0;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionOutput;9;992,-32;Inherit;False;False;-1;Color;0;False;1;0;COLOR;0,0,0,0;False;1;COLOR;0\nNode;AmplifyShaderEditor.FunctionOutput;32;688,-320;Inherit;False;False;-1;Vertex
+    Position (Local);7;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;46;384,1153.258;Inherit;False;False;-1;Outward
+    2D Normal (Local);13;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;33;384,961.2586;Inherit;False;False;-1;Texture
+    Weight;5;False;1;0;FLOAT4;0,0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.FunctionOutput;53;384,-128;Inherit;False;False;-1;Vertex
+    Tangent (World);10;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;52;688,-128;Inherit;False;False;-1;Vertex
+    Tangent (Local);11;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;48;384,1249.258;Inherit;False;False;-1;Outward
+    2D Normal (World);12;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;15;896,-512;Inherit;False;False;-1;Screen
+    Pos;15;False;1;0;FLOAT2;0,0;False;1;FLOAT2;0\nWireConnection;14;0;25;0\nWireConnection;29;0;34;0\nWireConnection;29;1;7;0\nWireConnection;42;0;35;0\nWireConnection;7;0;4;12\nWireConnection;39;0;4;10\nWireConnection;25;0;49;0\nWireConnection;25;1;36;0\nWireConnection;25;2;5;0\nWireConnection;28;0;37;0\nWireConnection;28;1;8;0\nWireConnection;8;0;4;11\nWireConnection;50;8;16;0\nWireConnection;16;0;4;3\nWireConnection;40;0;4;10\nWireConnection;4;1;1;0\nWireConnection;5;0;4;9\nWireConnection;27;0;6;0\nWireConnection;27;1;42;0\nWireConnection;6;0;39;0\nWireConnection;0;0;4;3\nWireConnection;41;0;40;0\nWireConnection;2;0;4;5\nWireConnection;45;0;4;14\nWireConnection;31;0;4;6\nWireConnection;10;0;27;0\nWireConnection;13;0;14;0\nWireConnection;11;0;28;0\nWireConnection;12;0;29;0\nWireConnection;9;0;25;0\nWireConnection;32;0;4;4\nWireConnection;46;0;4;15\nWireConnection;33;0;4;13\nWireConnection;53;0;4;7\nWireConnection;52;0;4;8\nWireConnection;48;0;4;16\nWireConnection;15;0;50;0\nASEEND*/\n//CHKSM=E0A0D9C20A56F31B7F10FE11FC488C7FF44C753B"
+  m_functionName: 
+  m_description: 
+  m_additionalIncludes:
+    m_additionalIncludes: []
+    m_outsideIncludes: []
+  m_additionalPragmas:
+    m_additionalPragmas: []
+    m_outsidePragmas: []
+  m_additionalDirectives:
+    m_validData: 0
+    m_isDirty: 1
+    m_moduleName: ' Additional Directives'
+    m_independentModule: 1
+    m_customEdited: 0
+    m_additionalDirectives:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    m_shaderFunctionDirectives: []
+    m_nativeDirectives: []
+    m_nativeDirectivesIndex: -1
+    m_nativeDirectivesFoldout: 0
+    m_directivesSaveItems:
+    - LineType: 1
+      LineValue: SHADER_GRAPH
+      GUIDToggle: 0
+      GUIDValue: 
+      Origin: 2
+    - LineType: 2
+      LineValue: multi_compile _ MUDBUN_PROCEDURAL
+      GUIDToggle: 0
+      GUIDValue: 
+      Origin: 2
+    - LineType: 0
+      LineValue: Assets/MudBun/Shader/Render/ShaderCommon.cginc
+      GUIDToggle: 0
+      GUIDValue: 
+      Origin: 2
+    - LineType: 0
+      LineValue: Assets/MudBun/Shader/Render/MeshCommon.cginc
+      GUIDToggle: 0
+      GUIDValue: 
+      Origin: 2
+  m_nodeCategory: 0
+  m_customNodeCategory: MudBun
+  m_previewPosition: 0
+  m_hidden: 0

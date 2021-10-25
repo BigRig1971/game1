@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b2425a2284af743826c689403a4924, type: 3}
+  m_Name: Mud Ray-Traced Voxels
+  m_EditorClassIdentifier: 
+  m_functionInfo: "// Made with Amplify Shader Editor\n// Available at the Unity
+    Asset Store - http://u3d.as/y3X \n/*ASEBEGIN\nVersion=18909\n-1610;238;1302;678;2457.681;681.6448;1.677222;True;False\nNode;AmplifyShaderEditor.ColorNode;101;-1280,192;Inherit;False;Property;_Emission;Emission;1;0;Fetch;True;0;0;0;False;0;False;0,0,0,0;0,0,0,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4\nNode;AmplifyShaderEditor.GetLocalVarNode;42;-1664,-640;Inherit;False;75;vertexPosLs;1;0;OBJECT;;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;79;-832,640;Inherit;False;2;2;0;FLOAT4x4;0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1;False;1;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;104;-864,-384;Inherit;False;2;2;0;FLOAT4;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.ComponentMaskNode;47;-1120,-640;Inherit;False;True;True;True;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.GetLocalVarNode;68;-1664,-192;Inherit;False;72;rayOriginLs;1;0;OBJECT;;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;105;-256,-192;Inherit;False;2;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.ComponentMaskNode;66;-256,-384;Inherit;False;True;True;True;False;1;0;FLOAT4;0,0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.VertexToFragmentNode;112;-1664,-288;Inherit;False;False;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.VertexIdVariableNode;65;-1664,-384;Inherit;False;0;1;INT;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;106;-256,-64;Inherit;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.ComponentMaskNode;119;-544,416;Inherit;False;True;True;True;False;1;0;FLOAT4;0,0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionNode;115;-320.0001,864;Inherit;False;World
+    To Screen;-1;;1;50b3ac8846f702445a58bf980e772412;0;1;8;FLOAT3;0,0,0;False;1;FLOAT2;0\nNode;AmplifyShaderEditor.DynamicAppendNode;118;-832,448;Inherit;False;FLOAT4;4;0;FLOAT3;0,0,0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT;1;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.ComponentMaskNode;67;-256,-288;Inherit;False;False;False;False;True;1;0;FLOAT4;0,0,0,0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.RangedFloatNode;102;-1280,480;Inherit;False;Property;_Smoothness;Smoothness;2;0;Fetch;True;0;0;0;False;0;False;0;0;0;0;0;1;FLOAT;0\nNode;AmplifyShaderEditor.SimpleSubtractOpNode;43;-1248,-640;Inherit;False;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.VertexToFragmentNode;121;-544,864;Inherit;False;False;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.VertexToFragmentNode;50;-1472,-640;Inherit;False;False;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.CustomExpressionNode;64;-1280,-384;Inherit;False;mudbun_ray_traced_voxels_frag(Id,
+    VertPosLs, RayOriginLs, RayDirLs, ViewDirLs, FragmentPosLs, FragmentNormLs, Depth,
+    Color, Emission, Metallic, Smoothness, TextureWeight)@$$#ifdef SHADERPASS_FORWARD$ShadowCoords
+    = TransformWorldToShadowCoord(mul(localToWorld, float4(FragmentPosLs, 1.0f)).xyz)@$#endif;7;Call;14;True;Id;INT;0;In;;Inherit;False;True;VertPosLs;FLOAT3;0,0,0;In;;Inherit;False;True;RayOriginLs;FLOAT3;0,0,0;In;;Inherit;False;True;RayDirLs;FLOAT3;0,0,0;In;;Inherit;False;True;ViewDirLs;FLOAT3;0,0,0;In;;Inherit;False;True;Color;FLOAT4;0,0,0,0;Out;;Inherit;False;True;Emission;FLOAT3;0,0,0;Out;;Inherit;False;True;Metallic;FLOAT;0;Out;;Inherit;False;True;Smoothness;FLOAT;0;Out;;Inherit;False;True;TextureWeight;FLOAT4;0,0,0,0;Out;;Inherit;False;True;FragmentPosLs;FLOAT3;0,0,0;Out;;Inherit;False;True;Depth;FLOAT;0;Out;;Inherit;False;True;FragmentNormLs;FLOAT3;0,0,0;Out;;Inherit;False;True;BrushHash;INT;0;Out;;Inherit;False;MudBun
+    Ray-Traced Voxels Fragment;False;False;0;;False;15;0;FLOAT;0;False;1;INT;0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT3;0,0,0;False;5;FLOAT3;0,0,0;False;6;FLOAT4;0,0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT4;0,0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT;0;False;13;FLOAT3;0,0,0;False;14;INT;0;False;10;FLOAT;0;FLOAT4;7;FLOAT3;8;FLOAT;9;FLOAT;10;FLOAT4;11;FLOAT3;12;FLOAT;13;FLOAT3;14;INT;15\nNode;AmplifyShaderEditor.ColorNode;100;-1280,0;Inherit;False;Property;_Color;Color;0;0;Fetch;True;0;0;0;False;0;False;0,0,0,0;0,0,0,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4\nNode;AmplifyShaderEditor.ComponentMaskNode;109;-1088,192;Inherit;False;True;True;True;False;1;0;COLOR;0,0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.NormalizeNode;46;-928,-640;Inherit;False;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;117;-672,416;Inherit;False;2;2;0;FLOAT4x4;0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1;False;1;FLOAT4;0,0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.GetLocalVarNode;120;-736,864;Inherit;False;40;vertexPosWs;1;0;OBJECT;;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;107;-256,64;Inherit;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.GetLocalVarNode;110;-1856,-288;Inherit;False;75;vertexPosLs;1;0;OBJECT;;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.CustomExpressionNode;116;-832,352;Inherit;False;return
+    localToWorld@;6;Create;0;Local To World;True;False;0;;False;0;1;FLOAT4x4;0\nNode;AmplifyShaderEditor.CameraToWorldMatrix;22;-1664,-896;Inherit;False;0;1;FLOAT4x4;0\nNode;AmplifyShaderEditor.GetLocalVarNode;141;-1664,0;Inherit;False;137;viewDirLs;1;0;OBJECT;;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.RegisterLocalVarNode;49;-768,-640;Inherit;False;rayDirLs;-1;True;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.CustomExpressionNode;2;-1504,-1408;Inherit;False;float3
+    vertexPosWs@$mudbun_ray_traced_voxels_vert(Id, VertexPosLs, vertexPosWs)@$return
+    vertexPosWs@;3;Create;2;True;Id;INT;0;In;;Inherit;False;True;VertexPosLs;FLOAT3;0,0,0;Out;;Inherit;False;MudBun
+    Ray-Traced Voxels Vertex;True;False;0;;False;2;0;INT;0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0;FLOAT3;2\nNode;AmplifyShaderEditor.RegisterLocalVarNode;75;-1152,-1312;Inherit;False;vertexPosLs;-1;True;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.GetLocalVarNode;45;-1664,-544;Inherit;False;72;rayOriginLs;1;0;OBJECT;;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.ComponentMaskNode;33;-896,-896;Inherit;False;True;True;True;False;1;0;FLOAT4;0,0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.ComponentMaskNode;73;-896,-768;Inherit;False;True;True;True;False;1;0;FLOAT4;0,0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;70;-1024,-768;Inherit;False;2;2;0;FLOAT4x4;0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1;False;1;FLOAT4;0,0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.CustomExpressionNode;78;-1024,640;Inherit;False;return
+    localToWorldIt@;6;Create;0;Local To World IT;True;False;0;;False;0;1;FLOAT4x4;0\nNode;AmplifyShaderEditor.CustomExpressionNode;69;-1280,-768;Inherit;False;return
+    worldToLocal@;6;Create;0;World To Local Matrix;True;False;0;;False;0;1;FLOAT4x4;0\nNode;AmplifyShaderEditor.VertexIdVariableNode;8;-1664,-1408;Inherit;False;0;1;INT;0\nNode;AmplifyShaderEditor.RegisterLocalVarNode;72;-704,-768;Inherit;False;rayOriginLs;-1;True;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.RegisterLocalVarNode;44;-704,-896;Inherit;False;rayOriginWs;-1;True;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.VectorFromMatrixNode;92;-1472,-896;Inherit;False;Column;3;1;0;FLOAT4x4;1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1;False;5;FLOAT4;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4\nNode;AmplifyShaderEditor.RegisterLocalVarNode;40;-1152,-1408;Inherit;False;vertexPosWs;-1;True;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.RangedFloatNode;103;-1280,384;Inherit;False;Property;_Metallic;Metallic;2;0;Fetch;True;0;0;0;False;0;False;0;0;0;0;0;1;FLOAT;0\nNode;AmplifyShaderEditor.VectorFromMatrixNode;140;-1472,-1152;Inherit;False;Column;2;1;0;FLOAT4x4;1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1;False;5;FLOAT4;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4\nNode;AmplifyShaderEditor.GetLocalVarNode;74;-1664,-96;Inherit;False;49;rayDirLs;1;0;OBJECT;;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.RegisterLocalVarNode;134;-704,-1152;Inherit;False;viewDirWs;-1;True;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.RegisterLocalVarNode;137;-704,-1024;Inherit;False;viewDirLs;-1;True;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.CameraToWorldMatrix;139;-1664,-1152;Inherit;False;0;1;FLOAT4x4;0\nNode;AmplifyShaderEditor.CustomExpressionNode;138;-1280,-1024;Inherit;False;return
+    worldToLocal@;6;Create;0;World To Local Matrix;True;False;0;;False;0;1;FLOAT4x4;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;136;-1024,-1024;Inherit;False;2;2;0;FLOAT4x4;0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1;False;1;FLOAT4;0,0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.ComponentMaskNode;135;-896,-1024;Inherit;False;True;True;True;False;1;0;FLOAT4;0,0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.ComponentMaskNode;133;-896,-1152;Inherit;False;True;True;True;False;1;0;FLOAT4;0,0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;99;128,384;Inherit;False;False;-1;Fragment
+    Depth;12;False;1;0;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionOutput;114;128,960;Inherit;False;False;-1;Brush
+    Hash;14;False;1;0;INT;0;False;1;INT;0\nNode;AmplifyShaderEditor.FunctionOutput;54;128,-192;Inherit;False;False;-1;Emission;2;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;58;128,-288;Inherit;False;False;-1;Alpha;1;False;1;0;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionOutput;52;128,-384;Inherit;False;False;-1;Color;0;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;60;128,-96;Inherit;False;False;-1;Metallic;3;False;1;0;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionOutput;76;128,480;Inherit;False;False;-1;Fragment
+    Position (World);8;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;9;-896,-1312;Inherit;False;False;-1;Vertex
+    Position (Local);7;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;77;128,576;Inherit;False;False;-1;Fragment
+    Position (Local);9;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;61;128,0;Inherit;False;False;-1;Smoothness;4;False;1;0;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.FunctionOutput;56;128,768;Inherit;False;False;-1;Fragment
+    Normal (Local);11;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;0;-896,-1408;Inherit;False;True;-1;Vertex
+    Position (World);6;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionOutput;113;128,864;Inherit;False;False;-1;Screen
+    Pos;13;False;1;0;FLOAT2;0,0;False;1;FLOAT2;0\nNode;AmplifyShaderEditor.FunctionOutput;62;128,96;Inherit;False;False;-1;Texture
+    Weight;5;False;1;0;FLOAT4;0,0,0,0;False;1;FLOAT4;0\nNode;AmplifyShaderEditor.FunctionOutput;55;128,672;Inherit;False;False;-1;Fragment
+    Normal (World);10;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nWireConnection;79;0;78;0\nWireConnection;79;1;64;14\nWireConnection;104;0;64;7\nWireConnection;104;1;100;0\nWireConnection;47;0;43;0\nWireConnection;105;0;64;8\nWireConnection;105;1;109;0\nWireConnection;66;0;104;0\nWireConnection;112;0;110;0\nWireConnection;106;0;64;9\nWireConnection;106;1;103;0\nWireConnection;119;0;117;0\nWireConnection;115;8;121;0\nWireConnection;118;0;64;12\nWireConnection;67;0;104;0\nWireConnection;43;0;50;0\nWireConnection;43;1;45;0\nWireConnection;121;0;120;0\nWireConnection;50;0;42;0\nWireConnection;64;1;65;0\nWireConnection;64;2;112;0\nWireConnection;64;3;68;0\nWireConnection;64;4;74;0\nWireConnection;64;5;141;0\nWireConnection;109;0;101;0\nWireConnection;46;0;47;0\nWireConnection;117;0;116;0\nWireConnection;117;1;118;0\nWireConnection;107;0;64;10\nWireConnection;107;1;102;0\nWireConnection;49;0;46;0\nWireConnection;2;0;8;0\nWireConnection;75;0;2;2\nWireConnection;33;0;92;0\nWireConnection;73;0;70;0\nWireConnection;70;0;69;0\nWireConnection;70;1;92;0\nWireConnection;72;0;73;0\nWireConnection;44;0;33;0\nWireConnection;92;0;22;0\nWireConnection;40;0;2;0\nWireConnection;140;0;139;0\nWireConnection;134;0;133;0\nWireConnection;137;0;135;0\nWireConnection;136;0;138;0\nWireConnection;136;1;140;0\nWireConnection;135;0;136;0\nWireConnection;133;0;140;0\nWireConnection;99;0;64;13\nWireConnection;114;0;64;15\nWireConnection;54;0;105;0\nWireConnection;58;0;67;0\nWireConnection;52;0;66;0\nWireConnection;60;0;106;0\nWireConnection;76;0;119;0\nWireConnection;9;0;75;0\nWireConnection;77;0;64;12\nWireConnection;61;0;107;0\nWireConnection;56;0;64;14\nWireConnection;0;0;40;0\nWireConnection;113;0;115;0\nWireConnection;62;0;64;11\nWireConnection;55;0;79;0\nASEEND*/\n//CHKSM=0798B1863934CA53E7DCB689F96D7CE96F9C40CE"
+  m_functionName: 
+  m_description: 
+  m_additionalIncludes:
+    m_additionalIncludes: []
+    m_outsideIncludes: []
+  m_additionalPragmas:
+    m_additionalPragmas: []
+    m_outsidePragmas: []
+  m_additionalDirectives:
+    m_validData: 0
+    m_isDirty: 1
+    m_moduleName: ' Additional Directives'
+    m_independentModule: 1
+    m_customEdited: 0
+    m_additionalDirectives:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    m_shaderFunctionDirectives: []
+    m_nativeDirectives: []
+    m_nativeDirectivesIndex: -1
+    m_nativeDirectivesFoldout: 0
+    m_directivesSaveItems:
+    - LineType: 1
+      LineValue: SHADER_GRAPH
+      GUIDToggle: 0
+      GUIDValue: 
+      Origin: 2
+    - LineType: 2
+      LineValue: multi_compile _ MUDBUN_PROCEDURAL
+      GUIDToggle: 0
+      GUIDValue: 
+      Origin: 2
+    - LineType: 0
+      LineValue: Assets/MudBun/Shader/Render/ShaderCommon.cginc
+      GUIDToggle: 0
+      GUIDValue: 
+      Origin: 2
+    - LineType: 0
+      LineValue: Assets/MudBun/Shader/Render/RayTracedVoxelsCommon.cginc
+      GUIDToggle: 0
+      GUIDValue: 
+      Origin: 2
+  m_nodeCategory: 0
+  m_customNodeCategory: MudBun
+  m_previewPosition: 0
+  m_hidden: 0
