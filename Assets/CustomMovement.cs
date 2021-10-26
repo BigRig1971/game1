@@ -28,6 +28,9 @@ namespace StarterAssets
 		//audio stuff
 		public AudioSource footStep;
 		public AudioSource stepInWater;
+		public AudioSource roll;
+		public AudioSource jumpLand;
+		public AudioSource jumpStart;
 		private bool inWater = false;
 
 		void Start()
@@ -146,7 +149,17 @@ namespace StarterAssets
 		{
 			_tpc._animator.applyRootMotion = false;
 		}
-		
-
+		public void OnRollSound()
+		{
+			roll?.Play();
+		}
+		public void OnJumpLandSound()
+		{
+			jumpLand?.Play();
+		}
+		public void OnJumpStartSound()
+		{
+			jumpStart?.Play();
+		}
 	}
 }
