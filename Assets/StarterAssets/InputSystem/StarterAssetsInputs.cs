@@ -15,6 +15,7 @@ namespace StarterAssets
 		public bool roll;
 		public bool swim;
 		public bool sprint;
+		public bool interaction;
 		[Header("Movement Settings")]
 		public bool analogMovement;
 	
@@ -62,6 +63,10 @@ namespace StarterAssets
 		{
 			CursorInput(value.isPressed);
 		}
+		public void OnInteraction(InputValue value)
+		{
+			InteractionInput(value.isPressed);
+		}
 
 #else
 	// old input sys if we do decide to have it (most likely wont)...
@@ -85,6 +90,10 @@ namespace StarterAssets
 		public void RollInput(bool newRollState)
 		{
 			roll = newRollState;
+		}
+		public void InteractionInput(bool newRollState)
+		{
+			interaction = newRollState;
 		}
 
 		public void SprintInput(bool newSprintState)

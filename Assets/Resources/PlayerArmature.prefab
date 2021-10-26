@@ -585,7 +585,6 @@ GameObject:
   - component: {fileID: 157568604268880500}
   - component: {fileID: 157568604268880497}
   - component: {fileID: 157568604268880498}
-  - component: {fileID: 157568604268880502}
   - component: {fileID: 157568604268880619}
   - component: {fileID: 414345892652085163}
   - component: {fileID: 962455014}
@@ -593,6 +592,7 @@ GameObject:
   - component: {fileID: 118766720}
   - component: {fileID: 2196397090442552120}
   - component: {fileID: 118766722}
+  - component: {fileID: 157568604268880502}
   m_Layer: 8
   m_Name: PlayerArmature
   m_TagString: Player
@@ -728,6 +728,7 @@ MonoBehaviour:
   roll: 0
   swim: 0
   sprint: 0
+  interaction: 0
   analogMovement: 0
   cursorLocked: 1
   cursorInputForLook: 1
@@ -899,45 +900,6 @@ MonoBehaviour:
     InterpolateOption: 0
     InterpolateMoveTowardsSpeed: 1
     InterpolateLerpSpeed: 0
---- !u!114 &157568604268880502
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 157568604268881697}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowLayerWeightsInspector: 1
-  ShowParameterInspector: 1
-  m_SynchronizeParameters:
-  - Type: 1
-    SynchronizeType: 2
-    Name: Speed
-  - Type: 4
-    SynchronizeType: 2
-    Name: Jump
-  - Type: 4
-    SynchronizeType: 2
-    Name: Grounded
-  - Type: 4
-    SynchronizeType: 2
-    Name: FreeFall
-  - Type: 1
-    SynchronizeType: 2
-    Name: MotionSpeed
-  - Type: 4
-    SynchronizeType: 2
-    Name: Swim
-  - Type: 9
-    SynchronizeType: 2
-    Name: Roll
-  m_SynchronizeLayers:
-  - SynchronizeType: 2
-    LayerIndex: 0
 --- !u!114 &157568604268880619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1035,6 +997,9 @@ MonoBehaviour:
   _verticalMovement: 0
   footStep: {fileID: 2141887402}
   stepInWater: {fileID: 1286398602}
+  roll: {fileID: 0}
+  jumpLand: {fileID: 0}
+  jumpStart: {fileID: 0}
 --- !u!114 &118766719
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1386,6 +1351,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71bb46eb2ca9de64cbfc92f6b61f6e2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &157568604268880502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 157568604268881697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters:
+  - Type: 1
+    SynchronizeType: 2
+    Name: Speed
+  - Type: 4
+    SynchronizeType: 2
+    Name: Jump
+  - Type: 4
+    SynchronizeType: 2
+    Name: Grounded
+  - Type: 4
+    SynchronizeType: 2
+    Name: FreeFall
+  - Type: 1
+    SynchronizeType: 2
+    Name: MotionSpeed
+  - Type: 4
+    SynchronizeType: 2
+    Name: Swim
+  - Type: 9
+    SynchronizeType: 2
+    Name: Roll
+  m_SynchronizeLayers:
+  - SynchronizeType: 2
+    LayerIndex: 0
 --- !u!1 &157568604268881698
 GameObject:
   m_ObjectHideFlags: 0
