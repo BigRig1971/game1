@@ -152,9 +152,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 543592583}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 840c3fd4e991e8c428b01653056d7854, type: 3}
+  m_Script: {fileID: 11500000, guid: 4ce99f75bcf3c4b458bede4de74d1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  health: 10
+  armor: 5
 --- !u!65 &543592585
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -245,7 +247,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7353921289047286324, guid: e1e96faae7d8aa849b3abcd9a30ff243, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7353921289047286326, guid: e1e96faae7d8aa849b3abcd9a30ff243, type: 3}
       propertyPath: m_RootOrder
@@ -687,6 +689,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ce99f75bcf3c4b458bede4de74d1595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  health: 10
+  armor: 0.5
 --- !u!1001 &1576464499
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3128,7 +3132,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 157568604268881697, guid: e3f8b4baf14cdf44a93eb63c5bc201ff, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e3f8b4baf14cdf44a93eb63c5bc201ff, type: 3}

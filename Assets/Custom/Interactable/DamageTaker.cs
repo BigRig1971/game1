@@ -19,8 +19,6 @@ public class DamageTaker : MonoBehaviour, IGenericInteractable, IDamagable
 			Debug.Log("dead");
 			Destroy(gameObject);
 		}
-		//throw new System.NotImplementedException();
-
 	}
 
 	public void Interact()
