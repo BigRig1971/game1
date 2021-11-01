@@ -62,7 +62,7 @@ namespace StarterAssets
 		}
 		private void Movement()
 		{
-			if (_tpc._input.roll)
+			if ( _tpc._input.cursorInputForLook && _tpc._input.roll)
 			{
 				_tpc._animator.SetBool(_animIDRoll, true);
 				
