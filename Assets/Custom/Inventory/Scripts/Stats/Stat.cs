@@ -9,11 +9,16 @@ public class StatModifier
     [SerializeField]
     private float m_ModifierValue = 0.0f;
     [SerializeField]
-    private bool m_equipItem;
+    private bool m_equipItem = false;
+    [SerializeField]
+   // private ScriptableObject[] m_ingredients;
+   
 
     public Stat ImpactedStat => m_ImpactedStat;
     public float ModifierValue => m_ModifierValue;
     public bool equipItem => m_equipItem;
+    //public ScriptableObject[] ingredients => m_ingredients;
+
    
 }
 
@@ -25,6 +30,11 @@ public class Stat : ScriptableObject
 
     public float BaseValue => m_BaseValue;
 
-    [SerializeField]
+   /* [SerializeField]
     private bool equip;
+
+    public bool Equip => equip;
+
+    [SerializeField]
+    private ScriptableObject[] ingredient;*/
 }

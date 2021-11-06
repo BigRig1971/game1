@@ -13,6 +13,9 @@ public class InventorySlotUIController : MonoBehaviour
     private Sprite EmptySlotSprite;
     [SerializeField]
     private Color HighlightColor;
+    [SerializeField]
+    
+   
 
     private Image m_Image;
 
@@ -102,4 +105,5 @@ public class InventorySlotUIController : MonoBehaviour
         }
         
     }
+    
 }

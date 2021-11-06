@@ -1,14 +1,12 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
 public class EquippedItemsUISlot
 {
     public InventorySlotUIController SlotController;
-    public InventorySystem.InventoryItemType ItemType;
-    
-
-    
+    public InventorySystem.InventoryItemType ItemType;   
 }
 
 public class EquippedItemsUIController : MonoBehaviour
@@ -19,18 +17,23 @@ public class EquippedItemsUIController : MonoBehaviour
     private InventoryCursorController m_Cursor;
     [SerializeField]
     private EquippedItemsUISlot[] m_Slots;
-    
     [SerializeField]
+    private GameObject[] _equipableItems;
+    
+    [SerializeField] 
     private InventorySystem.Inventory m_DisplayedEquippedItemsInventory;
-    public InventorySystem.InventoryItem equipItem;
+    private InventorySystem.InventoryItem equipItem;
     private void Awake()
     {
         InventoryUIChannel.OnInventoryToggle += OnInventoryToggle;
         gameObject.SetActive(false);
         m_Cursor.CursorSlot.OnItemChange += OnCursorItemChange;
+        foreach (GameObject go in _equipableItems)
+        {
+            go.SetActive(false);
+        }
     }
-
-    private void OnDestroy()
+	private void OnDestroy()
     {
         InventoryUIChannel.OnInventoryToggle -= OnInventoryToggle;
         m_Cursor.CursorSlot.OnItemChange -= OnCursorItemChange;
@@ -67,7 +70,7 @@ public class EquippedItemsUIController : MonoBehaviour
               
         InventorySystem.InventoryItem cursorItem = m_Cursor.CursorSlot.Item;
        if(cursorItem != null) equipItem = cursorItem;
-        Debug.Log(equipItem);
+        //Debug.Log(equipItem);
         foreach (EquippedItemsUISlot equipmentSlot in m_Slots)
         {
             equipmentSlot.SlotController.IsHighlighted = cursorItem != null && equipmentSlot.SlotController.InventorySlot.CanSlotContainItem(cursorItem);
@@ -75,8 +78,12 @@ public class EquippedItemsUIController : MonoBehaviour
     }
     public void EquipItem(bool equip)
 	{
-        if (equipItem == null) return;
-        GameObject.Find(equipItem.name).GetComponent<SkinnedMeshRenderer>().enabled = equip;
-        Debug.Log(equip);
+            foreach(GameObject go in _equipableItems)
+		{
+            if(equipItem.name == go.name)
+			{
+                go.SetActive(equip);
+			}
+		}  
     }
 }

@@ -11,8 +11,9 @@ public class StatHolder : MonoBehaviour
     private Stat[] m_ContainedStats;
     private List<StatModifier> m_Modifiers = new List<StatModifier>();
     public UnityEvent<Stat, float> OnStatChange;
-    public UnityEvent<Stat, bool> OnEquip;
+   public UnityEvent<Stat, bool> OnEquip;
     public UnityEvent<Stat, bool> OnUnequip;
+   // public UnityEvent<Stat, ScriptableObject[]> OnIngredient;
     
 
     public void AddModifer(StatModifier statModifier)
@@ -22,6 +23,8 @@ public class StatHolder : MonoBehaviour
 
         OnStatChange?.Invoke(statModifier.ImpactedStat, ComputeStatValue(statModifier.ImpactedStat));
         OnEquip?.Invoke(statModifier.ImpactedStat, true);
+       // OnIngredient?.Invoke(statModifier.ImpactedStat, statModifier.ingredients);
+       
 
     }
 
@@ -31,7 +34,8 @@ public class StatHolder : MonoBehaviour
 
         OnStatChange?.Invoke(statModifier.ImpactedStat, ComputeStatValue(statModifier.ImpactedStat));
         OnUnequip?.Invoke(statModifier.ImpactedStat, false);
-        
+        //OnIngredient?.Invoke(statModifier.ImpactedStat, statModifier.ingredients);
+
     }
 
     private float ComputeStatValue(Stat stat)

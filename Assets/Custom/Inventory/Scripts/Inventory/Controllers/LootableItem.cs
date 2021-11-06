@@ -7,13 +7,17 @@ public class LootableItem : MonoBehaviour
 	[SerializeField]
 	private InventoryChannel m_InventoryChannel;
 	[SerializeField]
-	private InventorySystem.InventoryItem m_LootableItem;
+	private InventorySystem.InventoryItem[] m_LootableItems;
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (other == null) return;
 
-		m_InventoryChannel?.RaiseLootItem(m_LootableItem);
+		if (other == null) return;
+		foreach (InventorySystem.InventoryItem i in m_LootableItems)
+		{			
+			m_InventoryChannel?.RaiseLootItem(i);
+		}
+		
 
 		Destroy(gameObject);
 

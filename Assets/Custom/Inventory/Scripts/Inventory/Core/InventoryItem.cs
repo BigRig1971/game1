@@ -8,7 +8,8 @@ namespace InventorySystem
     {
         public string Name;
         public Sprite Sprite;
-        public InventoryItemType ItemType;	
+        public InventoryItemType ItemType;
+       
 	}
    
 }

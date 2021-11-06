@@ -6,6 +6,8 @@ public class InventoryStatApplier : MonoBehaviour
     private EquippedItemsHolder m_EquippedItems;
     private StatHolder m_StatHolder;
     private Dictionary<InventorySystem.InventorySlot, StatModifier> m_AppliedModifiers = new Dictionary<InventorySystem.InventorySlot, StatModifier>();
+    
+
 
     private void Start()
     {

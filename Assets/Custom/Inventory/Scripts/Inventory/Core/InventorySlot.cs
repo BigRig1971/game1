@@ -123,21 +123,6 @@ namespace InventorySystem
 		{
 			return CanSlotHoldItems(m_Quantity + quantity);
 		}
-		public void OnEquipItem(bool equip)
-		{
-
-
-			if (equip)
-			{
-				GameObject.Find(m_Item.Name).GetComponent<SkinnedMeshRenderer>().enabled = true;
-			}
-			
-
-
-			if (!equip)
-			{
-				GameObject.Find(m_Item.Name).GetComponent<SkinnedMeshRenderer>().enabled = false;
-			}
-		}
+		
 	}
 }
