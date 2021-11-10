@@ -9,29 +9,29 @@ Shader "Hidden/Crest/Underwater/Underwater Effect HDRP"
 		Cull Off ZWrite Off ZTest Always Blend Off
 
 		HLSLINCLUDE
-		#pragma multi_compile_instancing
+		#pragma target 4.5
+
+		// #pragma enable_d3d11_debug_symbols
 
 		// Use multi_compile because these keywords are copied over from the ocean material. With shader_feature,
 		// the keywords would be stripped from builds. Unused shader variants are stripped using a build processor.
 		#pragma multi_compile_local __ CREST_CAUSTICS_ON
 		#pragma multi_compile_local __ CREST_FLOW_ON
 		#pragma multi_compile_local __ CREST_FOAM_ON
-		#pragma multi_compile_local __ CREST_COMPILESHADERWITHDEBUGINFO_ON
 
 		#pragma multi_compile_local __ CREST_MENISCUS
 		#pragma multi_compile_local __ _FULL_SCREEN_EFFECT
 		#pragma multi_compile_local __ _DEBUG_VIEW_OCEAN_MASK
 
-#if _COMPILESHADERWITHDEBUGINFO_ON
-		#pragma enable_d3d11_debug_symbols
-#endif
+		// Low appears good enough as it has filtering which is necessary when close to a shadow.
+		#define SHADOW_LOW
 
-		#pragma target 4.5
+		// In shared SG code we target the forward pass to avoid shader compilation errors.
+		#define SHADERPASS SHADERPASS_FORWARD
 
 		#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
+		#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
 		#include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
-
-		float4 _CameraDepthTexture_TexelSize;
 
 		#include "../../OceanConstants.hlsl"
 		#include "../../OceanInputsDriven.hlsl"
@@ -93,6 +93,7 @@ Shader "Hidden/Crest/Underwater/Underwater Effect HDRP"
 
 			half3 volumeLight = 0.0;
 			float3 displacement = 0.0;
+			half seaLevelOffset = 0.0;
 			{
 				// Offset slice so that we dont get high freq detail. But never use last lod as this has crossfading.
 				int sliceIndex = clamp(_DataSliceOffset, 0, _SliceCount - 2);
@@ -102,7 +103,7 @@ Shader "Hidden/Crest/Underwater/Underwater Effect HDRP"
 				half depth = CREST_OCEAN_DEPTH_BASELINE;
 				half2 shadow = 0.0;
 				{
-					SampleSeaDepth(_LD_TexArray_SeaFloorDepth, uv_slice, 1.0, depth);
+					SampleSingleSeaDepth(_LD_TexArray_SeaFloorDepth, uv_slice, depth, seaLevelOffset);
 	// #if CREST_SHADOWS_ON
 					SampleShadow(_LD_TexArray_Shadow, uv_slice, 1.0, shadow);
 	// #endif
@@ -153,7 +154,7 @@ Shader "Hidden/Crest/Underwater/Underwater Effect HDRP"
 				(
 					sceneColour,
 					worldPos,
-					displacement.y + _OceanCenterPosWorld.y,
+					displacement.y + _OceanCenterPosWorld.y + seaLevelOffset,
 					_DepthFogDensity,
 					_PrimaryLightIntensity,
 					_PrimaryLightDirection,
@@ -195,7 +196,6 @@ Shader "Hidden/Crest/Underwater/Underwater Effect HDRP"
 			{
 				float4 positionCS : SV_POSITION;
 				float2 uv         : TEXCOORD0;
-				float3 viewWS     : TEXCOORD1;
 				UNITY_VERTEX_OUTPUT_STEREO
 			};
 
@@ -208,9 +208,6 @@ Shader "Hidden/Crest/Underwater/Underwater Effect HDRP"
 				output.positionCS = GetFullScreenTriangleVertexPosition(input.vertexID);
 				output.uv = GetFullScreenTriangleTexCoord(input.vertexID);
 
-				// Compute world space view vector.
-				output.viewWS = ComputeWorldSpaceView(output.uv);
-
 				return output;
 			}
 
@@ -218,9 +215,13 @@ Shader "Hidden/Crest/Underwater/Underwater Effect HDRP"
 			{
 				UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
+				float rawDepth = LoadCameraDepth(input.positionCS.xy);
+
+				PositionInputs posInput = GetPositionInput(input.positionCS.xy, _ScreenSize.zw, rawDepth, UNITY_MATRIX_I_VP, UNITY_MATRIX_V);
+				const half3 view = GetWorldSpaceNormalizeViewDir(posInput.positionWS);
+
 				uint2 uvScreenSpace = input.positionCS.xy;
 				half3 sceneColour = LOAD_TEXTURE2D_X(_CrestCameraColorTexture, uvScreenSpace).rgb;
-				float rawDepth = LOAD_TEXTURE2D_X(_CameraDepthTexture, uvScreenSpace).x;
 				float mask = LOAD_TEXTURE2D_X(_CrestOceanMaskTexture, uvScreenSpace).x;
 				const float rawOceanDepth = LOAD_TEXTURE2D_X(_CrestOceanMaskDepthTexture, uvScreenSpace).x;
 
@@ -255,7 +256,6 @@ Shader "Hidden/Crest/Underwater/Underwater Effect HDRP"
 
 				if (isUnderwater)
 				{
-					const half3 view = normalize(input.viewWS);
 					sceneColour = ApplyUnderwaterEffect(sceneColour, rawDepth, sceneZ, view, input.uv, isOceanSurface);
 				}
 

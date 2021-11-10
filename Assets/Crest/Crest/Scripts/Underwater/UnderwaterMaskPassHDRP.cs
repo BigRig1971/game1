@@ -49,6 +49,7 @@ namespace Crest
                 slices: TextureXR.slices,
                 dimension: TextureXR.dimension,
                 colorFormat: GraphicsFormat.R16_SFloat,
+                enableRandomWrite: true,
                 useDynamicScale: true,
                 name: "Crest Ocean Mask"
             );
@@ -64,6 +65,8 @@ namespace Crest
                 useDynamicScale: true,
                 name: "Crest Ocean Mask Depth"
             );
+
+            UnderwaterRenderer.Instance.SetUpFixMaskArtefactsShader();
         }
         protected override void Cleanup()
         {
@@ -129,6 +132,11 @@ namespace Crest
                 farPlaneMultiplier,
                 debugDisableOceanMask
             );
+
+            // RTHandles will shrink its write area without shrinking the texture. This is the current write area size.
+            var size = _maskTexture.rtHandleProperties.currentRenderTargetSize;
+            var descriptor = new RenderTextureDescriptor(size.x, size.y);
+            UnderwaterRenderer.Instance.FixMaskArtefacts(commandBuffer, descriptor, _maskTexture);
         }
     }
 }

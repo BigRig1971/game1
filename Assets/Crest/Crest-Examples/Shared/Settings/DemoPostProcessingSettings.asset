@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 384c4d03a551c44448145f4093304119, type: 3}
   m_Name: ScreenSpaceReflection
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   m_AdvancedMode: 0
   quality:
     m_OverrideState: 0
@@ -84,6 +84,11 @@ MonoBehaviour:
     m_Value: 1
     min: 0.001
     max: 10
+  m_UpscaleRadius:
+    m_OverrideState: 0
+    m_Value: 2
+    min: 2
+    max: 6
   m_FullResolution:
     m_OverrideState: 0
     m_Value: 0
@@ -95,9 +100,6 @@ MonoBehaviour:
     m_Value: 8
     min: 1
     max: 32
-  m_AffectSmoothSurfaces:
-    m_OverrideState: 0
-    m_Value: 0
 --- !u!114 &-2109818796249167647
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -110,7 +112,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 598e2d32e2c7b0c418e030c3236d663a, type: 3}
   m_Name: ChromaticAberration
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   m_AdvancedMode: 0
   quality:
     m_OverrideState: 0
@@ -120,7 +122,7 @@ MonoBehaviour:
     m_Value: {fileID: 0}
   intensity:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 0.05
     min: 0
     max: 1
   m_MaxSamples:
@@ -162,7 +164,7 @@ MonoBehaviour:
   m_AdvancedMode: 0
   temperature:
     m_OverrideState: 1
-    m_Value: 11
+    m_Value: 20
     min: -100
     max: 100
   tint:
@@ -195,7 +197,7 @@ MonoBehaviour:
     m_Value: 1
   fixedExposure:
     m_OverrideState: 1
-    m_Value: 12.337543
+    m_Value: 8.5
   compensation:
     m_OverrideState: 0
     m_Value: 0

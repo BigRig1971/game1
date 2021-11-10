@@ -10,6 +10,7 @@
 
 void CrestNodeSampleOceanData_float
 (
+	in const bool i_isPrevious,
 	in const float2 i_positionXZWS,
 	in const float i_lodAlpha,
 	in const float3 i_oceanPosScale0,
@@ -22,7 +23,8 @@ void CrestNodeSampleOceanData_float
 	out half o_foam,
 	out half2 o_shadow,
 	out half2 o_flow,
-	out half o_sss // Unused
+	out half o_sss, // Unused
+	out float2 o_seaLevelDerivates
 )
 {
 	o_displacement = 0.0;
@@ -30,6 +32,7 @@ void CrestNodeSampleOceanData_float
 	o_shadow = 0.0;
 	o_flow = 0.0;
 	o_sss = 0.0;
+	o_seaLevelDerivates = 0.0;
 	o_oceanDepth = CREST_OCEAN_DEPTH_BASELINE;
 
 	// Calculate sample weights. params.z allows shape to be faded out (used on last lod to support pop-less scale transitions)
@@ -47,7 +50,16 @@ void CrestNodeSampleOceanData_float
 		const float3 uv_slice_smallerLod = WorldToUV(i_positionXZWS, cascadeData0, i_sliceIndex0);
 
 //#if !_DEBUGDISABLESHAPETEXTURES_ON
-		SampleDisplacements(_LD_TexArray_AnimatedWaves, uv_slice_smallerLod, wt_smallerLod, o_displacement);
+		// NOTE: Compiler error if ternary is used - 2021.10.27
+		if (i_isPrevious)
+		{
+			SampleDisplacements(_LD_TexArray_AnimatedWaves_Source, uv_slice_smallerLod, wt_smallerLod, o_displacement);
+		}
+		else
+		{
+			SampleDisplacements(_LD_TexArray_AnimatedWaves, uv_slice_smallerLod, wt_smallerLod, o_displacement);
+		}
+
 //#endif
 
 //#if _FOAM_ON
@@ -63,7 +75,16 @@ void CrestNodeSampleOceanData_float
 		const float3 uv_slice_biggerLod = WorldToUV(i_positionXZWS, cascadeData1, i_sliceIndex0 + 1.0);
 
 //#if !_DEBUGDISABLESHAPETEXTURES_ON
-		SampleDisplacements(_LD_TexArray_AnimatedWaves, uv_slice_biggerLod, wt_biggerLod, o_displacement);
+		// NOTE: Compiler error if ternary is used - 2021.10.27
+		if (i_isPrevious)
+		{
+			SampleDisplacements(_LD_TexArray_AnimatedWaves_Source, uv_slice_biggerLod, wt_biggerLod, o_displacement);
+		}
+		else
+		{
+			SampleDisplacements(_LD_TexArray_AnimatedWaves, uv_slice_biggerLod, wt_biggerLod, o_displacement);
+		}
+
 //#endif
 
 //#if _FOAM_ON
@@ -75,6 +96,8 @@ void CrestNodeSampleOceanData_float
 #endif
 	}
 
+	half seaLevelOffset = 0.0;
+
 	// Data that needs to be sampled at the displaced position
 	if (wt_smallerLod > 0.0001)
 	{
@@ -82,7 +105,7 @@ void CrestNodeSampleOceanData_float
 
 //#if _SUBSURFACESHALLOWCOLOUR_ON
 		// The minimum sampling weight is lower (0.0001) than others to fix shallow water colour popping.
-		SampleSeaDepth(_LD_TexArray_SeaFloorDepth, uv_slice_smallerLodDisp, wt_smallerLod, o_oceanDepth);
+		SampleSeaDepth(_LD_TexArray_SeaFloorDepth, uv_slice_smallerLodDisp, wt_smallerLod, o_oceanDepth, seaLevelOffset, cascadeData0, o_seaLevelDerivates);
 //#endif
 
 // #if CREST_SHADOWS_ON
@@ -98,7 +121,7 @@ void CrestNodeSampleOceanData_float
 
 //#if _SUBSURFACESHALLOWCOLOUR_ON
 		// The minimum sampling weight is lower (0.0001) than others to fix shallow water colour popping.
-		SampleSeaDepth(_LD_TexArray_SeaFloorDepth, uv_slice_biggerLodDisp, wt_biggerLod, o_oceanDepth);
+		SampleSeaDepth(_LD_TexArray_SeaFloorDepth, uv_slice_biggerLodDisp, wt_biggerLod, o_oceanDepth, seaLevelOffset, cascadeData1, o_seaLevelDerivates);
 //#endif
 
 // #if CREST_SHADOWS_ON
@@ -108,6 +131,8 @@ void CrestNodeSampleOceanData_float
 		}
 // #endif // CREST_SHADOWS_ON
 	}
+
+	o_displacement.y += seaLevelOffset;
 
 	// Foam can saturate
 	o_foam = saturate(o_foam);
@@ -162,6 +187,9 @@ void CrestNodeSampleOceanDataSingle_float
 		//#if _SUBSURFACESHALLOWCOLOUR_ON
 		SampleSeaDepth(_LD_TexArray_SeaFloorDepth, uv_slice, 1.0, o_oceanDepth);
 		//#endif
+
+		// Add sea floor offset to displacement.
+		o_displacement.y += _LD_TexArray_SeaFloorDepth.SampleLevel(LODData_linear_clamp_sampler, uv_slice, 0.0).y;
 
 // #if CREST_SHADOWS_ON
 		SampleShadow(_LD_TexArray_Shadow, uv_slice, 1.0, o_shadow);

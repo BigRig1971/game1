@@ -10,7 +10,7 @@ Material:
   m_Name: Ocean-Underwater
   m_Shader: {fileID: 4800000, guid: 197b8a87a0f26de4fafd1944ca43f6b2, type: 3}
   m_ShaderKeywords: CREST_CAUSTICS_ON CREST_FOAM_ON CREST_GENERATED_SHADER_ON _ALPHATEST_ON
-    _BLENDMODE_OFF _DOUBLESIDED_ON _ENABLE_FOG_ON_TRANSPARENT _REFRACTION_OFF _SURFACE_TYPE_TRANSPARENT
+    _DOUBLESIDED_ON _ENABLE_FOG_ON_TRANSPARENT _SURFACE_TYPE_TRANSPARENT _TRANSPARENT_WRITES_MOTION_VEC
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 1
@@ -54,7 +54,6 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    m_Ints: []
     m_Floats:
     - CREST_CAUSTICS: 1
     - CREST_FLOW: 0
@@ -104,7 +103,7 @@ Material:
     - _ReceivesSSR: 1
     - _ReceivesSSRTransparent: 1
     - _RefractionModel: 0
-    - _RefractionStrength: 1.27
+    - _RefractionStrength: 0.2
     - _RefractiveIndexOfWater: 1.33
     - _RenderQueueType: 4
     - _RequireSplitLighting: 0
@@ -132,7 +131,7 @@ Material:
     - _SupportDecals: 1
     - _SurfaceType: 1
     - _TransparentBackfaceEnable: 0
-    - _TransparentCullMode: 0
+    - _TransparentCullMode: 2
     - _TransparentDepthPostpassEnable: 0
     - _TransparentDepthPrepassEnable: 0
     - _TransparentSortPriority: 0
@@ -144,7 +143,7 @@ Material:
     - _ZTestTransparent: 4
     - _ZWrite: 1
     m_Colors:
-    - _DepthFogDensity: {r: 0.2, g: 0.06, b: 0.06, a: 0}
+    - _DepthFogDensity: {r: 0.5, g: 0.36, b: 0.36, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: 1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _FoamBubbleColor: {r: 0, g: 1, b: 0.8865156, a: 0}

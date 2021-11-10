@@ -25,6 +25,7 @@ void OceanNormals_half
 	in const half3 viewNorm,
 	in const bool i_isUnderwater,
 	in const half i_minReflectionDirectionY,
+	in const float2 i_seaLevelDerivatives,
 	out half3 o_normalTS,
 	out half o_sss,
 	out half o_foam
@@ -69,6 +70,8 @@ void OceanNormals_half
 	n_pixel.xz += SampleNormalMaps(i_positionXZWSUndisplaced, i_normals, i_normalsScale, i_normalsStrength, i_lodAlpha, cascadeData0, instanceData);
 #endif
 //#endif
+
+	n_pixel.xz += -i_seaLevelDerivatives;
 
 	// Finalise normal
 	n_pixel = normalize(n_pixel);

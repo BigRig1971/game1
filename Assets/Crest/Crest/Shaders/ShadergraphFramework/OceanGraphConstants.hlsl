@@ -13,4 +13,15 @@
 
 #define _SUBSURFACESCATTERING_ON 1
 
+#ifdef UNIVERSAL_PIPELINE_CORE_INCLUDED
+    #define CREST_URP 1
+#else
+    // HDRP does not appear to have a reliable keyword to target.
+    #define CREST_HDRP 1
+#endif
+
+#if defined(CREST_HDRP) && (SHADERPASS == SHADERPASS_FORWARD)
+#define CREST_HDRP_FORWARD_PASS 1
+#endif
+
 #endif // CREST_SHADERGRAPH_CONSTANTS_H

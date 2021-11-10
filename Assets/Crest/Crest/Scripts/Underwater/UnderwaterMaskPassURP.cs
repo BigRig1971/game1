@@ -12,12 +12,9 @@ namespace Crest
 
     internal class UnderwaterMaskPassURP : ScriptableRenderPass
     {
-        const string SHADER_OCEAN_MASK = "Hidden/Crest/Underwater/Ocean Mask URP";
+        const string k_ShaderPathOceanMask = "Hidden/Crest/Underwater/Ocean Mask URP";
 
         readonly PropertyWrapperMaterial _oceanMaskMaterial;
-
-        RenderTargetIdentifier _maskTarget = new RenderTargetIdentifier(UnderwaterRenderer.sp_CrestOceanMaskTexture, 0, CubemapFace.Unknown, -1);
-        RenderTargetIdentifier _depthTarget = new RenderTargetIdentifier(UnderwaterRenderer.sp_CrestOceanMaskDepthTexture, 0, CubemapFace.Unknown, -1);
 
         static UnderwaterMaskPassURP s_instance;
         UnderwaterRenderer _underwaterRenderer;
@@ -25,7 +22,7 @@ namespace Crest
         public UnderwaterMaskPassURP()
         {
             renderPassEvent = RenderPassEvent.BeforeRenderingOpaques;
-            _oceanMaskMaterial = new PropertyWrapperMaterial(SHADER_OCEAN_MASK);
+            _oceanMaskMaterial = new PropertyWrapperMaterial(k_ShaderPathOceanMask);
         }
 
         ~UnderwaterMaskPassURP()
@@ -39,6 +36,8 @@ namespace Crest
             {
                 s_instance = new UnderwaterMaskPassURP();
             }
+
+            UnderwaterRenderer.Instance.SetUpFixMaskArtefactsShader();
 
             s_instance._underwaterRenderer = underwaterRenderer;
 
@@ -78,37 +77,17 @@ namespace Crest
         }
 
         // Called before Configure.
-        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+        public override void OnCameraSetup(CommandBuffer buffer, ref RenderingData renderingData)
         {
             var descriptor = renderingData.cameraData.cameraTargetDescriptor;
-            // This will disable MSAA for our textures as MSAA will break sampling later on. This looks safe to do as
-            // Unity's CopyDepthPass does the same, but a possible better way or supporting MSAA is worth looking into.
-            descriptor.msaaSamples = 1;
-            descriptor.colorFormat = RenderTextureFormat.RHalf;
-            descriptor.depthBufferBits = 0;
-            // Use temporary render textures because setting these up ourselves for XR SPI proved to be too difficult.
-            cmd.GetTemporaryRT(UnderwaterRenderer.sp_CrestOceanMaskTexture, descriptor);
-            descriptor.colorFormat = RenderTextureFormat.Depth;
-            descriptor.depthBufferBits = 24;
-            cmd.GetTemporaryRT(UnderwaterRenderer.sp_CrestOceanMaskDepthTexture, descriptor);
+            UnderwaterRenderer.SetUpMaskTextures(buffer, descriptor);
         }
 
         // Called before Execute.
         public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
         {
-            ConfigureTarget(_maskTarget, _depthTarget);
+            ConfigureTarget(UnderwaterRenderer.Instance._maskTarget, UnderwaterRenderer.Instance._depthTarget);
             ConfigureClear(ClearFlag.All, Color.black);
-        }
-
-        public override void OnCameraCleanup(CommandBuffer cmd)
-        {
-            if (cmd == null)
-            {
-                throw new System.ArgumentNullException("cmd");
-            }
-
-            cmd.ReleaseTemporaryRT(UnderwaterRenderer.sp_CrestOceanMaskTexture);
-            cmd.ReleaseTemporaryRT(UnderwaterRenderer.sp_CrestOceanMaskDepthTexture);
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
@@ -120,8 +99,8 @@ namespace Crest
 
             CommandBuffer commandBuffer = CommandBufferPool.Get("Ocean Mask");
 
-            commandBuffer.SetGlobalTexture(UnderwaterRenderer.sp_CrestOceanMaskTexture, _maskTarget);
-            commandBuffer.SetGlobalTexture(UnderwaterRenderer.sp_CrestOceanMaskDepthTexture, _depthTarget);
+            commandBuffer.SetGlobalTexture(UnderwaterRenderer.sp_CrestOceanMaskTexture, UnderwaterRenderer.Instance._maskTarget);
+            commandBuffer.SetGlobalTexture(UnderwaterRenderer.sp_CrestOceanMaskDepthTexture, UnderwaterRenderer.Instance._depthTarget);
 
             UnderwaterRenderer.PopulateOceanMask(
                 commandBuffer,
@@ -131,6 +110,13 @@ namespace Crest
                 _oceanMaskMaterial.material,
                 _underwaterRenderer._farPlaneMultiplier,
                 _underwaterRenderer._debug._disableOceanMask
+            );
+
+            UnderwaterRenderer.Instance.FixMaskArtefacts
+            (
+                commandBuffer,
+                renderingData.cameraData.cameraTargetDescriptor,
+                UnderwaterRenderer.Instance._maskTarget
             );
 
             context.ExecuteCommandBuffer(commandBuffer);

@@ -46,6 +46,9 @@
             "m_Id": "f0b2df174bb33f859c16a9f69357d951"
         },
         {
+            "m_Id": "36c60a51479140a68c47a7204625f538"
+        },
+        {
             "m_Id": "38b5301f744de28f9357cb39f09a35f0"
         },
         {
@@ -498,6 +501,9 @@
         },
         {
             "m_Id": "cf71005397c3328ea6249ea841e495e1"
+        },
+        {
+            "m_Id": "1d003b8ee59d45d5b2fe37dc1b002023"
         }
     ],
     "m_GroupDatas": [
@@ -869,6 +875,20 @@
                     "m_Id": "cdfe0c6c8e3b8889b3950b5eb41d7f45"
                 },
                 "m_SlotId": 1127565577
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "1d003b8ee59d45d5b2fe37dc1b002023"
+                },
+                "m_SlotId": 0
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "983fae9e2eeace88b407bb1f47b6b3b2"
+                },
+                "m_SlotId": -1776021540
             }
         },
         {
@@ -3926,6 +3946,41 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
+    "m_ObjectId": "1d003b8ee59d45d5b2fe37dc1b002023",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "Property",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": -1207.9998779296875,
+            "y": -285.9999694824219,
+            "width": 187.49998474121095,
+            "height": 33.999996185302737
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "1ff8b7c5c6794a21b270b9db33b01bd9"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_Property": {
+        "m_Id": "36c60a51479140a68c47a7204625f538"
+    }
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "1d59076bcc68ac8c893640f13f9997a8",
     "m_Id": 0,
@@ -4058,6 +4113,27 @@
     "m_Labels": [
         "X"
     ]
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector2MaterialSlot",
+    "m_ObjectId": "1ff8b7c5c6794a21b270b9db33b01bd9",
+    "m_Id": 0,
+    "m_DisplayName": "Sea Level Derivatives",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Out",
+    "m_StageCapability": 3,
+    "m_Value": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "m_DefaultValue": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "m_Labels": []
 }
 
 {
@@ -5001,6 +5077,29 @@
     "m_Labels": [
         "X"
     ]
+}
+
+{
+    "m_SGVersion": 1,
+    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector2ShaderProperty",
+    "m_ObjectId": "36c60a51479140a68c47a7204625f538",
+    "m_Guid": {
+        "m_GuidSerialized": "1b522368-d08b-4db3-93c5-39fca58d9cc9"
+    },
+    "m_Name": "Sea Level Derivatives",
+    "m_DefaultReferenceName": "Vector2_36c60a51479140a68c47a7204625f538",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_Precision": 0,
+    "overrideHLSLDeclaration": false,
+    "hlslDeclarationOverride": 0,
+    "m_Hidden": false,
+    "m_Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+    }
 }
 
 {
@@ -9234,6 +9333,9 @@
             "m_Id": "8fbe2c0fddd4fb8e82f18022c4324455"
         },
         {
+            "m_Id": "ecc993e4e0654b3d9fdec082dcd28de0"
+        },
+        {
             "m_Id": "cf34bebc65c0e188b9ee32bb611a8d25"
         },
         {
@@ -9265,7 +9367,8 @@
         "3d0ec12e-66cc-41d2-86c0-64ff2ae2b077",
         "9b79e5eb-bd8d-4980-a7b1-e135e1064f34",
         "2d34323e-c798-4968-9f65-16a09ab1b96f",
-        "3f9ceb7c-41dc-4e82-ad28-8d2dcd6660db"
+        "3f9ceb7c-41dc-4e82-ad28-8d2dcd6660db",
+        "49d34511-9ff7-4a92-bdfd-4019d9b95c5f"
     ],
     "m_PropertyIds": [
         1146719713,
@@ -9281,7 +9384,8 @@
         1069711499,
         -940266401,
         -55805127,
-        -213867227
+        -213867227,
+        -1776021540
     ]
 }
 
@@ -13613,6 +13717,27 @@
     },
     "m_Modifiable": true,
     "m_DefaultType": 0
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector2MaterialSlot",
+    "m_ObjectId": "ecc993e4e0654b3d9fdec082dcd28de0",
+    "m_Id": -1776021540,
+    "m_DisplayName": "Sea Level Derivatives",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Vector2_e4d436e04aa24494a758eff4fee94f84",
+    "m_StageCapability": 2,
+    "m_Value": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "m_DefaultValue": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "m_Labels": []
 }
 
 {

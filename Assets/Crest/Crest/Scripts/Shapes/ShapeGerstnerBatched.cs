@@ -83,8 +83,9 @@ namespace Crest
             ShapeGerstnerBatched _gerstner;
             int _batchIndex = -1;
 
-            // The ocean input system uses this to decide which lod this batch belongs in
-            public float Wavelength => OceanRenderer.Instance._lodTransform.MaxWavelength(_batchIndex) / 2f;
+            // The ocean input system uses this to decide which LOD this batch belongs in. Multiply
+            // by 1.5 to boost sample count a bit for Gerstner which looks bad with 2 samples per wave.
+            public float Wavelength => 1.5f * OceanRenderer.Instance._lodTransform.MaxWavelength(_batchIndex) / 2f;
 
             public bool Enabled { get; set; }
 
@@ -925,6 +926,16 @@ namespace Crest
                 );
 
                 isValid = false;
+            }
+
+            if (showMessage == ValidatedHelper.HelpBox)
+            {
+                showMessage
+                (
+                    "The <i>ShapeGerstnerBatched</i> component is now obsolete.",
+                    "Prefer using <i>ShapeFFT</i> instead.",
+                    ValidatedHelper.MessageType.Warning, this
+                );
             }
 
             return isValid;

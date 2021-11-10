@@ -2,7 +2,11 @@
     "m_SGVersion": 2,
     "m_Type": "UnityEditor.ShaderGraph.GraphData",
     "m_ObjectId": "d10628fd999f4f56b4680aa7c5d8bd5b",
-    "m_Properties": [],
+    "m_Properties": [
+        {
+            "m_Id": "4ae130d466194f338c66790a9b6143bc"
+        }
+    ],
     "m_Keywords": [],
     "m_Nodes": [
         {
@@ -10,6 +14,9 @@
         },
         {
             "m_Id": "446588169ae524859bfeeea9ba6f4c94"
+        },
+        {
+            "m_Id": "37f6aab8d7234995aac41c3888f25c1b"
         }
     ],
     "m_GroupDatas": [],
@@ -19,6 +26,20 @@
         }
     ],
     "m_Edges": [
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "37f6aab8d7234995aac41c3888f25c1b"
+                },
+                "m_SlotId": 0
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "446588169ae524859bfeeea9ba6f4c94"
+                },
+                "m_SlotId": 15
+            }
+        },
         {
             "m_OutputSlot": {
                 "m_Node": {
@@ -304,6 +325,41 @@
 }
 
 {
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
+    "m_ObjectId": "37f6aab8d7234995aac41c3888f25c1b",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "Property",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": -370.0,
+            "y": -76.66668701171875,
+            "width": 136.66665649414063,
+            "height": 34.0
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "f019608bd64e44afb4fa8db2098b12b5"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_Property": {
+        "m_Id": "4ae130d466194f338c66790a9b6143bc"
+    }
+}
+
+{
     "m_SGVersion": 1,
     "m_Type": "UnityEditor.ShaderGraph.CustomFunctionNode",
     "m_ObjectId": "446588169ae524859bfeeea9ba6f4c94",
@@ -322,6 +378,9 @@
         }
     },
     "m_Slots": [
+        {
+            "m_Id": "4e0900b25da74260b5637c1e5aa8262b"
+        },
         {
             "m_Id": "7e3176d38d309089b56a506339209343"
         },
@@ -358,6 +417,38 @@
     "m_FunctionName": "CrestOceanSurfaceValues",
     "m_FunctionSource": "fac35d66111af5b4c8b2ee7b04a0450c",
     "m_FunctionBody": "Enter function body here..."
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Internal.BooleanShaderProperty",
+    "m_ObjectId": "4ae130d466194f338c66790a9b6143bc",
+    "m_Guid": {
+        "m_GuidSerialized": "bba026a3-f78d-4f8f-84bd-07593233cc3d"
+    },
+    "m_Name": "Is Previous",
+    "m_DefaultReferenceName": "Boolean_4ae130d466194f338c66790a9b6143bc",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_Precision": 0,
+    "overrideHLSLDeclaration": false,
+    "hlslDeclarationOverride": 0,
+    "m_Hidden": false,
+    "m_Value": false
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.BooleanMaterialSlot",
+    "m_ObjectId": "4e0900b25da74260b5637c1e5aa8262b",
+    "m_Id": 15,
+    "m_DisplayName": "Is_Previous",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Is_Previous",
+    "m_StageCapability": 3,
+    "m_Value": false,
+    "m_DefaultValue": false
 }
 
 {
@@ -614,6 +705,20 @@
         "w": 0.0
     },
     "m_Labels": []
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.BooleanMaterialSlot",
+    "m_ObjectId": "f019608bd64e44afb4fa8db2098b12b5",
+    "m_Id": 0,
+    "m_DisplayName": "Is Previous",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Out",
+    "m_StageCapability": 3,
+    "m_Value": false,
+    "m_DefaultValue": false
 }
 
 {

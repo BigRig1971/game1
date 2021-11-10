@@ -3,6 +3,7 @@
 // Copyright 2020 Wave Harmonic Ltd
 
 #include "OceanGraphConstants.hlsl"
+#include "../OceanGlobals.hlsl"
 #include "../OceanShaderHelpers.hlsl"
 
 // We take the unrefracted scene colour (i_sceneColourUnrefracted) as input because having a Scene Colour node in the graph
@@ -33,8 +34,19 @@ void CrestNodeSceneColour_half
 		// We're above the water, so behind interface is depth fog
 		refractOffset *= min(1.0, 0.5 * (i_sceneZ - i_pixelZ)) / i_sceneZ;
 	}
+
+#if CREST_HDRP
+	// HDRP gets artefacts (dark patches) at the edges. And to quote a report, "Mainly on DX12 on Xbox Series X", color
+	// artefacts appear underwater from refractions.
+	const float4 screenPosRefract = clamp(i_screenPos + float4(refractOffset, 0.0, 0.0), 0.01, 0.99);
+#else
 	const float4 screenPosRefract = i_screenPos + float4(refractOffset, 0.0, 0.0);
+#endif
 	const float sceneZRefractDevice = SHADERGRAPH_SAMPLE_SCENE_DEPTH(screenPosRefract.xy);
+
+	// Convert coordinates for Load.
+	const float2 positionSS = i_screenPos.xy * _ScreenSize.xy;
+	const float2 refractedPositionSS = screenPosRefract.xy * _ScreenSize.xy;
 
 	// Depth fog & caustics - only if view ray starts from above water
 	if (!i_underwater)
@@ -46,12 +58,19 @@ void CrestNodeSceneColour_half
 		{
 			// NOTE: For HDRP, refractions produce an outline which requires multisampling with a two pixel offset to
 			// cover. This is without MSAA. A deeper investigation is needed.
-			o_sceneDistance = CrestLinearEyeDepth(CrestMultiSampleSceneDepth(sceneZRefractDevice, screenPosRefract.xy, i_refractionStrength)) - i_pixelZ;
+			float msDepth = CrestMultiLoadDepth
+			(
+				_CameraDepthTexture,
+				refractedPositionSS,
+				i_refractionStrength > 0 ? 2 : _CrestDepthTextureOffset,
+				sceneZRefractDevice
+			);
+			o_sceneDistance = CrestLinearEyeDepth(msDepth) - i_pixelZ;
 
 			o_sceneColour = SHADERGRAPH_SAMPLE_SCENE_COLOR(screenPosRefract.xy);
 
 			// HDRP needs a different way to unproject to world space. I tried to put this code into URP but it didnt work on 2019.3.0f1
-			PositionInputs posInput = GetPositionInput(screenPosRefract.xy * _ScreenSize.xy, _ScreenSize.zw, sceneZRefractDevice, UNITY_MATRIX_I_VP, UNITY_MATRIX_V);
+			PositionInputs posInput = GetPositionInput(refractedPositionSS, _ScreenSize.zw, sceneZRefractDevice, UNITY_MATRIX_I_VP, UNITY_MATRIX_V);
 			o_scenePositionWS = posInput.positionWS;
 #if (SHADEROPTIONS_CAMERA_RELATIVE_RENDERING != 0)
 			o_scenePositionWS += _WorldSpaceCameraPos;
@@ -60,12 +79,12 @@ void CrestNodeSceneColour_half
 		else
 		{
 			// It seems that when MSAA is enabled this can sometimes be negative
-			o_sceneDistance = max(CrestLinearEyeDepth(CrestMultiSampleSceneDepth(i_deviceSceneZ, i_screenPos.xy)) - i_pixelZ, 0.0);
+			o_sceneDistance = max(CrestLinearEyeDepth(CREST_MULTILOAD_SCENE_DEPTH(positionSS, i_deviceSceneZ)) - i_pixelZ, 0.0);
 
 			o_sceneColour = i_sceneColourUnrefracted;
 
 			// HDRP needs a different way to unproject to world space. I tried to put this code into URP but it didnt work on 2019.3.0f1
-			PositionInputs posInput = GetPositionInput(i_screenPos.xy * _ScreenSize.xy, _ScreenSize.zw, i_deviceSceneZ, UNITY_MATRIX_I_VP, UNITY_MATRIX_V);
+			PositionInputs posInput = GetPositionInput(positionSS, _ScreenSize.zw, i_deviceSceneZ, UNITY_MATRIX_I_VP, UNITY_MATRIX_V);
 			o_scenePositionWS = posInput.positionWS;
 #if (SHADEROPTIONS_CAMERA_RELATIVE_RENDERING != 0)
 			o_scenePositionWS += _WorldSpaceCameraPos;
@@ -79,7 +98,7 @@ void CrestNodeSceneColour_half
 		o_sceneColour = SHADERGRAPH_SAMPLE_SCENE_COLOR(screenPosRefract.xy);
 
 		// HDRP needs a different way to unproject to world space. I tried to put this code into URP but it didnt work on 2019.3.0f1
-		PositionInputs posInput = GetPositionInput(screenPosRefract.xy * _ScreenSize.xy, _ScreenSize.zw, sceneZRefractDevice, UNITY_MATRIX_I_VP, UNITY_MATRIX_V);
+		PositionInputs posInput = GetPositionInput(refractedPositionSS, _ScreenSize.zw, sceneZRefractDevice, UNITY_MATRIX_I_VP, UNITY_MATRIX_V);
 		o_scenePositionWS = posInput.positionWS;
 #if (SHADEROPTIONS_CAMERA_RELATIVE_RENDERING != 0)
 		o_scenePositionWS += _WorldSpaceCameraPos;

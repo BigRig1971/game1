@@ -21,14 +21,15 @@ namespace Crest
 
     public class RenderPipelineHelper
     {
-        public static bool IsLegacy => GraphicsSettings.renderPipelineAsset == null;
+        // GraphicsSettings.currentRenderPipeline could be from the graphics setting or current quality level.
+        public static bool IsLegacy => GraphicsSettings.currentRenderPipeline == null;
 
         public static bool IsUniversal
         {
             get
             {
 #if CREST_URP
-                return GraphicsSettings.renderPipelineAsset is UniversalRenderPipelineAsset;
+                return GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset;
 #else
                 return false;
 #endif
@@ -40,7 +41,7 @@ namespace Crest
             get
             {
 #if CREST_HDRP
-                return GraphicsSettings.renderPipelineAsset is HDRenderPipelineAsset;
+                return GraphicsSettings.currentRenderPipeline is HDRenderPipelineAsset;
 #else
                 return false;
 #endif

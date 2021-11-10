@@ -5,6 +5,7 @@
 float4 _CameraDepthTexture_TexelSize;
 
 #include "OceanGraphConstants.hlsl"
+#include "../OceanGlobals.hlsl"
 #include "../OceanShaderHelpers.hlsl"
 
 void CrestNodeLinearEyeDepth_float
@@ -23,5 +24,5 @@ void CrestNodeMultiSampleDepth_float
 	out float o_rawDepth
 )
 {
-	o_rawDepth = CrestMultiSampleSceneDepth(i_rawDepth, i_positionNDC);
+	o_rawDepth = CREST_MULTISAMPLE_SCENE_DEPTH(i_positionNDC, i_rawDepth);
 }

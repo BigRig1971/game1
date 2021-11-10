@@ -40,6 +40,8 @@ void CrestNodeSampleClipSurfaceData_float
 		SampleClip(_LD_TexArray_ClipSurface, uv_slice_biggerLod, wt_biggerLod, o_clipSurface);
 	}
 
+	o_clipSurface = lerp(_CrestClipByDefault, o_clipSurface, wt_smallerLod + wt_biggerLod);
+
 	// 0.5 mip bias for LOD blending and texel resolution correction. This will help to tighten and smooth clipped edges.
 	// We set to 2 or 0 to work correctly with other alpha inputs like feathering.
 	o_clipSurface = o_clipSurface > 0.5 ? 2.0 : 0.0;

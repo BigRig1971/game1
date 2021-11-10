@@ -10,9 +10,9 @@ namespace Crest
 
     public partial class UnderwaterRenderer
     {
-        const string SHADER_UNDERWATER_EFFECT = "Hidden/Crest/Underwater/Underwater Effect";
-        internal const string FULL_SCREEN_EFFECT = "_FULL_SCREEN_EFFECT";
-        internal const string DEBUG_VIEW_OCEAN_MASK = "_DEBUG_VIEW_OCEAN_MASK";
+        const string k_ShaderPathUnderwaterEffect = "Hidden/Crest/Underwater/Underwater Effect";
+        internal const string k_KeywordFullScreenEffect = "_FULL_SCREEN_EFFECT";
+        internal const string k_KeywordDebugViewOceanMask = "_DEBUG_VIEW_OCEAN_MASK";
 
         internal static readonly int sp_CrestCameraColorTexture = Shader.PropertyToID("_CrestCameraColorTexture");
         static readonly int sp_InvViewProjection = Shader.PropertyToID("_InvViewProjection");
@@ -35,7 +35,7 @@ namespace Crest
         {
             if (_underwaterEffectMaterial?.material == null)
             {
-                _underwaterEffectMaterial = new PropertyWrapperMaterial(SHADER_UNDERWATER_EFFECT);
+                _underwaterEffectMaterial = new PropertyWrapperMaterial(k_ShaderPathUnderwaterEffect);
             }
 
             if (_underwaterEffectCommandBuffer == null)
@@ -75,6 +75,9 @@ namespace Crest
                 _filterOceanData
             );
 
+            // Call after UpdatePostProcessMaterial as it copies material from ocean which will overwrite this.
+            SetInverseViewProjectionMatrix(_underwaterEffectMaterial.material);
+
             _underwaterEffectCommandBuffer.Clear();
 
             if (_camera.allowMSAA)
@@ -95,6 +98,8 @@ namespace Crest
             _underwaterEffectCommandBuffer.DrawProcedural(Matrix4x4.identity, _underwaterEffectMaterial.material, -1, MeshTopology.Triangles, 3, 1);
 
             RenderTexture.ReleaseTemporary(temporaryColorBuffer);
+            // We no longer need the temporary mask textures so release them.
+            CleanUpMaskTextures(_underwaterEffectCommandBuffer);
         }
 
         internal static void UpdatePostProcessMaterial(
@@ -127,11 +132,11 @@ namespace Crest
             // Enabling/disabling keywords each frame don't seem to have large measurable overhead
             if (debugViewPostProcessMask)
             {
-                underwaterPostProcessMaterial.EnableKeyword(DEBUG_VIEW_OCEAN_MASK);
+                underwaterPostProcessMaterial.EnableKeyword(k_KeywordDebugViewOceanMask);
             }
             else
             {
-                underwaterPostProcessMaterial.DisableKeyword(DEBUG_VIEW_OCEAN_MASK);
+                underwaterPostProcessMaterial.DisableKeyword(k_KeywordDebugViewOceanMask);
             }
 
             // We sample shadows at the camera position which will be the first slice.
@@ -177,25 +182,11 @@ namespace Crest
 
             if (forceFullShader)
             {
-                underwaterPostProcessMaterial.EnableKeyword(FULL_SCREEN_EFFECT);
+                underwaterPostProcessMaterial.EnableKeyword(k_KeywordFullScreenEffect);
             }
             else
             {
-                underwaterPostProcessMaterial.DisableKeyword(FULL_SCREEN_EFFECT);
-            }
-
-            // Have to set these explicitly as the built-in transforms aren't in world-space for the blit function
-            if (XRHelpers.IsSinglePass)
-            {
-                // NOTE: Not needed for HDRP.
-                underwaterPostProcessMaterial.SetMatrix(sp_InvViewProjection, (GL.GetGPUProjectionMatrix(XRHelpers.LeftEyeProjectionMatrix, false) * XRHelpers.LeftEyeViewMatrix).inverse);
-                underwaterPostProcessMaterial.SetMatrix(sp_InvViewProjectionRight, (GL.GetGPUProjectionMatrix(XRHelpers.RightEyeProjectionMatrix, false) * XRHelpers.RightEyeViewMatrix).inverse);
-            }
-            else
-            {
-                // NOTE: Not needed for HDRP.
-                var inverseViewProjectionMatrix = (GL.GetGPUProjectionMatrix(camera.projectionMatrix, false) * camera.worldToCameraMatrix).inverse;
-                underwaterPostProcessMaterial.SetMatrix(sp_InvViewProjection, inverseViewProjectionMatrix);
+                underwaterPostProcessMaterial.DisableKeyword(k_KeywordFullScreenEffect);
             }
 
             // Project ocean normal onto camera plane.
@@ -218,7 +209,7 @@ namespace Crest
 
                 UnityEngine.Profiling.Profiler.BeginSample("Underwater sample spherical harmonics");
 
-                LightProbes.GetInterpolatedProbe(OceanRenderer.Instance.ViewCamera.transform.position, null, out SphericalHarmonicsL2 sphericalHarmonicsL2);
+                LightProbes.GetInterpolatedProbe(OceanRenderer.Instance.ViewCamera.transform.position, null, out var sphericalHarmonicsL2);
                 sphericalHarmonicsL2.Evaluate(sphericalHarmonicsData._shDirections, sphericalHarmonicsData._ambientLighting);
                 underwaterPostProcessMaterial.SetVector(sp_AmbientLighting, sphericalHarmonicsData._ambientLighting[0]);
 

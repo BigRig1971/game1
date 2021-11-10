@@ -143,10 +143,12 @@ namespace StarterAssets
 		}
 		public void OnApplyRootMotion()
 		{
+			if(!_tpc._animator.applyRootMotion)
 			_tpc._animator.applyRootMotion = true;
 		}
 		public void OnDisableRootMotion()
 		{
+			if(_tpc._animator.applyRootMotion)
 			_tpc._animator.applyRootMotion = false;
 		}
 		public void OnRollSound()

@@ -499,7 +499,7 @@ namespace Crest
                 // so keeping it this way for now. I'm guessing we'll enable on URP and maybe BIRP in the future.
                 if (RenderPipelineHelper.IsHighDefinition)
                 {
-                    mr.motionVectorGenerationMode = MotionVectorGenerationMode.Camera;
+                    mr.motionVectorGenerationMode = MotionVectorGenerationMode.Object;
                 }
                 else
                 {

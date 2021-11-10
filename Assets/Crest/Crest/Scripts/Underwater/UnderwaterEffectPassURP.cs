@@ -95,11 +95,6 @@ namespace Crest
             ConfigureTarget(_sourceIdentifierRT);
         }
 
-        public override void OnCameraCleanup(CommandBuffer cmd)
-        {
-            cmd.ReleaseTemporaryRT(sp_TemporaryRT);
-        }
-
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             var camera = renderingData.cameraData.camera;
@@ -125,6 +120,7 @@ namespace Crest
             // Required for XR SPI as forward vector in matrix is incorrect.
             _underwaterEffectMaterial.material.SetVector(sp_CameraForward, camera.transform.forward);
 
+#if ENABLE_VR && ENABLE_XR_MODULE
             if (renderingData.cameraData.xrRendering && XRGraphics.stereoRenderingMode == XRGraphics.StereoRenderingMode.SinglePassInstanced)
             {
                 commandBuffer.SetRenderTarget(_temporaryIdentifierRT, RenderBufferLoadAction.Load, RenderBufferStoreAction.Store, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.DontCare);
@@ -138,6 +134,7 @@ namespace Crest
                 commandBuffer.DrawMesh(RenderingUtils.fullscreenMesh, Matrix4x4.identity, _underwaterEffectMaterial.material);
             }
             else
+#endif // ENABLE_VR && ENABLE_XR_MODULE
             {
                 commandBuffer.SetGlobalTexture(UnderwaterRenderer.sp_CrestCameraColorTexture, _sourceIdentifierRT);
                 // We cannot read and write using the same texture so use a temporary texture as an intermediary.
@@ -146,6 +143,10 @@ namespace Crest
             }
 
             context.ExecuteCommandBuffer(commandBuffer);
+
+            UnderwaterRenderer.CleanUpMaskTextures(commandBuffer);
+            commandBuffer.ReleaseTemporaryRT(sp_TemporaryRT);
+
             CommandBufferPool.Release(commandBuffer);
 
             _firstRender = false;

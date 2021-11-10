@@ -5,6 +5,10 @@
 #include "OceanGraphConstants.hlsl"
 #include "../OceanGlobals.hlsl"
 
+#if CREST_HDRP_FORWARD_PASS
+#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/HDShadow.hlsl"
+#endif
+
 void CrestNodeApplyCaustics_float
 (
 	in const half3 i_sceneColour,
@@ -64,29 +68,40 @@ void CrestNodeApplyCaustics_float
 
 // #if CREST_SHADOWS_ON
 	{
-		// Calculate projected position again as we do not want the fudge factor. If we include the fudge factor, the
-		// caustics will not be aligned with shadows.
-		const float2 shadowSurfacePosXZ = i_scenePos.xz + i_lightDir.xz * sceneDepth / i_lightDir.y;
-		real2 causticShadow = 0.0;
+#if CREST_URP
+		// We could skip GetMainLight but this is recommended approach which is likely more robust to API changes.
+		float4 shadowCoord = TransformWorldToShadowCoord(i_scenePos);
+		Light mainLight = GetMainLight(TransformWorldToShadowCoord(i_scenePos));
+		causticsStrength *= mainLight.shadowAttenuation;
+#endif // CREST_URP
 
-		// TODO - pass in to avoid reading here?
-		const CascadeParams cascadeData0 = _CrestCascadeData[_LD_SliceIndex];
-		const CascadeParams cascadeData1 = _CrestCascadeData[_LD_SliceIndex + 1];
+#if CREST_HDRP_FORWARD_PASS
+		DirectionalLightData light = _DirectionalLightDatas[_DirectionalShadowIndex];
+		HDShadowContext context = InitShadowContext();
+		context.directionalShadowData = _HDDirectionalShadowData[_DirectionalShadowIndex];
 
-		// As per the comment for the underwater code in ScatterColour,
-		// LOD_1 data can be missing when underwater
-		if (i_underwater)
-		{
-			const float3 uv_smallerLod = WorldToUV(shadowSurfacePosXZ, cascadeData0, _LD_SliceIndex);
-			SampleShadow(_LD_TexArray_Shadow, uv_smallerLod, 1.0, causticShadow);
-		}
-		else
-		{
-			// only sample the bigger lod. if pops are noticeable this could lerp the 2 lods smoothly, but i didnt notice issues.
-			float3 uv_biggerLod = WorldToUV(shadowSurfacePosXZ, cascadeData1, _LD_SliceIndex + 1);
-			SampleShadow(_LD_TexArray_Shadow, uv_biggerLod, 1.0, causticShadow);
-		}
-		causticsStrength *= 1.0 - causticShadow.y;
+		float3 positionWS = GetCameraRelativePositionWS(i_scenePos);
+		// From Unity:
+		// > With XR single-pass and camera-relative: offset position to do lighting computations from the combined center view (original camera matrix).
+		// > This is required because there is only one list of lights generated on the CPU. Shadows are also generated once and shared between the instanced views.
+		ApplyCameraRelativeXR(positionWS);
+
+		// TODO: Pass in screen space position and scene normal.
+		half shadows = GetDirectionalShadowAttenuation
+		(
+			context,
+			0, // positionSS
+			positionWS,
+			0, // normalWS
+			light.shadowIndex,
+			-light.forward
+		);
+
+		// Apply shadow strength from main light.
+		shadows = LerpWhiteTo(shadows, light.shadowDimmer);
+
+		causticsStrength *= shadows;
+#endif // CREST_HDRP_FORWARD_PASS
 	}
 // #endif // CREST_SHADOWS_ON
 

@@ -15,7 +15,8 @@ void CrestNodeOceanGlobals_float
 )
 {
 	o_crestTime = _CrestTime;
-	o_texelsPerWave = _TexelsPerWave;
+	// TODO: Look at removing as I do not think it is used.
+	o_texelsPerWave = 2.0;
 	o_oceanCenterPosWorld = _OceanCenterPosWorld;
 	o_sliceCount = _SliceCount;
 	o_meshScaleLerp = _MeshScaleLerp;

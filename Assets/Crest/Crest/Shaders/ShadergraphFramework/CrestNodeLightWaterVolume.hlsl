@@ -55,8 +55,16 @@ void CrestNodeLightWaterVolume_half
 	// Approximate subsurface scattering - add light when surface faces viewer. Use geometry normal - don't need high freqs.
 	half towardsSun = pow(max(0.0, dot(i_primaryLightDirection, -i_viewNorm)), i_sssSunFalloff);
 
+	half sss = i_sss;
+
+	// Extents need the default SSS to avoid popping and not being noticeably different.
+	if (_LD_SliceIndex == ((uint)_SliceCount - 1))
+	{
+		sss = CREST_SSS_MAXIMUM - CREST_SSS_RANGE;
+	}
+
 	float v = abs(i_viewNorm.y);
 	half3 subsurface = (i_sssIntensityBase + i_sssIntensitySun * towardsSun) * i_sssTint * i_primaryLightIntensity * shadow;
-	subsurface *= (1.0 - v * v) * i_sss;
+	subsurface *= (1.0 - v * v) * sss;
 	o_volumeLight += subsurface;
 }

@@ -2,10 +2,10 @@
 
 // Copyright 2020 Wave Harmonic Ltd
 
-#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Version.hlsl"
-#include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
-
 #include "OceanGraphConstants.hlsl"
+
+#if CREST_HDRP
+#include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
 
 void ApplyIndirectLightingMultiplier
 (
@@ -19,6 +19,7 @@ void ApplyIndirectLightingMultiplier
 	io_ambientLight *= GetIndirectDiffuseMultiplier(renderingLayers);
 #endif
 }
+#endif // CREST_HDRP
 
 void CrestNodeAmbientLight_half
 (
@@ -27,5 +28,7 @@ void CrestNodeAmbientLight_half
 {
 	// Use the constant term (0th order) of SH stuff - this is the average
 	o_ambientLight = half3(unity_SHAr.w, unity_SHAg.w, unity_SHAb.w);
+#if CREST_HDRP
 	ApplyIndirectLightingMultiplier(o_ambientLight);
+#endif
 }

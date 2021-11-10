@@ -22,8 +22,6 @@ Shader "Hidden/Crest/Underwater/Ocean Mask HDRP"
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
 			#include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
 
-			float4 _CameraDepthTexture_TexelSize;
-
 			#include "../UnderwaterMaskShared.hlsl"
 			ENDHLSL
 		}
@@ -39,8 +37,6 @@ Shader "Hidden/Crest/Underwater/Ocean Mask HDRP"
 			HLSLPROGRAM
 			#pragma vertex Vert
 			#pragma fragment Frag
-
-			#pragma multi_compile_instancing
 
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
 			#include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"

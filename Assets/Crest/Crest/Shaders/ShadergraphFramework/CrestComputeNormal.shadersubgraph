@@ -44,6 +44,9 @@
         },
         {
             "m_Id": "275e59dc409c0b8eb5901860202741ac"
+        },
+        {
+            "m_Id": "e4d436e04aa24494a758eff4fee94f84"
         }
     ],
     "m_Keywords": [],
@@ -101,6 +104,9 @@
         },
         {
             "m_Id": "6521f2679a377685a528ce5f8790bb12"
+        },
+        {
+            "m_Id": "c58a0631b57c485b814aba0ed3741cc6"
         }
     ],
     "m_GroupDatas": [],
@@ -346,6 +352,20 @@
                     "m_Id": "19f4d59664180484a5b5eaf61d2623da"
                 },
                 "m_SlotId": 17
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "c58a0631b57c485b814aba0ed3741cc6"
+                },
+                "m_SlotId": 0
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "19f4d59664180484a5b5eaf61d2623da"
+                },
+                "m_SlotId": 32
             }
         },
         {
@@ -640,6 +660,9 @@
         },
         {
             "m_Id": "5a85abac473795859c108f92f573783b"
+        },
+        {
+            "m_Id": "99b4f077bb74492ca108ce752e30e42a"
         },
         {
             "m_Id": "68cf7ae711ea068e8a95116d85c3361d"
@@ -1735,6 +1758,27 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector2MaterialSlot",
+    "m_ObjectId": "99b4f077bb74492ca108ce752e30e42a",
+    "m_Id": 32,
+    "m_DisplayName": "Sea_Level_Derivatives",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Sea_Level_Derivatives",
+    "m_StageCapability": 3,
+    "m_Value": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "m_DefaultValue": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "m_Labels": []
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "9e9a795617fba98db04638a60cb0b509",
     "m_Id": 24,
@@ -1962,6 +2006,41 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
+    "m_ObjectId": "c58a0631b57c485b814aba0ed3741cc6",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "Property",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": -442.9999694824219,
+            "y": 503.00006103515627,
+            "width": 187.5,
+            "height": 34.000003814697269
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "ded74607c9bb493f991892b2dd9403c8"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_Property": {
+        "m_Id": "e4d436e04aa24494a758eff4fee94f84"
+    }
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "cace3c63e46ca080b5241fc9308a7ca9",
     "m_Id": 7,
@@ -2036,6 +2115,27 @@
 }
 
 {
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector2MaterialSlot",
+    "m_ObjectId": "ded74607c9bb493f991892b2dd9403c8",
+    "m_Id": 0,
+    "m_DisplayName": "Sea Level Derivatives",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Out",
+    "m_StageCapability": 3,
+    "m_Value": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "m_DefaultValue": {
+        "x": 0.0,
+        "y": 0.0
+    },
+    "m_Labels": []
+}
+
+{
     "m_SGVersion": 1,
     "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
     "m_ObjectId": "e39d25676babc485b4663b8a685ca7ad",
@@ -2055,6 +2155,29 @@
     "m_RangeValues": {
         "x": 0.0,
         "y": 1.0
+    }
+}
+
+{
+    "m_SGVersion": 1,
+    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector2ShaderProperty",
+    "m_ObjectId": "e4d436e04aa24494a758eff4fee94f84",
+    "m_Guid": {
+        "m_GuidSerialized": "49d34511-9ff7-4a92-bdfd-4019d9b95c5f"
+    },
+    "m_Name": "Sea Level Derivatives",
+    "m_DefaultReferenceName": "Vector2_e4d436e04aa24494a758eff4fee94f84",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_Precision": 0,
+    "overrideHLSLDeclaration": false,
+    "hlslDeclarationOverride": 0,
+    "m_Hidden": false,
+    "m_Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
     }
 }
 

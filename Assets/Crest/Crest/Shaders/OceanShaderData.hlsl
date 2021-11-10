@@ -11,7 +11,7 @@
 // Samplers
 
 #if defined(UNITY_DECLARE_SCREENSPACE_TEXTURE)
-UNITY_DECLARE_SCREENSPACE_TEXTURE(_CameraDepthTexture);
+TEXTURE2D_X(_CameraDepthTexture); SAMPLER(sampler_CameraDepthTexture);
 UNITY_DECLARE_SCREENSPACE_TEXTURE(_BackgroundTexture);
 #elif defined(TEXTURE2D_X)
 TEXTURE2D_X(_CameraDepthTexture);
@@ -22,6 +22,8 @@ SAMPLER(sampler_CameraOpaqueTexture);
 #endif
 
 float4 _CameraDepthTexture_TexelSize;
+
+TEXTURE2D_X(_CrestScreenSpaceShadowTexture);
 
 // NOTE: _Normals is used outside of _APPLYNORMALMAPPING_ON so we cannot surround it here.
 sampler2D _Normals;
