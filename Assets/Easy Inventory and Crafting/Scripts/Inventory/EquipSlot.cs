@@ -9,14 +9,21 @@ namespace EZInventory
     {
         public string equipParentName;
         public Sprite defaultSprite;
-
         Transform equipParent;
         GameObject equipInstance;
-
-        // Start is called before the first frame update
-        void Start()
+        public GameObject[] _equipableGo;
+        
+		private void Awake()
+		{
+            
+        }
+		void Start()
         {
-            equipParent = GameObject.Find(equipParentName).transform;
+            foreach(GameObject go in _equipableGo)
+			{
+                go.SetActive(false);
+			}
+          //  equipParent = GameObject.Find(equipParentName).transform;
         }
 
         private void Update()
@@ -40,6 +47,24 @@ namespace EZInventory
         {
             if (currentItem)
             {
+                foreach (GameObject go in _equipableGo)
+                {
+                    if (go.name == currentItem.name)
+                    {
+                        go.SetActive(true);
+                    }
+                }
+            }
+			else
+			{
+                foreach(GameObject go in _equipableGo)
+				{
+                    go.SetActive(false);
+				}
+			}
+           /* if (currentItem)
+            {
+                //Debug.Log(currentItem);
                 if (!equipParent)
                 {
                     Debug.LogError("Was unable to find equipParent, check equipParentName is correct");
@@ -47,12 +72,13 @@ namespace EZInventory
                 else if (!equipInstance)
                 {
                     equipInstance = Instantiate(currentItem.equipPrefab, equipParent) as GameObject;
+                    
                 }
             }
             else if (equipInstance)
             {
                 Destroy(equipInstance);
-            }
+            }*/
         }
 
         protected override void SetUI()
@@ -64,5 +90,6 @@ namespace EZInventory
                 itemImage.color = Color.white;
             }
         }
+       
     }
 }

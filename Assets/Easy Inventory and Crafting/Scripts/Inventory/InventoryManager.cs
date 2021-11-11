@@ -53,7 +53,7 @@ namespace EZInventory
                 currentItem = null;
 
             //open/close inventory
-            if (Input.GetKeyDown(KeyCode.Tab))
+           /* if (Input.GetKeyDown(KeyCode.Tab))
             {
                 if (inventoryMain.activeSelf)
                 {
@@ -63,7 +63,7 @@ namespace EZInventory
                 {
                     OpenInventory();
                 }
-            }
+            }*/
 
             if (currentItem)
             {
@@ -102,7 +102,7 @@ namespace EZInventory
             {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
-                Time.timeScale = 0;
+                //Time.timeScale = 0;
             }
         }
 
@@ -116,7 +116,7 @@ namespace EZInventory
             {
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
-                Time.timeScale = 1;
+                //Time.timeScale = 1;
             }
             instance.inventoryMain.SetActive(false);
         }
@@ -131,7 +131,7 @@ namespace EZInventory
         public static int AddItemToInventory(ItemSO item, int amount)
         {
             int remaining = amount;
-
+            if (slots == null) return 0;
             //check slots that contain same item
             foreach (InventorySlot slot in slots)
             {

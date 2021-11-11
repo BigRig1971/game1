@@ -16,7 +16,7 @@ namespace EZInventory
         public Dropdown itemsDropdown;
         public Text warningText;
         int currentItem;
-        int currentItemAmount = 99;
+        int currentItemAmount = 1;
 
         // Start is called before the first frame update
         void Start()

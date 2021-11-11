@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine;
-using Cinemachine;
+
 
 
 namespace StarterAssets
@@ -163,5 +163,12 @@ namespace StarterAssets
 		{
 			jumpStart?.Play();
 		}
+		private void ChangeSkinnedMesh(GameObject bodyPart, Mesh pMesh)
+		{
+			Mesh meshInstance = Instantiate(pMesh) as Mesh;
+
+			bodyPart.GetComponent<SkinnedMeshRenderer>().sharedMesh = meshInstance;
+		}
 	}
+
 }

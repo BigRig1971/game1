@@ -19,6 +19,7 @@ namespace EZInventory
         [Tooltip("If this is an equiipable item, this is what GameObject will spawn when held/equipped.")]
         public GameObject equipPrefab;
         
+        
 
         public enum Type
         {
@@ -26,7 +27,8 @@ namespace EZInventory
             Head,
             Torso,
             Legs,
-            Hand
+            Hand,
+            Feet
         }
     }
 }

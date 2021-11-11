@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cinemachine;
 using UnityEngine.InputSystem;
 using Cameras;
 using StarterAssets;
+using EZInventory;
 
 namespace StarterAssets
 {
@@ -23,18 +23,30 @@ namespace StarterAssets
 				_tpc._input.cursor = false;
 				state = !state;
 				if (state)
-				{					
-					Cursor.visible = true;
-					Cursor.lockState = CursorLockMode.None;
-					_tpc._input.cursorInputForLook = false;
+				{
+					OnCursorVisable();
+					
 				}
 				else
 				{
-					Cursor.visible = false;
-					Cursor.lockState = CursorLockMode.Locked;
-					_tpc._input.cursorInputForLook = true;				
+					OnCursorHide();				
 				}
 			}
+		}
+		public void OnCursorVisable()
+		{
+			InventoryManager.OpenInventory();
+			//Cursor.visible = true;
+			//Cursor.lockState = CursorLockMode.None;
+			_tpc._input.cursorInputForLook = false;
+			
+		}
+		public void OnCursorHide()
+		{
+			InventoryManager.CloseInventory();
+			//Cursor.visible = false;
+			//Cursor.lockState = CursorLockMode.Locked;
+			_tpc._input.cursorInputForLook = true;
 		}
 	}
 }
