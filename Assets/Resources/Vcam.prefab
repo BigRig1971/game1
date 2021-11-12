@@ -75,10 +75,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Damping: {x: 0.1, y: 0.25, z: 0.3}
-  ShoulderOffset: {x: 1, y: -0.02, z: 0}
+  ShoulderOffset: {x: 0, y: -0.02, z: 0}
   VerticalArmLength: 0
-  CameraSide: 0.5
-  CameraDistance: 2
+  CameraSide: 0
+  CameraDistance: 3
   CameraCollisionFilter:
     serializedVersion: 2
     m_Bits: 2147483647
@@ -95,6 +95,7 @@ GameObject:
   - component: {fileID: 6463954851646446056}
   - component: {fileID: 6463954851646446236}
   - component: {fileID: 4933520304887963551}
+  - component: {fileID: 591580629}
   m_Layer: 0
   m_Name: Vcam
   m_TagString: Untagged
@@ -133,7 +134,7 @@ MonoBehaviour:
   - m_Script
   m_LockStageInInspector: 
   m_StreamingVersion: 20170927
-  m_Priority: 10
+  m_Priority: 20
   m_StandbyUpdate: 2
   m_LookAt: {fileID: 0}
   m_Follow: {fileID: 0}
@@ -184,3 +185,15 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &591580629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6463954851646447505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82b5928127bcee8478ac05b73ca39034, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

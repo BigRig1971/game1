@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 8900000, guid: 619e305f5165a9946b7f72464e44ca4a, type: 3}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 5726.342, g: 4989.1426, b: 6982.0938, a: 1}
+  m_IndirectSpecularColor: {r: 5726.342, g: 4989.1426, b: 6982.1562, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2414,6 +2414,26 @@ Cloth:
   - {x: 0.6666667, y: 0.16666667, z: 0.16666667}
   - {x: 0.5, y: 0.5, z: 0}
   m_VirtualParticleIndices: 
+--- !u!1 &591580626 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6463954851646447505, guid: a6bca36d6195be444b3e33949d335136, type: 3}
+  m_PrefabInstance: {fileID: 1920445783}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &591580630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591580626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44d70cc20219cd84593f67d248eafe36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Offset: {x: 0, y: 0, z: 0}
+  m_ApplyAfter: 0
+  m_PreserveComposition: 0
 --- !u!1 &657112290 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 511813a73280c764cb987c0303b7c287, type: 3}
@@ -2642,7 +2662,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6463954851646446236, guid: a6bca36d6195be444b3e33949d335136, type: 3}
   m_PrefabInstance: {fileID: 1920445783}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 591580626}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 45e653bab7fb20e499bda25e1b646fea, type: 3}
@@ -6195,7 +6215,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8463273387121746141, guid: ddf71bfb72c45407fb8cea42d3aaeac4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2548.63
+      value: 2550.63
       objectReference: {fileID: 0}
     - target: {fileID: 8463273387121746141, guid: ddf71bfb72c45407fb8cea42d3aaeac4, type: 3}
       propertyPath: m_LocalRotation.w
@@ -7124,7 +7144,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6463954851646446056, guid: a6bca36d6195be444b3e33949d335136, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2548.63
+      value: 2550.63
       objectReference: {fileID: 0}
     - target: {fileID: 6463954851646446056, guid: a6bca36d6195be444b3e33949d335136, type: 3}
       propertyPath: m_LocalRotation.w
@@ -7155,16 +7175,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6463954851646446178, guid: a6bca36d6195be444b3e33949d335136, type: 3}
-      propertyPath: CameraSide
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6463954851646446178, guid: a6bca36d6195be444b3e33949d335136, type: 3}
       propertyPath: CameraDistance
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 6463954851646446178, guid: a6bca36d6195be444b3e33949d335136, type: 3}
-      propertyPath: ShoulderOffset.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6463954851646446236, guid: a6bca36d6195be444b3e33949d335136, type: 3}
       propertyPath: m_Follow
@@ -7174,10 +7186,6 @@ PrefabInstance:
       propertyPath: m_LookAt
       value: 
       objectReference: {fileID: 923241618}
-    - target: {fileID: 6463954851646446236, guid: a6bca36d6195be444b3e33949d335136, type: 3}
-      propertyPath: m_Priority
-      value: 20
-      objectReference: {fileID: 0}
     - target: {fileID: 6463954851646446236, guid: a6bca36d6195be444b3e33949d335136, type: 3}
       propertyPath: m_Transitions.m_OnCameraLive.m_PersistentCalls.m_Calls.Array.size
       value: 0
