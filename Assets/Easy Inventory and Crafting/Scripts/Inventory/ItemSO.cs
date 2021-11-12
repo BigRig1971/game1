@@ -27,7 +27,8 @@ namespace EZInventory
             Head,
             Torso,
             Legs,
-            Hand,
+            HandRight,
+            HandLeft,
             Feet
         }
     }

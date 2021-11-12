@@ -16,7 +16,7 @@ namespace HeurekaGames.AssetHunterPRO
     {
         public const int WINDOWMENUITEMPRIO = 11;
 
-        public const string VERSION = "2.1.2";
+        public const string VERSION = "2.1.3";
         private static AH_Window m_window;
 
         [NonSerialized] bool m_Initialized;
@@ -99,6 +99,38 @@ namespace HeurekaGames.AssetHunterPRO
         {
             AH_SerializationHelper.NewBuildInfoCreated -= onBuildInfoCreated;
         }
+        
+        void OnInspectorUpdate()
+        {
+            if (!m_window)
+                initializeWindow();
+        }
+
+        void OnGUI()
+        {
+            /*if (Application.isPlaying)
+                return;*/
+
+            InitIfNeeded();
+            doHeader();
+
+            if (buildInfoManager == null || !buildInfoManager.HasSelection)
+            {
+                doNoBuildInfoLoaded();
+                return;
+            }
+
+            if (buildInfoManager.IsProjectClean() && ((AH_MultiColumnHeader)m_TreeView.multiColumnHeader).ShowMode == AH_MultiColumnHeader.AssetShowMode.Unused)
+            {
+                Heureka_WindowStyler.DrawCenteredImage(m_window, AH_EditorData.Instance.AchievementIcon.Icon);
+                return;
+            }
+
+            doSearchBar(toolbarRect);
+            doTreeView(multiColumnTreeViewRect);
+
+            doBottomToolBar(bottomToolbarRect);
+        }
 
         void OnProjectChanged()
         {
@@ -116,6 +148,54 @@ namespace HeurekaGames.AssetHunterPRO
             //This might be called excessively
             if (AH_SettingsManager.Instance.AutoRefreshLog)
                 RefreshBuildLog();
+        }
+
+        //callback
+        private void onBuildInfoCreated(string path)
+        {
+            if (EditorUtility.DisplayDialog(
+                    "New buildinfo log created",
+                    "Do you want to load it into Asset Hunter",
+                    "Ok", "Cancel"))
+            {
+                m_Initialized = false;
+                buildInfoManager.SelectBuildInfo(path);
+            }
+        }
+
+        void InitIfNeeded()
+        {
+            //We dont need to do stuff when in play mode
+            if (buildInfoManager && buildInfoManager.HasSelection && !m_Initialized)
+            {
+                // Check if it already exists (deserialized from window layout file or scriptable object)
+                if (m_TreeViewState == null)
+                    m_TreeViewState = new TreeViewState();
+
+                bool firstInit = m_MultiColumnHeaderState == null;
+                var headerState = AH_TreeViewWithTreeModel.CreateDefaultMultiColumnHeaderState(multiColumnTreeViewRect.width);
+                if (MultiColumnHeaderState.CanOverwriteSerializedFields(m_MultiColumnHeaderState, headerState))
+                    MultiColumnHeaderState.OverwriteSerializedFields(m_MultiColumnHeaderState, headerState);
+                m_MultiColumnHeaderState = headerState;
+
+                var multiColumnHeader = new AH_MultiColumnHeader(headerState);
+                if (firstInit)
+                    multiColumnHeader.ResizeToFit();
+
+                var treeModel = new TreeModel<AH_TreeviewElement>(buildInfoManager.GetTreeViewData());
+
+                m_TreeView = new AH_TreeViewWithTreeModel(m_TreeViewState, multiColumnHeader, treeModel);
+
+                m_SearchField = new SearchField();
+                m_SearchField.downOrUpArrowKeyPressed += m_TreeView.SetFocusAndEnsureSelectedItem;
+
+                m_Initialized = true;
+                buildInfoManager.ProjectDirty = false;
+            }
+
+            //This is an (ugly) fix to make sure we dotn loose our icons due to some singleton issues after play/stop
+            if (guiContentRefresh.image == null)
+                initializeGUIContent();
         }
 
         private void deleteEmptyFolders()
@@ -170,7 +250,6 @@ namespace HeurekaGames.AssetHunterPRO
             titleContent = new GUIContent("Asset Hunter", AH_EditorData.Instance.WindowPaneIcon.Icon);
 
             guiContentLoadBuildInfo = new GUIContent("Load", AH_EditorData.Instance.LoadLogIcon.Icon, "Load info from a previous build");
-            //guiContentGenerateBuildInfo = new GUIContent("Build", AH_EditorData.Instance.GenerateIcon.Icon, "Create dummy buildinfo manually. Requires enabled scenes in buildsettings");
             guiContentSettings = new GUIContent("Settings", AH_EditorData.Instance.Settings.Icon, "Open settings");
             guiContentGenerateReferenceGraph = new GUIContent("Dependencies", AH_EditorData.Instance.RefFromIcon.Icon, "See asset dependency graph");
             guiContentDuplicates = new GUIContent("Duplicates", AH_EditorData.Instance.DuplicateIcon.Icon, "Find duplicate assets");
@@ -184,54 +263,9 @@ namespace HeurekaGames.AssetHunterPRO
             guiContentRefresh = new GUIContent(AH_EditorData.Instance.RefreshIcon.Icon, "Refresh data");
         }
 
-        void OnInspectorUpdate()
-        {
-            if (!m_window)
-                initializeWindow();
-        }
-
-        void OnGUI()
-        {
-            /*if (Application.isPlaying)
-                return;*/
-
-            InitIfNeeded();
-            doHeader();
-
-            if (buildInfoManager == null || !buildInfoManager.HasSelection)
-            {
-                doNoBuildInfoLoaded();
-                return;
-            }
-
-            if (buildInfoManager.IsProjectClean() && ((AH_MultiColumnHeader)m_TreeView.multiColumnHeader).ShowMode == AH_MultiColumnHeader.AssetShowMode.Unused)
-            {
-                Heureka_WindowStyler.DrawCenteredImage(m_window, AH_EditorData.Instance.AchievementIcon.Icon);
-                return;
-            }
-
-            doSearchBar(toolbarRect);
-            doTreeView(multiColumnTreeViewRect);
-
-            doBottomToolBar(bottomToolbarRect);
-        }
-
         private void doNoBuildInfoLoaded()
         {
             Heureka_WindowStyler.DrawCenteredMessage(m_window, AH_EditorData.Instance.WindowHeaderIcon.Icon, 380f, 110f, "Buildinfo not yet loaded" + Environment.NewLine + "Load existing / create new build");
-        }
-
-        //callback
-        private void onBuildInfoCreated(string path)
-        {
-            if (EditorUtility.DisplayDialog(
-                    "New buildinfo log created",
-                    "Do you want to load it into Asset Hunter",
-                    "Ok", "Cancel"))
-            {
-                m_Initialized = false;
-                buildInfoManager.SelectBuildInfo(path);
-            }
         }
 
         private void doHeader()
@@ -250,7 +284,7 @@ namespace HeurekaGames.AssetHunterPRO
                     RefreshGUIContent.tooltip = String.Format("{0}{1}", RefreshGUIContent.tooltip, " (Project has changed which means that treeview is out of date)");
                 }
 
-                if (doSelectionButton(RefreshGUIContent))// GUILayout.Button(content, GUILayout.MaxWidth(32), GUILayout.Height(18)))
+                if (doSelectionButton(RefreshGUIContent))
                     RefreshBuildLog();
 
                 GUI.color = origColor;
@@ -314,6 +348,61 @@ namespace HeurekaGames.AssetHunterPRO
             EditorGUILayout.EndHorizontal();
         }
 
+        private void doSearchBar(Rect rect)
+        {
+            if (m_TreeView != null)
+                m_TreeView.searchString = m_SearchField.OnGUI(rect, m_TreeView.searchString);
+        }
+
+        private void doTreeView(Rect rect)
+        {
+            if (m_TreeView != null)
+                m_TreeView.OnGUI(rect);
+        }
+
+        private void doBottomToolBar(Rect rect)
+        {
+            if (m_TreeView == null)
+                return;
+
+            GUILayout.BeginArea(rect);
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUIStyle style = "miniButton";
+
+                if (GUILayout.Button("Expand All", style))
+                {
+                    m_TreeView.ExpandAll();
+                }
+
+                if (GUILayout.Button("Collapse All", style))
+                {
+                    m_TreeView.CollapseAll();
+                }
+
+                GUILayout.Label("Build: " + buildInfoManager.GetSelectedBuildDate() + " (" + buildInfoManager.GetSelectedBuildTarget() + ")");
+                GUILayout.FlexibleSpace();
+                GUILayout.Label(buildInfoManager.TreeView != null ? AssetDatabase.GetAssetPath(buildInfoManager.TreeView) : string.Empty);
+                GUILayout.FlexibleSpace();
+
+                if (((AH_MultiColumnHeader)m_TreeView.multiColumnHeader).mode == AH_MultiColumnHeader.Mode.SortedList || !string.IsNullOrEmpty(m_TreeView.searchString))
+                {
+                    if (GUILayout.Button("Return to Treeview", style))
+                    {
+                        m_TreeView.ShowTreeMode();
+                    }
+                }
+
+                GUIContent exportContent = new GUIContent("Export list", "Export all the assets in the list above to a json file");
+                if (GUILayout.Button(exportContent, style))
+                {
+                    AH_ElementList.DumpCurrentListToFile(m_TreeView);
+                }
+            }
+            GUILayout.EndArea();
+        }
+
         private bool doSelectionButton(GUIContent content)
         {
             GUIContent btnContent = new GUIContent(content);
@@ -322,14 +411,6 @@ namespace HeurekaGames.AssetHunterPRO
 
             return GUILayout.Button(btnContent, GUILayout.MaxHeight(AH_SettingsManager.Instance.HideButtonText ? ButtonMaxHeight * 2f : ButtonMaxHeight));
         }
-
-        /*private void generateBuildInfo()
-        {
-            if (EditorUtility.DisplayDialog("New build", "Create new build based on current buildsettings?", "OK", "Cancel"))
-            {
-                AH_BuildProcessor.GenerateBuild();
-            }
-        }*/
 
         private void OnIgnoreListUpdatedEvent()
         {
@@ -389,96 +470,6 @@ namespace HeurekaGames.AssetHunterPRO
             {
                 uiStartPos = value;
             }
-        }
-
-        void InitIfNeeded()
-        {
-            //We dont need to do stuff when in play mode
-            if (buildInfoManager && buildInfoManager.HasSelection && !m_Initialized)
-            {
-                // Check if it already exists (deserialized from window layout file or scriptable object)
-                if (m_TreeViewState == null)
-                    m_TreeViewState = new TreeViewState();
-
-                bool firstInit = m_MultiColumnHeaderState == null;
-                var headerState = AH_TreeViewWithTreeModel.CreateDefaultMultiColumnHeaderState(multiColumnTreeViewRect.width);
-                if (MultiColumnHeaderState.CanOverwriteSerializedFields(m_MultiColumnHeaderState, headerState))
-                    MultiColumnHeaderState.OverwriteSerializedFields(m_MultiColumnHeaderState, headerState);
-                m_MultiColumnHeaderState = headerState;
-
-                var multiColumnHeader = new AH_MultiColumnHeader(headerState);
-                if (firstInit)
-                    multiColumnHeader.ResizeToFit();
-
-                var treeModel = new TreeModel<AH_TreeviewElement>(buildInfoManager.GetTreeViewData());
-
-                m_TreeView = new AH_TreeViewWithTreeModel(m_TreeViewState, multiColumnHeader, treeModel);
-
-                m_SearchField = new SearchField();
-                m_SearchField.downOrUpArrowKeyPressed += m_TreeView.SetFocusAndEnsureSelectedItem;
-
-                m_Initialized = true;
-                buildInfoManager.ProjectDirty = false;
-            }
-
-            //This is an (ugly) fix to make sure we dotn loose our icons due to some singleton issues after play/stop
-            if (guiContentRefresh.image == null)
-                initializeGUIContent();
-        }
-
-        void doSearchBar(Rect rect)
-        {
-            if (m_TreeView != null)
-                m_TreeView.searchString = m_SearchField.OnGUI(rect, m_TreeView.searchString);
-        }
-
-        void doTreeView(Rect rect)
-        {
-            if (m_TreeView != null)
-                m_TreeView.OnGUI(rect);
-        }
-
-        void doBottomToolBar(Rect rect)
-        {
-            if (m_TreeView == null)
-                return;
-
-            GUILayout.BeginArea(rect);
-
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                GUIStyle style = "miniButton";
-
-                if (GUILayout.Button("Expand All", style))
-                {
-                    m_TreeView.ExpandAll();
-                }
-
-                if (GUILayout.Button("Collapse All", style))
-                {
-                    m_TreeView.CollapseAll();
-                }
-
-                GUILayout.Label("Build: " + buildInfoManager.GetSelectedBuildDate() + " (" + buildInfoManager.GetSelectedBuildTarget() + ")");
-                GUILayout.FlexibleSpace();
-                GUILayout.Label(buildInfoManager.TreeView != null ? AssetDatabase.GetAssetPath(buildInfoManager.TreeView) : string.Empty);
-                GUILayout.FlexibleSpace();
-
-                if (((AH_MultiColumnHeader)m_TreeView.multiColumnHeader).mode == AH_MultiColumnHeader.Mode.SortedList || !string.IsNullOrEmpty(m_TreeView.searchString))
-                {
-                    if (GUILayout.Button("Return to Treeview", style))
-                    {
-                        m_TreeView.ShowTreeMode();
-                    }
-                }
-
-                GUIContent exportContent = new GUIContent("Export list", "Export all the assets in the list above to a json file");
-                if (GUILayout.Button(exportContent, style))
-                {
-                    AH_ElementList.DumpCurrentListToFile(m_TreeView);
-                }
-            }
-            GUILayout.EndArea();
         }
 
         private void OnDestroy()

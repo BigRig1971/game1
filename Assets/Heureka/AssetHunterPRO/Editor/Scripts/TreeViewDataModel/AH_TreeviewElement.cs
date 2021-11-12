@@ -190,6 +190,10 @@ namespace HeurekaGames.AssetHunterPRO.BaseTreeviewImpl.AssetTreeView
                 }
 
                 fileSize = new System.IO.FileInfo(absPath).Length;
+
+                var fileInfo = new System.IO.FileInfo(absPath);
+                fileSize = fileInfo != null ? fileInfo.Length : 0;
+
                 fileSizeStringRepresentation = AH_Utils.GetSizeAsString(fileSize);
                 assestSizeStringRepresentation = AH_Utils.GetSizeAsString(assetSize);
             }

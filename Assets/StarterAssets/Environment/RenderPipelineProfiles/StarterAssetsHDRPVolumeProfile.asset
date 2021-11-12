@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d877ec3e844f2ca46830012e8e79319b, type: 3}
   m_Name: PhysicallyBasedSky
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   m_AdvancedMode: 0
   rotation:
     m_OverrideState: 0
@@ -598,14 +598,14 @@ MonoBehaviour:
   m_AdvancedMode: 0
   quality:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 2
   threshold:
     m_OverrideState: 0
     m_Value: 0
     min: 0
   intensity:
     m_OverrideState: 1
-    m_Value: 0.024
+    m_Value: 0.037
     min: 0
     max: 1
   scatter:
@@ -634,7 +634,7 @@ MonoBehaviour:
     m_Value: 2
   m_HighQualityPrefiltering:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
   m_HighQualityFiltering:
     m_OverrideState: 1
     m_Value: 1
@@ -715,7 +715,7 @@ MonoBehaviour:
   m_AdvancedMode: 0
   mode:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0
   meteringMode:
     m_OverrideState: 0
     m_Value: 2
@@ -724,13 +724,13 @@ MonoBehaviour:
     m_Value: 1
   fixedExposure:
     m_OverrideState: 1
-    m_Value: 7.12177
+    m_Value: 15
   compensation:
     m_OverrideState: 1
     m_Value: 3.11
   limitMin:
     m_OverrideState: 1
-    m_Value: 5.5409927
+    m_Value: 2.9598663
   limitMax:
     m_OverrideState: 1
     m_Value: 13.578639

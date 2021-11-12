@@ -64,7 +64,7 @@ namespace EZInventory
                     Destroy(currentEquip.gameObject);
                 }
                 //Instantiate equip item if currentItem type = Hand
-                if (slots[currentSlotIndex].currentItem && slots[currentSlotIndex].currentItem.type == ItemSO.Type.Hand)
+                if (slots[currentSlotIndex].currentItem && slots[currentSlotIndex].currentItem.type == ItemSO.Type.HandRight)
                 {
                     currentEquip = Instantiate(slots[currentSlotIndex].currentItem.equipPrefab, equipParent).transform;
                     currentEquip.localPosition = Vector3.zero;

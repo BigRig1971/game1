@@ -10,8 +10,8 @@ namespace EZInventory
     /// </summary>
     public class ItemPickupable : MonoBehaviour
     {
-        ItemSO itemSO;
-        int itemAmount;
+       ItemSO itemSO;
+       int itemAmount;
         static Transform camTransform;
 
         private void Start()

@@ -6,16 +6,19 @@ namespace HeurekaGames
 {
     public static class Heureka_WindowStyler
     {
+        public static float HeaderHeight { get; private set; } = 24f;
+
         public static readonly Color clr_Pink = new Color((226f / 256f), (32f / 256f), (140f / 256f), 1);
         public static readonly Color clr_Dark = new Color((48f / 256f), (41f / 256f), (47f / 256f), 1);
         public static readonly Color clr_dBlue = new Color((47f / 256f), (102f / 256f), (144f / 256f), 1);
         public static readonly Color clr_lBlue = new Color((58f / 256f), (124f / 256f), (165f / 256f), 1);
         public static readonly Color clr_White = new Color((217f / 256f), (220f / 256f), (214f / 256f), 1);
         public static readonly Color clr_Red = new Color((183f / 256f), (0f / 256f), (0f / 256f));
+        public static readonly Color clr_middleGreen = new Color((85f / 256f), (133f / 256f), (100f / 256f));
 
-        public static void DrawGlobalHeader(Color color, string label, string version = "")
+        public static void DrawGlobalHeader(Color color, string label, string version = "", Action additionHeaderContent = null)
         {
-            EditorGUI.DrawRect(new Rect(0, 0, EditorGUIUtility.currentViewWidth, 24), color);
+            EditorGUI.DrawRect(new Rect(0, 0, EditorGUIUtility.currentViewWidth, HeaderHeight), color);
             EditorGUILayout.BeginHorizontal();
             GUILayout.Space(4);
 
@@ -28,9 +31,12 @@ namespace HeurekaGames
                 EditorGUILayout.Space();
                 GUILayout.Label(version, EditorStyles.whiteLabel);
                 EditorGUILayout.EndVertical();
+                additionHeaderContent?.Invoke();
             }
 
-            GUILayout.FlexibleSpace();
+            if(additionHeaderContent==null)
+                GUILayout.FlexibleSpace();
+
             EditorGUILayout.EndHorizontal();
         }
 
@@ -74,7 +80,7 @@ namespace HeurekaGames
             var whiteStyle = new GUIStyle(EditorStyles.label);
             whiteStyle.normal.textColor = Color.white;
 
-            labelStartPos.y += 30;
+            labelStartPos.y += 20;
             for (int i = 1; i < lines.Length; i++)
             {
                 GUI.Label(new Rect(labelStartPos.x, labelStartPos.y, textWidth, textHeight), lines[i], whiteStyle);

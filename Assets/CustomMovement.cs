@@ -14,6 +14,7 @@ namespace StarterAssets
 		//custom movement
 		private int _animIDRoll;
 		private int _swim;
+		private int _punch;
 		private CharacterController _controller;
 		private Camera _mainCamera;
 		private ThirdPersonController _tpc;
@@ -32,17 +33,18 @@ namespace StarterAssets
 		public AudioSource jumpLand;
 		public AudioSource jumpStart;
 		private bool inWater = false;
-
+		private float _previousSpeed;
 		void Start()
 		{
 			_tpc = GetComponent<ThirdPersonController>();
 			_controller = GetComponent<CharacterController>();
 			_animIDRoll = Animator.StringToHash("Roll");
 			_swim = Animator.StringToHash("Swim");
-			
+			_punch = Animator.StringToHash("Punch");
+
 			//  _animator.runtimeAnimatorController = OnLand;
 			_mainCamera = Camera.main;
-
+			_previousSpeed = _tpc.MoveSpeed;
 
 		}
 
@@ -68,7 +70,16 @@ namespace StarterAssets
 				
 				_tpc._input.roll = false;
 			}
+			if (_tpc._input.punch)
+			{
+				
+				_tpc.MoveSpeed = 0;
+				_tpc._animator.SetBool(_punch, true);
+
+				_tpc._input.punch = false;
 			
+			}
+
 		}
 		public void ButtAboveWater()
 		{

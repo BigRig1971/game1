@@ -281,7 +281,11 @@ namespace HeurekaGames.AssetHunterPRO
                 case BuildTargetGroup.WSA:
                     {
                         List<Texture2D> textures = new List<Texture2D>();
+
+#if !UNITY_2021_1_OR_NEWER
+                        //Obsolete at some point in 2021
                         textures.Add(AssetDatabase.LoadAssetAtPath<Texture2D>(PlayerSettings.WSA.packageLogo));
+#endif
 
                         HashSet<PlayerSettings.WSAImageScale> exceptionScales = new HashSet<PlayerSettings.WSAImageScale>();
 

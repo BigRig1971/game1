@@ -1,5 +1,4 @@
 using UnityEngine;
-using Cinemachine;
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 using UnityEngine.InputSystem;
 #endif
@@ -16,6 +15,7 @@ namespace StarterAssets
 		public bool swim;
 		public bool sprint;
 		public bool interaction;
+		public bool punch;
 		[Header("Movement Settings")]
 		public bool analogMovement;
 	
@@ -67,6 +67,10 @@ namespace StarterAssets
 		{
 			InteractionInput(value.isPressed);
 		}
+		public void OnPunch(InputValue value)
+		{
+			PunchInput(value.isPressed);
+		}
 
 #else
 	// old input sys if we do decide to have it (most likely wont)...
@@ -94,6 +98,10 @@ namespace StarterAssets
 		public void InteractionInput(bool newRollState)
 		{
 			interaction = newRollState;
+		}
+		public void PunchInput(bool newPunchState)
+		{
+			punch = newPunchState;
 		}
 
 		public void SprintInput(bool newSprintState)
