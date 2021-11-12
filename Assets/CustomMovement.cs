@@ -73,7 +73,7 @@ namespace StarterAssets
 			if (_tpc._input.punch)
 			{
 				
-				_tpc.MoveSpeed = 0;
+				
 				_tpc._animator.SetBool(_punch, true);
 
 				_tpc._input.punch = false;

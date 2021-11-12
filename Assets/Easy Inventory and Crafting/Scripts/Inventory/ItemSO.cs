@@ -18,6 +18,7 @@ namespace EZInventory
         public Color itemBorderColor = new Color(1, 1, 1, 1);
         [Tooltip("If this is an equiipable item, this is what GameObject will spawn when held/equipped.")]
         public GameObject equipPrefab;
+        public Animation animationClip;
         
         
 
@@ -29,7 +30,8 @@ namespace EZInventory
             Legs,
             HandRight,
             HandLeft,
-            Feet
+            Feet,
+            Buildable
         }
     }
 }
