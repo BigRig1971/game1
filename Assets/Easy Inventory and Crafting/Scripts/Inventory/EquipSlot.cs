@@ -15,14 +15,14 @@ namespace EZInventory
         
 		private void Awake()
 		{
-            
+            foreach (GameObject go in _equipableGo)
+            {
+                go.SetActive(false);
+            }
         }
 		void Start()
         {
-            foreach(GameObject go in _equipableGo)
-			{
-                go.SetActive(false);
-			}
+            
           //  equipParent = GameObject.Find(equipParentName).transform;
         }
 

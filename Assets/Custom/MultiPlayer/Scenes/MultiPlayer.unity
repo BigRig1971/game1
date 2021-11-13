@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 8900000, guid: 619e305f5165a9946b7f72464e44ca4a, type: 3}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 5726.342, g: 4989.1426, b: 6982.1562, a: 1}
+  m_IndirectSpecularColor: {r: 5726.233, g: 4989.1387, b: 6982.758, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -472,6 +472,11 @@ PrefabInstance:
       objectReference: {fileID: 3786725052280628841, guid: c4a4d038dbe0fa849962422f8dbe2811, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 110682f3b2e634b43927cbc761b62c16, type: 3}
+--- !u!1 &439287772 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6463954851646447505, guid: a6bca36d6195be444b3e33949d335136, type: 3}
+  m_PrefabInstance: {fileID: 1920445783}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &465135458
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2642,7 +2647,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6463954851646446236, guid: a6bca36d6195be444b3e33949d335136, type: 3}
   m_PrefabInstance: {fileID: 1920445783}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 439287772}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 45e653bab7fb20e499bda25e1b646fea, type: 3}
@@ -2692,6 +2697,11 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!20 &1001227117 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 8463273387121746142, guid: ddf71bfb72c45407fb8cea42d3aaeac4, type: 3}
+  m_PrefabInstance: {fileID: 1576464499}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1001227118
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2867,6 +2877,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   miningRing: {fileID: 0}
+--- !u!114 &1347569420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1347569418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e75e0a40e9d0ef845a4e51e2168f4192, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cam: {fileID: 1001227117}
+  layer:
+    m_Bits: 0
+  buildDistance: 20
+  previewGameObject: {fileID: 0}
+  previewScript: {fileID: 0}
+  stickTolerance: 1.5
+  isBuilding: 0
+  pauseBuilding: 0
+  camPivot: {fileID: 439287772}
+  currentBuildStructure: {fileID: 0}
 --- !u!4 &1347569437 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 157568604268881644, guid: e3f8b4baf14cdf44a93eb63c5bc201ff, type: 3}

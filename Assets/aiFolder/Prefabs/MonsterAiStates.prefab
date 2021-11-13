@@ -45,6 +45,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GSM: {fileID: 3040600152842464128}
   chaseState: {fileID: 7028616510036298606}
+  target: {fileID: 0}
+  dirNum: 0
+  bankFloat: 0
+  bankChange: 0
 --- !u!1 &2039540772989173986
 GameObject:
   m_ObjectHideFlags: 0
@@ -101,16 +105,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
+  canFly: 0
+  numberOfAttacks: 5
   canSwim: 1
-  herding: 0
   currentState: {fileID: 4719828284215160146}
   enemyGameObject: {fileID: 0}
   MainGo: {fileID: 0}
-  MyHerdie: {fileID: 0}
+  Go: {fileID: 0}
   scale: 1
   followDistance: 10
   attackDistance: 2
-  maxSpeed: 2.5
+  speed: 2.5
   turnSpeed: 2
   maxAltitude: 297
   minAltitude: 150
@@ -129,6 +134,9 @@ MonoBehaviour:
   homeDistance: 0
   previousTurnSpeed: 0
   velocity: 0
+  PreviousFramePosition: {x: 0, y: 0, z: 0}
+  homePosition: {x: 0, y: 0, z: 0}
+  _obstacle: 0
   turnRight:
     m_PersistentCalls:
       m_Calls:
@@ -228,9 +236,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  PreviousFramePosition: {x: 0, y: 0, z: 0}
-  homePosition: {x: 0, y: 0, z: 0}
-  _obstacle: 0
 --- !u!135 &3030295628752729196
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -383,7 +388,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 24300001, guid: cc0bf72c5763743468b1ee3d764d3d04, type: 2}
-  m_audioClip: {fileID: 8300000, guid: d37b2c591f7e89d4e8e806938df598cb, type: 3}
+  m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 0.7
   m_Pitch: 0.5
@@ -714,7 +719,6 @@ ParticleSystemRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
@@ -776,19 +780,19 @@ ParticleSystem:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3178759390578950324}
-  serializedVersion: 8
+  serializedVersion: 7
   lengthInSec: 0.3
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 3
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
-  emitterVelocityMode: 1
   looping: 0
   prewarm: 0
   playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
+  useRigidbodyForVelocity: 1
   startDelay:
     serializedVersion: 2
     minMaxState: 0
@@ -1266,7 +1270,6 @@ ParticleSystem:
         m_RotationOrder: 4
     randomizeRotationDirection: 0
     maxNumParticles: 100
-    customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 1
     rotation3D: 0
     gravityModifier:
@@ -5560,7 +5563,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 24300001, guid: cc0bf72c5763743468b1ee3d764d3d04, type: 2}
-  m_audioClip: {fileID: 8300000, guid: 39fd36735ebf9f54e8352aa27ab328f3, type: 3}
+  m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 0.2
   m_Pitch: 0.7
