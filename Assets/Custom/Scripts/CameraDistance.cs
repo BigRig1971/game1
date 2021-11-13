@@ -1,29 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cinemachine.Utility;
+using Cinemachine;
 using UnityEngine.InputSystem;
 
 
 public class CameraDistance : MonoBehaviour
 {
-	CinemachineCameraOffset camOffset;
-	
+	CinemachineVirtualCamera vcam;
+	[SerializeField] float maxDistance = 5f;
+	float prevDistance;
 
-	// Start is called before the first frame update
 	void Start()
 	{
-		
-		camOffset = GetComponent<CinemachineCameraOffset>();
-
+		vcam = GetComponent<CinemachineVirtualCamera>();
+		prevDistance = vcam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance;
 	}
 
-	// Update is called once per frame
+	
 	void Update()
 	{
-		
-		camOffset.m_Offset.z += Input.mouseScrollDelta.y;
-		camOffset.m_Offset = new Vector3(0.0f, 0.0f, Mathf.Clamp(camOffset.m_Offset.z, -5f, 0f));
+		var thirdperson = vcam.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
+		thirdperson.CameraDistance -= Input.mouseScrollDelta.y;
+		thirdperson.CameraDistance = (Mathf.Clamp(thirdperson.CameraDistance, prevDistance, maxDistance));
+		//camOffset.m_Offset.z += Input.mouseScrollDelta.y;
+		//camOffset.m_Offset = new Vector3(0.0f, 0.0f, Mathf.Clamp(camOffset.m_Offset.z, maxDistance * -1, 0f));
 	}
 }
 
