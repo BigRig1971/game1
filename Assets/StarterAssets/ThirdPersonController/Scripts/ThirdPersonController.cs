@@ -224,6 +224,7 @@ namespace StarterAssets
 				}
 				else
 				{
+					if(_input.move == null)
 					transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
 				}
 			}
