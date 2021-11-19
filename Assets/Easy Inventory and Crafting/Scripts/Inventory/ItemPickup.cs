@@ -8,21 +8,25 @@ namespace EZInventory
 
     public class ItemPickup : MonoBehaviour
     {
-        [SerializeField] ItemSO[] _items;
-        ItemSO itemSO;
-        int itemAmount;
-        
+       [System.Serializable]
+        public class Item
+        {
+            public ItemSO _item;
+            public int _itemAmount;         
+        }
+        public Item[] _listOfItems;
+
         private void OnTriggerEnter(Collider other)
         {
             if (other.tag == "Player")
             {
-                foreach(ItemSO _item in _items)
+                foreach(Item loi in _listOfItems)
 				{
-                    int remaining = InventoryManager.AddItemToInventory(_item, 1);
-
+                    int remaining = InventoryManager.AddItemToInventory(loi._item, loi._itemAmount);
+                    
                     if (remaining > 0)
                     {
-                        itemAmount = remaining;
+                        loi._itemAmount = remaining;
                     }
                     else
                     {

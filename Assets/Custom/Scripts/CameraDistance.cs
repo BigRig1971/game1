@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using UnityEngine.InputSystem;
+using EZInventory;
 
 
 public class CameraDistance : MonoBehaviour
@@ -20,10 +21,18 @@ public class CameraDistance : MonoBehaviour
 	
 	void Update()
 	{
+		if (!InventoryManager.IsOpen())
+		{
+			Zoom();
+		}
+		
+		
+	}
+	void Zoom()
+	{
 		var thirdperson = vcam.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
 		thirdperson.CameraDistance -= Input.mouseScrollDelta.y;
 		thirdperson.CameraDistance = (Mathf.Clamp(thirdperson.CameraDistance, prevDistance, maxDistance));
-		
 	}
 }
 

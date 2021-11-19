@@ -15,7 +15,6 @@ namespace EZInventory
         public PickUpOnlySlot resultSlot;
         public InventorySlot inventorySlotPrefab;
         public IngredientSlotSimple IngredientSlotPrefab;
-        
         RecipeSimple currentRecipe;
         List<IngredientSlotSimple> ingredientSlots;
         Transform currentSlotTransform;
@@ -25,7 +24,8 @@ namespace EZInventory
         // Start is called before the first frame update
         void Awake()
         {
-            foreach(RecipeSimple recipe in recipes)
+            recipes = Resources.LoadAll<RecipeSimple>("Recipes");
+            foreach (RecipeSimple recipe in recipes)
             {
                 InventorySlot slot = Instantiate(inventorySlotPrefab, recipesParent);
                 slot.includeInInventory = false;
