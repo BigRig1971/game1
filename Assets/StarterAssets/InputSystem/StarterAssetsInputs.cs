@@ -15,7 +15,7 @@ namespace StarterAssets
 		public bool swim;
 		public bool sprint;
 		public bool interaction;
-		public bool punch;
+		public bool RightHand;
 		[Header("Movement Settings")]
 		public bool analogMovement;
 	
@@ -67,9 +67,9 @@ namespace StarterAssets
 		{
 			InteractionInput(value.isPressed);
 		}
-		public void OnPunch(InputValue value)
+		public void OnRightHand(InputValue value)
 		{
-			PunchInput(value.isPressed);
+			RightHandInput(value.isPressed);
 		}
 
 #else
@@ -99,9 +99,9 @@ namespace StarterAssets
 		{
 			interaction = newRollState;
 		}
-		public void PunchInput(bool newPunchState)
+		public void RightHandInput(bool newRightHandState)
 		{
-			punch = newPunchState;
+			RightHand = newRightHandState;
 		}
 
 		public void SprintInput(bool newSprintState)
