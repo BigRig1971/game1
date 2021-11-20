@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class EquipableManager : MonoBehaviour
 {
-	public List<GameObject> listOfGO = new List<GameObject>();
-	public GameObject equipableItemHolder;
-	public Transform[] equipableItems;
-	[SerializeField] ScriptableObject[] itemSoList;
+	
+	[SerializeField]
+	private GameObject equipableItemHolder;
+	public List<GameObject> EquipableItems = new List<GameObject>();
+	private Transform[] equipableItems;
+	private ScriptableObject[] itemSoList;
 	private void Awake()
 	{
 		itemSoList = Resources.LoadAll<ScriptableObject>("EquipableItems");
@@ -18,12 +20,11 @@ public class EquipableManager : MonoBehaviour
 			{
 				if (child.name == iso.name)
 				{
-					if (!listOfGO.Contains(child.gameObject))
-						listOfGO.Add(child.gameObject);
+					if (!EquipableItems.Contains(child.gameObject))
+						EquipableItems.Add(child.gameObject);
 				}
 			}
 		}
-
 	}
 	private void Start()
 	{
@@ -31,9 +32,10 @@ public class EquipableManager : MonoBehaviour
 	}
 	void DisableEquipped()
 	{
-		foreach (GameObject go in listOfGO)
+		foreach (GameObject go in EquipableItems)
 		{
 			go.SetActive(false);
+		
 		}
 	}
 }

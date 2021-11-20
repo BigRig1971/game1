@@ -7,12 +7,16 @@ public class SpawnGameObjects : MonoBehaviour
 {
 	
 	[SerializeField]
-	private GameObject player;
+	private GameObject[] PrefabsToSpawn;
 	[SerializeField]
 	private CinemachineVirtualCamera vcam;
 	private void Start()
-	{			
-		PhotonNetwork.Instantiate(player.name, this.transform.position, Quaternion.identity);
+	{	
+		foreach(GameObject go in PrefabsToSpawn)
+		{
+			PhotonNetwork.Instantiate(go.name, this.transform.position, Quaternion.identity);
+		}
+		
 		StartCoroutine(SpawnCamera());
 	}
 	private IEnumerator SpawnCamera()

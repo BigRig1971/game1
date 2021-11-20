@@ -9,8 +9,6 @@ namespace StarterAssets
 {
 	public class CustomMovement : MonoBehaviour
 	{
-		//custom inputs
-
 		//custom movement
 		private int _animIDRoll;
 		private int _swim;
@@ -18,13 +16,8 @@ namespace StarterAssets
 		private CharacterController _controller;
 		private Camera _mainCamera;
 		private ThirdPersonController _tpc;
-	
-		//   public RuntimeAnimatorController OnLand;
-		//   public RuntimeAnimatorController InWater;
 		private bool headAboveWater = true;
 		private bool buttAboveWater = true;
-		private bool headBelowWater = false;
-		private bool buttBelowWater = false;
 		public bool _verticalMovement = false;
 		//audio stuff
 		public AudioSource footStep;
@@ -41,22 +34,14 @@ namespace StarterAssets
 			_animIDRoll = Animator.StringToHash("Roll");
 			_swim = Animator.StringToHash("Swim");
 			_rightHand = Animator.StringToHash("RightHand");
-
-			//  _animator.runtimeAnimatorController = OnLand;
 			_mainCamera = Camera.main;
 			_previousSpeed = _tpc.MoveSpeed;
-
 		}
-
-		// Update is called once per frame
 		void Update()
 		{
 			Movement();
-			
-		}
-		private void FixedUpdate()
-		{
-
+			OxygenLevel();
+			//HealthLevel();
 		}
 		private IEnumerator Delay()
 		{
@@ -71,20 +56,16 @@ namespace StarterAssets
 				_tpc._input.roll = false;
 			}
 			if (_tpc._input.RightHand)
-			{
-				
-				
+			{			
 				_tpc._animator.SetBool(_rightHand, true);
 
-				_tpc._input.RightHand = false;
-			
+				_tpc._input.RightHand = false;			
 			}
 
 		}
 		public void ButtAboveWater()
 		{
 			buttAboveWater = true;
-
 			Walking();
 		}
 		public void ButtBelowWater()
@@ -174,12 +155,28 @@ namespace StarterAssets
 		{
 			jumpStart?.Play();
 		}
-		private void ChangeSkinnedMesh(GameObject bodyPart, Mesh pMesh)
+		private void OxygenLevel()
 		{
-			Mesh meshInstance = Instantiate(pMesh) as Mesh;
-
-			bodyPart.GetComponent<SkinnedMeshRenderer>().sharedMesh = meshInstance;
+			if (!headAboveWater && OxygenBar.Instance.value >= 0f)
+			{
+				
+				OxygenBar.Instance.UpdateStat(-.1f);
+			}
+			else if (OxygenBar.Instance.value <= OxygenBar.Instance.maxValue)
+			{
+				OxygenBar.Instance.UpdateStat(.1f);
+			}
+		}
+		private void HealthLevel()
+		{
+			if(OxygenBar.Instance.value <= 0f && HealthBar.Instance.value >= 0f)
+			{
+				HealthBar.Instance.UpdateStat(-.1f);
+			}
+			else if(HealthBar.Instance.value <= HealthBar.Instance.maxValue)
+			{
+				HealthBar.Instance.UpdateStat(.2f);
+			}
 		}
 	}
-
 }

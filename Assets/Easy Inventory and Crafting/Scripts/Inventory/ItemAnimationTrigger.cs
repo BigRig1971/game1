@@ -12,7 +12,7 @@ public class ItemAnimationTrigger : MonoBehaviour
     {
 		if (Input.GetKeyDown(_keyCode) && !InventoryManager.IsOpen())
 		{         
-            _animator.SetTrigger(_triggerName);
+          if(_animator)  _animator.SetTrigger(_triggerName);
 		}
     }
 }

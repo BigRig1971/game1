@@ -288,7 +288,6 @@ namespace Photon.Pun.Demo.Asteroids
             {
                 object isPlayerReady;
                 if (p.CustomProperties.TryGetValue(AsteroidsGame.PLAYER_READY, out isPlayerReady))
-
                 {
                     if (!(bool) isPlayerReady)
                     {

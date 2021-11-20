@@ -14,58 +14,54 @@ namespace EZInventory
 		Transform equipParent;
 		GameObject equipInstance;
 		public GameObject previousGO = null;
+		public bool itemEquipped = false;
+		public bool canEquip = true;
+
+		private void Start()
+		{
+
+		}
 		private void Update()
 		{
 			if (currentItemAmount <= 0)
 			{
 				currentItem = null;
-				
 			}
-
 			SetUI();
-
 			if (mouseOver)
 			{
 				MouseOverChecks();
 			}
-
 			Equip();
 		}
-
 		void Equip()
 		{
 
 			if (currentItem)
 			{
-				//if (previousGO != null) previousGO.SetActive(false);
-				foreach (GameObject go in equipManager.listOfGO)
+				if(previousGO && previousGO.name != currentItem.name)
 				{
+					previousGO.SetActive(false);
+					itemEquipped = false;
+				}
+				foreach (GameObject go in equipManager.EquipableItems)
 
-					if (go.name == currentItem.name)
+				{
+					if (go.name == currentItem.name && itemEquipped == false)
 					{
 						go.SetActive(true);
 						previousGO = go;
-						
+						itemEquipped = true;
 					}
-					else
-					{
-						if(currentItem.type == this.type)
-						{
-							go.SetActive(false);
-						}
-					}
-					
-				}	
+				}
 			}
 			else
 			{
-				
-				
-				
-				
 				if (previousGO != null) previousGO.SetActive(false);
+				itemEquipped = false;
 			}
-			
+
+
 			/* if (currentItem)
 			 {
 				 //Debug.Log(currentItem);
@@ -94,6 +90,6 @@ namespace EZInventory
 				itemImage.color = Color.white;
 			}
 		}
-		
+
 	}
 }
