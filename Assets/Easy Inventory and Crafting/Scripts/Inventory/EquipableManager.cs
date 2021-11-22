@@ -7,6 +7,7 @@ public class EquipableManager : MonoBehaviour
 	
 	[SerializeField]
 	private GameObject equipableItemHolder;
+	[HideInInspector]
 	public List<GameObject> EquipableItems = new List<GameObject>();
 	private Transform[] equipableItems;
 	private ScriptableObject[] itemSoList;

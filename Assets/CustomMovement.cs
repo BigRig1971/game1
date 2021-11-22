@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 
@@ -9,6 +10,13 @@ namespace StarterAssets
 {
 	public class CustomMovement : MonoBehaviour
 	{
+		//stats
+		public ItemStatSO health;
+		public Image healthImage;
+		public ItemStatSO oxygen;
+		public Image oxygenImage;
+		public bool canBreath = true;
+
 		//custom movement
 		private int _animIDRoll;
 		private int _swim;
@@ -40,8 +48,8 @@ namespace StarterAssets
 		void Update()
 		{
 			Movement();
-			OxygenLevel();
-			//HealthLevel();
+			OnOxygenBar();
+			OnHealthBar();
 		}
 		private IEnumerator Delay()
 		{
@@ -155,27 +163,32 @@ namespace StarterAssets
 		{
 			jumpStart?.Play();
 		}
-		private void OxygenLevel()
+		public void OnHoldBreath()
 		{
-			if (!headAboveWater && OxygenBar.Instance.value >= 0f)
-			{
-				
-				OxygenBar.Instance.UpdateStat(-.1f);
-			}
-			else if (OxygenBar.Instance.value <= OxygenBar.Instance.maxValue)
-			{
-				OxygenBar.Instance.UpdateStat(.1f);
-			}
+			canBreath = false;
 		}
-		private void HealthLevel()
+		public void OnBreath()
 		{
-			if(OxygenBar.Instance.value <= 0f && HealthBar.Instance.value >= 0f)
+			canBreath = true;
+		}
+		void OnOxygenBar()
+		{
+			oxygenImage.fillAmount = oxygen.fillAmount;
+			if(canBreath) oxygen.UpdateStat(.03f);
+			if (!canBreath) oxygen.UpdateStat(-.1f);
+		}
+		void OnHealthBar()
+		{
+			healthImage.fillAmount = health.fillAmount;
+			if (Input.GetKeyDown(KeyCode.M) || oxygen.value <= 0)
 			{
-				HealthBar.Instance.UpdateStat(-.1f);
+				health.UpdateStat(-.1f);
+				
+
 			}
-			else if(HealthBar.Instance.value <= HealthBar.Instance.maxValue)
+			else
 			{
-				HealthBar.Instance.UpdateStat(.2f);
+				health.UpdateStat(.1f);
 			}
 		}
 	}
