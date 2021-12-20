@@ -9,6 +9,7 @@ using UnityEngine.UI;
 
 
 
+
 [CreateAssetMenu(fileName = "New Stat", menuName = "EZ Inventory/Stat")]
 public class ItemStatSO : ScriptableObject
 {

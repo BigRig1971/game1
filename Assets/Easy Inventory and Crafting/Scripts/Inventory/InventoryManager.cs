@@ -9,6 +9,7 @@ namespace EZInventory
 {
     public class InventoryManager : MonoBehaviour
     {
+        
         [Tooltip("If true: hides cursor when inventory is closed, freezes time when open.")]
         public bool inventoryPause = true;
         [Tooltip("The main inventory parent, turns on/off with tab")]
@@ -20,21 +21,28 @@ namespace EZInventory
 
         static InventoryManager instance;
 
-        private static List<InventorySlot> slots;
+
         
+        
+        private static List<InventorySlot> slots;
+       // public InventorySlotsSO _slots;//**************************
         public static ItemSO currentItem { get; private set; }
         public static int currentItemAmount { get; private set; }
 
+		private void Awake()
+		{
+            
+		}
 
-        // Start is called before the first frame update
-        void Start()
+		// Start is called before the first frame update
+		void Start()
         {
             if (instance == null)
                 instance = this;
 
             //Turn on inventory to grab slots, then turn back off.
             if (inventoryMain) inventoryMain.SetActive(true);
-
+           
             slots = new List<InventorySlot>();
             foreach (InventorySlot slot in GetComponentsInChildren<InventorySlot>())
             {

@@ -10,12 +10,6 @@ namespace StarterAssets
 {
 	public class CustomMovement : MonoBehaviour
 	{
-		//stats
-		public ItemStatSO health;
-		public Image healthImage;
-		public ItemStatSO oxygen;
-		public Image oxygenImage;
-		public bool canBreath = true;
 
 		//custom movement
 		private int _animIDRoll;
@@ -47,9 +41,7 @@ namespace StarterAssets
 		}
 		void Update()
 		{
-			Movement();
-			OnOxygenBar();
-			OnHealthBar();
+			Movement();		
 		}
 		private IEnumerator Delay()
 		{
@@ -163,33 +155,6 @@ namespace StarterAssets
 		{
 			jumpStart?.Play();
 		}
-		public void OnHoldBreath()
-		{
-			canBreath = false;
-		}
-		public void OnBreath()
-		{
-			canBreath = true;
-		}
-		void OnOxygenBar()
-		{
-			oxygenImage.fillAmount = oxygen.fillAmount;
-			if(canBreath) oxygen.UpdateStat(.03f);
-			if (!canBreath) oxygen.UpdateStat(-.1f);
-		}
-		void OnHealthBar()
-		{
-			healthImage.fillAmount = health.fillAmount;
-			if (Input.GetKeyDown(KeyCode.M) || oxygen.value <= 0)
-			{
-				health.UpdateStat(-.1f);
-				
-
-			}
-			else
-			{
-				health.UpdateStat(.1f);
-			}
-		}
+		
 	}
 }
