@@ -6,35 +6,31 @@ using EZInventory;
 namespace EZInventory
 {
 
-    public class ItemPickup : MonoBehaviour
-    {
-       [System.Serializable]
-        public class Item
-        {
-            public ItemSO _item;
-            public int _itemAmount;         
-        }
-        public Item[] _listOfItems;
+	public class ItemPickup : MonoBehaviour
+	{
+		[System.Serializable]
+		public class Item
+		{
+			public ItemSO _item;
+			public int _itemAmount;
+		}
+		public Item[] _listOfItems;
+	
+		public void LootableItems()
+		{
+			foreach (Item loi in _listOfItems)
+			{
+				int remaining = InventoryManager.AddItemToInventory(loi._item, loi._itemAmount);
 
-        private void OnTriggerEnter(Collider other)
-        {
-            if (other.tag == "Player")
-            {
-                foreach(Item loi in _listOfItems)
+				if (remaining > 0)
 				{
-                    int remaining = InventoryManager.AddItemToInventory(loi._item, loi._itemAmount);
-                    
-                    if (remaining > 0)
-                    {
-                        loi._itemAmount = remaining;
-                    }
-                    else
-                    {
-                        Destroy(gameObject);
-                    }
-                }
-               
-            }
-        }
-    }
+					loi._itemAmount = remaining;
+				}
+				/*else
+				{
+					Destroy(gameObject);
+				}*/
+			}
+		}
+	}
 }

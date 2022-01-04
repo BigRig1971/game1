@@ -15,6 +15,7 @@ namespace StarterAssets
 		private int _animIDRoll;
 		private int _swim;
 		private int _rightHand;
+		
 		private CharacterController _controller;
 		private Camera _mainCamera;
 		private ThirdPersonController _tpc;
@@ -29,6 +30,7 @@ namespace StarterAssets
 		public AudioSource jumpStart;
 		private bool inWater = false;
 		private float _previousSpeed;
+		private bool fp = false;
 		void Start()
 		{
 			_tpc = GetComponent<ThirdPersonController>();
@@ -38,9 +40,23 @@ namespace StarterAssets
 			_rightHand = Animator.StringToHash("RightHand");
 			_mainCamera = Camera.main;
 			_previousSpeed = _tpc.MoveSpeed;
+			
+			
 		}
 		void Update()
 		{
+			if (Input.GetKeyDown(KeyCode.F))
+			{
+				fp = !fp;
+				if (fp)
+				{
+					_tpc._animator.SetBool("FingerPussy", true);
+				}
+				if (!fp)
+				{
+					_tpc._animator.SetBool("FingerPussy", false);
+				}
+			}
 			Movement();		
 		}
 		private IEnumerator Delay()

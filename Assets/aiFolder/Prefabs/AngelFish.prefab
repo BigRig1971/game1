@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 924150438179003251}
   m_Layer: 12
   m_Name: AngelFish
-  m_TagString: Leader
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -354,6 +354,10 @@ PrefabInstance:
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 3040600152842464128, guid: 2fb859894bdbd564fb3f25a5db855917, type: 3}
+      propertyPath: runSpeed
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3040600152842464128, guid: 2fb859894bdbd564fb3f25a5db855917, type: 3}
       propertyPath: maxRadius
       value: 40
       objectReference: {fileID: 0}
@@ -364,6 +368,10 @@ PrefabInstance:
     - target: {fileID: 3040600152842464128, guid: 2fb859894bdbd564fb3f25a5db855917, type: 3}
       propertyPath: turnSpeed
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3040600152842464128, guid: 2fb859894bdbd564fb3f25a5db855917, type: 3}
+      propertyPath: walkSpeed
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3040600152842464128, guid: 2fb859894bdbd564fb3f25a5db855917, type: 3}
       propertyPath: maxAltitude
@@ -386,7 +394,15 @@ PrefabInstance:
       value: 4096
       objectReference: {fileID: 0}
     - target: {fileID: 3040600152842464128, guid: 2fb859894bdbd564fb3f25a5db855917, type: 3}
+      propertyPath: animRunSpeed
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3040600152842464128, guid: 2fb859894bdbd564fb3f25a5db855917, type: 3}
       propertyPath: _CreatureType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3040600152842464128, guid: 2fb859894bdbd564fb3f25a5db855917, type: 3}
+      propertyPath: animWalkSpeed
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3040600152842464128, guid: 2fb859894bdbd564fb3f25a5db855917, type: 3}
@@ -395,7 +411,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3040600152842464128, guid: 2fb859894bdbd564fb3f25a5db855917, type: 3}
       propertyPath: followDistance
-      value: 1
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3040600152842464128, guid: 2fb859894bdbd564fb3f25a5db855917, type: 3}
       propertyPath: _aiMonsterMachines.Array.size

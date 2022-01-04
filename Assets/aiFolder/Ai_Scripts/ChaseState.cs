@@ -18,6 +18,7 @@ public class ChaseState : GenericState
 		else
 		{
 			Follow();
+			GSM.anim.SetFloat("Blend", GSM.animRunSpeed);
 			return this;
 		}
 	}
@@ -26,14 +27,15 @@ public class ChaseState : GenericState
 	}
 	private void Start()
 	{
+		
 	}
 	void Follow()
 	{
 		SwitchToPlayer();
 		var qto = Quaternion.LookRotation(projectedWaypoint - transform.position);
-		qto = Quaternion.Slerp(transform.rotation, qto, 1 * Time.deltaTime * GSM.turnSpeed);
+		qto = Quaternion.Slerp(transform.rotation, qto, 1 * Time.deltaTime * GSM.turnSpeed * 1f);
 		GSM.rb.MoveRotation(qto);
-		GSM.rb.MovePosition(transform.position + transform.forward * Time.deltaTime * GSM.speed);
+		GSM.rb.MovePosition(transform.position + transform.forward * Time.deltaTime * GSM.runSpeed);
 	}
 	public void TurnLeft()
 	{

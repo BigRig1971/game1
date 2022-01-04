@@ -69,7 +69,7 @@ public class GroundHugger : MonoBehaviour
             surface. Ergo, no sliding will occur. */
             currentGravity = -groundNormal * Physics.gravity.magnitude;
         }
-        ourRigidBody.AddForce(currentGravity *20, ForceMode.Force);
+        ourRigidBody.AddForce(currentGravity *30, ForceMode.Force);
     }
 
     void FixedUpdate()

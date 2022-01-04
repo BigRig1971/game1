@@ -5413,9 +5413,12 @@ MonoBehaviour:
   Go: {fileID: 0}
   scale: 5
   followDistance: 3
-  attackDistance: 0.01
-  speed: 1
-  turnSpeed: 3
+  attackDistance: 0.54
+  walkSpeed: 1
+  animWalkSpeed: 1
+  runSpeed: 2
+  animRunSpeed: 2
+  turnSpeed: 2
   maxAltitude: 240
   minAltitude: 205
   navWidth: 0.3
@@ -5653,7 +5656,7 @@ GameObject:
   - component: {fileID: 6336296986083277103}
   m_Layer: 12
   m_Name: SeagullPf
-  m_TagString: Leader
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

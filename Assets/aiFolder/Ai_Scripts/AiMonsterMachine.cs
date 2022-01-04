@@ -17,7 +17,7 @@ public class AiMonsterMachine : MonoBehaviour
 	public GameObject enemyGameObject;
 	public GameObject MainGo;
 	public GameObject Go;
-	public float scale = 1, followDistance = 10f, attackDistance = 3f, speed = 2.5f, turnSpeed = 3f, maxAltitude = 400f, minAltitude = 280f, navWidth = 1.5f, navLength = 3f, maxRadius = 20f, rayDelay = 1f;
+	public float scale = 1, followDistance = 10f, attackDistance = 3f, walkSpeed = 1f, animWalkSpeed = 1f, runSpeed = 2f, animRunSpeed = 2f, turnSpeed = 1f, maxAltitude = 400f, minAltitude = 280f, navWidth = 1.5f, navLength = 3f, maxRadius = 20f, rayDelay = 1f;
 	[HideInInspector]
 	public Animator anim;
 	[HideInInspector]
@@ -43,11 +43,15 @@ public class AiMonsterMachine : MonoBehaviour
 		previousTurnSpeed = turnSpeed;
 		homePosition = transform.position;
 		scale = scale * Random.Range(.7f, 1.3f);
-		speed = speed * scale;
+		walkSpeed = walkSpeed * scale;
+		runSpeed = runSpeed * scale;
+		animWalkSpeed = animWalkSpeed * scale;
+		animRunSpeed = animRunSpeed * scale;
+		turnSpeed = turnSpeed * scale;
 		attackDistance = attackDistance * scale;
 		enemyGameObject = GameObject.FindGameObjectWithTag("Player");
 		anim = MainGo.GetComponent<Animator>();
-		previousSpeed = speed;
+		previousSpeed = walkSpeed;
 		MainGo.transform.localScale = new Vector3(scale, scale, scale);
 	}
 	private void Start()
@@ -79,14 +83,14 @@ public class AiMonsterMachine : MonoBehaviour
 		rb.position = pos;
 		CheckForObstacles();
 
-		if (velocity > 0.1f)
+		/*if (velocity > 0.1f)
 		{
-			anim.SetFloat("Blend", velocity);//,.1f, Time.deltaTime);
+			anim.SetFloat("Blend", 1);//,.1f, Time.deltaTime);
 		}
 		else
 		{
 			anim.SetFloat("Blend", 0f);
-		}
+		}*/
 		
 	}
 	private void Update()

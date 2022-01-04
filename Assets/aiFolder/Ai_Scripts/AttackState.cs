@@ -31,12 +31,13 @@ public class AttackState : GenericState
 		{
 			
 			Attacking();
+			GSM.anim.SetFloat("Blend", GSM.walkSpeed * 0f);
 			return this;
 		}	
 	}
 	private void Start()
 	{
-		//GSM.anim.SetFloat("Blend", 0);
+		
 	}
 	void Attacking()
 	{
@@ -45,6 +46,7 @@ public class AttackState : GenericState
 		{
 			
 			StartCoroutine(AttackEnemy());
+
 		}
 	}
 	IEnumerator AttackEnemy()
@@ -52,7 +54,8 @@ public class AttackState : GenericState
 
 		canAttack = false;
 		int randomNumber = Random.Range(1, GSM.numberOfAttacks);
-		GSM.anim.SetTrigger("bite");
+		//GSM.anim.SetTrigger("bite");
+		
 		GSM.anim.SetTrigger("Attack" + randomNumber);
 		
 		yield return new WaitForSeconds(wooshDelay);
@@ -67,7 +70,7 @@ public class AttackState : GenericState
 		Attack();
 		yield return new WaitForSeconds(Random.Range(.5f, 3));
 		canAttack = true;
-		GSM.speed = GSM.previousSpeed;
+		//GSM.walkSpeed = GSM.previousSpeed;
 	}
 	private void Attack()
 	{	
@@ -76,7 +79,7 @@ public class AttackState : GenericState
 		float dot = Vector3.Dot(transform.forward, (GSM.enemyGameObject.transform.position - transform.position).normalized);
 		if (dot > 0.7f)
 		{
-			GSM.speed = -1f;
+			//GSM.walkSpeed = -1f;
 			EnemyHit?.Invoke(attackPower, enemyHitSound);	
 		}
 	}

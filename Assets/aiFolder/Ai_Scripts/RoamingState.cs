@@ -26,6 +26,7 @@ public class RoamingState : GenericState
 		else
 		{
 			RoamAround();
+			GSM.anim.SetFloat("Blend", GSM.animWalkSpeed);
 			return this;
 		}
 	}
@@ -42,7 +43,7 @@ public class RoamingState : GenericState
 
 	private void Start()
 	{
-
+		
 		GetNewWaypoint();
 
 
@@ -65,27 +66,18 @@ public class RoamingState : GenericState
 		fakeForward.Normalize();
 		Vector3 dir = (this.transform.position - wayPoint).normalized;
 		var qto = Quaternion.LookRotation(wayPoint - transform.position);
-		qto = Quaternion.Slerp(transform.rotation, qto, 1 * Time.deltaTime * GSM.turnSpeed);
+		qto = Quaternion.Slerp(transform.rotation, qto, 1 * Time.deltaTime * GSM.turnSpeed *.5f);
 		GSM.rb.MoveRotation(qto);
-		
-		
+		GSM.rb.MovePosition(transform.position + transform.forward * Time.deltaTime * GSM.walkSpeed);
 
-			GSM.rb.MovePosition(transform.position + transform.forward * Time.deltaTime * GSM.speed);
-		
-
-		
-			//GSM.rb.MovePosition(transform.position + fakeForward * Time.deltaTime * GSM.speed);
-			
-		
-		
 		float dot = Vector3.Dot(transform.right, (wayPoint - transform.position).normalized);
 
 		if (GSM.canFly)
 		{
 			Vector3 forward = transform.forward;
-		float angle = Vector3.SignedAngle(dir, forward, Vector3.up);
+			float angle = Vector3.SignedAngle(dir, forward, Vector3.up);
 			GSM.anim.SetFloat("Direction", dot, .1f, Time.deltaTime);
-			
+
 		}
 
 	}
@@ -101,19 +93,18 @@ public class RoamingState : GenericState
 
 	public void GetNewWaypoint()
 	{
-		//GSM.turnSpeed = GSM.previousTurnSpeed;
-		//GSM.maxSpeed = GSM.previousSpeed;
+
 		StartCoroutine(RoamingDelay());
 	}
 	public void TurnLeft()
 	{
-		
+
 		projectedWaypoint = transform.position + (transform.right * -30 + (transform.forward * 10));
 		StartCoroutine(DodgingDelay());
 	}
 	public void TurnRight()
 	{
-	
+
 		projectedWaypoint = transform.position + (transform.right * 30) + (transform.forward * 10);
 		StartCoroutine(DodgingDelay());
 	}
@@ -124,7 +115,7 @@ public class RoamingState : GenericState
 	}
 	public void TurnUp()
 	{
-	
+
 		projectedWaypoint = transform.position + (transform.up * 10) + (transform.forward * 30);
 		StartCoroutine(DodgingDelay());
 	}
@@ -143,12 +134,13 @@ public class RoamingState : GenericState
 	IEnumerator Idle()
 	{
 		yield return new WaitForSeconds(Random.Range(10f, 20f));
-		GSM.speed = 0f;
-		GSM.anim.SetBool("Eat", true);
+		GSM.walkSpeed = 0f;
+		GSM.anim.SetFloat("Blend", 0f);
+		//GSM.anim.SetBool("Idle", true);
 		yield return new WaitForSeconds(Random.Range(1f, 3f));
-		GSM.anim.SetBool("Eat", false);
+		//GSM.anim.SetBool("Idle", false);
 		GSM.rb.angularDrag = 1;
-		GSM.speed = GSM.previousSpeed;
+		GSM.walkSpeed = GSM.previousSpeed;
 	}
 	IEnumerator RoamingDelay()
 	{
@@ -191,7 +183,7 @@ public class RoamingState : GenericState
 		{
 			while (true)
 			{
-				 float dist = Vector3.Distance(GO.transform.position, transform.position);
+				float dist = Vector3.Distance(GO.transform.position, transform.position);
 				Vector3 dir = (this.transform.position - GO.transform.position).normalized;
 				//if (dist > groupingFactor)
 				{
@@ -205,21 +197,21 @@ public class RoamingState : GenericState
 	}
 	IEnumerator AttackWait()
 	{
-		
+
 		yield return new WaitForSeconds(Random.Range(1, 3));
-		
+
 	}
 
 	public void FollowTheLeader(GameObject v, int cz, float speed, bool ct)
 	{
-		GSM.speed = speed;
+		GSM.walkSpeed = speed;
 		GSM.turnSpeed = speed / 2;
 		groupingFactor = cz;
 		GO = v;
 		StartCoroutine(HerdingWaypoint());
 		if (ct)
 		{
-			GetNewWaypoint();	
+			GetNewWaypoint();
 		}
 	}
 	private void OnDrawGizmosSelected()

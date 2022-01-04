@@ -18,6 +18,7 @@ namespace RealisticEyeMovements {
 
 			[Tooltip("Drag objects here for the actor to look at. If empty, actor will look in random directions.")]
 			public Transform[] pointsOfInterest;
+		public string[] poiTags;
 
 			[Tooltip("Ratio of how often to look at player vs elsewhere. 0: never, 1: always")]
 			[Range(0,1)]
@@ -66,7 +67,7 @@ namespace RealisticEyeMovements {
 			const float minLookAtMeTimeToReact = 4;
 
 			Transform targetPOI;
-		
+		Transform targetPoiWithTag;
 			Transform mainCameraXform;
 			Transform mainCameraParentXform;
 			Transform playerEyeCenterXform;
@@ -166,6 +167,35 @@ namespace RealisticEyeMovements {
 					visibleIndex++;
 				}
 			
+			return null;
+		}
+		Transform ChooseNextPOITAG()
+		{
+			
+			if (poiTags == null || poiTags.Length == 0)
+				return null;
+
+			int numPOIsInView = 0;
+			foreach (string p in poiTags)
+				targetPoiWithTag = GameObject.FindGameObjectWithTag(p).transform;
+				if (targetPoiWithTag != null && targetPoiWithTag != targetPOI && eyeAndHeadAnimator.CanGetIntoView(targetPoiWithTag.position) && targetPoiWithTag.gameObject.activeInHierarchy)
+					numPOIsInView++;
+			if (numPOIsInView == 0)
+				
+				return targetPOI;
+
+
+			int targetVisibleIndex = Random.Range(0, numPOIsInView);
+			int visibleIndex = 0;
+			foreach (string p in poiTags)
+				if (targetPoiWithTag != null && targetPoiWithTag != targetPOI && eyeAndHeadAnimator.CanGetIntoView(targetPoiWithTag.position) && targetPoiWithTag.gameObject.activeInHierarchy)
+				{
+					if (visibleIndex == targetVisibleIndex)
+						return targetPoiWithTag;
+
+					visibleIndex++;
+				}
+
 			return null;
 		}
 
@@ -339,6 +369,8 @@ namespace RealisticEyeMovements {
 			nextChangePOITime = Time.time + Random.Range(Mathf.Min(minLookTime, maxLookTime), Mathf.Max(minLookTime, maxLookTime));
 			
 			Transform nextTargetPOI = ChooseNextHeadTargetPOI();
+			//Transform nextTargetPOI = ChooseNextPOITAG();
+			//Debug.Log(nextTargetPOI);
 			if ( nextTargetPOI != null && nextTargetPOI == targetPOI && state == State.LookingAroundIdly )
 				return;
 			
