@@ -12,6 +12,7 @@ namespace EZInventory
     {
        ItemSO itemSO;
        int itemAmount;
+ 
         static Transform camTransform;
 
         private void Start()
@@ -22,31 +23,25 @@ namespace EZInventory
 
         private void Update()
         {
-            transform.forward = -camTransform.forward;
+          //  transform.forward = -camTransform.forward;
         }
 
         public void SetUpPickupable(ItemSO item, int amount)
         {
             itemSO = item;
             itemAmount = amount;
-            GetComponent<SpriteRenderer>().sprite = item.itemSprite;
+           
+           // GetComponent<SpriteRenderer>().sprite = item.itemSprite;
+            
         }
-
-        private void OnTriggerEnter(Collider other)
-        {
-            if (other.tag == "Player")
-            {
+        public void LootableItems()
+        {           
                 int remaining = InventoryManager.AddItemToInventory(itemSO, itemAmount);
 
                 if (remaining > 0)
                 {
-                    itemAmount = remaining;
-                }
-                else
-                {
-                    Destroy(gameObject);
-                }
-            }
+                itemAmount = remaining;
+            }      
         }
     }
 }

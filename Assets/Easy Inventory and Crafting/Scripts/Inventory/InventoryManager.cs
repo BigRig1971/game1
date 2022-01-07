@@ -192,7 +192,7 @@ namespace EZInventory
             Vector3 direction = player.forward + random;
 
             //"Throw" item forwards
-            ItemPickupable drop = (Instantiate(Resources.Load("Item Pickupable"), player.position + direction * 2, Quaternion.identity) as GameObject).GetComponent<ItemPickupable>();
+            ItemPickupable drop = (Instantiate(Resources.Load("Item Pickupable"), (player.position + direction * 2)+ (player.up * 1.2f), Quaternion.identity) as GameObject).GetComponent<ItemPickupable>();
             drop.SetUpPickupable(item, amount);
 
             //Remove current item

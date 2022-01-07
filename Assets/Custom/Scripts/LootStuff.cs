@@ -5,7 +5,8 @@ using EZInventory;
 public class LootStuff : MonoBehaviour
 {
 	Animator anim;
-	ItemPickup itemPickup;
+	LootableItem itemPickup;
+	ItemPickupable droppedItemPickup;
 	public string element;
 	GameObject otherGO;
 	private void Start()
@@ -17,14 +18,16 @@ public class LootStuff : MonoBehaviour
 		if (other.tag == "Lootable")
 		{
 			otherGO = other.gameObject;
-			itemPickup = other.gameObject.GetComponent<ItemPickup>();
+			itemPickup = other.gameObject.GetComponent<LootableItem>();
+			droppedItemPickup = other.gameObject.GetComponent<ItemPickupable>();
 			StartCoroutine(LootItem());
 		}
 	}
 	private IEnumerator LootItem()
 	{
 		(gameObject.GetComponent(element) as MonoBehaviour).enabled = false;
-		itemPickup.LootableItems();
+		if(itemPickup!= null) itemPickup.LootableItems();
+		if (droppedItemPickup != null) droppedItemPickup.LootableItems();
 		anim.SetBool("Pickup", true);
 		
 		yield return new WaitForSeconds(.3f);
