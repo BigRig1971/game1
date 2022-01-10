@@ -5,43 +5,47 @@ using EZInventory;
 
 namespace EZInventory
 {
-    /// <summary>
-    /// Adds items to inventory on collision with Player
-    /// </summary>
-    public class ItemPickupable : MonoBehaviour
-    {
-       ItemSO itemSO;
-       int itemAmount;
- 
-        static Transform camTransform;
+	/// <summary>
+	/// Adds items to inventory on collision with Player
+	/// </summary>
+	public class ItemPickupable : MonoBehaviour
+	{
+		ItemSO itemSO;
+		int itemAmount;
 
-        private void Start()
-        {
-            if (!camTransform)
-                camTransform = Camera.main.transform;
-        }
+		static Transform camTransform;
 
-        private void Update()
-        {
-          //  transform.forward = -camTransform.forward;
-        }
+		private void Start()
+		{
+			if (!camTransform)
+				camTransform = Camera.main.transform;
+		}
 
-        public void SetUpPickupable(ItemSO item, int amount)
-        {
-            itemSO = item;
-            itemAmount = amount;
-           
-           // GetComponent<SpriteRenderer>().sprite = item.itemSprite;
-            
-        }
-        public void LootableItems()
-        {           
-                int remaining = InventoryManager.AddItemToInventory(itemSO, itemAmount);
+		private void Update()
+		{
+			//  transform.forward = -camTransform.forward;
+		}
 
-                if (remaining > 0)
-                {
-                itemAmount = remaining;
-            }      
-        }
-    }
+		public void SetUpPickupable(ItemSO item, int amount)
+		{
+			itemSO = item;
+			itemAmount = amount;
+
+			// GetComponent<SpriteRenderer>().sprite = item.itemSprite;
+
+		}
+		public void LootableItems()
+		{
+			int remaining = InventoryManager.AddItemToInventory(itemSO, itemAmount);
+
+			if (remaining > 0)
+			{
+				itemAmount = remaining;
+			}
+			else
+			{
+				Destroy(gameObject, .5f);
+			}
+		}
+	}
 }

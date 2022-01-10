@@ -17,22 +17,31 @@ public class BuildSystem : MonoBehaviour
 	[HideInInspector] //hiding this in inspector, so it doesnt accidently get clicked
 	public bool isBuilding = false;//are we or are we not currently trying to build something? 
 	private bool pauseBuilding = false;//used to pause the raycast
-	public ScriptableObject[] buildItems;             //attempt to spawn inventory items from database  ***********
-	public ScriptableObject currentBuildItem;
+	public ItemSO[] buildItems;             //attempt to spawn inventory items from database  ***********
+	public ItemSO currentBuildItem;
 	public bool isBuilt = false;
-	
+
 
 	private void Awake()
 	{
-		buildItems = Resources.LoadAll<ScriptableObject>("BuildItems");
+		buildItems = Resources.LoadAll<ItemSO>("BuildItems");
 	}
 	private void Start()
 	{
-		
+
 
 	}
 	private void Update()
 	{
+		if (Input.GetMouseButtonDown(0))
+		{
+			BuildTheFucker();
+		}
+		if (InventoryManager.IsOpen() && Input.GetMouseButtonDown(2))
+		{
+			removeItemFromField();
+		}
+
 		if (Input.GetKeyDown(KeyCode.Y))//rotate
 		{
 			if (previewGameObject != null)
@@ -86,26 +95,36 @@ public class BuildSystem : MonoBehaviour
 		}
 
 	}
-	/*  public void removeItemFromField()
-	  {
-		  Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-		  RaycastHit hit;  
-		  if (Physics.Raycast(ray, out hit, 10000, layerRemovable))
-		  {
+	public void removeItemFromField()
+	{
 
-			  Debug.DrawLine(ray.origin, hit.point);
-			  Debug.Log("Clicked on " + hit.transform.gameObject.name);
-			  if (hit.transform.gameObject && itemToRemove.itemID == 0)
-			  {
-				  itemToRemove.itemID = hit.transform.gameObject.GetComponent<itemIdentifier>().itemID;
+		Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+		RaycastHit hit;
+		if (Physics.Raycast(ray, out hit, 10000))
+		{
+
+			Debug.DrawLine(ray.origin, hit.point);
+			//Debug.Log("Clicked on " + hit.transform.gameObject.name);
+
+			
+			foreach (ItemSO item in buildItems)
+			{
+				Debug.Log(item.name);
+				Debug.Log(hit.transform.name);
+				if (hit.transform.name == item.name)
+				{
+
+					
+					InventoryManager.AddItemToInventory(item, 1);
+					Destroy(hit.transform.gameObject);
+				}
 
 
-				  Destroy(hit.transform.gameObject);
-			  }
+			}
 
 
-		  }
-	  }*/
+		}
+	}
 
 
 
@@ -123,7 +142,7 @@ public class BuildSystem : MonoBehaviour
 		CancelBuild();
 		//camPivot.transform.localPosition = new Vector3(camPivot.transform.localPosition.x + camPosX, camPivot.transform.localPosition.y + camPosY, camPivot.transform.localPosition.z + camPosZ);
 		previewGameObject = Instantiate(_go, Vector3.zero, Quaternion.identity);
-		
+
 		previewScript = previewGameObject.GetComponent<Preview>();
 		isBuilding = true;
 		//Debug.Log(_go.name);
@@ -187,8 +206,8 @@ public class BuildSystem : MonoBehaviour
 
 			//if your using something from blender and anchor points are setup correctly use this line
 			previewGameObject.transform.position = hit.point;
-			
-			
+
+
 		}
 
 	}
