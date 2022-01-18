@@ -45,6 +45,18 @@ namespace StarterAssets
 		}
 		void Update()
 		{
+			if (Input.GetKeyDown(KeyCode.V))
+			{
+				fp = !fp;
+				if (fp)
+				{
+					_tpc._animator.SetBool("Dance", true);
+				}
+				if (!fp)
+				{
+					_tpc._animator.SetBool("Dance", false);
+				}
+			}
 			if (Input.GetKeyDown(KeyCode.F))
 			{
 				fp = !fp;

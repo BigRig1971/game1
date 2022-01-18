@@ -65,6 +65,7 @@ namespace StarterAssets
 		private float _cinemachineTargetPitch;
 
 		// player
+		public bool _rootMotion = false;
 		public float _speed;
 		private float _animationBlend;
 		private float _targetRotation = 0.0f;
@@ -101,6 +102,7 @@ namespace StarterAssets
 			{
 				_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
 			}
+
 		}
 
 		private void Start()
@@ -115,6 +117,10 @@ namespace StarterAssets
 			// reset our timeouts on start
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
+			if (_rootMotion)
+			{
+				_animator.applyRootMotion = true;
+			}
 		}
 
 		private void Update()
@@ -123,8 +129,11 @@ namespace StarterAssets
 
 			JumpAndGravity();
 			GroundedCheck();
-			
+			if (_animator.GetBool("Attack") != true)
+			{
 				Move();
+			}
+
 		}
 
 		private void LateUpdate()
@@ -174,6 +183,7 @@ namespace StarterAssets
 
 		public void Move()
 		{
+
 			// set target speed based on move speed, sprint speed and if sprint is pressed
 			float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
 
@@ -187,6 +197,7 @@ namespace StarterAssets
 			float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
 
 			float speedOffset = 0.1f;
+
 			float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
 
 			// accelerate or decelerate to target speed
@@ -219,7 +230,7 @@ namespace StarterAssets
 				{
 					_verticalVelocity = _mainCamera.transform.forward.y * 5;
 
-					
+
 					transform.rotation = Quaternion.Euler(_mainCamera.transform.eulerAngles.x, rotation, 0.0f);
 				}
 				else
@@ -229,7 +240,7 @@ namespace StarterAssets
 			}
 			else
 			{
-				
+
 				transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
 			}
 
@@ -237,9 +248,14 @@ namespace StarterAssets
 			Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
 			// move the player
-			_controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime) ;
+
+
+			_controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+
 
 			// update animator if using character
+
+
 			if (_hasAnimator)
 			{
 				_animator.SetFloat(_animIDSpeed, _animationBlend);

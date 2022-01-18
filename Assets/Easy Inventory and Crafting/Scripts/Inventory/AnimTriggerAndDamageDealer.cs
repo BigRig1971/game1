@@ -12,7 +12,7 @@ public class AnimTriggerAndDamageDealer : MonoBehaviour
 	public float delayImpact = .3f;
 	public Animator _animator;
 	LootableItem damagableGo;
-	public bool canCauseDamage = false;
+	private bool canCauseDamage = false;
 	private void OnEnable()
 	{
 		if (_boolName == "") return;
@@ -29,28 +29,52 @@ public class AnimTriggerAndDamageDealer : MonoBehaviour
 	{
 		if (other.CompareTag("Lootable") && canCauseDamage)
 		{
-			canCauseDamage = false;
+
 			damagableGo = other.gameObject.GetComponent<LootableItem>();
-			StartCoroutine(PauseAnimation());
+			StartCoroutine(CauseSomeDamage());
 		}
 	}
+
 	void Update()
 	{
-		if (Input.GetKeyDown(_keyCode) && !InventoryManager.IsOpen())
+		if (_animator.GetCurrentAnimatorStateInfo(0).IsName(_triggerName))
+		{
+			if(!_animator.GetBool("Attack"))
+			_animator.SetBool("Attack", true);
+		}
+		else
+		{
+			if (_animator.GetBool("Attack"))
+				_animator.SetBool("Attack", false);
+		}
+			if (Input.GetKeyDown(_keyCode) && !InventoryManager.IsOpen())
+		{		
+			if (!_animator.GetCurrentAnimatorStateInfo(0).IsName(_triggerName))
+			{
+				canCauseDamage = true;				
+				_animator.SetTrigger(_triggerName);
+				//_animator.SetBool("Attack", true);
+			}		
+		}
+		/*else
 		{
 			if (!_animator.GetCurrentAnimatorStateInfo(0).IsName(_triggerName))
 			{
-				canCauseDamage = true;
-				_animator.SetTrigger(_triggerName);
+				_animator.SetBool("Attack", false);
 			}
-		}
+		}*/
 	}
-	private IEnumerator PauseAnimation()
+	private IEnumerator CauseSomeDamage()
 	{
+		canCauseDamage = false;
 		damagableGo.TakeDamage(damagePower);
 		_animator.SetTrigger("Interrupt");
 		_animator.speed = 0f;
 		yield return new WaitForSeconds(.2f);
 		_animator.speed = 1;
+		if(damagableGo.health <= 0)
+		{
+			damagableGo.LootableItems();
+		}
 	}
 }
