@@ -27,6 +27,7 @@ Material:
   m_ShaderKeywords: N_F_CS_ON N_F_ESSGI_ON N_F_ESSR_ON N_F_ESSS_ON N_F_PAL_ON N_F_RELGI_ON
     N_F_SS_ON N_F_TRANS_ON _ALPHATEST_ON _BLENDMODE_ALPHA _BLENDMODE_PRESERVE_SPECULAR_LIGHTING
     _DISABLE_SSR_TRANSPARENT _MATERIAL_FEATURE_CLEAR_COAT _NORMALMAP_TANGENT_SPACE
+    _SPECULAR_OCCLUSION_NONE
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -64,7 +65,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseColorMap:
-        m_Texture: {fileID: 2800000, guid: 23866d02cc7dda14587b6f163d5d5812, type: 3}
+        m_Texture: {fileID: 2800000, guid: cc8298e00cf36ea4caed1eb13186d1fd, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BentNormalMap:
@@ -120,7 +121,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 23866d02cc7dda14587b6f163d5d5812, type: 3}
+        m_Texture: {fileID: 2800000, guid: cc8298e00cf36ea4caed1eb13186d1fd, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MaskGloss:
@@ -215,7 +216,6 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    m_Ints: []
     m_Floats:
     - Boolean_8D34052F: 0
     - DiffusionProfile_261f48f1fbc94ccbafc421414859c159: 3.99017
@@ -450,7 +450,7 @@ Material:
     - _SmoothnessRemapMin: 0
     - _SpecularAAScreenSpaceVariance: 0.1
     - _SpecularAAThreshold: 0.2
-    - _SpecularOcclusionMode: 1
+    - _SpecularOcclusionMode: 0
     - _SrcBlend: 1
     - _StencilRef: 0
     - _StencilRefDepth: 8
@@ -502,9 +502,9 @@ Material:
     - Color_83777D09: {r: 1, g: 1, b: 1, a: 0}
     - DiffusionProfile_261f48f1fbc94ccbafc421414859c159_Asset: {r: -694.41174, g: -2.8006413e+22, b: 2.7147835e-26, a: 3.4189296e+30}
     - DiffusionProfile_bfbe0deb8ec4428a9cfcdb968651903c_Asset: {r: -694.41174, g: -2.8006413e+22, b: 2.7147835e-26, a: 3.4189296e+30}
-    - _BaseColor: {r: 0.9811321, g: 0.9811321, b: 0.9811321, a: 1}
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _BaseColorMap_MipInfo: {r: 0, g: 0, b: 0, a: 0}
-    - _Color: {r: 0.9811321, g: 0.9811321, b: 0.9811321, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _CustomLightDirection: {r: 0, g: 0, b: 10, a: 0}
     - _DiffusionProfileAsset: {r: -1.405437e+32, g: 2.0030989e-26, b: 0.00000006313206, a: -4.4045647e-18}
     - _DoubleSidedConstants: {r: 1, g: 1, b: 1, a: 0}
