@@ -4,6 +4,10 @@
 
 using System;
 using UnityEngine;
+#if CREST_HDRP
+using System.Collections.Generic;
+using UnityEngine.Rendering.HighDefinition;
+#endif
 #if CREST_URP
 using UnityEngine.Rendering.Universal;
 #endif
@@ -90,6 +94,17 @@ namespace Crest
         GameObject _drawCacheQuad;
         Camera _camDepthCache;
         Material _copyDepthMaterial;
+
+#if CREST_HDRP
+        static readonly List<FrameSettingsField> s_FrameSettingsFields = new List<FrameSettingsField>()
+        {
+            FrameSettingsField.OpaqueObjects,
+            FrameSettingsField.TransparentObjects,
+            FrameSettingsField.TransparentPrepass,
+            FrameSettingsField.TransparentPostpass,
+            FrameSettingsField.AsyncCompute,
+        };
+#endif
 
         void Start()
         {
@@ -195,30 +210,54 @@ namespace Crest
                 _camDepthCache.orthographic = true;
                 _camDepthCache.clearFlags = CameraClearFlags.SolidColor;
                 // Clear to 'very deep'
-                _camDepthCache.backgroundColor = Color.white * 1000f;
+                _camDepthCache.backgroundColor = Color.white * LodDataMgrSeaFloorDepth.k_DepthBaseline;
                 _camDepthCache.enabled = false;
                 _camDepthCache.allowMSAA = false;
-                if (RenderPipelineHelper.IsUniversal)
-                {
-                    _camDepthCache.allowDynamicResolution = false;
-                }
-                
+                _camDepthCache.allowDynamicResolution = false;
+                _camDepthCache.depthTextureMode = DepthTextureMode.Depth;
                 // Stops behaviour from changing in VR. I tried disabling XR before/after camera render but it makes the editor
                 // go bonkers with split windows.
                 _camDepthCache.cameraType = CameraType.Reflection;
                 // I'd prefer to destroy the camera object, but I found sometimes (on first start of editor) it will fail to render.
                 _camDepthCache.gameObject.SetActive(false);
 
-#if CREST_URP
                 if (RenderPipelineHelper.IsUniversal)
                 {
+#if CREST_URP
                     var additionalCameraData = _camDepthCache.gameObject.AddComponent<UniversalAdditionalCameraData>();
                     additionalCameraData.renderShadows = false;
                     additionalCameraData.requiresColorTexture = false;
                     additionalCameraData.requiresDepthTexture = false;
                     additionalCameraData.renderPostProcessing = false;
-                }
 #endif
+                }
+                else if (RenderPipelineHelper.IsHighDefinition)
+                {
+#if CREST_HDRP
+                    var additionalCameraData = _camDepthCache.gameObject.AddComponent<HDAdditionalCameraData>();
+
+                    additionalCameraData.clearColorMode = HDAdditionalCameraData.ClearColorMode.Color;
+                    additionalCameraData.volumeLayerMask = 0;
+                    additionalCameraData.probeLayerMask = 0;
+                    additionalCameraData.xrRendering = false;
+
+                    // Override camera frame settings to disable most of the expensive rendering for this camera.
+                    // Most importantly, disable custom passes and post-processing as third-party stuff might throw
+                    // errors because of this camera. Even with excluding a lot of HDRP features, it still does a
+                    // lit pass which is not cheap.
+                    additionalCameraData.customRenderingSettings = true;
+
+                    foreach (FrameSettingsField frameSetting in Enum.GetValues(typeof(FrameSettingsField)))
+                    {
+                        if (!s_FrameSettingsFields.Contains(frameSetting))
+                        {
+                            // Enable override and then disable the feature.
+                            additionalCameraData.renderingPathCustomFrameSettingsOverrideMask.mask[(uint)frameSetting] = true;
+                            additionalCameraData.renderingPathCustomFrameSettings.SetEnabled(frameSetting, false);
+                        }
+                    }
+#endif
+                }
             }
 
             if (updateComponents || isDepthCacheCameraCreation)
@@ -311,8 +350,22 @@ namespace Crest
                 return;
             }
 
+            var oldShadowDistance = 0f;
+
+            if (RenderPipelineHelper.IsLegacy)
+            {
+                // Stop shadow passes from executing.
+                oldShadowDistance = QualitySettings.shadowDistance;
+                QualitySettings.shadowDistance = 0f;
+            }
+
             // Render scene, saving depths in depth buffer.
             _camDepthCache.Render();
+
+            if (RenderPipelineHelper.IsLegacy)
+            {
+                QualitySettings.shadowDistance = oldShadowDistance;
+            }
 
             if (_copyDepthMaterial == null)
             {
@@ -424,10 +477,18 @@ namespace Crest
                 AssetDatabase.ImportAsset(path);
 
                 TextureImporter ti = AssetImporter.GetAtPath(path) as TextureImporter;
+                ti.textureShape = TextureImporterShape.Texture2D;
                 ti.textureType = TextureImporterType.SingleChannel;
                 ti.sRGBTexture = false;
                 ti.alphaSource = TextureImporterAlphaSource.None;
+                ti.mipmapEnabled = false;
                 ti.alphaIsTransparency = false;
+                // Compression will clamp negative values.
+                ti.textureCompression = TextureImporterCompression.Uncompressed;
+                ti.filterMode = FilterMode.Point;
+                ti.wrapMode = TextureWrapMode.Clamp;
+                // Values are slightly different with NPOT Scale applied.
+                ti.npotScale = TextureImporterNPOTScale.None;
                 ti.SaveAndReimport();
 
                 Debug.Log("Crest: Cache saved to " + path, AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path));

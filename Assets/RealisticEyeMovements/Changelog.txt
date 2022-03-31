@@ -1,5 +1,23 @@
 Changelog
 
+2.1.5
+- Fixed issue with OpenXR not doing the social triangle.
+
+2.1.4
+-Optional delegates on LookTargetController for more control
+	IsPlayerInViewDelegate
+		Used to determine whether the player is in view, and can be looked at. Register your own function here if you want some more custom logic, for example based on distance, raycasting to see whether there are occluding things in between etc.
+	IsPlayerLookingAtMeDelegate
+		Used to determine whether that player is looking at the character (for example to decide whether to stare back). Register your own function here if you want some more custom logic, for example based on distance, raycasting to see whether there are occluding things in between etc.
+	GetPOIsDelegate
+		Called every time the character is ready to look at a new thing. Returns the things that the character can choose from to look at. So instead of assigning a fixed list at start, you can update the points of interest whenever needed via this delegate. This is useful if there are changing/appearing/disappearing things in the environment that the character can look at. For example, in VR House Disco, every time the character is ready to look at a new target, this delegate returns the other dancers in front of the character as potential look targets to choose from.
+- Updated presets.
+-Replaced head and neck tilt angle with three each: pitch, roll and yaw. These angles are now applied after the head oriented towards the target. The head angles are applied not only for HeadControl set to Transform but also AnimatorIK and FinalIK.
+- Fixed issue where blinking didn't close the eyelids completely when looking up or down or eyeWidenOrSquint widened the eyes.
+- Fixed some issues when FinalIK components are not enabled at start.
+- Fixed issue when looking at player and the player camera switches from one to another.
+
+
 2.1.3
 - Switched to new head animation method HillHybrid. The old method SmoothDamp is still available if you want.
 - Added new parameters Head Tilt and Neck Tilt in case you want to "roll" the head around the forward axis.

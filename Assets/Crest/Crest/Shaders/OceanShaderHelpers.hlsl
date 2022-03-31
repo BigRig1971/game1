@@ -7,9 +7,18 @@
 #ifndef CREST_OCEAN_SHADER_HELPERS_H
 #define CREST_OCEAN_SHADER_HELPERS_H
 
+// Silence Unity errors in SG editor.
+#ifdef SHADERGRAPH_PREVIEW
+#define LOAD_DEPTH_TEXTURE_X(a, b) 0
+#define SAMPLE_DEPTH_TEXTURE_X(a, b, c) 0
+#define TEXTURE2D_X(t) Texture2D t
+Texture2D _CameraDepthTexture;
+SamplerState sampler_CameraDepthTexture;
+#else
 // Unity does not define these.
 #define SAMPLE_DEPTH_TEXTURE_X(textureName, samplerName, coord2) SAMPLE_TEXTURE2D_X(textureName, samplerName, coord2).r
 #define LOAD_DEPTH_TEXTURE_X(textureName, coord2) LOAD_TEXTURE2D_X(textureName, coord2).r
+#endif
 
 // Sample depth macros for all pipelines. Use macros as HDRP depth is a mipchain which can change according to:
 // com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl
@@ -68,6 +77,7 @@ float CrestLinearEyeDepth(const float i_rawDepth)
 #endif // _PROJECTION
 }
 
+#ifdef TEXTURE2D_X
 // Works for all pipelines.
 float CrestMultiSampleDepth
 (
@@ -109,5 +119,6 @@ float CrestMultiLoadDepth(TEXTURE2D_X(i_texture), const uint2 i_positionSS, cons
 
 	return rawDepth;
 }
+#endif
 
 #endif // CREST_OCEAN_SHADER_HELPERS_H

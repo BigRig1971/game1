@@ -90,22 +90,8 @@ namespace Crest
             }
 #endif
 
-#if CREST_SRP
-            // Only on HDRP so far..
-            if (_volume == null && RenderPipelineHelper.IsHighDefinition)
-            {
-                // Create volume to weigh in underwater profile
-                var go = new GameObject();
-                go.name = "Underwater Lighting Volume";
-                _volume = go.AddComponent<Volume>();
-                _volume.weight = 0;
-                _volume.priority = 1000;
-                _volume.profile = _volumeProfile;
-            }
-#endif
-
-            Color density = OceanRenderer.Instance.OceanMaterial.GetColor("_DepthFogDensity");
-            _averageDensity = (density.r + density.g + density.b) / 3f;
+            var density = OceanRenderer.Instance.UnderwaterDepthFogDensity;
+            _averageDensity = (density.x + density.y + density.z) / 3f;
 
             _isInitialised = true;
         }
@@ -138,10 +124,13 @@ namespace Crest
 
         void LateUpdate()
         {
-            if (OceanRenderer.Instance == null)
+            if (OceanRenderer.Instance == null || UnderwaterRenderer.Instance == null)
             {
                 return;
             }
+
+            var density = OceanRenderer.Instance.UnderwaterDepthFogDensity;
+            _averageDensity = (density.x + density.y + density.z) / 3f;
 
             float depthMultiplier = Mathf.Exp(_averageDensity *
                 Mathf.Min(OceanRenderer.Instance.ViewerHeightAboveWater * DEPTH_OUTSCATTER_CONSTANT, 0f) *

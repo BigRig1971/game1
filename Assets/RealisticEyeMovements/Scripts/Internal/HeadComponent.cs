@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define HIDE_HELPER_OBJECTS_IN_INSPECTOR
+
+using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -35,8 +37,6 @@ namespace RealisticEyeMovements
 			
 			#if USE_FINAL_IK
 				RootMotion.FinalIK.LookAtIK lookAtIK;
-				RootMotion.FinalIK.FullBodyBipedIK fbbik;
-				bool isFinalIKInitialized;
 			#endif
 		
 			// Head jitter
@@ -67,6 +67,7 @@ namespace RealisticEyeMovements
 			Quaternion character_From_Head_Q;
 			Quaternion head_From_Character_Q;
 			Quaternion character_From_Neck_Q;
+			Quaternion neck_From_Character_Q;
 			Quaternion headBase_From_HeadEffectorPivot_Q;
 			Quaternion targetHeadBase_From_HeadEffector_Q;
 			Quaternion headBase_From_head_Q;
@@ -101,7 +102,7 @@ namespace RealisticEyeMovements
 			
 		#endregion
 
-
+	
 		float ClampHorizontalHeadAngle(float headAngle)
 		{
 			float maxLimitedHeadAngle = Mathf.Lerp(kMaxHorizHeadAngle, 0, eyeAndHeadAnimator.limitHeadAngle);
@@ -179,13 +180,9 @@ namespace RealisticEyeMovements
 			
 			#if USE_FINAL_IK
 				lookAtIK = eyeAndHeadAnimator.GetComponentInChildren<RootMotion.FinalIK.LookAtIK>();
-				fbbik = eyeAndHeadAnimator.GetComponentInChildren<RootMotion.FinalIK.FullBodyBipedIK>();
 				
 				if ( lookAtIK != null && headControl != HeadControl.FinalIK )
-				{
-					Debug.LogWarning(eyeAndHeadAnimator.name + " RealisticEyeMovements: head control is set to " + headControl + ", but LookAtIK component found. Switching head control to FinalIK.", eyeAndHeadAnimator.gameObject);
-					headControl = HeadControl.FinalIK;
-				}
+					Debug.LogWarning(eyeAndHeadAnimator.name + " RealisticEyeMovements: head control is set to " + headControl + ", but LookAtIK component found.", eyeAndHeadAnimator.gameObject);
 			#endif
 			
 			//*** Head jitter
@@ -217,6 +214,9 @@ namespace RealisticEyeMovements
 				{
 					if ( animator != null )
 						spineXform = headControl == HeadControl.Transform ? Utils.GetSpineBoneFromAnimator(animator) : animator.GetBoneTransform(HumanBodyBones.Hips);
+						// If headControl is Transform, we can set a bone pretty high up to serve as base. But other headControls might move
+						// the upper body when orienting the head, and the base should not be moved by that (feedback effects), so we have to set the base
+						// to be the hip bones: low enough that the head orientation doesn't affect it.
 					
 					if ( spineXform == null )
 					{
@@ -227,14 +227,18 @@ namespace RealisticEyeMovements
 				}
 				
 				// Spine base is positioned at the spine bone, but vertically under the head. It is used to compute "forward" for selecting new idle look targets: spine base to head bone is used as "up".
-				spineBaseXform = new GameObject(eyeAndHeadAnimator.name + " spine base").transform;
-				spineBaseXform.gameObject.hideFlags = HideFlags.HideInHierarchy;
+				spineBaseXform = new GameObject("REM " + eyeAndHeadAnimator.name + " spine base").transform;
+				#if HIDE_HELPER_OBJECTS_IN_INSPECTOR
+					spineBaseXform.gameObject.hideFlags = HideFlags.HideInHierarchy;
+				#endif
 				spineBaseXform.parent = spineXform;
 				spineBaseXform.position =  headXform.position + Vector3.Project(spineXform.position  - headXform.position, eyeAndHeadAnimator.transform.up);
 				spineBaseXform.rotation = eyeAndHeadAnimator.transform.rotation;
 				
-				headBaseXform = new GameObject(eyeAndHeadAnimator.name + " head base").transform;
-				headBaseXform.gameObject.hideFlags = HideFlags.HideInHierarchy;
+				headBaseXform = new GameObject("REM " + eyeAndHeadAnimator.name + " head base").transform;
+				#if HIDE_HELPER_OBJECTS_IN_INSPECTOR
+					headBaseXform.gameObject.hideFlags = HideFlags.HideInHierarchy;
+				#endif
 				headBaseXform.parent = spineXform;
 				headBaseXform.position = headXform.position;
 				headBaseXform.rotation = eyeAndHeadAnimator.transform.rotation;
@@ -244,8 +248,10 @@ namespace RealisticEyeMovements
 
 			if (headEffectorPivotXform == null)
 			{
-				headEffectorPivotXform = new GameObject(eyeAndHeadAnimator.name + " head target").transform;
-				headEffectorPivotXform.gameObject.hideFlags = HideFlags.HideInHierarchy;
+				headEffectorPivotXform = new GameObject("REM " + eyeAndHeadAnimator.name + " head target").transform;
+				#if HIDE_HELPER_OBJECTS_IN_INSPECTOR
+					headEffectorPivotXform.gameObject.hideFlags = HideFlags.HideInHierarchy;
+				#endif
 				headEffectorPivotXform.parent = headBaseXform;
 				headEffectorPivotXform.localPosition = Vector3.zero;
 				headEffectorPivotXform.localRotation = Quaternion.identity;
@@ -268,12 +274,12 @@ namespace RealisticEyeMovements
 						
 					if ( headXform == null )
 					{
-						Debug.LogError(eyeAndHeadAnimator.name + ": RealisticEyeMovements: head control is set to AnimatorIK, but head bone not found! Reverting to no head control.", eyeAndHeadAnimator.gameObject);
+						Debug.LogError(eyeAndHeadAnimator.name + ": RealisticEyeMovements: head control is set to FinalIK, but head bone not found! Reverting to no head control.", eyeAndHeadAnimator.gameObject);
 						headControl = HeadControl.None;
 					}
 				#else
-					Debug.LogError(eyeAndHeadAnimator.name + ": RealisticEyeMovements: head control is set to FinalIK, but USE_FINAL_IK is not defined. Reverting head control to AnimatorIK.", eyeAndHeadAnimator.gameObject);
-					headControl = HeadControl.AnimatorIK;
+					Debug.LogError(eyeAndHeadAnimator.name + ": RealisticEyeMovements: head control is set to FinalIK, but USE_FINAL_IK is not defined. Reverting to no head control.", eyeAndHeadAnimator.gameObject);
+					headControl = HeadControl.None;
 				#endif
 			}
 			if ( headControl == HeadControl.AnimatorIK )
@@ -303,6 +309,7 @@ namespace RealisticEyeMovements
 							? "RealisticEyeMovements: head control is set to Transform, but no transform assigned and mecanim head not found! Reverting to no head control."
 							: "ealisticEyeMovements: head control is set to Head Target, but no head target assigned! Reverting to no head control."),
 						eyeAndHeadAnimator.gameObject);
+					headControl = HeadControl.None;
 				}
 			}
 
@@ -313,11 +320,19 @@ namespace RealisticEyeMovements
 			character_From_Head_Q = character_From_World_Q * headXform.rotation;
 			head_From_Character_Q = Quaternion.Inverse(character_From_Head_Q);
 			if ( neckXform != null )
+			{
 				character_From_Neck_Q = character_From_World_Q * neckXform.rotation;
-			
+				neck_From_Character_Q = Quaternion.Inverse(character_From_Neck_Q);
+			}
 			forwardInHeadSpace = Quaternion.Inverse(headXform.rotation) * eyeAndHeadAnimator.transform.forward;
 		}
 
+		
+		bool IsHeadMovementTotalAngleTooSmall()
+		{
+			return headMovementTotalAngle < 0.1f;
+		}
+		
 		
 		public bool IsSwitchingHeadTarget()
 		{
@@ -332,7 +347,7 @@ namespace RealisticEyeMovements
 		{
 			timeSinceEnabled += deltaTime;
 			
-			currentHeadIKWeight = Mathf.Lerp( currentHeadIKWeight, targetHeadWeight, Time.deltaTime);
+			currentHeadIKWeight = Mathf.Lerp( currentHeadIKWeight, targetHeadWeight, deltaTime);
 			
 			UpdateHeadEffector(deltaTime);
 			
@@ -373,22 +388,9 @@ namespace RealisticEyeMovements
 			Vector3 headTargetPos = headEffectorPivotXform.TransformPoint(2 * eyeAndHeadAnimator.eyeDistanceScale * Vector3.forward);
 			
 			animator.SetLookAtPosition(headTargetPos);
-			animator.SetLookAtWeight(eyeAndHeadAnimator.mainWeight * currentHeadIKWeight, eyeAndHeadAnimator.bodyWeight, 1, 0, 1);
-	}
-		
-		
-		public void OnDestroy()
-		{
-			#if USE_FINAL_IK
-				if ( isFinalIKInitialized )
-				{
-					if ( fbbik != null && fbbik.solver != null && fbbik.solver.OnPostUpdate == OnFinalIKPostUpdate )
-						fbbik.solver.OnPostUpdate = null;
-					else if ( lookAtIK != null && lookAtIK.solver != null && lookAtIK.solver.OnPostUpdate == OnFinalIKPostUpdate )
-						lookAtIK.solver.OnPostUpdate = null;
-				}
-			#endif
+			animator.SetLookAtWeight(eyeAndHeadAnimator.mainWeight * currentHeadIKWeight, eyeAndHeadAnimator.bodyWeight, 1, 0, 0);
 		}
+		
 		
 		
 		public void OnEnable()
@@ -397,15 +399,6 @@ namespace RealisticEyeMovements
 		}
 		
 		
-		#if USE_FINAL_IK
-			void OnFinalIKPostUpdate()
-			{
-				if ( eyeAndHeadAnimator.updateType != EyeAndHeadAnimator.UpdateType.External )
-					eyeAndHeadAnimator.Update2(Time.deltaTime);
-			}
-		#endif
-
-
 		public void SetEyeRootXform(Transform eyeRootXform)
 		{
 			eyeCenterOnHeadAxisInHeadPivotLocalCoords = headEffectorPivotXform.InverseTransformPoint(eyeRootXform.position);
@@ -423,7 +416,6 @@ namespace RealisticEyeMovements
 					if ( neckXform != null && (eyeAndHeadAnimator.neckHorizWeight > 0 || eyeAndHeadAnimator.neckVertWeight > 0) )
 					{
 						Quaternion neckTargetRotation = headEffectorPivotXform.parent.rotation *
-						                                Quaternion.Euler(0, 0, eyeAndHeadAnimator.neckTilt) *
 						                                Quaternion.Euler(Utils.NormalizedDegAngle(localEuler.x) * eyeAndHeadAnimator.neckVertWeight * 0.5f,
 												                                Utils.NormalizedDegAngle(localEuler.y) * eyeAndHeadAnimator.neckHorizWeight *0.5f,
 												                                0) * character_From_Neck_Q;
@@ -435,10 +427,9 @@ namespace RealisticEyeMovements
 					
 					Quaternion target_world_From_head_Q = Quaternion.FromToRotation(headForward, targetForward) * headXform.rotation;
 					
-					// Tilt head
-					target_world_From_head_Q = target_world_From_head_Q * head_From_Character_Q * Quaternion.Euler(0, 0, eyeAndHeadAnimator.headTilt) * character_From_Head_Q;
-					
 					headXform.rotation = Quaternion.Slerp(headXform.rotation, target_world_From_head_Q, eyeAndHeadAnimator.mainWeight * currentHeadIKWeight);
+					
+										
 				}
 			}
 			
@@ -452,23 +443,7 @@ namespace RealisticEyeMovements
 			
 			#if USE_FINAL_IK
 				else if ( headControl == HeadControl.FinalIK )
-				{
-					if ( false == isFinalIKInitialized )
-					{
-						if ( fbbik != null )
-							fbbik.solver.OnPostUpdate += OnFinalIKPostUpdate;
-						else if ( lookAtIK != null )
-							lookAtIK.solver.OnPostUpdate += OnFinalIKPostUpdate;
-						
-						isFinalIKInitialized = true;
-					}
-
-					if ( lookAtIK != null )
-					{
-						lookAtIK.solver.IKPositionWeight = eyeAndHeadAnimator.mainWeight * currentHeadIKWeight;
-						lookAtIK.solver.IKPosition = headEffectorPivotXform.TransformPoint( eyeAndHeadAnimator.eyeDistanceScale * Vector3.forward );
-					}
-				}
+					UpdateFinalIK();
 			#endif
 		}
 		
@@ -488,7 +463,7 @@ namespace RealisticEyeMovements
 			targetHeadBase_From_HeadEffector_Q = headBaseFromWorldQ * headEffectorPivotXform.parent.rotation * Quaternion.Euler(targetLocalAngles);
 			headMovementTotalAngle = Mathf.Abs(Utils.NormalizedDegAngle(Quaternion.Angle(headBase_From_HeadEffectorPivot_Q, targetHeadBase_From_HeadEffector_Q)));
 			
-			if ( headMovementTotalAngle < 0.1f )
+			if ( IsHeadMovementTotalAngleTooSmall() )
 				return;
 			
 			Vector3 localToHeadBaseAngles = headBase_From_HeadEffectorPivot_Q.eulerAngles;
@@ -533,6 +508,19 @@ namespace RealisticEyeMovements
 		}
 
 
+		public void TiltHead()
+		{
+			if ( neckXform != null )
+			{
+				Quaternion neckTargetRotation = neckXform.rotation * neck_From_Character_Q * Quaternion.Euler(eyeAndHeadAnimator.neckPitchAngle, eyeAndHeadAnimator.neckYawAngle, eyeAndHeadAnimator.neckRollAngle) * character_From_Neck_Q;
+				neckXform.rotation = Quaternion.Slerp(neckXform.rotation, neckTargetRotation, eyeAndHeadAnimator.mainWeight * currentHeadIKWeight);
+			}
+			
+			Quaternion headTargetRotation = headXform.rotation * head_From_Character_Q * Quaternion.Euler(eyeAndHeadAnimator.headPitchAngle, eyeAndHeadAnimator.headYawAngle, eyeAndHeadAnimator.headRollAngle) * character_From_Head_Q;
+			headXform.rotation = Quaternion.Slerp(headXform.rotation, headTargetRotation, eyeAndHeadAnimator.mainWeight * currentHeadIKWeight);
+		}
+		
+		
 		public void Update()
 		{
 			if ( headControl == HeadControl.Transform && headXform != null && eyeAndHeadAnimator.headWeight > 0 && eyeAndHeadAnimator.resetHeadAtFrameStart )
@@ -543,9 +531,21 @@ namespace RealisticEyeMovements
 		}
 		
 		
+		#if USE_FINAL_IK
+			void UpdateFinalIK()
+			{
+				if ( lookAtIK != null )
+				{
+					lookAtIK.solver.IKPositionWeight = eyeAndHeadAnimator.mainWeight * currentHeadIKWeight;
+					lookAtIK.solver.IKPosition = headEffectorPivotXform.TransformPoint( 2 * eyeAndHeadAnimator.eyeDistanceScale * Vector3.forward );
+				}
+			}
+		#endif
+		
+		
 		void UpdateHeadEffector(float deltaTime)
 		{
-			if ( headControl == HeadControl.None || currentHeadIKWeight <= 0 || deltaTime <= 0 )
+			if ( headControl == HeadControl.None || currentHeadIKWeight <= 0 || deltaTime <= 0 || IsHeadMovementTotalAngleTooSmall() )
 				return;
 
 			Vector3 headTargetGlobalPos = eyeAndHeadAnimator.GetCurrentHeadTargetPos();
@@ -590,10 +590,22 @@ namespace RealisticEyeMovements
 				}
 			}
 			
+			Vector3 velBeforeLerp = smoothDampVelocity;
 			smoothDampVelocity = Vector3.Lerp(actualVelocity, smoothDampVelocity, maxHillSmoothLerpDuringThisHeadMovement);
 			float smoothDuration = headDuration * 0.4f;
 			
+			Vector3 velBeforeSmoothDamp = smoothDampVelocity;
 			Vector3 smoothDampLocalAngles = Vector3.SmoothDamp(localToHeadBaseAngles, targetLocalToHeadBaseAngles, ref smoothDampVelocity, smoothDuration, headMaxSpeed, deltaTime);
+			
+			if ( float.IsNaN(smoothDampLocalAngles.x) || float.IsNaN(smoothDampLocalAngles.y) || float.IsNaN(smoothDampLocalAngles.z) )
+			{
+				Debug.LogError($"NaN in smoothDampLocalAngles: {smoothDampLocalAngles.x} {smoothDampLocalAngles.y} {smoothDampLocalAngles.z} local: {localToHeadBaseAngles.x} {localToHeadBaseAngles.y} {localToHeadBaseAngles.z} target: {targetLocalToHeadBaseAngles.x} {targetLocalToHeadBaseAngles.y} {targetLocalToHeadBaseAngles.z}", eyeAndHeadAnimator.gameObject);
+				Debug.LogError($"\tvel {velBeforeSmoothDamp.x} {velBeforeSmoothDamp.y} {velBeforeSmoothDamp.z} smoothDuration: {smoothDuration} headMaxSpeed: {headMaxSpeed} deltaTime: {deltaTime}");
+				Debug.LogError($"\tvelBeforeLerp: {velBeforeLerp.x} {velBeforeLerp.y} {velBeforeLerp.z} maxHillSmoothLerpDuringThisHeadMovement: {maxHillSmoothLerpDuringThisHeadMovement}");
+				Debug.LogError($"\theadMovementTotalAngle: {headMovementTotalAngle:0.00} headMaxSpeed: {headMaxSpeed:0.00}");
+				
+				return;
+			}
 			
 			float timeSinceHeadMovementStart = Time.time - timeOfHeadMovementStart;
 			if ( useHillIfPossible &&  headDuration > 0 && headDuration >= timeSinceHeadMovementStart && maxHillSmoothLerpDuringThisHeadMovement < 1 )
@@ -614,6 +626,10 @@ namespace RealisticEyeMovements
 				const float relativeAngleSpeedErrorAtWhichToUseSmoothDampInsteadOfHill = 0.25f;
 				float hillSmoothLerp = Mathf.Clamp01((angleFromExpectedCurrentDirection + angleFromExpectedTarget)/headMovementTotalAngle/relativeAngleErrorAtWhichToUseSmoothDampInsteadOfHill +
 				                                     velocityDiff/headMaxSpeed/relativeAngleSpeedErrorAtWhichToUseSmoothDampInsteadOfHill);
+				
+				if ( float.IsNaN(hillSmoothLerp) )
+					Debug.LogError($"hillSmoothLerp is NaN. angleFromExpectedCurrentDirection: {angleFromExpectedCurrentDirection:0.00} angleFromExpectedTarget: {angleFromExpectedTarget:0.00} velocityDiff: {velocityDiff:0.00}");
+				
 				maxHillSmoothLerpDuringThisHeadMovement = Mathf.Max(maxHillSmoothLerpDuringThisHeadMovement, hillSmoothLerp);
 				
 				headEffectorPivotXform.rotation = headBaseXform.rotation * 

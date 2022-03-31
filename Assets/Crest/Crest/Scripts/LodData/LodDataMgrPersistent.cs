@@ -30,8 +30,11 @@ namespace Crest
         readonly int sp_SimDeltaTime = Shader.PropertyToID("_SimDeltaTime");
         readonly int sp_SimDeltaTimePrev = Shader.PropertyToID("_SimDeltaTimePrev");
 
+        // Is this the first step since being enabled?
+        protected bool _needsPrewarmingThisStep = true;
+
         // This is how far the simulation time is behind unity's time
-        float _timeToSimulate = 0f;
+        protected float _timeToSimulate = 0f;
 
         public int LastUpdateSubstepCount { get; private set; }
 
@@ -55,6 +58,7 @@ namespace Crest
                 return;
             }
             _renderSimProperties = new PropertyWrapperCompute();
+            _needsPrewarmingThisStep = true;
         }
 
         protected override void InitData()
@@ -67,6 +71,13 @@ namespace Crest
             TextureArrayHelpers.ClearToBlack(_sources);
 
             _targets.RunLambda(buffer => TextureArrayHelpers.ClearToBlack(buffer));
+        }
+
+        public override void ClearLodData()
+        {
+            base.ClearLodData();
+            _targets.RunLambda(x => TextureArrayHelpers.ClearToBlack(x));
+            TextureArrayHelpers.ClearToBlack(_sources);
         }
 
         public void ValidateSourceData(bool usePrevTransform)
@@ -92,9 +103,6 @@ namespace Crest
             // Do a set of substeps to catch up
             GetSimSubstepData(_timeToSimulate, out var numSubsteps, out var substepDt);
 
-            // Record how much we caught up
-            _timeToSimulate -= substepDt * numSubsteps;
-
             LastUpdateSubstepCount = numSubsteps;
 
             // Even if no steps were needed this frame, the sim still needs to advect to compensate for camera motion / ocean scale changes,
@@ -111,6 +119,9 @@ namespace Crest
             {
                 var isFirstStep = stepi == 0;
 
+                // Record how much we caught up
+                _timeToSimulate -= substepDt;
+
                 // Buffers are already flipped, but we need to ping-pong for subsequent substeps.
                 if (!isFirstStep)
                 {
@@ -118,6 +129,11 @@ namespace Crest
                     // as they will not match buffered cascade data etc. Each buffer entry must be for a single frame
                     // and substeps are "sub-frame".
                     Helpers.Swap(ref _sources, ref current);
+                }
+                else
+                {
+                    // We only want to handle teleports for the first step.
+                    _needsPrewarmingThisStep = _needsPrewarmingThisStep || OceanRenderer.Instance._hasTeleportedThisFrame;
                 }
 
                 _renderSimProperties.Initialise(buf, _shader, krnl_ShaderSim);
@@ -164,6 +180,8 @@ namespace Crest
                     }
                 }
 
+                // The very first step since being enabled.
+                _needsPrewarmingThisStep = false;
                 _substepDtPrevious = substepDt;
             }
 

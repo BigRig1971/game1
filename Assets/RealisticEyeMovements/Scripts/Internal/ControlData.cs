@@ -143,9 +143,9 @@ namespace RealisticEyeMovements
 
 				#region Eyelid Blendshapes
 
-					[SerializeField] EyelidPositionBlendshape[] blendshapesForBlinking = new EyelidPositionBlendshape[0];
-					[SerializeField] EyelidPositionBlendshape[] blendshapesForLookingUp = new EyelidPositionBlendshape[0];
-					[SerializeField] EyelidPositionBlendshape[] blendshapesForLookingDown = new EyelidPositionBlendshape[0];
+					[SerializeField] EyelidPositionBlendshape[] blendshapesForBlinking = Array.Empty<EyelidPositionBlendshape>();
+					[SerializeField] EyelidPositionBlendshape[] blendshapesForLookingUp = Array.Empty<EyelidPositionBlendshape>();
+					[SerializeField] EyelidPositionBlendshape[] blendshapesForLookingDown = Array.Empty<EyelidPositionBlendshape>();
 
 					[Serializable]
 					public class BlendshapesConfig
@@ -155,7 +155,7 @@ namespace RealisticEyeMovements
 						public float[] blendshapeWeights;
 					}
 
-					[SerializeField] BlendshapesConfig[] blendshapesConfigs = new BlendshapesConfig[0];
+					[SerializeField] BlendshapesConfig[] blendshapesConfigs = Array.Empty<BlendshapesConfig>();
 
 					public bool isEyelidBlendshapeDefaultSet;
 					public bool isEyelidBlendshapeClosedSet;
@@ -348,6 +348,9 @@ namespace RealisticEyeMovements
 			blendshapesConfigs = new BlendshapesConfig[skinnedMeshRenderers.Length];
 			for (int i = 0; i < skinnedMeshRenderers.Length; i++)
 			{
+			    if ( skinnedMeshRenderers[i].sharedMesh == null )
+				    continue;
+			    
 				BlendshapesConfig blendshapesConfig = new BlendshapesConfig
 					{skinnedMeshRenderer = skinnedMeshRenderers[i]};
 				blendshapesConfig.blendShapeCount = blendshapesConfig.skinnedMeshRenderer.sharedMesh.blendShapeCount;
@@ -609,7 +612,7 @@ namespace RealisticEyeMovements
 				if (blendShape.skinnedMeshRenderer != null)
 				{
 					float value = Mathf.Lerp(
-						(blendShape.isUsedInEalierConfig && relativeToCurrentValueIfUsedInOtherConfig)
+						blendShape.isUsedInEalierConfig && relativeToCurrentValueIfUsedInOtherConfig
 							? blendShape.skinnedMeshRenderer.GetBlendShapeWeight(blendShape.index)
 							: blendShape.defaultWeight,
 						blendShape.positionWeight, lerpValue);
@@ -825,6 +828,9 @@ namespace RealisticEyeMovements
 				{
 					for (int i = 0; i < skinnedMeshRenderers.Length; i++)
 					{
+					    if ( skinnedMeshRenderers[i].sharedMesh == null )
+						    continue;
+			    
 						SkinnedMeshRenderer skinnedMeshRenderer = skinnedMeshRenderers[i];
 						BlendshapesConfig blendshapesConfig = blendshapesConfigs[i];
 						if (skinnedMeshRenderer != blendshapesConfig.skinnedMeshRenderer ||
@@ -1137,14 +1143,20 @@ namespace RealisticEyeMovements
 				bool isLookingDown = leftEyeAngle > 0;
 				float eyeUp01 = isLookingDown
 					? 0
-					: ((eyeControl == EyeControl.MecanimEyeBones)
+					: eyeControl == EyeControl.MecanimEyeBones
 						? leftBoneEyeRotationLimiter.GetEyeUp01(leftEyeAngle)
-						: leftEyeballEyeRotationLimiter.GetEyeUp01(leftEyeAngle));
+						: leftEyeballEyeRotationLimiter.GetEyeUp01(leftEyeAngle);
 				float eyeDown01 = !isLookingDown
 					? 0
-					: ((eyeControl == EyeControl.MecanimEyeBones)
+					: eyeControl == EyeControl.MecanimEyeBones
 						? leftBoneEyeRotationLimiter.GetEyeDown01(leftEyeAngle)
-						: leftEyeballEyeRotationLimiter.GetEyeDown01(leftEyeAngle));
+						: leftEyeballEyeRotationLimiter.GetEyeDown01(leftEyeAngle);
+
+				if (eyeWidenOrSquint < 0)
+					blink01 = Mathf.Lerp(blink01, 1, -eyeWidenOrSquint);
+				
+                eyeUp01 *= 1-blink01;
+                eyeDown01 *= 1-blink01;
 
 				if (eyelidsFollowEyesVertically)
 				{
@@ -1153,9 +1165,6 @@ namespace RealisticEyeMovements
 					else
 						LerpBlendshapeConfig(blendshapesForLookingUp, eyeUp01 * finalEyelidWeight);
 				}
-
-				if (eyeWidenOrSquint < 0)
-					blink01 = Mathf.Lerp(blink01, 1, -eyeWidenOrSquint);
 
 				LerpBlendshapeConfig(blendshapesForBlinking, blink01 * finalEyelidWeight,
 					relativeToCurrentValueIfUsedInOtherConfig: eyelidsFollowEyesVertically);

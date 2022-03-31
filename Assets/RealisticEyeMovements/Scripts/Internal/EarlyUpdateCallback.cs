@@ -15,6 +15,12 @@ namespace RealisticEyeMovements {
 		#endregion
 
 
+		void Start()
+		{
+			hideFlags = HideFlags.HideInInspector;
+		}
+		
+		
 		void Update()
 		{
 			if ( onEarlyUpdate != null )

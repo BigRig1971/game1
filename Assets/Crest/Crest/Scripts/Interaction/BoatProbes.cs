@@ -40,6 +40,8 @@ namespace Crest
         public float _minSpatialLength = 12f;
         [Range(0, 1)]
         public float _turningHeel = 0.35f;
+        [Tooltip("Clamps the buoyancy force to this value. Useful for handling fully submerged objects. Enter 'Infinity' to disable.")]
+        public float _maximumBuoyancyForce = Mathf.Infinity;
 
         [Header("Drag")]
         public float _dragInWaterUp = 3f;
@@ -56,6 +58,19 @@ namespace Crest
         public float _engineBias = 0f;
         [Tooltip("Used to automatically add turning input")]
         public float _turnBias = 0f;
+
+        // Debug
+        [Space(10)]
+
+        [SerializeField]
+        DebugFields _debug = new DebugFields();
+
+        [Serializable]
+        class DebugFields
+        {
+            [Tooltip("Draw queries for each force point as gizmos.")]
+            public bool _drawQueries = false;
+        }
 
         private const float WATER_DENSITY = 1000;
 
@@ -129,6 +144,12 @@ namespace Crest
                 waterSurfaceVel += new Vector3(surfaceFlow.x, 0, surfaceFlow.y);
             }
 
+            if (_debug._drawQueries)
+            {
+                Debug.DrawLine(transform.position + 5f * Vector3.up, transform.position + 5f * Vector3.up +
+                    waterSurfaceVel, new Color(1, 1, 1, 0.6f));
+            }
+
             // Buoyancy
             FixedUpdateBuoyancy();
             FixedUpdateDrag(waterSurfaceVel);
@@ -145,6 +166,16 @@ namespace Crest
             _queryPoints[_forcePoints.Length] = transform.position;
 
             collProvider.Query(GetHashCode(), ObjectWidth, _queryPoints, _queryResultDisps, null, _queryResultVels);
+
+            if (_debug._drawQueries)
+            {
+                for (var i = 0; i < _forcePoints.Length; i++)
+                {
+                    var query = _queryPoints[i];
+                    query.y = OceanRenderer.Instance.SeaLevel + _queryResultDisps[i].y;
+                    VisualiseCollisionArea.DebugDrawCross(query, 1f, Color.magenta);
+                }
+            }
         }
 
         void FixedUpdateEngine()
@@ -185,7 +216,12 @@ namespace Crest
                 var heightDiff = waterHeight - _queryPoints[i].y;
                 if (heightDiff > 0)
                 {
-                    _rb.AddForceAtPosition(archimedesForceMagnitude * heightDiff * Vector3.up * _forcePoints[i]._weight * _forceMultiplier / _totalWeight, _queryPoints[i]);
+                    var force = archimedesForceMagnitude * heightDiff * Vector3.up * _forcePoints[i]._weight * _forceMultiplier / _totalWeight;
+                    if (_maximumBuoyancyForce < Mathf.Infinity)
+                    {
+                        force = Vector3.ClampMagnitude(force, _maximumBuoyancyForce);
+                    }
+                    _rb.AddForceAtPosition(force, _queryPoints[i]);
                 }
             }
         }

@@ -96,6 +96,8 @@ namespace Crest
         public static int sp_LD_SliceIndex = Shader.PropertyToID("_LD_SliceIndex");
         protected static int sp_LODChange = Shader.PropertyToID("_LODChange");
 
+        protected virtual int ResolutionOverride => -1;
+
         // shape texture resolution
         int _shapeRes = -1;
 
@@ -162,12 +164,21 @@ namespace Crest
 
             Debug.Assert(OceanRenderer.Instance.CurrentLodCount <= MAX_LOD_COUNT);
 
-            var resolution = OceanRenderer.Instance.LodDataResolution;
+            var resolution = ResolutionOverride == -1 ? OceanRenderer.Instance.LodDataResolution : ResolutionOverride;
             var desc = new RenderTextureDescriptor(resolution, resolution, CompatibleTextureFormat, 0);
             _targets = new BufferedData<RenderTexture>(BufferCount, () => CreateLodDataTextures(desc, SimName, NeedToReadWriteTextureData));
 
             // Bind globally once here on init, which will bind to all graphics shaders (not compute)
             Shader.SetGlobalTexture(GetParamIdSampler(), _targets.Current);
+        }
+
+        /// <summary>
+        /// Clears persistent LOD data. Some simulations have persistent data which can linger for a little while after
+        /// being disabled. This will manually clear that data.
+        /// </summary>
+        public virtual void ClearLodData()
+        {
+            // Intentionally left empty.
         }
 
         public virtual void UpdateLodData()
@@ -217,7 +228,7 @@ namespace Crest
                     continue;
                 }
 
-                draw.Value.Draw(buf, 1f, 0, lodIdx);
+                draw.Value.Draw(this, buf, 1f, 0, lodIdx);
             }
         }
 
@@ -239,7 +250,7 @@ namespace Crest
                 float weight = filter.Filter(draw.Value, out var isTransition);
                 if (weight > 0f)
                 {
-                    draw.Value.Draw(buf, weight, isTransition, lodIdx);
+                    draw.Value.Draw(this, buf, weight, isTransition, lodIdx);
                 }
             }
         }

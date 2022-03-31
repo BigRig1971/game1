@@ -53,8 +53,14 @@ namespace RealisticEyeMovements {
 				public float bodyWeight = 0.1f;
 				public float neckHorizWeight = 0.5f;
 				public float neckVertWeight = 0.5f;
-				public float headTilt = 0;
-				public float neckTilt = 0;
+				public float headPitchAngle = 0;
+				[FormerlySerializedAs("headTilt")]
+				public float headRollAngle = 0;
+				public float headYawAngle = 0;
+				public float neckPitchAngle = 0;
+				[FormerlySerializedAs("neckTilt")]
+				public float neckRollAngle = 0;
+				public float neckYawAngle = 0;
 				public bool resetHeadAtFrameStart = false;
 				[FormerlySerializedAs("headBoneNonMecanimXform")]
 				public Transform headBoneNonMecanim;
@@ -72,7 +78,9 @@ namespace RealisticEyeMovements {
 			public bool useMacroSaccades = true;
 			public float saccadeSpeed = 0.5f;
 			[SerializeField] float macroSaccadesPerMinute = 10;
-			[SerializeField] float microSaccadesPerMinute = 35;
+			[FormerlySerializedAs("microSaccadesPerMinute")]
+			[SerializeField] float microSaccadesPerMinuteLookingIdle = 45;
+			[SerializeField] float microSaccadesPerMinuteLookingAtPOI = 80;
 			public bool useHeadJitter = true;
 			public float headJitterFrequency = 0.2f;
 			public float headJitterAmplitude = 1.0f;
@@ -95,8 +103,8 @@ namespace RealisticEyeMovements {
 			#region eye lids
 				public float eyelidsWeight = 1;
 				
-				public float kMinNextBlinkTime = 3.0f;
-				public float kMaxNextBlinkTime = 15.0f;
+				public float kMinNextBlinkTime = 3f;
+				public float kMaxNextBlinkTime = 15f;
 				
 				public float blinkSpeed = 1;
 				
@@ -162,8 +170,10 @@ namespace RealisticEyeMovements {
 
 			Animator animator;
 			EarlyUpdateCallback earlyUpdateCallback;
+			VeryLateUpdateCallback veryLateUpdateCallback;
 			bool hasCheckedIdleLookTargetsThisFrame;
 			bool placeNewIdleLookTargetsAtNextOpportunity;
+			bool hasFixedUpdateRunThisFrame;
 
 			#region Transforms for target
 				Transform currentHeadTargetPOI;
@@ -561,7 +571,8 @@ namespace RealisticEyeMovements {
 				idleTargetHorizAngle = idleTargetHorizAngle,
 				crossEyeCorrection = crossEyeCorrection,
 				saccadeSpeed = saccadeSpeed,
-				microSaccadesPerMinute = microSaccadesPerMinute,
+				microSaccadesPerMinuteLookingIdle = microSaccadesPerMinuteLookingIdle,
+				microSaccadesPerMinuteLookingAtPOI = microSaccadesPerMinuteLookingAtPOI,
 				macroSaccadesPerMinute = macroSaccadesPerMinute,
 				limitHeadAngle = limitHeadAngle,
 			};
@@ -570,10 +581,13 @@ namespace RealisticEyeMovements {
 		}
 
 
+		// We use WaitForFixedUpdate instead of FixedUpdate because we want to run after the
+		// Animator (set to Animate Physics mode) has been updated.
 		IEnumerator FixedUpdateRT()
 		{
 			if ( animator != null && animator.updateMode != AnimatorUpdateMode.AnimatePhysics )
-				Debug.LogWarning(name + ": EyeAndHeadAnimator's update mode is set to FixedUpdate. The animator's update mode should be set to Animate Physics, but isn't.", gameObject);
+				Debug.LogError(name + ": EyeAndHeadAnimator's update mode is set to FixedUpdateBothUpdates. The animator's update mode should be set to Animate Physics, but isn't.", gameObject);
+			
 			WaitForFixedUpdate waitForFixedUpdate = new WaitForFixedUpdate();
 			
 			while ( true )
@@ -583,7 +597,15 @@ namespace RealisticEyeMovements {
 				
 				yield return waitForFixedUpdate;
 				
-				Update1(Time.fixedDeltaTime);
+				if ( headComponent.headControl != HeadComponent.HeadControl.AnimatorIK )
+				{
+					Update1(Time.fixedDeltaTime);
+					
+					if ( updateType == UpdateType.FixedUpdate )
+						Update2(Time.fixedDeltaTime);
+				}
+				
+				hasFixedUpdateRunThisFrame = true;
 			}
 		}
 
@@ -659,7 +681,6 @@ namespace RealisticEyeMovements {
 			const float kMaxDistanceForTriangleScaling = 1;
 			float normalizedDistanceBetweenTargetEyes = distanceBetweenTargetEyes <= 0 ? kMinDistanceForTriangleScaling : distBetweenEyeCenters * 0.068f / distanceBetweenTargetEyes;
 			float triangleSizeFactor = Mathf.Lerp(0.5f, 1,  Mathf.InverseLerp(kMinDistanceForTriangleScaling, kMaxDistanceForTriangleScaling, normalizedDistanceBetweenTargetEyes));
-			// Debug.Log($"triangleSizeFactor: {triangleSizeFactor:0.00} normalizedDistanceBetweenTargetEyes: {normalizedDistanceBetweenTargetEyes:0.00} distanceBetweenTargetEyes: {distanceBetweenTargetEyes:0.00}");
 			switch( playerFaceLookTarget )
 			{
 				case FaceLookTarget.EyesCenter:
@@ -759,7 +780,8 @@ namespace RealisticEyeMovements {
 			idleTargetHorizAngle = import.idleTargetHorizAngle;
 			crossEyeCorrection = import.crossEyeCorrection;
 			saccadeSpeed = import.saccadeSpeed;
-			microSaccadesPerMinute = import.microSaccadesPerMinute;
+			microSaccadesPerMinuteLookingIdle = import.microSaccadesPerMinuteLookingIdle;
+			microSaccadesPerMinuteLookingAtPOI = import.microSaccadesPerMinuteLookingAtPOI;
 			macroSaccadesPerMinute = import.macroSaccadesPerMinute;
 			limitHeadAngle = import.limitHeadAngle;
 			
@@ -985,7 +1007,7 @@ namespace RealisticEyeMovements {
 			if ( Time.timeScale <= 0 )
 				return;
 			
-			if ( updateType == UpdateType.LateUpdate )
+			if ( updateType == UpdateType.LateUpdate && headComponent.headControl != HeadComponent.HeadControl.AnimatorIK )
 				Update1(Time.deltaTime);
 		}
 
@@ -1090,6 +1112,8 @@ namespace RealisticEyeMovements {
 			if ( headComponent.headControl != HeadComponent.HeadControl.AnimatorIK )
 				return;
 		
+			Update1();
+
 			headComponent.OnAnimatorIK(animator);
 		}
 	
@@ -1113,10 +1137,10 @@ namespace RealisticEyeMovements {
 					Destroy( createdXform.gameObject );
 				}
 			
-			headComponent.OnDestroy();
-
 			if ( earlyUpdateCallback != null )
 				Destroy(earlyUpdateCallback);
+			if ( veryLateUpdateCallback != null )
+				Destroy(veryLateUpdateCallback);
 		}
 
 
@@ -1130,6 +1154,8 @@ namespace RealisticEyeMovements {
 
 			if ( earlyUpdateCallback != null && false == ResetBlendshapesAtFrameStartEvenIfDisabled )
 				earlyUpdateCallback.onEarlyUpdate -= OnEarlyUpdate;
+			if ( veryLateUpdateCallback != null )
+				veryLateUpdateCallback.onVeryLateUpdate -= OnVeryLateUpdate;
 		}
 
 		
@@ -1137,7 +1163,8 @@ namespace RealisticEyeMovements {
 		{
 			// Restore the default before all other scripts run so we can lerp with weights relative to what we find (which might have been changed by animation)
 			// later in the frame.
-			if ( updateType != UpdateType.FixedUpdate && (ResetBlendshapesAtFrameStartEvenIfDisabled || mainWeight > 0 && enabled ) )
+			if ( updateType != UpdateType.FixedUpdate &&
+			     (ResetBlendshapesAtFrameStartEvenIfDisabled || mainWeight > 0 && enabled ) )
 				controlData.RestoreDefault();
 		}
 		
@@ -1148,8 +1175,19 @@ namespace RealisticEyeMovements {
 				earlyUpdateCallback = GetComponent<EarlyUpdateCallback>();
 			if ( earlyUpdateCallback == null )
 				earlyUpdateCallback = gameObject.AddComponent<EarlyUpdateCallback>();
+			earlyUpdateCallback.onEarlyUpdate -= OnEarlyUpdate;
 			earlyUpdateCallback.onEarlyUpdate += OnEarlyUpdate;
 
+			if ( updateType != UpdateType.External )
+			{
+				if ( veryLateUpdateCallback == null )
+					veryLateUpdateCallback = GetComponent<VeryLateUpdateCallback>();
+				if ( veryLateUpdateCallback == null )
+					veryLateUpdateCallback = gameObject.AddComponent<VeryLateUpdateCallback>();
+				veryLateUpdateCallback.onVeryLateUpdate -= OnVeryLateUpdate;
+				veryLateUpdateCallback.onVeryLateUpdate += OnVeryLateUpdate;
+			}
+			
 			ConvertLegacyIfNecessary();
 			controlData.ConvertLegacyIfNecessary();
 			
@@ -1172,6 +1210,22 @@ namespace RealisticEyeMovements {
 		}
 		
 		
+		void OnVeryLateUpdate()
+		{
+			if ( updateType == UpdateType.LateUpdate )
+				Update2();
+			else if ( updateType == UpdateType.FixedUpdate && hasFixedUpdateRunThisFrame )
+			{
+				if ( headComponent.headControl == HeadComponent.HeadControl.FinalIK ||
+				     headComponent.headControl == HeadComponent.HeadControl.HeadTarget ||
+				     headComponent.headControl == HeadComponent.HeadControl.AnimatorIK )
+					Update2();
+			}
+			
+			hasFixedUpdateRunThisFrame = false;
+		}
+		
+		
 		public void ResetBlinking()
 		{
 			blinkingComponent.ResetBlinking();
@@ -1191,10 +1245,14 @@ namespace RealisticEyeMovements {
 		{
 			float durationFactor = 1;
 			if ( lookTarget == LookTarget.Face )
-				durationFactor = faceLookTarget == FaceLookTarget.Mouth ? 0.45f : 0.6f;
-			
+				durationFactor = faceLookTarget == FaceLookTarget.Mouth ? 0.7f : 1f;
+		
+			float microSaccadesPerMinute = lookTarget == LookTarget.Face || lookTarget == LookTarget.SpecificThing
+														? microSaccadesPerMinuteLookingAtPOI
+														: microSaccadesPerMinuteLookingIdle;
+
 			timeToMicroSaccade = microSaccadesPerMinute <= 0 ? Mathf.Infinity :
-				Mathf.Max(0.4f, durationFactor * 60/microSaccadesPerMinute * Random.Range(0.6f, 1.4f)); 
+				Mathf.Max(0.4f, durationFactor * 60/microSaccadesPerMinute * Random.Range(0.25f, 1.6f));
 		}
 		
 		
@@ -1215,9 +1273,17 @@ namespace RealisticEyeMovements {
 		}
 
 
-		public void SetMicroSaccadesPerMinute(float microSaccadesPerMinute)
+		public void SetMicroSaccadesPerMinuteLookingIdle(float microSaccadesPerMinuteLookingIdle)
 		{
-			this.microSaccadesPerMinute = microSaccadesPerMinute;
+			this.microSaccadesPerMinuteLookingIdle = microSaccadesPerMinuteLookingIdle;
+			
+			ResetTimeToMicroSaccade();
+		}
+		
+		
+		public void SetMicroSaccadesPerMinuteLookingAtPOI(float microSaccadesPerMinuteLookingAtPOI)
+		{
+			this.microSaccadesPerMinuteLookingAtPOI = microSaccadesPerMinuteLookingAtPOI;
 			
 			ResetTimeToMicroSaccade();
 		}
@@ -1271,7 +1337,7 @@ namespace RealisticEyeMovements {
 
 			//*** Blink if eyes move enough
 			{
-				if (blinkIfEyesMoveEnough)
+				if (blinkIfEyesMoveEnough && blinkingComponent.timeSinceLastBlinkFinished > 0.75f)
 					if ( useUpperEyelids || useLowerEyelids || controlData.eyelidControl == ControlData.EyelidControl.Blendshapes )
 					{
 						float distance = Mathf.Max(leftHorizDistance, Mathf.Max(rightHorizDistance, Mathf.Max(leftVertDistance, rightVertDistance)));
@@ -1355,8 +1421,8 @@ namespace RealisticEyeMovements {
 		}
 		
 		
-		// If using FinalIK, this is supposed to be called before
-		// the head is oriented, because it sets the head target.
+		// Update1 is supposed to be called after the animation has finished.
+		// If using FinalIK, this is supposed to be called before the head is oriented, because it sets the head target.
 		public void Update1(float deltaTime)
 		{
 			if ( false == isInitialized || false == enabled )
@@ -1394,9 +1460,6 @@ namespace RealisticEyeMovements {
 				if (OnCannotGetTargetIntoView != null)
 					OnCannotGetTargetIntoView();
 			}
-
-			if ( headComponent.headControl != HeadComponent.HeadControl.FinalIK && updateType != UpdateType.External )
-				Update2(deltaTime);
 		}
 
 
@@ -1406,19 +1469,20 @@ namespace RealisticEyeMovements {
 		}
 		
 		
+		// Update2 is supposed to be called after the head has been oriented.
 		// If using FinalIK, this is supposed to be called after the head is oriented,
 		// because it moves the eyes from the head orientation to their final look target
 		public void Update2(float deltaTime)
 		{
-			if ( deltaTime <= 0 )
-				return;
+			if ( currentEyeTargetPOI == null && socialTriangleLeftEyeXform == null ) return;
+			if ( deltaTime <= 0 ) return;
+			if ( false == isInitialized || false == enabled ) return;
+			if ( lookTarget == LookTarget.StraightAhead ) return;
+
+
+			if ( headComponent.headControl != HeadComponent.HeadControl.None )
+				headComponent.TiltHead();
 			
-			if ( false == isInitialized || false == enabled )
-				return;
-
-			if ( lookTarget == LookTarget.StraightAhead )
-				return;
-
 			CheckMicroSaccades(deltaTime);
 			CheckMacroSaccades(deltaTime);
 
@@ -1430,9 +1494,12 @@ namespace RealisticEyeMovements {
 			if ( kDrawSightlinesInEditor )
 				DrawSightlinesInEditor();
 			
-			LeftEyeRay = new Ray( leftEyeAnchor.position, GetLeftEyeDirection());
-			RightEyeRay = new Ray(rightEyeAnchor.position, GetRightEyeDirection());
-			EyesCombinedRay = new Ray( eyesRootXform.position, GetOwnLookDirection());
+			if (leftEyeAnchor != null && rightEyeAnchor != null)
+			{
+				LeftEyeRay = new Ray( leftEyeAnchor.position, GetLeftEyeDirection());
+				RightEyeRay = new Ray(rightEyeAnchor.position, GetRightEyeDirection());
+				EyesCombinedRay = new Ray( eyesRootXform.position, GetOwnLookDirection());
+			} 
 			
 			if ( OnUpdate2Finished != null )
 				OnUpdate2Finished();
@@ -1480,6 +1547,12 @@ namespace RealisticEyeMovements {
 
 			Vector3 eyeTargetGlobal = shouldDoSocialTriangle	? GetLookTargetPosForSocialTriangle( faceLookTarget )
 																						: trans.TransformPoint(microSaccadeTargetLocal);
+			
+			// Don't let look target go behind eyes
+			Vector3 eyeTargetInLocalSpace = eyesRootXform.InverseTransformPoint(eyeTargetGlobal);
+			eyeTargetGlobal = eyesRootXform.TransformPoint(new Vector3(	eyeTargetInLocalSpace.x,
+																														eyeTargetInLocalSpace.y,
+																														Mathf.Max(0.05f * eyeDistanceScale, eyeTargetInLocalSpace.z)));
 			
 			//*** Prevent cross-eyes
 			{

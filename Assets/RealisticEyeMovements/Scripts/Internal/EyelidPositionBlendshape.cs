@@ -64,7 +64,7 @@ namespace RealisticEyeMovements
 			{
 				EyelidPositionBlendshapeForExport export = new EyelidPositionBlendshapeForExport
 				{
-					skinnedMeshRendererPath = (skinnedMeshRenderer != null) ? Utils.GetPathForTransform(startXform, skinnedMeshRenderer.transform) : null,
+					skinnedMeshRendererPath = skinnedMeshRenderer != null ? Utils.GetPathForTransform(startXform, skinnedMeshRenderer.transform) : null,
 					defaultWeight = defaultWeight,
 					positionWeight = positionWeight,
 					index = index,
@@ -78,7 +78,7 @@ namespace RealisticEyeMovements
 
 			public void Import(EyelidPositionBlendshapeForExport export, Transform startXform)
 			{
-				skinnedMeshRenderer = (export.skinnedMeshRendererPath != null) ? Utils.GetTransformFromPath(startXform, export.skinnedMeshRendererPath).GetComponent<SkinnedMeshRenderer>() : null;
+				skinnedMeshRenderer = export.skinnedMeshRendererPath != null ? Utils.GetTransformFromPath(startXform, export.skinnedMeshRendererPath).GetComponent<SkinnedMeshRenderer>() : null;
 				defaultWeight = export.defaultWeight;
 				positionWeight = export.positionWeight;
 				index = export.index;

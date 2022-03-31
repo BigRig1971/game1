@@ -189,6 +189,20 @@
         {
             "m_OutputSlot": {
                 "m_Node": {
+                    "m_Id": "19f4d59664180484a5b5eaf61d2623da"
+                },
+                "m_SlotId": 33
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "61cbfe5ed6ff9e84b826a8b3818b118d"
+                },
+                "m_SlotId": 4
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
                     "m_Id": "35a4a3c6e72a1282b5137b0f82b8c0f3"
                 },
                 "m_SlotId": 0
@@ -672,6 +686,9 @@
         },
         {
             "m_Id": "548df418d96b40d6812f6ba7d9b92968"
+        },
+        {
+            "m_Id": "bb461f17ee6544a49494a09c12917a1d"
         }
     ],
     "synonyms": [],
@@ -1096,6 +1113,31 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector4MaterialSlot",
+    "m_ObjectId": "4ae01d3aac964ddfb037ac0594554bac",
+    "m_Id": 4,
+    "m_DisplayName": "Albedo",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Albedo",
+    "m_StageCapability": 2,
+    "m_Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+    },
+    "m_DefaultValue": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+    },
+    "m_Labels": []
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
     "m_ObjectId": "4af6034197f3cc8aaeb792d9cf6d352c",
     "m_Group": {
@@ -1296,6 +1338,9 @@
         },
         {
             "m_Id": "223341e5d5c44819a1daa4d4fc482237"
+        },
+        {
+            "m_Id": "4ae01d3aac964ddfb037ac0594554bac"
         }
     ],
     "synonyms": [],
@@ -1892,6 +1937,31 @@
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Out",
+    "m_StageCapability": 3,
+    "m_Value": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+    },
+    "m_DefaultValue": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 0.0
+    },
+    "m_Labels": []
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector4MaterialSlot",
+    "m_ObjectId": "bb461f17ee6544a49494a09c12917a1d",
+    "m_Id": 33,
+    "m_DisplayName": "Albedo",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Albedo",
     "m_StageCapability": 3,
     "m_Value": {
         "x": 0.0,

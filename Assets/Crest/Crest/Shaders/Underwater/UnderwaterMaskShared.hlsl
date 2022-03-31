@@ -12,6 +12,8 @@
 #include "../OceanVertHelpers.hlsl"
 #include "../OceanShaderHelpers.hlsl"
 
+#include "../Helpers/WaterVolume.hlsl"
+
 struct Attributes
 {
 	// The old unity macros require this name and type.
@@ -25,11 +27,8 @@ struct Varyings
 	UNITY_VERTEX_OUTPUT_STEREO
 };
 
-// Hack - due to SV_IsFrontFace occasionally coming through as true for backfaces,
-// add a param here that forces ocean to be in undrwater state. I think the root
-// cause here might be imprecision or numerical issues at ocean tile boundaries, although
-// i'm not sure why cracks are not visible in this case.
-float _ForceUnderwater;
+// Variable mask for when fog is applied before transparent pass and ocean tile might be culled.
+half _MaskBelowSurface;
 
 Varyings Vert(Attributes v)
 {
@@ -117,6 +116,12 @@ Varyings Vert(Attributes v)
 
 half4 Frag(const Varyings input, const bool i_isFrontFace : SV_IsFrontFace) : SV_Target
 {
+	UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+
+#if CREST_WATER_VOLUME
+	ApplyVolumeToOceanMask(input.positionCS);
+#endif
+
 	// @MSAAOutlineFix:
 	// The edge of the ocean surface at the near plane will be MSAA'd leaving a noticeable edge. By rendering the mask
 	// with a slightly further near plane, it exposes the edge to having the underwater fog applied which is much nicer.
@@ -125,13 +130,13 @@ half4 Frag(const Varyings input, const bool i_isFrontFace : SV_IsFrontFace) : SV
 		discard;
 	}
 
-	if (IsUnderwater(i_isFrontFace, _ForceUnderwater))
+	if (IsUnderwater(i_isFrontFace, _CrestForceUnderwater))
 	{
-		return (half4)UNDERWATER_MASK_BELOW_SURFACE;
+		return (half4)_MaskBelowSurface;
 	}
 	else
 	{
-		return (half4)UNDERWATER_MASK_ABOVE_SURFACE;
+		return (half4)CREST_MASK_ABOVE_SURFACE;
 	}
 }
 

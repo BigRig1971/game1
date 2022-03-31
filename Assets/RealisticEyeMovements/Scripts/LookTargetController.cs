@@ -3,11 +3,14 @@
 // Copyright 2020 tore.knabe@gmail.com
 
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
 using UnityEngine.XR;
+using Random = UnityEngine.Random;
+// ReSharper disable UnassignedField.Global
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace RealisticEyeMovements {
@@ -17,8 +20,7 @@ namespace RealisticEyeMovements {
 		#region fields
 
 			[Tooltip("Drag objects here for the actor to look at. If empty, actor will look in random directions.")]
-			public Transform[] pointsOfInterest;
-		public string[] poiTags;
+			public List<Transform> pointsOfInterest;
 
 			[Tooltip("Ratio of how often to look at player vs elsewhere. 0: never, 1: always")]
 			[Range(0,1)]
@@ -56,22 +58,31 @@ namespace RealisticEyeMovements {
 			public Transform playerLeftEyeXform { get; private set; }
 			public Transform playerRightEyeXform { get; private set; }
 			
+			public float DistanceToPlayer { get; private set; }
+			
+			
 			[Header("Events")]
 			public UnityEvent OnStartLookingAtPlayer = new UnityEvent();
 			public UnityEvent OnStopLookingAtPlayer = new UnityEvent();
 			public UnityEvent OnPlayerEntersPersonalSpace = new UnityEvent();
 			public UnityEvent OnLookAwayFromShyness = new UnityEvent();
 
+			public Func<List<Transform>> GetPOIsDelegate;
+			public Func<Transform, bool> IsPlayerInViewDelegate;
+			public Func<Transform, bool> IsPlayerLookingAtMeDelegate;
+			
 			EyeAndHeadAnimator eyeAndHeadAnimator;
 
 			const float minLookAtMeTimeToReact = 4;
 
 			Transform targetPOI;
-		Transform targetPoiWithTag;
+		
 			Transform mainCameraXform;
 			Transform mainCameraParentXform;
 			Transform playerEyeCenterXform;
 			Transform usedThirdPersonPlayerEyeCenter;
+
+			Camera playerCamera;
 
 			GameObject createdVRParentGO;
 			GameObject createdPlayerEyeCenterGO;
@@ -79,6 +90,7 @@ namespace RealisticEyeMovements {
 			GameObject createdPlayerRightEyeGO;
 		
 			float lastDistanceToPlayer = -1;
+			float smoothedPlayerApproachSpeed;
 			float playerLookingAtMeTime;
 			float nextChangePOITime;
 			float stareBackDeadtime;	
@@ -108,7 +120,6 @@ namespace RealisticEyeMovements {
 		#endregion
 	
 	
-
 		void Awake()
 		{
 			// For VR we use Unity's InputTracking to find the user's eyes, but that only gives local positions, and
@@ -120,12 +131,10 @@ namespace RealisticEyeMovements {
 		}
 
 
-
 		public void Blink()
 		{
 			eyeAndHeadAnimator.Blink();
 		}
-
 
 
 		void ChangeStateTo(State newState)
@@ -142,23 +151,23 @@ namespace RealisticEyeMovements {
 		}
 
 
-
 		Transform ChooseNextHeadTargetPOI()
 		{
-			if ( pointsOfInterest == null || pointsOfInterest.Length == 0 )
+			List<Transform> _pois = CurrentPOIs();
+			
+			if ( _pois == null || _pois.Count == 0 )
 				return null;
 
 			int numPOIsInView = 0;
-			foreach (Transform t in pointsOfInterest)
+			foreach (Transform t in _pois)
 				if  ( t != null && t != targetPOI && eyeAndHeadAnimator.CanGetIntoView(t.position) && t.gameObject.activeInHierarchy )
 					numPOIsInView++;
 			if ( numPOIsInView == 0 )
 				return targetPOI;
 			
-			
 			int targetVisibleIndex = Random.Range(0, numPOIsInView);
 			int visibleIndex = 0;
-			foreach (Transform t in pointsOfInterest)
+			foreach (Transform t in _pois)
 				if  ( t != null && t != targetPOI && eyeAndHeadAnimator.CanGetIntoView(t.position) && t.gameObject.activeInHierarchy )
 				{
 					if ( visibleIndex == targetVisibleIndex )
@@ -169,36 +178,6 @@ namespace RealisticEyeMovements {
 			
 			return null;
 		}
-		Transform ChooseNextPOITAG()
-		{
-			
-			if (poiTags == null || poiTags.Length == 0)
-				return null;
-
-			int numPOIsInView = 0;
-			foreach (string p in poiTags)
-				targetPoiWithTag = GameObject.FindGameObjectWithTag(p).transform;
-				if (targetPoiWithTag != null && targetPoiWithTag != targetPOI && eyeAndHeadAnimator.CanGetIntoView(targetPoiWithTag.position) && targetPoiWithTag.gameObject.activeInHierarchy)
-					numPOIsInView++;
-			if (numPOIsInView == 0)
-				
-				return targetPOI;
-
-
-			int targetVisibleIndex = Random.Range(0, numPOIsInView);
-			int visibleIndex = 0;
-			foreach (string p in poiTags)
-				if (targetPoiWithTag != null && targetPoiWithTag != targetPOI && eyeAndHeadAnimator.CanGetIntoView(targetPoiWithTag.position) && targetPoiWithTag.gameObject.activeInHierarchy)
-				{
-					if (visibleIndex == targetVisibleIndex)
-						return targetPoiWithTag;
-
-					visibleIndex++;
-				}
-
-			return null;
-		}
-
 
 
 		public void ClearLookTarget()
@@ -208,18 +187,30 @@ namespace RealisticEyeMovements {
 		}
 
 
-
-		Transform FindPlayerCamera()
+		List<Transform> CurrentPOIs()
 		{
+			return GetPOIsDelegate != null ? GetPOIsDelegate() : pointsOfInterest;
+		}
+		
+			
+		Transform FindPlayer()
+		{
+			playerCamera = null;
 			if ( thirdPersonPlayerEyeCenter != null )
 				return thirdPersonPlayerEyeCenter;
 				
 			if ( Camera.main != null )
-				return Camera.main.transform;
+			{
+				playerCamera = Camera.main;
+				return playerCamera.transform;
+			}
 				
 			foreach ( Camera cam in FindObjectsOfType<Camera>() )
 				if ( cam.targetTexture == null )
-					return cam.transform;
+				{
+					playerCamera = cam;
+					return playerCamera.transform;
+				}
 					
 			return null;
 		}
@@ -259,11 +250,11 @@ namespace RealisticEyeMovements {
 
 			//*** Player eyes: either user main camera or VR cameras
 			{
-				useNativeVRSupport = useVR = Utils.IsVRDevicePresent() && XRSettings.enabled;
+				useNativeVRSupport = useVR = XRSettings.enabled;
 
 				if ( useNativeVRSupport )
 				{
-					if ( FindPlayerCamera() == null )
+					if ( FindPlayer() == null )
 					{
 						Debug.LogWarning("Main camera not found. Please set the main camera's tag to 'MainCamera'.");
 						useVR = false;
@@ -272,7 +263,7 @@ namespace RealisticEyeMovements {
 					}
 					else
 					{
-						mainCameraXform = FindPlayerCamera();
+						mainCameraXform = FindPlayer();
 						createdPlayerEyeCenterGO = new GameObject("CreatedPlayerCenterVREye") { hideFlags = HideFlags.HideInHierarchy };
 						createdPlayerLeftEyeGO = new GameObject("CreatedPlayerLeftVREye") { hideFlags = HideFlags.HideInHierarchy };
 						createdPlayerRightEyeGO = new GameObject("CreatedPlayerRightVREye") { hideFlags = HideFlags.HideInHierarchy };
@@ -299,8 +290,8 @@ namespace RealisticEyeMovements {
 
 				if ( false == useVR )
 				{
-					if ( FindPlayerCamera() != null )
-						playerEyeCenterXform = FindPlayerCamera();
+					if ( FindPlayer() != null )
+						playerEyeCenterXform = FindPlayer();
 					else
 					{
 						Debug.LogWarning("Main camera not found. Please set the main camera's tag to 'MainCamera' or set Player Eye Center.");
@@ -315,31 +306,45 @@ namespace RealisticEyeMovements {
 		}
 
 
-
 		public bool IsLookingAtPlayer()
 		{
 			return state == State.LookingAtPlayer;
 		}
 
 
-
 		public bool IsPlayerInView()
 		{
-			UpdatePlayerEyeTransformReferences();
+			if ( thirdPersonPlayerEyeCenter != usedThirdPersonPlayerEyeCenter )
+				UpdatePlayerEyeTransformReferences();
+			
+			if ( IsPlayerInViewDelegate != null )
+				return IsPlayerInViewDelegate(playerEyeCenterXform);
 			
 			return playerEyeCenterXform != null && eyeAndHeadAnimator.IsInView( playerEyeCenterXform.position );
 		}
 
+		
+		public bool IsPlayerLookingAtMe()
+		{
+			if ( thirdPersonPlayerEyeCenter != usedThirdPersonPlayerEyeCenter )
+				UpdatePlayerEyeTransformReferences();
+			
+			if ( IsPlayerLookingAtMeDelegate != null )
+				return IsPlayerLookingAtMeDelegate(playerEyeCenterXform);
+			
+			float playerLookingAtMeAngle = eyeAndHeadAnimator.GetStareAngleTargetAtMe( playerEyeCenterXform );
+			return playerLookingAtMeAngle < 15;
+		}
 
-
-
+		
 		// To keep looking at the player until new command, set duration to -1
 		public void LookAtPlayer(float duration=-1, float headLatency=0.075f)
 		{
 			if (false == isInitialized)
 				Initialize();
 
-			UpdatePlayerEyeTransformReferences();
+			if ( thirdPersonPlayerEyeCenter != usedThirdPersonPlayerEyeCenter )
+				UpdatePlayerEyeTransformReferences();
 
 			if ( playerLeftEyeXform != null && playerRightEyeXform	!= null )
 				eyeAndHeadAnimator.LookAtFace( playerLeftEyeXform, playerRightEyeXform, playerEyeCenterXform, headLatency );
@@ -357,7 +362,6 @@ namespace RealisticEyeMovements {
 		}
 	
 	
-	
 		public void LookAroundIdly()
 		{
 			if (false == isInitialized)
@@ -369,8 +373,6 @@ namespace RealisticEyeMovements {
 			nextChangePOITime = Time.time + Random.Range(Mathf.Min(minLookTime, maxLookTime), Mathf.Max(minLookTime, maxLookTime));
 			
 			Transform nextTargetPOI = ChooseNextHeadTargetPOI();
-			//Transform nextTargetPOI = ChooseNextPOITAG();
-			//Debug.Log(nextTargetPOI);
 			if ( nextTargetPOI != null && nextTargetPOI == targetPOI && state == State.LookingAroundIdly )
 				return;
 			
@@ -383,7 +385,6 @@ namespace RealisticEyeMovements {
 					
 			ChangeStateTo(State.LookingAroundIdly);
 		}
-
 
 
 		// To keep looking at the poi until new command, set duration to -1
@@ -402,7 +403,6 @@ namespace RealisticEyeMovements {
 		}
 	
 	
-	
 		// To keep looking at the poi until new command, set duration to -1
 		public void LookAtPoiDirectly( Vector3 poi, float duration=-1, float headLatency=0.075f )
 		{
@@ -413,7 +413,6 @@ namespace RealisticEyeMovements {
 			nextChangePOITime = duration >= 0 ? Time.time + duration : -1;
 			ChangeStateTo(State.LookingAtPoiDirectly);
 		}
-	
 	
 	
 		void LookAwayFromPlayer()
@@ -436,17 +435,17 @@ namespace RealisticEyeMovements {
 		}
 
 
-
 		void OnCannotGetTargetIntoView()
 		{
+			List<Transform> _pois = CurrentPOIs();
+			
 			bool shouldKeepTryingToLookAtTarget =	(state == State.LookingAtPoiDirectly ||
 																		state == State.LookingAtPlayer && nextChangePOITime < 0 ||
-																		state == State.LookingAroundIdly && pointsOfInterest.Length == 1 && targetPOI == pointsOfInterest[0])
+																		state == State.LookingAroundIdly && _pois != null && _pois.Count == 1 && targetPOI == _pois[0])
 																&& keepTargetEvenWhenLost;
 			if ( false == shouldKeepTryingToLookAtTarget && eyeAndHeadAnimator.CanChangePointOfAttention() )
 				OnTargetLost();
 		}
-
 
 		
 		void OnDestroy()
@@ -469,7 +468,15 @@ namespace RealisticEyeMovements {
 		}
 
 
-
+		void OnPlayerCameraDisabled()
+		{
+			UpdatePlayerEyeTransformReferences();
+			
+			if ( IsLookingAtPlayer() && thirdPersonPlayerEyeCenter == null )
+				LookAtPlayer(nextChangePOITime);
+		}
+		
+		
 		void OnPlayerEyesParentDestroyed(DestroyNotifier destroyNotifier)
 		{
 			if ( destroyNotifier.gameObject != createdVRParentGO )
@@ -489,12 +496,10 @@ namespace RealisticEyeMovements {
 		}
 
 
-
 		void OnTargetDestroyed()
 		{
 			OnTargetLost();
 		}
-
 
 
 		void OnTargetLost()
@@ -508,13 +513,11 @@ namespace RealisticEyeMovements {
 
 
 
-
 		void Start()
 		{
 			if ( false == isInitialized )
 				Initialize();
 		}
-
 
 
 		void UpdateLookTarget(bool shouldLookAwayFromPlayer=false)
@@ -530,105 +533,105 @@ namespace RealisticEyeMovements {
 		
 		void UpdateNativeVREyePositions()
 		{
-			if (useNativeVRSupport && usedThirdPersonPlayerEyeCenter == null)
+			if ( mainCameraXform == null )
 			{
-				if ( mainCameraXform == null )
+				if ( Camera.main == null )
 				{
-					if ( Camera.main == null )
+					Debug.LogError("Main camera not found");
+					return;
+				}
+				mainCameraXform = Camera.main.transform;
+			}
+
+			if ( false == useNativeVRSupport || false == Utils.IsVRDevicePresent() || usedThirdPersonPlayerEyeCenter != null)
+			{
+				playerEyeCenterXform.position = playerLeftEyeXform.position = playerRightEyeXform.position = mainCameraXform.position;
+				
+				return;
+			}
+			
+			if ( mainCameraXform.parent != null)
+			{
+				var parent = mainCameraXform.parent;
+				InputTracking.GetNodeStates(nodeStateList);
+				foreach (XRNodeState nodeState in nodeStateList)
+					if (nodeState.nodeType == XRNode.CenterEye)
 					{
-						Debug.LogError("Main camera not found");
-						return;
+						Vector3 centerEyeLocalPos;
+						Quaternion centerEyeLocalQ;
+						if ( nodeState.TryGetPosition(out centerEyeLocalPos) )
+							playerEyeCenterXform.position = parent.TransformPoint(centerEyeLocalPos);
+						if ( nodeState.TryGetRotation(out centerEyeLocalQ) )
+							playerEyeCenterXform.rotation = parent.rotation * centerEyeLocalQ;
 					}
-					mainCameraXform = Camera.main.transform;
-				}
+					else if (nodeState.nodeType == XRNode.LeftEye)
+					{
+						Vector3 leftEyeLocalPos;
+						if ( nodeState.TryGetPosition(out leftEyeLocalPos) )
+							playerLeftEyeXform.position = parent.TransformPoint(leftEyeLocalPos);
+					}
+					else if (nodeState.nodeType == XRNode.RightEye)
+					{
+						Vector3 rightEyeLocalPos;
+						if ( nodeState.TryGetPosition(out rightEyeLocalPos) )
+							playerRightEyeXform.position = parent.TransformPoint(rightEyeLocalPos);
+					}
+			}
+			else
+			{
+				InputTracking.GetNodeStates(nodeStateList);
+				Vector3 camLocal = Vector3.zero;
+				foreach (XRNodeState nodeState in nodeStateList)
+					if (nodeState.nodeType == XRNode.CenterEye)
+					{
+						Vector3 centerEyeLocalPos;
+						Quaternion centerEyeLocalQ;
+						if ( nodeState.TryGetPosition(out centerEyeLocalPos) )
+							camLocal = centerEyeLocalPos;
+						if ( nodeState.TryGetRotation(out centerEyeLocalQ) )
+							mainCameraParentXform.rotation = mainCameraXform.rotation * Quaternion.Inverse(centerEyeLocalQ);
+					}
+				mainCameraParentXform.position = mainCameraXform.position - camLocal.x * mainCameraParentXform.right - camLocal.y * mainCameraParentXform.up - mainCameraParentXform.forward*camLocal.z;
 
-				if ( mainCameraXform.parent != null)
-				{
-					var parent = mainCameraXform.parent;
-					InputTracking.GetNodeStates(nodeStateList);
-					foreach (XRNodeState nodeState in nodeStateList)
-						if (nodeState.nodeType == XRNode.CenterEye)
-						{
-							Vector3 centerEyeLocalPos;
-							Quaternion centerEyeLocalQ;
-							if ( nodeState.TryGetPosition(out centerEyeLocalPos) )
-								playerEyeCenterXform.position = parent.TransformPoint(centerEyeLocalPos);
-							if ( nodeState.TryGetRotation(out centerEyeLocalQ) )
-								playerEyeCenterXform.rotation = parent.rotation * centerEyeLocalQ;
-						}
-						else if (nodeState.nodeType == XRNode.LeftEye)
-						{
-							Vector3 leftEyeLocalPos;
-							if ( nodeState.TryGetPosition(out leftEyeLocalPos) )
-								playerLeftEyeXform.position = parent.TransformPoint(leftEyeLocalPos);
-						}
-						else if (nodeState.nodeType == XRNode.RightEye)
-						{
-							Vector3 rightEyeLocalPos;
-							if ( nodeState.TryGetPosition(out rightEyeLocalPos) )
-								playerRightEyeXform.position = parent.TransformPoint(rightEyeLocalPos);
-						}
-				}
-				else
-				{
-					InputTracking.GetNodeStates(nodeStateList);
-					Vector3 camLocal = Vector3.zero;
-					foreach (XRNodeState nodeState in nodeStateList)
-						if (nodeState.nodeType == XRNode.CenterEye)
-						{
-							Vector3 centerEyeLocalPos;
-							Quaternion centerEyeLocalQ;
-							if ( nodeState.TryGetPosition(out centerEyeLocalPos) )
-								camLocal = centerEyeLocalPos;
-							if ( nodeState.TryGetRotation(out centerEyeLocalQ) )
-								mainCameraParentXform.rotation = mainCameraXform.rotation * Quaternion.Inverse(centerEyeLocalQ);
-						}
-					mainCameraParentXform.position = mainCameraXform.position - camLocal.x * mainCameraParentXform.right - camLocal.y * mainCameraParentXform.up - mainCameraParentXform.forward*camLocal.z;
+				InputTracking.GetNodeStates(nodeStateList);
+				foreach (XRNodeState nodeState in nodeStateList)
+					if (nodeState.nodeType == XRNode.CenterEye)
+					{
+						Vector3 centerEyeLocalPos;
+						Quaternion centerEyeLocalQ;
+						if ( nodeState.TryGetPosition(out centerEyeLocalPos) )
+							playerEyeCenterXform.position = mainCameraParentXform.TransformPoint(centerEyeLocalPos);
+						if ( nodeState.TryGetRotation(out centerEyeLocalQ) )
+							playerEyeCenterXform.rotation = mainCameraParentXform.rotation * centerEyeLocalQ;
+					}
+					else if (nodeState.nodeType == XRNode.LeftEye)
+					{
+						Vector3 leftEyeLocalPos;
+						if ( nodeState.TryGetPosition(out leftEyeLocalPos) )
+							playerLeftEyeXform.position = mainCameraParentXform.TransformPoint(leftEyeLocalPos);
+					}
+					else if (nodeState.nodeType == XRNode.RightEye)
+					{
+						Vector3 rightEyeLocalPos;
+						if ( nodeState.TryGetPosition(out rightEyeLocalPos) )
+							playerRightEyeXform.position = mainCameraParentXform.TransformPoint(rightEyeLocalPos);
+					}
+			}
 
-					InputTracking.GetNodeStates(nodeStateList);
-					foreach (XRNodeState nodeState in nodeStateList)
-						if (nodeState.nodeType == XRNode.CenterEye)
-						{
-							Vector3 centerEyeLocalPos;
-							Quaternion centerEyeLocalQ;
-							if ( nodeState.TryGetPosition(out centerEyeLocalPos) )
-								playerEyeCenterXform.position = mainCameraParentXform.TransformPoint(centerEyeLocalPos);
-							if ( nodeState.TryGetRotation(out centerEyeLocalQ) )
-								playerEyeCenterXform.rotation = mainCameraParentXform.rotation * centerEyeLocalQ;
-						}
-						else if (nodeState.nodeType == XRNode.LeftEye)
-						{
-							Vector3 leftEyeLocalPos;
-							if ( nodeState.TryGetPosition(out leftEyeLocalPos) )
-								playerLeftEyeXform.position = mainCameraParentXform.TransformPoint(leftEyeLocalPos);
-						}
-						else if (nodeState.nodeType == XRNode.RightEye)
-						{
-							Vector3 rightEyeLocalPos;
-							if ( nodeState.TryGetPosition(out rightEyeLocalPos) )
-								playerRightEyeXform.position = mainCameraParentXform.TransformPoint(rightEyeLocalPos);
-						}
-				}
-
-				//*** Work around a  b u g  in SteamVR plugin that gives wrong positions for left and right eye
-				// https://github.com/ValveSoftware/steamvr_unity_plugin/issues/903
-				{
-					float leftEyeDist = Vector3.Distance(playerEyeCenterXform.position, playerLeftEyeXform.position);
-					float rightEyeDist = Vector3.Distance(playerEyeCenterXform.position, playerRightEyeXform.position);
-					
-					playerLeftEyeXform.position = playerEyeCenterXform.position -leftEyeDist *  playerEyeCenterXform.right;
-					playerRightEyeXform.position = playerEyeCenterXform.position +rightEyeDist *  playerEyeCenterXform.right;
-				}
+			//*** Work around a  b u g  in SteamVR plugin that gives wrong positions for left and right eye
+			// https://github.com/ValveSoftware/steamvr_unity_plugin/issues/903
+			{
+				float leftEyeDist = Vector3.Distance(playerEyeCenterXform.position, playerLeftEyeXform.position);
+				float rightEyeDist = Vector3.Distance(playerEyeCenterXform.position, playerRightEyeXform.position);
+				
+				playerLeftEyeXform.position = playerEyeCenterXform.position -leftEyeDist *  playerEyeCenterXform.right;
+				playerRightEyeXform.position = playerEyeCenterXform.position +rightEyeDist *  playerEyeCenterXform.right;
 			}
 		}
 
 
-
 		void UpdatePlayerEyeTransformReferences()
 		{
-			if ( thirdPersonPlayerEyeCenter == usedThirdPersonPlayerEyeCenter )
-				return;
-
 			if ( thirdPersonPlayerEyeCenter != null )
 			{
 				if ( Utils.IsEqualOrDescendant(transform, thirdPersonPlayerEyeCenter) )
@@ -654,13 +657,13 @@ namespace RealisticEyeMovements {
 				}
 				else
 				{
-					playerEyeCenterXform = FindPlayerCamera();
+					playerEyeCenterXform = FindPlayer();
 					playerLeftEyeXform = playerRightEyeXform = null;
 				}
 			}
 			else
 			{
-				playerEyeCenterXform = FindPlayerCamera();
+				playerEyeCenterXform = FindPlayer();
 				playerLeftEyeXform = playerRightEyeXform = null;
 			}
 
@@ -668,26 +671,36 @@ namespace RealisticEyeMovements {
 		}
 
 
-
 		void VeryLateUpdate()
 		{
 			if ( false == isInitialized )
 				return;
 			
-			UpdatePlayerEyeTransformReferences();
+			if ( thirdPersonPlayerEyeCenter == null && (playerCamera == null || playerCamera.gameObject.activeInHierarchy == false || playerCamera.enabled == false) )
+				OnPlayerCameraDisabled();
+			
+			if ( thirdPersonPlayerEyeCenter != usedThirdPersonPlayerEyeCenter )
+				UpdatePlayerEyeTransformReferences();
 			
 			if (useNativeVRSupport && usedThirdPersonPlayerEyeCenter == null)
 				UpdateNativeVREyePositions();
 				
-			float distanceToPlayer = playerEyeCenterXform == null ? 0 : Vector3.Distance(eyeAndHeadAnimator.GetOwnEyeCenter(), playerEyeCenterXform.position);
+			DistanceToPlayer = playerEyeCenterXform == null ? 0 : Vector3.Distance(eyeAndHeadAnimator.GetOwnEyeCenter(), playerEyeCenterXform.position);
+			if ( lastDistanceToPlayer < 0 )
+				lastDistanceToPlayer = DistanceToPlayer;
 			
+			if ( Time.deltaTime > 0 )
+			{
+				float playerApproachSpeed = (lastDistanceToPlayer-DistanceToPlayer)/Time.deltaTime;
+				smoothedPlayerApproachSpeed = Mathf.Lerp(smoothedPlayerApproachSpeed, playerApproachSpeed, Time.deltaTime * 2);
+			}
 			bool shouldLookBackAtPlayer = false;
 			bool shouldNoticePlayer = false;
 			bool shouldLookAwayFromPlayer = false;
 
-			bool isPlayerInView = playerEyeCenterXform != null && eyeAndHeadAnimator.IsInView( playerEyeCenterXform.position );
-			bool isPlayerInAwarenessZone = playerEyeCenterXform != null && isPlayerInView && distanceToPlayer < noticePlayerDistance;
-			bool isPlayerInPersonalSpace = playerEyeCenterXform != null && isPlayerInView && distanceToPlayer < personalSpaceDistance;
+			bool isPlayerInView = IsPlayerInView();
+			bool isPlayerInAwarenessZone = playerEyeCenterXform != null && isPlayerInView && DistanceToPlayer < noticePlayerDistance;
+			bool isPlayerInPersonalSpace = playerEyeCenterXform != null && isPlayerInView && DistanceToPlayer < personalSpaceDistance;
 
 			
 			//*** Awareness zone
@@ -700,8 +713,8 @@ namespace RealisticEyeMovements {
 						{
 							timeOfLastNoticeCheck = Time.time;
 						
-							bool isPlayerApproaching = lastDistanceToPlayer > distanceToPlayer;
-							float closenessFactor01 = (noticePlayerDistance - distanceToPlayer)/noticePlayerDistance;
+							bool isPlayerApproaching = smoothedPlayerApproachSpeed > 0;
+							float closenessFactor01 = (noticePlayerDistance - DistanceToPlayer)/noticePlayerDistance;
 							float noticeProbability = Mathf.Lerp (0.1f, 0.5f, closenessFactor01);
 							shouldNoticePlayer = isPlayerApproaching && timeOutsideOfAwarenessZone > 1 && Random.value < noticeProbability; 
 						}
@@ -718,7 +731,7 @@ namespace RealisticEyeMovements {
 				{
 					 if ( isPlayerInPersonalSpace )
 					 {
-						timeInsidePersonalSpace += Time.deltaTime * Mathf.Clamp01((personalSpaceDistance - distanceToPlayer)/(0.5f * personalSpaceDistance));
+						timeInsidePersonalSpace += Time.deltaTime * Mathf.Clamp01((personalSpaceDistance - DistanceToPlayer)/(0.5f * personalSpaceDistance));
 						const float kMinTimeInPersonalSpaceToLookAway = 1;
 						if ( timeInsidePersonalSpace >= kMinTimeInPersonalSpaceToLookAway )
 							shouldLookAwayFromPlayer = true;
@@ -755,7 +768,7 @@ namespace RealisticEyeMovements {
 					if ( stareBackFactor > 0 && playerEyeCenterXform != null )
 					{
 						float playerLookingAtMeAngle = eyeAndHeadAnimator.GetStareAngleTargetAtMe( playerEyeCenterXform );
-						bool isPlayerLookingAtMe = playerLookingAtMeAngle < 15;
+						bool isPlayerLookingAtMe = IsPlayerLookingAtMe();
 			
 						playerLookingAtMeTime = isPlayerInView && isPlayerLookingAtMe	? Mathf.Min(10, playerLookingAtMeTime + Mathf.Cos(Mathf.Deg2Rad * playerLookingAtMeAngle) * Time.deltaTime)
 																															: Mathf.Max(0, playerLookingAtMeTime - Time.deltaTime);
@@ -794,7 +807,7 @@ namespace RealisticEyeMovements {
 			if ( playerEyeCenterXform != null && ( shouldLookBackAtPlayer || shouldNoticePlayer ) )
 				LookAtPlayer(Random.Range(Mathf.Min(minLookTime, maxLookTime), Mathf.Max(minLookTime, maxLookTime)));
 
-			lastDistanceToPlayer = distanceToPlayer;
+			lastDistanceToPlayer = DistanceToPlayer;
 		}
 	}
 

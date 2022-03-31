@@ -91,7 +91,7 @@ namespace Crest
 
             public bool HasWaves { get; set; }
 
-            public void Draw(CommandBuffer buf, float weight, int isTransition, int lodIdx)
+            public void Draw(LodDataMgr lodData, CommandBuffer buf, float weight, int isTransition, int lodIdx)
             {
                 HasWaves = false;
                 _gerstner.UpdateBatch(this, _batchIndex);
@@ -880,7 +880,7 @@ namespace Crest
             // Renderer
             if (_mode == GerstnerMode.Geometry)
             {
-                isValid = ValidatedHelper.ValidateRenderer(gameObject, showMessage, "Crest/Inputs/Animated Waves/Gerstner");
+                isValid = ValidatedHelper.ValidateRenderer<MeshRenderer>(gameObject, showMessage, "Crest/Inputs/Animated Waves/Gerstner");
             }
             else if (_mode == GerstnerMode.Global && GetComponent<MeshRenderer>() != null)
             {

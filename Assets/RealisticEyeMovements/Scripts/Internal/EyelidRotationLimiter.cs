@@ -94,7 +94,6 @@ namespace RealisticEyeMovements
 		}
 
 
-
 		public void GetRotationAndPosition( float eyeAngle, float blink01, float eyeWidenOrSquint, bool isUpper, out Quaternion rotation, ref Vector3 position, ControlData.EyelidBoneMode eyelidBoneMode )
 		{
 			bool isLookingDown = eyeAngle > 0;
@@ -102,6 +101,8 @@ namespace RealisticEyeMovements
 					
 			if ( eyeWidenOrSquint < 0 )
 				blink01 = Mathf.Lerp(blink01, 1, -eyeWidenOrSquint);
+			else
+				eyeWidenOrSquint *= 1-blink01;
 
 			//*** Rotation
 			{
@@ -140,7 +141,6 @@ namespace RealisticEyeMovements
 		}
 
 
-
 		public static EyelidRotationLimiter Import(EyelidRotationLimiterForExport import, Transform startXform)
 		{
 			EyelidRotationLimiter limiter = new EyelidRotationLimiter
@@ -166,7 +166,6 @@ namespace RealisticEyeMovements
 			
 			return limiter;
 		}
-
 
 
 		public void PrettyPrint()

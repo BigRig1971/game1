@@ -32,10 +32,17 @@ namespace Crest
         {
             "_FULL_SCREEN_EFFECT",
             "_DEBUG_VIEW_OCEAN_MASK",
+            "_DEBUG_VIEW_STENCIL",
+            "CREST_UNDERWATER_BEFORE_TRANSPARENT",
+            "CREST_FLOATING_ORIGIN",
+
             // Defined by URP but considered UserDefined.
             "_MAIN_LIGHT_SHADOWS",
             "_MAIN_LIGHT_SHADOWS_CASCADE",
             "_SHADOWS_SOFT",
+
+            // Unity 2021.2 considers this UserDefined."
+            "STEREO_ENABLED_ON",
         };
 
         bool IsUnderwaterShader(string shaderName)

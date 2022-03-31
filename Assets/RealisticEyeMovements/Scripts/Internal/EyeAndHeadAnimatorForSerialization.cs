@@ -41,7 +41,8 @@ namespace RealisticEyeMovements
 			public float crossEyeCorrection = 1;
 			public float saccadeSpeed = 0.5f;
 			public float macroSaccadesPerMinute = 10;
-			public float microSaccadesPerMinute = 35;
+			public float microSaccadesPerMinuteLookingIdle = 45;
+			public float microSaccadesPerMinuteLookingAtPOI = 80;
 			public float limitHeadAngle = 0;
 		
 		#endregion

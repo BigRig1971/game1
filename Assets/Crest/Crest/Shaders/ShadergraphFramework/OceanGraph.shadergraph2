@@ -444,6 +444,9 @@
         },
         {
             "m_Id": "5b69718deab6457d9b7078b1b45157c5"
+        },
+        {
+            "m_Id": "610bd32621444cb59dd9ac3dc795b884"
         }
     ],
     "m_GroupDatas": [
@@ -893,9 +896,9 @@
             },
             "m_InputSlot": {
                 "m_Node": {
-                    "m_Id": "01717f91918a4191a16ca9eb0a394f85"
+                    "m_Id": "610bd32621444cb59dd9ac3dc795b884"
                 },
-                "m_SlotId": 0
+                "m_SlotId": -148776820
             }
         },
         {
@@ -1246,6 +1249,20 @@
                     "m_Id": "53a629a4551a828680fbb0226eff6089"
                 },
                 "m_SlotId": 475509304
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "610bd32621444cb59dd9ac3dc795b884"
+                },
+                "m_SlotId": 1
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "01717f91918a4191a16ca9eb0a394f85"
+                },
+                "m_SlotId": 0
             }
         },
         {
@@ -2116,7 +2133,7 @@
             "m_Guid": ""
         }
     },
-    "m_Path": "Shader Graphs",
+    "m_Path": "Crest",
     "m_ConcretePrecision": 0,
     "m_PreviewMode": 2,
     "m_OutputNode": {
@@ -2176,6 +2193,21 @@
         "z": 0.0,
         "w": 0.0
     }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "00f0de97c6914a6da1ee5642f44d521f",
+    "m_Id": 1,
+    "m_DisplayName": "Clip",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Clip",
+    "m_StageCapability": 3,
+    "m_Value": 0.0,
+    "m_DefaultValue": 0.0,
+    "m_Labels": []
 }
 
 {
@@ -5509,6 +5541,21 @@
 }
 
 {
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "4a2394802c1c45e4b8b1caf1fc69b876",
+    "m_Id": -148776820,
+    "m_DisplayName": "Clip",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Vector1_700cbde2aa654f358f668b6966ed96d9",
+    "m_StageCapability": 3,
+    "m_Value": 0.0,
+    "m_DefaultValue": 0.0,
+    "m_Labels": []
+}
+
+{
     "m_SGVersion": 1,
     "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
     "m_ObjectId": "4a3c770430d2578aaf28126d16b17016",
@@ -6676,6 +6723,48 @@
     "m_Property": {
         "m_Id": "08614caadf35c0898de1d0d6d01e7ea1"
     }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.SubGraphNode",
+    "m_ObjectId": "610bd32621444cb59dd9ac3dc795b884",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "CrestWaterVolume",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": 2557.333251953125,
+            "y": 1278.6666259765625,
+            "width": 207.99998474121095,
+            "height": 278.0
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "4a2394802c1c45e4b8b1caf1fc69b876"
+        },
+        {
+            "m_Id": "00f0de97c6914a6da1ee5642f44d521f"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": false,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_SerializedSubGraph": "{\n    \"subGraph\": {\n        \"fileID\": -5475051401550479605,\n        \"guid\": \"75e99e7ba3efc024b89d555442b4614a\",\n        \"type\": 3\n    }\n}",
+    "m_PropertyGuids": [
+        "64189e8c-eb39-46a3-aec2-78ddef091ba3"
+    ],
+    "m_PropertyIds": [
+        -148776820
+    ]
 }
 
 {

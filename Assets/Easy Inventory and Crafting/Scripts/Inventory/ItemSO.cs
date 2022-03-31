@@ -17,8 +17,10 @@ namespace EZInventory
         [Tooltip("Color of the item slot border.")]
         public Color itemBorderColor = new Color(1, 1, 1, 1);
         [Tooltip("If this is an equiipable item, this is what GameObject will spawn when held/equipped.")]
+        [SerializeField]
         public GameObject equipPrefab;
         public GameObject buildPrefab;
+        public GameObject questReward;
         public ItemStatSO[] stat;
 
         
@@ -34,7 +36,8 @@ namespace EZInventory
             HandRight,
             HandLeft,
             Feet,
-            Buildable
+            Buildable,
+            Quest
         }
     }
 }

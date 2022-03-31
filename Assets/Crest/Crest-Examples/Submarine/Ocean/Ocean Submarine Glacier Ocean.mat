@@ -55,6 +55,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - CREST_ALBEDO: 0
     - CREST_CAUSTICS: 1
     - CREST_FLOW: 0
     - CREST_FOAM: 1
@@ -92,7 +93,7 @@ Material:
     - _FoamSmoothness: 0.7
     - _MinReflectionDirectionY: 0
     - _NormalsScale: 40
-    - _NormalsStrength: 0.387
+    - _NormalsStrength: 0
     - _NormalsStrengthOverall: 1
     - _Occlusion: 0.385
     - _OpaqueCullMode: 2
@@ -113,7 +114,7 @@ Material:
     - _SmoothnessFalloff: 0.16
     - _SmoothnessFar: 0.844
     - _SmoothnessFarDistance: 608
-    - _Specular: 0.34
+    - _Specular: 0.613
     - _SrcBlend: 1
     - _StencilRef: 0
     - _StencilRefDepth: 8
@@ -147,6 +148,6 @@ Material:
     - _SSSTint: {r: 0.2551175, g: 0.46226418, b: 0.4270558, a: 0}
     - _ScatterColourBase: {r: 0.022027416, g: 0.074766874, b: 0.103773594, a: 0}
     - _ScatterColourShadow: {r: 0, g: 0.03921569, b: 0.078431346, a: 1}
-    - _ScatterColourShallow: {r: 0.1313141, g: 0.241, b: 0.241, a: 1}
+    - _ScatterColourShallow: {r: 0.023529412, g: 0.07450981, b: 0.101960786, a: 0}
     - _Specular: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

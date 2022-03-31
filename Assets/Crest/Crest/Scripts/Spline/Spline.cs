@@ -17,7 +17,7 @@ namespace Crest.Spline
     /// </summary>
     [ExecuteAlways]
     [AddComponentMenu(Internal.Constants.MENU_PREFIX_SPLINE + "Spline")]
-    [HelpURL(Internal.Constants.HELP_URL_BASE_USER + "wave-conditions.html" + Internal.Constants.HELP_URL_RP + "#wave-splines-preview")]
+    [HelpURL(Internal.Constants.HELP_URL_BASE_USER + "wave-conditions.html" + Internal.Constants.HELP_URL_RP + "#wave-splines")]
     public partial class Spline : MonoBehaviour, ISplinePointCustomDataSetup
     {
         /// <summary>
@@ -43,7 +43,7 @@ namespace Crest.Spline
 
         [SerializeField]
         float _radius = 20f;
-        [SerializeField, Delayed]
+        [SerializeField, UnityEngine.Delayed]
         int _subdivisions = 1;
 
         public float Radius => _radius;

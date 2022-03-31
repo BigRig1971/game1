@@ -22,25 +22,26 @@ void CrestNodeSampleClipSurfaceData_float
 {
 	o_clipSurface = 0.0;
 
-	// Calculate sample weights. params.z allows shape to be faded out (used on last lod to support pop-less scale transitions)
-	const float wt_smallerLod = (1.0 - i_lodAlpha) * i_oceanParams0.z;
-	const float wt_biggerLod = (1.0 - wt_smallerLod) * i_oceanParams1.z;
+	uint slice0; uint slice1; float alpha;
+	PosToSliceIndices(i_positionXZWS, 0.0, _CrestCascadeData[0]._scale, slice0, slice1, alpha);
 
-	// Data that needs to be sampled at the undisplaced position
-	if (wt_smallerLod > 0.001)
+	const CascadeParams cascadeData0 = _CrestCascadeData[slice0];
+	const CascadeParams cascadeData1 = _CrestCascadeData[slice1];
+	const float weight0 = (1.0 - alpha) * cascadeData0._weight;
+	const float weight1 = (1.0 - weight0) * cascadeData1._weight;
+
+	if (weight0 > 0.001)
 	{
-		CascadeParams cascadeData = MakeCascadeParams(i_oceanPosScale0, i_oceanParams0);
-		const float3 uv_slice_smallerLod = WorldToUV(i_positionXZWS, cascadeData, i_sliceIndex0);
-		SampleClip(_LD_TexArray_ClipSurface, uv_slice_smallerLod, wt_smallerLod, o_clipSurface);
+		const float3 uv = WorldToUV(i_positionXZWS, cascadeData0, slice0);
+		SampleClip(_LD_TexArray_ClipSurface, uv, weight0, o_clipSurface);
 	}
-	if (wt_biggerLod > 0.001)
+	if (weight1 > 0.001)
 	{
-		CascadeParams cascadeData = MakeCascadeParams(i_oceanPosScale1, i_oceanParams1);
-		const float3 uv_slice_biggerLod = WorldToUV(i_positionXZWS, cascadeData, i_sliceIndex0 + 1.0);
-		SampleClip(_LD_TexArray_ClipSurface, uv_slice_biggerLod, wt_biggerLod, o_clipSurface);
+		const float3 uv = WorldToUV(i_positionXZWS, cascadeData1, slice1);
+		SampleClip(_LD_TexArray_ClipSurface, uv, weight1, o_clipSurface);
 	}
 
-	o_clipSurface = lerp(_CrestClipByDefault, o_clipSurface, wt_smallerLod + wt_biggerLod);
+	o_clipSurface = lerp(_CrestClipByDefault, o_clipSurface, weight0 + weight1);
 
 	// 0.5 mip bias for LOD blending and texel resolution correction. This will help to tighten and smooth clipped edges.
 	// We set to 2 or 0 to work correctly with other alpha inputs like feathering.

@@ -38,7 +38,8 @@ namespace RealisticEyeMovements {
 			SerializedProperty idleTargetHorizAngleProp;
 			SerializedProperty crossEyeCorrectionProp;
 			SerializedProperty saccadeSpeedProp;
-			SerializedProperty microSaccadesPerMinuteProp;
+			SerializedProperty microSaccadesPerMinuteLookingIdleProp;
+			SerializedProperty microSaccadesPerMinuteLookingAtPOIProp;
 			SerializedProperty macroSaccadesPerMinuteProp;
 			SerializedProperty limitHeadAngleProp;
 			
@@ -54,8 +55,12 @@ namespace RealisticEyeMovements {
 			SerializedProperty spineXformProp;
 			SerializedProperty headTargetProp;
 			SerializedProperty headWeightProp;
-			SerializedProperty headTiltProp;
-			SerializedProperty neckTiltProp;
+			SerializedProperty headPitchAngleProp;
+			SerializedProperty headRollAngleProp;
+			SerializedProperty headYawAngleProp;
+			SerializedProperty neckPitchAngleProp;
+			SerializedProperty neckRollAngleProp;
+			SerializedProperty neckYawAngleProp;
 			SerializedProperty resetHeadAtFrameStartProp;
 			SerializedProperty bodyWeightProp;
 			SerializedProperty neckHorizWeightProp;
@@ -107,10 +112,11 @@ namespace RealisticEyeMovements {
 				EditorGUI.indentLevel++;
 				
 				EditorGUILayout.Slider(eyelidsWeightProp, 0, 1, new GUIContent( "Eyelids weight", "How much this component controls eyelids (Modulated by the main and eyes weights)."));
+				EditorGUILayout.Space();
 				EditorGUILayout.PropertyField(kMinNextBlinkTimeProp, new GUIContent("Min next blink time", "Minimum seconds until next blink"));
 				EditorGUILayout.PropertyField(kMaxNextBlinkTimeProp, new GUIContent("Max next blink time", "Maximum seconds until next blink"));
+				EditorGUILayout.Space();
 				EditorGUILayout.Slider(blinkSpeedProp, 0.1f, 3, new GUIContent("Blink speed", "The blinking speed. Default is 1."));
-				EditorGUILayout.PropertyField(eyelidsFollowEyesVerticallyProp, new GUIContent("Eyelids follow eyes vertically", "Whether the eyelids move up a bit when looking up and down when looking down."));
 				if (controlData.eyelidControl == ControlData.EyelidControl.Bones)
 				{
 					const string tooltip = "0: normal. 1: max widened, -1: max squint";
@@ -121,6 +127,8 @@ namespace RealisticEyeMovements {
 					const string tooltip = "0: normal. -1: max squint";
 					EditorGUILayout.Slider(eyeWidenOrSquintProp, -1, 0, new GUIContent("Eye widen or squint", tooltip));
 				}
+				EditorGUILayout.Space();
+				EditorGUILayout.PropertyField(eyelidsFollowEyesVerticallyProp, new GUIContent("Eyelids follow eyes vertically", "Whether the eyelids move up a bit when looking up and down when looking down."));
 
 				EditorGUI.indentLevel--;
 			}
@@ -134,14 +142,18 @@ namespace RealisticEyeMovements {
 			{
 				EditorGUI.indentLevel++;
 				EditorGUILayout.Slider(eyesWeightProp, 0, 1, new GUIContent( "Eyes weight", "How much this component controls eyes direction (modulated by main weight)."));
+				EditorGUILayout.Space();
 				EditorGUILayout.PropertyField(useMicroSaccadesProp);
 				EditorGUILayout.PropertyField(useMacroSaccadesProp);
+				EditorGUILayout.Space();
 				EditorGUILayout.PropertyField(maxEyeHorizAngleProp, new GUIContent("Max eye horiz angle", "Maximum horizontal eye angle (away from nose)"));
 				EditorGUILayout.PropertyField(maxEyeHorizAngleTowardsNoseProp, new GUIContent("Max eye horiz angle towards nose", "Maximum horizontal eye angle towards nose"));
+				EditorGUILayout.Space();
 				EditorGUILayout.Slider(idleTargetHorizAngleProp, 0, 40, new GUIContent("Idle target horiz angle", "In Look Idly mode, choose next look target within this number of angles horizontally relative to looking forward."));
 				EditorGUILayout.Slider(crossEyeCorrectionProp, 0, 5, new GUIContent("Cross eye correction", "Cross eye correction factor"));
 				EditorGUILayout.Slider(saccadeSpeedProp, 0, 5, new GUIContent("Saccade speed", "1 is most realistic, but a slower value like 0.5 looks better for most characters."));
-				EditorGUILayout.Slider(microSaccadesPerMinuteProp, 0, 120, new GUIContent("Micro saccades per min", "How many macro saccades are made on average per minute."));
+				EditorGUILayout.Slider(microSaccadesPerMinuteLookingIdleProp, 0, 180, new GUIContent("Micro saccades/min looking idle", "How many macro saccades are made on average per minute when looking idle."));
+				EditorGUILayout.Slider(microSaccadesPerMinuteLookingAtPOIProp, 0, 180, new GUIContent("Micro saccades/min looking at POI", "How many macro saccades are made on average per minute when looking at a specific thing."));
 				EditorGUILayout.Slider(macroSaccadesPerMinuteProp, 0, 120, new GUIContent("Macro saccades per min", "How many macro saccades are made on average per minute."));
 				EditorGUI.indentLevel--;
 			}
@@ -201,6 +213,8 @@ namespace RealisticEyeMovements {
 					const string tooltipHeadAnimationType = "Animation method for head.";
 					EditorGUILayout.PropertyField(headAnimationTypeProp, new GUIContent("Head animation type", tooltipHeadAnimationType));
 
+					EditorGUILayout.Space();
+					
 					EditorGUILayout.Slider(headWeightProp, 0, 1, new GUIContent( "Head weight", "How much this component controls head direction (modulated by main weight)."));
 					
 					if ( eyeAndHeadAnimator.headComponent.headControl == HeadComponent.HeadControl.AnimatorIK )
@@ -210,26 +224,52 @@ namespace RealisticEyeMovements {
 						EditorGUILayout.Slider(neckHorizWeightProp, 0, 1, new GUIContent("Neck horizontal weight", "How much the neck follows the head horizontally."));
 						EditorGUILayout.Slider(neckVertWeightProp, 0, 1, new GUIContent("Neck vertical weight", "How much the neck follows the head vertically."));
 					}
+					
+					EditorGUILayout.Space();
+					
+					EditorGUILayout.LabelField("Additional head tilt", EditorStyles.boldLabel);
+					EditorGUI.indentLevel++;
+					EditorGUILayout.Slider(headPitchAngleProp, -45, 45, new GUIContent( "Pitch angle", "The pitch angle of the head (up/down)"));
+					EditorGUILayout.Slider(headRollAngleProp, -45, 45, new GUIContent( "Roll angle", "The roll angle of the head (tilt around backward-forward axis like a confused dog)"));
+					EditorGUILayout.Slider(headYawAngleProp, -45, 45, new GUIContent( "Yaw angle", "The yaw angle of the head (look left/right around vertical axis)"));
+					EditorGUI.indentLevel--;
+					
+					EditorGUILayout.Space();
+					
 					if ( eyeAndHeadAnimator.headComponent.headControl == HeadComponent.HeadControl.Transform )
 					{
-						EditorGUILayout.Slider(headTiltProp, -45, 45, new GUIContent( "Head tilt", "The tilt angle of the head"));
 						if ( eyeAndHeadAnimator.neckBoneNonMecanim != null || canUseMecanimNeckBone )
-							EditorGUILayout.Slider(neckTiltProp, -45, 45, new GUIContent( "Neck tilt", "The tilt angle of the neck"));
-						
+						{
+							EditorGUILayout.LabelField("Additional neck tilt", EditorStyles.boldLabel);
+							EditorGUI.indentLevel++;
+							EditorGUILayout.Slider(neckPitchAngleProp, -45, 45, new GUIContent( "Pitch angle", "The pitch angle of the neck (up/down)"));
+							EditorGUILayout.Slider(neckRollAngleProp, -45, 45, new GUIContent( "Roll angle", "The roll angle of the neck (tilt around backward-forward axis like a confused dog)"));
+							EditorGUILayout.Slider(neckYawAngleProp, -45, 45, new GUIContent( "Yaw angle", "The yaw angle of the neck (look left/right around vertical axis)"));
+							EditorGUI.indentLevel--;
+							EditorGUILayout.Space();
+						}
 						EditorGUILayout.PropertyField(resetHeadAtFrameStartProp, new GUIContent("Reset head at frame start", "Check if the head's forward is ok, but he head is rotated wrongly around that forward (might occur when the head is not animated)"));
+						EditorGUILayout.Space();
 					}
 					
+					EditorGUILayout.LabelField("Head speed", EditorStyles.boldLabel);
+					EditorGUI.indentLevel++;
 					const string tooltipHeadSpeedSwitchTarget = "Increases or decreases head speed when switching to a new look target (1: normal)";
-					EditorGUILayout.Slider(headSpeedChangeToNewTargetProp, 0.1f, 5, new GUIContent("Head speed for switching target", tooltipHeadSpeedSwitchTarget));
-
+					EditorGUILayout.Slider(headSpeedChangeToNewTargetProp, 0.1f, 5, new GUIContent("Speed for switching target", tooltipHeadSpeedSwitchTarget));
 					const string tooltipHeadSpeedTrackTarget = "Increases or decreases head speed when tracking the current look target (1: normal)";
-					EditorGUILayout.Slider(headSpeedTrackTargetProp, 0.1f, 5, new GUIContent("Head speed for following target", tooltipHeadSpeedTrackTarget));
+					EditorGUILayout.Slider(headSpeedTrackTargetProp, 0.1f, 5, new GUIContent("Speed for following target", tooltipHeadSpeedTrackTarget));
+					EditorGUI.indentLevel--;
+					EditorGUILayout.Space();
+
+					EditorGUILayout.LabelField("Head jitter", EditorStyles.boldLabel);
+					EditorGUI.indentLevel++;
+					EditorGUILayout.PropertyField(useHeadJitterProp);
+					EditorGUILayout.PropertyField(headJitterFrequencyProp, new GUIContent("Jitter frequency", "The frequency of the head jitter."));
+					EditorGUILayout.PropertyField(headJitterAmplitudeProp, new GUIContent("Jitter amplitude", "The amplitude of the head jitter."));
+					EditorGUI.indentLevel--;
+					EditorGUILayout.Space();
 
 					EditorGUILayout.Slider(limitHeadAngleProp, 0, 1, new GUIContent("Limit head angle", "Limits the angle for the head movement"));
-
-					EditorGUILayout.PropertyField(useHeadJitterProp);
-					EditorGUILayout.PropertyField(headJitterFrequencyProp, new GUIContent("Head jitter frequency", "The frequency of the head jitter."));
-					EditorGUILayout.PropertyField(headJitterAmplitudeProp, new GUIContent("Head jitter amplitude", "The amplitude of the head jitter."));
 				}
 				
 				EditorGUI.indentLevel--;
@@ -511,11 +551,12 @@ namespace RealisticEyeMovements {
 			}
 			
 			if ( false == isDefaultSet || false == isClosedSet || false == isLookDownSet || false == isLookUpSet || isAnimatorMissing || areEyeBonesMissing || areEyelidTransformsMissing || areEyeBonesMissing )
-				EditorGUILayout.LabelField("Please complete setup.", redTextStyle);
+				if ( eyeAndHeadAnimator.gameObject.activeInHierarchy )
+					EditorGUILayout.LabelField("Please complete setup.", redTextStyle);
 		}
 			
 
-		void OnEnable()
+		void InitVariables()
 		{
 			eyeAndHeadAnimator = (EyeAndHeadAnimator) target;
 			controlData = eyeAndHeadAnimator.controlData;
@@ -526,6 +567,14 @@ namespace RealisticEyeMovements {
 				rightEyeFromAnimator = animator.GetBoneTransform(HumanBodyBones.RightEye);
 			}		
 			
+			canUseMecanimHeadBone = animator != null && animator.GetBoneTransform(HumanBodyBones.Head) != null;
+			canUseMecanimNeckBone = animator != null && animator.GetBoneTransform(HumanBodyBones.Neck) != null;
+			animatorHasSpine = animator != null && Utils.GetSpineBoneFromAnimator(animator) != null;
+		}
+		
+		
+		void OnEnable()
+		{
 			mainWeightProp = serializedObject.FindProperty("mainWeight");
 			eyesWeightProp = serializedObject.FindProperty("eyesWeight");
 			useMicroSaccadesProp = serializedObject.FindProperty("useMicroSaccades");
@@ -540,7 +589,8 @@ namespace RealisticEyeMovements {
 			idleTargetHorizAngleProp = serializedObject.FindProperty("idleTargetHorizAngle");
 			crossEyeCorrectionProp = serializedObject.FindProperty("crossEyeCorrection");
 			saccadeSpeedProp = serializedObject.FindProperty("saccadeSpeed");
-			microSaccadesPerMinuteProp = serializedObject.FindProperty("microSaccadesPerMinute");
+			microSaccadesPerMinuteLookingIdleProp = serializedObject.FindProperty("microSaccadesPerMinuteLookingIdle");
+			microSaccadesPerMinuteLookingAtPOIProp = serializedObject.FindProperty("microSaccadesPerMinuteLookingAtPOI");
 			macroSaccadesPerMinuteProp = serializedObject.FindProperty("macroSaccadesPerMinute");
 			
 			limitHeadAngleProp = serializedObject.FindProperty("limitHeadAngle");
@@ -559,8 +609,12 @@ namespace RealisticEyeMovements {
 			bodyWeightProp = serializedObject.FindProperty("bodyWeight");
 			neckHorizWeightProp = serializedObject.FindProperty("neckHorizWeight");
 			neckVertWeightProp = serializedObject.FindProperty("neckVertWeight");
-			headTiltProp = serializedObject.FindProperty("headTilt");
-			neckTiltProp = serializedObject.FindProperty("neckTilt");
+			headPitchAngleProp = serializedObject.FindProperty("headPitchAngle");
+			headRollAngleProp = serializedObject.FindProperty("headRollAngle");
+			headYawAngleProp = serializedObject.FindProperty("headYawAngle");
+			neckPitchAngleProp = serializedObject.FindProperty("neckPitchAngle");
+			neckRollAngleProp = serializedObject.FindProperty("neckRollAngle");
+			neckYawAngleProp = serializedObject.FindProperty("neckYawAngle");
 			resetHeadAtFrameStartProp = serializedObject.FindProperty("resetHeadAtFrameStart");
 			headSpeedChangeToNewTargetProp = serializedObject.FindProperty("headChangeToNewTargetSpeed");
 			headSpeedTrackTargetProp = serializedObject.FindProperty("headTrackTargetSpeed");
@@ -583,9 +637,7 @@ namespace RealisticEyeMovements {
 			lowerLeftEyelidBonesProp = controlDataProp.FindPropertyRelative("lowerLeftEyelidBones");
 			lowerRightEyelidBonesProp = controlDataProp.FindPropertyRelative("lowerRightEyelidBones");
 			
-			canUseMecanimHeadBone = animator != null && animator.GetBoneTransform(HumanBodyBones.Head) != null;
-			canUseMecanimNeckBone = animator != null && animator.GetBoneTransform(HumanBodyBones.Neck) != null;
-			animatorHasSpine = animator != null && Utils.GetSpineBoneFromAnimator(animator) != null;
+			InitVariables();
 			
 			eyeAndHeadAnimator.ConvertLegacyIfNecessary();
 			controlData.ConvertLegacyIfNecessary();
@@ -622,6 +674,9 @@ namespace RealisticEyeMovements {
 		
 		void UpdateSetupStateVariables()
 		{
+			if ( animator == null )
+				InitVariables();
+			
 			isEyeballControl = controlData.eyeControl == ControlData.EyeControl.SelectedObjects;
 			isEyeBoneControl = controlData.eyeControl == ControlData.EyeControl.MecanimEyeBones;
 			isEyelidBoneControl = controlData.eyelidControl == ControlData.EyelidControl.Bones;

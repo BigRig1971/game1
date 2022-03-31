@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace RealisticEyeMovements
 {
-    struct CritDampTweenQuaternion
+    internal struct CritDampTweenQuaternion
     {
         [StructLayout(LayoutKind.Explicit)]
         struct QVUnion
@@ -52,7 +52,7 @@ namespace RealisticEyeMovements
             var n2 = 1 + omega * dt;
             velocity = n1 / (n2 * n2);
 			float speed = velocity.magnitude;
-			velocity = (Mathf.Min(speed, maxSpeed)/speed) * velocity;
+			velocity = Mathf.Min(speed, maxSpeed)/speed * velocity;
             _rotation.v = (_rotation.v + velocity * dt).normalized;
 
         }

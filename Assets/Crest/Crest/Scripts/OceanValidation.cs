@@ -9,6 +9,7 @@
 
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Crest.EditorHelpers;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -86,15 +87,15 @@ namespace Crest
         {
             var mat = material.targetObject as Material;
             Undo.RecordObject(mat, $"Enable keyword {keyword}");
-            if (enabled)
-            {
-                mat.EnableKeyword(keyword);
-            }
-            else
-            {
-                mat.DisableKeyword(keyword);
-            }
+            mat.SetKeyword(keyword, enabled);
             mat.SetFloat(floatParam, enabled ? 1f : 0f);
+        }
+
+        internal static void FixSetMaterialIntProperty(SerializedObject material, string label, string intParam, int value)
+        {
+            var mat = material.targetObject as Material;
+            Undo.RecordObject(mat, $"change {label}");
+            mat.SetInt(intParam, value);
         }
 
         static void FixRemoveRenderer(SerializedObject componentOrGameObject)
@@ -108,14 +109,24 @@ namespace Crest
             EditorUtility.SetDirty(gameObject);
         }
 
-        public static bool ValidateRenderer(GameObject gameObject, ShowMessage showMessage, string shaderPrefix)
+        public static void FixAddMissingMathPackage(SerializedObject componentOrGameObject)
         {
-            return ValidateRenderer(gameObject, showMessage, isRendererRequired: true, isRendererOptional: false, shaderPrefix);
+            PackageManagerHelpers.AddMissingPackage("com.unity.mathematics");
         }
 
-        public static bool ValidateRenderer(GameObject gameObject, ShowMessage showMessage, bool isRendererRequired, bool isRendererOptional, string shaderPrefix = null)
+        public static void FixAddMissingBurstPackage(SerializedObject componentOrGameObject)
         {
-            gameObject.TryGetComponent<MeshRenderer>(out var renderer);
+            PackageManagerHelpers.AddMissingPackage("com.unity.burst");
+        }
+
+        public static bool ValidateRenderer<T>(GameObject gameObject, ShowMessage showMessage, string shaderPrefix) where T : Renderer
+        {
+            return ValidateRenderer<T>(gameObject, showMessage, isRendererRequired: true, isRendererOptional: false, shaderPrefix);
+        }
+
+        public static bool ValidateRenderer<T>(GameObject gameObject, ShowMessage showMessage, bool isRendererRequired, bool isRendererOptional, string shaderPrefix = null) where T : Renderer
+        {
+            gameObject.TryGetComponent<T>(out var renderer);
 
             if (isRendererRequired)
             {
@@ -127,9 +138,18 @@ namespace Crest
                         return true;
                     }
 
+                    var type = typeof(T);
+                    var name = type.Name;
+
+                    // Give users a hint as to what "Renderer" really means.
+                    if (type == typeof(Renderer))
+                    {
+                        name += " (Mesh, Trail etc)";
+                    }
+
                     showMessage
                     (
-                        "A MeshRenderer component is required but none is attached to ocean input.",
+                        $"A <i>{name}</i> component is required but none is attached to ocean input.",
                         "Attach a <i>MeshRenderer</i> component.",
                         MessageType.Error, gameObject,
                         FixAttachComponent<MeshRenderer>
@@ -262,11 +282,20 @@ namespace Crest
                         foreach (var message in messages)
                         {
                             EditorGUILayout.BeginHorizontal();
+
                             var fixDescription = message._fixDescription;
+                            var originalGUIEnabled = GUI.enabled;
+
                             if (message._action != null)
                             {
                                 fixDescription += " Click the fix/repair button on the right to fix.";
+
+                                if ((message._action == ValidatedHelper.FixAddMissingMathPackage || message._action == ValidatedHelper.FixAddMissingBurstPackage) && PackageManagerHelpers.IsBusy)
+                                {
+                                    GUI.enabled = false;
+                                }
                             }
+
                             EditorGUILayout.HelpBox($"{message._message} {fixDescription}", messageType);
 
                             // Jump to object button.
@@ -321,6 +350,8 @@ namespace Crest
                                     }
                                 }
                             }
+
+                            GUI.enabled = originalGUIEnabled;
 
                             EditorGUILayout.EndHorizontal();
                         }

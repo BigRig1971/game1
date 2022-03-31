@@ -14,6 +14,7 @@ half3 ScatterColour
 	in const half3 i_ambientLighting,
 	in const half3 i_lightDir,
 	in const half3 i_lightCol,
+	in const half3 i_additionalLightCol,
 	in const bool i_underwater
 )
 {
@@ -44,6 +45,10 @@ half3 ScatterColour
 		half3 subsurface = (_SubSurfaceBase + _SubSurfaceSun * towardsSun) * _SubSurfaceColour.rgb * i_lightCol * i_shadow;
 		if (!i_underwater)
 		{
+#if _ADDITIONAL_LIGHTS
+			// Already includes attenuation from distance and shadows. Exclude from underwater.
+			subsurface += _SubSurfaceColour.rgb * i_additionalLightCol;
+#endif
 			subsurface *= (1.0 - v * v) * sss;
 		}
 		col += subsurface;
@@ -57,20 +62,21 @@ half3 ScatterColour
 #if _CAUSTICS_ON
 void ApplyCaustics
 (
+	in const WaveHarmonic::Crest::TiledTexture i_causticsTexture,
+	in const WaveHarmonic::Crest::TiledTexture i_distortionTexture,
 	in const int2 i_positionSS,
 	in const float3 i_scenePos,
 	in const half3 i_lightDir,
 	in const float i_sceneZ,
-	in sampler2D i_normals,
 	in const bool i_underwater,
 	inout half3 io_sceneColour,
-	in const CascadeParams cascadeData0,
-	in const CascadeParams cascadeData1
+	in const int i_sliceIndex,
+	in const CascadeParams cascadeData
 )
 {
 	// could sample from the screen space shadow texture to attenuate this..
 	// underwater caustics - dedicated to P
-	const float3 scenePosUV = WorldToUV(i_scenePos.xz, cascadeData1, _LD_SliceIndex + 1);
+	const float3 scenePosUV = WorldToUV(i_scenePos.xz, cascadeData, i_sliceIndex);
 
 	float3 disp = 0.0;
 	// this gives height at displaced position, not exactly at query position.. but it helps. i cant pass this from vert shader
@@ -87,17 +93,49 @@ void ApplyCaustics
 	// caustics come from many directions and don't exhibit such a strong directonality
 	// Removing the fudge factor (4.0) will cause the caustics to move around more with the waves. But this will also
 	// result in stretched/dilated caustics in certain areas. This is especially noticeable on angled surfaces.
-	float2 surfacePosXZ = i_scenePos.xz + i_lightDir.xz * sceneDepth / (4.*i_lightDir.y);
-	float4 cuv1 = float4((surfacePosXZ / _CausticsTextureScale + float2(0.044*_CrestTime + 17.16, -0.169*_CrestTime)), 0., mipLod);
-	float4 cuv2 = float4((1.37*surfacePosXZ / _CausticsTextureScale + float2(0.248*_CrestTime, 0.117*_CrestTime)), 0., mipLod);
+	float2 lightProjection = i_lightDir.xz * sceneDepth / (4.0 * i_lightDir.y);
+
+	float3 cuv1 = 0.0; float3 cuv2 = 0.0;
+	{
+		float2 surfacePosXZ = i_scenePos.xz;
+		float surfacePosScale = 1.37;
+
+#if CREST_FLOATING_ORIGIN
+		// Apply tiled floating origin offset. Always needed.
+		surfacePosXZ -= i_causticsTexture.FloatingOriginOffset();
+		// Scale was causing popping.
+		surfacePosScale = 1.0;
+#endif
+
+		surfacePosXZ += lightProjection;
+
+		cuv1 = float3
+		(
+			surfacePosXZ / i_causticsTexture._scale + float2(0.044 * _CrestTime + 17.16, -0.169 * _CrestTime),
+			mipLod
+		);
+		cuv2 = float3
+		(
+			surfacePosScale * surfacePosXZ / i_causticsTexture._scale + float2(0.248 * _CrestTime, 0.117 * _CrestTime),
+			mipLod
+		);
+	}
 
 	// We'll use this distortion code for above water in single pass due to refraction bug.
 #if !defined(UNITY_SINGLE_PASS_STEREO) && !defined(UNITY_STEREO_INSTANCING_ENABLED)
 	if (i_underwater)
 #endif
 	{
-		// Add distortion if we're not getting the refraction
-		half2 causticN = _CausticsDistortionStrength * UnpackNormal(tex2D(i_normals, surfacePosXZ / _CausticsDistortionScale)).xy;
+		float2 surfacePosXZ = i_scenePos.xz;
+
+#if CREST_FLOATING_ORIGIN
+		// Apply tiled floating origin offset. Always needed.
+		surfacePosXZ -= i_distortionTexture.FloatingOriginOffset();
+#endif
+
+		surfacePosXZ += lightProjection;
+
+		half2 causticN = _CausticsDistortionStrength * UnpackNormal(i_distortionTexture.Sample(surfacePosXZ / i_distortionTexture._scale)).xy;
 		cuv1.xy += 1.30 * causticN;
 		cuv2.xy += 1.77 * causticN;
 	}
@@ -119,7 +157,11 @@ void ApplyCaustics
 #endif // _SHADOWS_ON
 
 	io_sceneColour.xyz *= 1.0 + causticsStrength *
-		(0.5*tex2Dlod(_CausticsTexture, cuv1).xyz + 0.5*tex2Dlod(_CausticsTexture, cuv2).xyz - _CausticsTextureAverage);
+	(
+		0.5 * i_causticsTexture.SampleLevel(cuv1.xy, cuv1.z).xyz +
+		0.5 * i_causticsTexture.SampleLevel(cuv2.xy, cuv2.z).xyz -
+		_CausticsTextureAverage
+	);
 }
 #endif // _CAUSTICS_ON
 
@@ -137,7 +179,6 @@ half3 OceanEmission
 	in const float i_sceneZ,
 	const float i_rawDepth,
 	in const half3 i_bubbleCol,
-	in sampler2D i_normals,
 	in const bool i_underwater,
 	in const half3 i_scatterCol,
 	in const CascadeParams cascadeData0,
@@ -192,7 +233,7 @@ half3 OceanEmission
 #else
 		float3 scenePos = ComputeWorldSpacePosition(uvBackgroundRefract, rawDepth, UNITY_MATRIX_I_VP);
 #endif
-		ApplyCaustics(i_positionSS, scenePos, i_lightDir, i_sceneZ, i_normals, i_underwater, sceneColour, cascadeData0, cascadeData1);
+		ApplyCaustics(_CausticsTiledTexture, _CausticsDistortionTiledTexture, i_positionSS, scenePos, i_lightDir, i_sceneZ, i_underwater, sceneColour, _LD_SliceIndex + 1, cascadeData1);
 #endif
 		alpha = 1.0 - exp(-_DepthFogDensity.xyz * depthFogDistance);
 	}

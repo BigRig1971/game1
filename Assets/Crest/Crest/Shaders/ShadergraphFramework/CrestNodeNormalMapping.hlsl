@@ -8,6 +8,7 @@
 #include "../OceanGlobals.hlsl"
 #include "../OceanHelpersNew.hlsl"
 #include "OceanNormalMapping.hlsl"
+#include "../ShaderLibrary/Texture.hlsl"
 
 void OceanNormals_half
 (
@@ -28,12 +29,23 @@ void OceanNormals_half
 	in const float2 i_seaLevelDerivatives,
 	out half3 o_normalTS,
 	out half o_sss,
-	out half o_foam
+	out half o_foam,
+	out half4 o_albedo
 )
 {
 	o_sss = 0.0;
 	o_foam = 0.0;
+	o_albedo = 0.0;
 	o_normalTS = half3(0.0, 0.0, 1.0);
+
+#ifdef SHADERGRAPH_PREVIEW
+	// sampler_TextureNormals is not defined in shader graph. Silence error.
+	SamplerState sampler_TextureNormals = LODData_linear_clamp_sampler;
+	float4 _TextureNormals_TexelSize = (float4)0.0;
+#endif
+
+	const WaveHarmonic::Crest::TiledTexture normalsTexture =
+		WaveHarmonic::Crest::TiledTexture::Make(i_normals, sampler_TextureNormals, _TextureNormals_TexelSize, i_normalsScale);
 
 	// TODO pass this in? it needs _normalScrollSpeeds and _farNormalsWeight
 	const PerCascadeInstanceData instanceData = _CrestPerCascadeInstanceData[i_sliceIndex0];
@@ -54,6 +66,9 @@ void OceanNormals_half
 #ifdef CREST_FOAM_ON
 		SampleFoam(_LD_TexArray_Foam, uv_slice_smallerLod, wt_smallerLod, o_foam);
 #endif
+#if defined(CREST_ALBEDO_ON) || !defined(CREST_GENERATED_SHADER_ON)
+		SampleAlbedo(_LD_TexArray_Albedo, uv_slice_smallerLod, wt_smallerLod, o_albedo);
+#endif
 	}
 	if (wt_biggerLod > 0.001)
 	{
@@ -61,13 +76,16 @@ void OceanNormals_half
 #ifdef CREST_FOAM_ON
 		SampleFoam(_LD_TexArray_Foam, uv_slice_biggerLod, wt_biggerLod, o_foam);
 #endif
+#if defined(CREST_ALBEDO_ON) || !defined(CREST_GENERATED_SHADER_ON)
+		SampleAlbedo(_LD_TexArray_Albedo, uv_slice_biggerLod, wt_biggerLod, o_albedo);
+#endif
 	}
 
 //#if _APPLYNORMALMAPPING_ON
 #if defined(CREST_FLOW_ON)
-	ApplyNormalMapsWithFlow(i_flow, i_positionXZWSUndisplaced, i_normals, i_normalsScale, i_normalsStrength, i_lodAlpha, cascadeData0, instanceData, n_pixel);
+	ApplyNormalMapsWithFlow(i_flow, normalsTexture, i_positionXZWSUndisplaced, i_normalsStrength, i_lodAlpha, cascadeData0, instanceData, n_pixel);
 #else
-	n_pixel.xz += SampleNormalMaps(i_positionXZWSUndisplaced, i_normals, i_normalsScale, i_normalsStrength, i_lodAlpha, cascadeData0, instanceData);
+	n_pixel.xz += SampleNormalMaps(normalsTexture, i_positionXZWSUndisplaced, 0.0, i_normalsStrength, i_lodAlpha, cascadeData0, instanceData);
 #endif
 //#endif
 

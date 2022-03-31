@@ -37,7 +37,7 @@ namespace Crest
                 s_instance = new UnderwaterMaskPassURP();
             }
 
-            UnderwaterRenderer.Instance.SetUpFixMaskArtefactsShader();
+            UnderwaterRenderer.Instance.OnEnableMask();
 
             s_instance._underwaterRenderer = underwaterRenderer;
 
@@ -47,6 +47,11 @@ namespace Crest
 
         public static void Disable()
         {
+            if (UnderwaterRenderer.Instance != null)
+            {
+                UnderwaterRenderer.Instance.OnDisableMask();
+            }
+
             RenderPipelineManager.beginCameraRendering -= EnqueuePass;
         }
 
@@ -57,30 +62,37 @@ namespace Crest
                 return;
             }
 
-            // Only support main camera for now.
-            if (!ReferenceEquals(OceanRenderer.Instance.ViewCamera, camera))
+            // Only support main camera, scene camera and preview camera.
+            if (!ReferenceEquals(s_instance._underwaterRenderer._camera, camera))
             {
-                return;
+#if UNITY_EDITOR
+                if (!s_instance._underwaterRenderer.IsActiveForEditorCamera(camera))
+#endif
+                {
+                    return;
+                }
             }
 
-            // Only support game cameras for now.
-            if (camera.cameraType != CameraType.Game)
+            if (!Helpers.MaskIncludesLayer(camera.cullingMask, OceanRenderer.Instance.Layer))
             {
                 return;
             }
 
             // Enqueue the pass. This happens every frame.
-            if (camera.TryGetComponent<UniversalAdditionalCameraData>(out var cameraData))
-            {
-                cameraData.scriptableRenderer.EnqueuePass(s_instance);
-            }
+            camera.GetUniversalAdditionalCameraData().scriptableRenderer.EnqueuePass(s_instance);
         }
 
         // Called before Configure.
         public override void OnCameraSetup(CommandBuffer buffer, ref RenderingData renderingData)
         {
             var descriptor = renderingData.cameraData.cameraTargetDescriptor;
-            UnderwaterRenderer.SetUpMaskTextures(buffer, descriptor);
+            // Keywords and other things.
+            _underwaterRenderer.SetUpVolume(_oceanMaskMaterial.material);
+            _underwaterRenderer.SetUpMaskTextures(descriptor);
+            if (_underwaterRenderer._mode != UnderwaterRenderer.Mode.FullScreen && _underwaterRenderer._volumeGeometry != null)
+            {
+                _underwaterRenderer.SetUpVolumeTextures(descriptor);
+            }
         }
 
         // Called before Execute.
@@ -99,9 +111,17 @@ namespace Crest
 
             CommandBuffer commandBuffer = CommandBufferPool.Get("Ocean Mask");
 
-            commandBuffer.SetGlobalTexture(UnderwaterRenderer.sp_CrestOceanMaskTexture, UnderwaterRenderer.Instance._maskTarget);
-            commandBuffer.SetGlobalTexture(UnderwaterRenderer.sp_CrestOceanMaskDepthTexture, UnderwaterRenderer.Instance._depthTarget);
 
+            // Populate water volume before mask so we can use the stencil.
+            if (_underwaterRenderer._mode != UnderwaterRenderer.Mode.FullScreen && _underwaterRenderer._volumeGeometry != null)
+            {
+                _underwaterRenderer.PopulateVolume(commandBuffer, _underwaterRenderer._volumeFrontFaceTarget, _underwaterRenderer._volumeBackFaceTarget);
+                // Copy only the stencil by copying everything and clearing depth.
+                commandBuffer.CopyTexture(_underwaterRenderer._mode == UnderwaterRenderer.Mode.Portal ? _underwaterRenderer._volumeFrontFaceTarget : _underwaterRenderer._volumeBackFaceTarget, _underwaterRenderer._depthTarget);
+                Helpers.Blit(commandBuffer, _underwaterRenderer._depthTarget, Helpers.UtilityMaterial, (int)Helpers.UtilityPass.ClearDepth);
+            }
+
+            _underwaterRenderer.SetUpMask(commandBuffer, _underwaterRenderer._maskTarget, _underwaterRenderer._depthTarget);
             UnderwaterRenderer.PopulateOceanMask(
                 commandBuffer,
                 camera,
@@ -109,6 +129,7 @@ namespace Crest
                 _underwaterRenderer._cameraFrustumPlanes,
                 _oceanMaskMaterial.material,
                 _underwaterRenderer._farPlaneMultiplier,
+                _underwaterRenderer.EnableShaderAPI,
                 _underwaterRenderer._debug._disableOceanMask
             );
 

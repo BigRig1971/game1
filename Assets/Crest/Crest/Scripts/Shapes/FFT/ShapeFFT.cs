@@ -19,6 +19,7 @@ namespace Crest
     [AddComponentMenu(Internal.Constants.MENU_PREFIX_SCRIPTS + "Shape FFT")]
     [HelpURL(Internal.Constants.HELP_URL_BASE_USER + "wave-conditions.html" + Internal.Constants.HELP_URL_RP)]
     public partial class ShapeFFT : MonoBehaviour, LodDataMgrAnimWaves.IShapeUpdatable
+        , ISplinePointCustomDataSetup
 #if UNITY_EDITOR
         , IReceiveSplinePointOnDrawGizmosSelectedMessages
 #endif
@@ -46,18 +47,20 @@ namespace Crest
 
         [Tooltip("Primary wave direction heading (deg). This is the angle from x axis in degrees that the waves are oriented towards. If a spline is being used to place the waves, this angle is relative ot the spline."), Range(-180, 180)]
         public float _waveDirectionHeadingAngle = 0f;
+        public float WindDirRadForFFT => _meshForDrawingWaves != null ? 0f : _waveDirectionHeadingAngle * Mathf.Deg2Rad;
         public Vector2 PrimaryWaveDirection => new Vector2(Mathf.Cos(Mathf.PI * _waveDirectionHeadingAngle / 180f), Mathf.Sin(Mathf.PI * _waveDirectionHeadingAngle / 180f));
 
         [Tooltip("When true, uses the wind speed on this component rather than the wind speed from the Ocean Renderer component.")]
         public bool _overrideGlobalWindSpeed = false;
         [Tooltip("Wind speed in km/h. Controls wave conditions."), Range(0, 150f, 2f), Predicated("_overrideGlobalWindSpeed")]
         public float _windSpeed = 20f;
+        public float WindSpeedForFFT => (_overrideGlobalWindSpeed ? _windSpeed : OceanRenderer.Instance._globalWindSpeed) / 3.6f;
 
         [Tooltip("Multiplier for these waves to scale up/down."), Range(0f, 1f)]
         public float _weight = 1f;
 
         [Tooltip("How much these waves respect the shallow water attenuation setting in the Animated Waves Settings. Set to 0 to ignore shallow water."), SerializeField, Range(0f, 1f)]
-        float _respectShallowWaterAttenuation = 1f;
+        public float _respectShallowWaterAttenuation = 1f;
 
         [HideInInspector]
         [Delayed, Tooltip("How many wave components to generate in each octave.")]
@@ -93,6 +96,18 @@ namespace Crest
         [Tooltip("Maximum amount a point on the surface will be displaced horizontally by waves from its rest position. Increase this if gaps appear at sides of screen."), SerializeField]
         float _maxHorizontalDisplacement = 15f;
 
+        [Header("Collision Data Baking")]
+        [Tooltip("Enable running this FFT with baked data. This makes the FFT periodic (repeating in time).")]
+        public bool _enableBakedCollision = false;
+        [Tooltip("Frames per second of baked data. Larger values may help the collision track the surface closely at the cost of more frames and increase baked data size."), DecoratedField, Predicated("_enableBakedCollision")]
+        public int _timeResolution = 4;
+        [Tooltip("Smallest wavelength required in collision. To preview the effect of this, disable power sliders in spectrum for smaller values than this number. Smaller values require more resolution and increase baked data size."), DecoratedField, Predicated("_enableBakedCollision")]
+        public float _smallestWavelengthRequired = 2f;
+        [Tooltip("FFT waves will loop with a period of this many seconds. Smaller values decrease data size but can make waves visibly repetitive."), Predicated("_enableBakedCollision"), Range(4f, 128f)]
+        public float _timeLoopLength = 32f;
+
+        internal float LoopPeriod => _enableBakedCollision ? _timeLoopLength : -1f;
+
         Mesh _meshForDrawingWaves;
 
         float _windTurbulenceOld;
@@ -123,7 +138,7 @@ namespace Crest
 
             public bool Enabled { get => true; set { } }
 
-            public void Draw(CommandBuffer buf, float weight, int isTransition, int lodIdx)
+            public void Draw(LodDataMgr lodData, CommandBuffer buf, float weight, int isTransition, int lodIdx)
             {
                 var finalWeight = weight * _shapeFFT._weight;
                 if (finalWeight > 0f)
@@ -145,7 +160,7 @@ namespace Crest
             }
         }
 
-        const int CASCADE_COUNT = 16;
+        public const int CASCADE_COUNT = 16;
 
         FFTBatch[] _batches = null;
 
@@ -162,6 +177,7 @@ namespace Crest
         static readonly int sp_WaveBufferSliceIndex = Shader.PropertyToID("_WaveBufferSliceIndex");
         static readonly int sp_AverageWavelength = Shader.PropertyToID("_AverageWavelength");
         static readonly int sp_RespectShallowWaterAttenuation = Shader.PropertyToID("_RespectShallowWaterAttenuation");
+        static readonly int sp_MaximumAttenuationDepth = Shader.PropertyToID("_MaximumAttenuationDepth");
         static readonly int sp_FeatherWaveStart = Shader.PropertyToID("_FeatherWaveStart");
         readonly int sp_AxisX = Shader.PropertyToID("_AxisX");
 
@@ -196,6 +212,7 @@ namespace Crest
             }
 
             _matGenerateWaves.SetFloat(sp_RespectShallowWaterAttenuation, _respectShallowWaterAttenuation);
+            _matGenerateWaves.SetFloat(sp_MaximumAttenuationDepth, OceanRenderer.Instance._lodDataAnimWaves.Settings.MaximumAttenuationDepth);
             _matGenerateWaves.SetFloat(sp_FeatherWaveStart, _featherWaveStart);
 
             // If using geo, the primary wave dir is used by the input shader to rotate the waves relative
@@ -204,16 +221,17 @@ namespace Crest
             _matGenerateWaves.SetVector(sp_AxisX, waveDir);
 
             // If geometry is being used, the ocean input shader will rotate the waves to align to geo
-            var windDirRad = _meshForDrawingWaves != null ? 0f : _waveDirectionHeadingAngle * Mathf.Deg2Rad;
-            var windSpeedMPS = (_overrideGlobalWindSpeed ? _windSpeed : OceanRenderer.Instance._globalWindSpeed) / 3.6f;
+            var windDirRad = WindDirRadForFFT;
+            var windSpeedMPS = WindSpeedForFFT;
+            float loopPeriod = LoopPeriod;
 
             // Don't create tons of generators when values are varying. Notify so that existing generators may be adapted.
             if (_windTurbulenceOld != _windTurbulence || _windDirRadOld != windDirRad || _windSpeedOld != windSpeedMPS || _spectrumOld != _spectrum)
             {
-                FFTCompute.OnGenerationDataUpdated(_resolution, _windTurbulenceOld, _windDirRadOld, _windSpeedOld, _spectrumOld, _windTurbulence, windDirRad, windSpeedMPS, _spectrum);
+                FFTCompute.OnGenerationDataUpdated(_resolution, loopPeriod, _windTurbulenceOld, _windDirRadOld, _windSpeedOld, _spectrumOld, _windTurbulence, windDirRad, windSpeedMPS, _spectrum);
             }
 
-            var waveData = FFTCompute.GenerateDisplacements(buf, _resolution, _windTurbulence, windDirRad, windSpeedMPS, OceanRenderer.Instance.CurrentTime, _activeSpectrum, updateDataEachFrame);
+            var waveData = FFTCompute.GenerateDisplacements(buf, _resolution, loopPeriod, _windTurbulence, windDirRad, windSpeedMPS, OceanRenderer.Instance.CurrentTime, _activeSpectrum, updateDataEachFrame);
 
             _windTurbulenceOld = _windTurbulence;
             _windDirRadOld = windDirRad;
@@ -248,7 +266,8 @@ namespace Crest
 
         void ReportMaxDisplacement()
         {
-            OceanRenderer.Instance.ReportMaxDisplacementFromShape(_maxHorizontalDisplacement, _maxVerticalDisplacement, _maxVerticalDisplacement);
+            // Apply weight or will cause popping due to scale change.
+            OceanRenderer.Instance.ReportMaxDisplacementFromShape(_maxHorizontalDisplacement * _weight, _maxVerticalDisplacement * _weight, _maxVerticalDisplacement * _weight);
         }
 
         void InitBatches()
@@ -267,8 +286,8 @@ namespace Crest
             {
                 var radius = _overrideSplineSettings ? _radius : splineForWaves.Radius;
                 var subdivs = _overrideSplineSettings ? _subdivisions : splineForWaves.Subdivisions;
-                if (ShapeGerstnerSplineHandling.GenerateMeshFromSpline(splineForWaves, transform, subdivs, radius, Vector2.one,
-                    ref _meshForDrawingWaves, out _, out _))
+                if (ShapeGerstnerSplineHandling.GenerateMeshFromSpline<SplinePointDataWaves>(splineForWaves, transform, subdivs,
+                    radius, Vector2.one, ref _meshForDrawingWaves, out _, out _))
                 {
                     _meshForDrawingWaves.name = gameObject.name + "_mesh";
                 }
@@ -367,9 +386,7 @@ namespace Crest
         {
             if (_debugDrawSlicesInEditor)
             {
-                var windDirRad = _meshForDrawingWaves != null ? 0f : _waveDirectionHeadingAngle * Mathf.Deg2Rad;
-                var windSpeedMPS = (_overrideGlobalWindSpeed ? _windSpeed : OceanRenderer.Instance._globalWindSpeed) / 3.6f;
-                FFTCompute.OnGUI(_resolution, _windTurbulence, windDirRad, windSpeedMPS, _activeSpectrum);
+                FFTCompute.OnGUI(_resolution, LoopPeriod, _windTurbulence, WindDirRadForFFT, WindSpeedForFFT, _activeSpectrum);
             }
         }
 
@@ -378,6 +395,18 @@ namespace Crest
             DrawMesh();
         }
 #endif
+
+        public bool AttachDataToSplinePoint(GameObject splinePoint)
+        {
+            if (splinePoint.TryGetComponent(out SplinePointDataWaves _))
+            {
+                // Already existing, nothing to do
+                return false;
+            }
+
+            splinePoint.AddComponent<SplinePointDataWaves>();
+            return true;
+        }
     }
 
 #if UNITY_EDITOR
@@ -397,12 +426,134 @@ namespace Crest
                 );
             }
 
+#if !CREST_UNITY_MATHEMATICS
+            if (_enableBakedCollision)
+            {
+                showMessage
+                (
+                    "The <i>Unity Mathematics (com.unity.mathematics)</i> package is required for baking.",
+                    "Add the <i>Unity Mathematics</i> package.",
+                    ValidatedHelper.MessageType.Warning, this,
+                    ValidatedHelper.FixAddMissingMathPackage
+                );
+            }
+#endif
+
             return isValid;
         }
     }
 
     // Here for the help boxes
     [CustomEditor(typeof(ShapeFFT))]
-    public class ShapeFFTEditor : ValidatedEditor { }
+    public class ShapeFFTEditor : ValidatedEditor
+    {
+#if CREST_UNITY_MATHEMATICS
+        /// <summary>
+        /// Display some validation and statistics about the bake.
+        /// </summary>
+        void BakeHelpBox(ShapeFFT target)
+        {
+            var message = "";
+
+            FFTBaker.ComputeRequiredOctaves(target._spectrum, target._smallestWavelengthRequired, out var smallestOctaveRequired, out var largestOctaveRequired);
+            if (largestOctaveRequired == -1 || smallestOctaveRequired == -1 || smallestOctaveRequired > largestOctaveRequired)
+            {
+                EditorGUILayout.HelpBox("No waves in spectrum. Increase one or more of the spectrum sliders.", MessageType.Error);
+                return;
+            }
+
+            message += $"FFT resolution is {target._resolution}.";
+            message += $" Spectrum power sliders give {largestOctaveRequired - smallestOctaveRequired + 1} active octaves greater than smallest wavelength {target._smallestWavelengthRequired}m.";
+            var scales = largestOctaveRequired - smallestOctaveRequired + 2;
+            message += $" Bake data resolution will be {target._resolution} x {target._resolution} x {scales}.";
+
+            message += "\n\n";
+            message += $"Period is {target._timeLoopLength}s.";
+            message += $" Frames per second setting is {target._timeResolution}.";
+            var frameCount = target._timeLoopLength * target._timeResolution;
+            message += $" Frame count is {target._timeLoopLength} x {target._timeResolution} = {frameCount}.";
+
+            message += "\n\n";
+            var pointsPerFrame = target._resolution * target._resolution * scales;
+            var channelCount = 4;
+            var bytesPerChannel = 4;
+            message += $"Total data size will be {pointsPerFrame * frameCount * channelCount * bytesPerChannel / 1048576f} MB.";
+
+            EditorGUILayout.HelpBox(message, MessageType.Info);
+        }
+
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+            var fft = target as ShapeFFT;
+
+            bool bakingEnabled = fft._enableBakedCollision;
+
+            if (bakingEnabled)
+            {
+                if (fft._spectrum == null)
+                {
+                    EditorGUILayout.HelpBox("A spectrum must be assigned to enable collision baking.", MessageType.Error);
+                    return;
+                }
+
+                BakeHelpBox(fft);
+            }
+
+            GUI.enabled = bakingEnabled;
+            OnInspectorGUIBaking();
+            GUI.enabled = true;
+        }
+
+        /// <summary>
+        /// Controls & GUI for baking.
+        /// </summary>
+        void OnInspectorGUIBaking()
+        {
+            if (OceanRenderer.Instance == null) return;
+
+            var bakeLabel = "Bake to asset";
+            var bakeAndAssignLabel = "Bake to asset and assign to current settings";
+            var selectCurrentSettingsLabel = "Select current settings";
+            if (OceanRenderer.Instance._simSettingsAnimatedWaves != null)
+            {
+                if (GUILayout.Button(bakeLabel))
+                {
+                    FFTBaker.BakeShapeFFT(target as ShapeFFT);
+                }
+
+                GUI.enabled = GUI.enabled && OceanRenderer.Instance._simSettingsAnimatedWaves != null;
+                if (GUILayout.Button(bakeAndAssignLabel))
+                {
+                    var result = FFTBaker.BakeShapeFFT(target as ShapeFFT);
+                    if (result != null)
+                    {
+                        OceanRenderer.Instance._simSettingsAnimatedWaves.CollisionSource = SimSettingsAnimatedWaves.CollisionSources.BakedFFT;
+                        OceanRenderer.Instance._simSettingsAnimatedWaves._bakedFFTData = result;
+                        Selection.activeObject = OceanRenderer.Instance._simSettingsAnimatedWaves;
+
+                        // Rebuild ocean
+                        OceanRenderer.Instance.Rebuild();
+                    }
+                }
+                GUI.enabled = true;
+
+                if (GUILayout.Button(selectCurrentSettingsLabel))
+                {
+                    Selection.activeObject = OceanRenderer.Instance._simSettingsAnimatedWaves;
+                }
+            }
+            else
+            {
+                // No settings available, disable and show tooltip
+                GUI.enabled = false;
+                GUILayout.Button(new GUIContent(bakeAndAssignLabel, "No settings available to apply to. Assign an Animated Waves Sim Settings to the OceanRenderer component."));
+                GUILayout.Button(new GUIContent(selectCurrentSettingsLabel, "No settings available. Assign an Animated Waves Sim Settings to the OceanRenderer component."));
+                GUI.enabled = true;
+            }
+        }
+#endif // CREST_UNITY_MATHEMATICS
+    }
 #endif
 }

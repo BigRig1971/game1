@@ -18,7 +18,7 @@ namespace Crest
     using UnityEngine;
     using UnityEngine.Rendering;
 
-    static class Extensions
+    static class OceanShaderGUIExtensions
     {
         public static void SetKeyword(this Material material, string keyword, bool enabled)
         {
@@ -94,6 +94,7 @@ namespace Crest
             var isSSR = ToggleProperty("Enable Screen-Space Reflections", "_ReceivesSSRTransparent", "_DISABLE_SSR_TRANSPARENT", inverted: true);
             ToggleProperty("Enable Decals", "_SupportDecals", "_DISABLE_DECALS", inverted: true);
             ToggleProperty("Alpha Clipping (Clip Surface)", "_AlphaCutoffEnable", "_ALPHATEST_ON");
+            ToggleProperty("Motion Vectors", "_TransparentWritingMotionVec", "_TRANSPARENT_WRITES_MOTION_VEC");
             // SSR depends on depth prepass.
             var isDepthPrepass = ToggleProperty("Transparent Depth Prepass", "_TransparentDepthPrepassEnable") || isSSR;
 

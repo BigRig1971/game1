@@ -4,6 +4,12 @@
 
 Shader "Hidden/Crest/Underwater/Ocean Mask HDRP"
 {
+	Properties
+	{
+		// Needed so it can be scripted.
+		_StencilRef("Stencil Reference", Int) = 0
+	}
+
 	SubShader
 	{
 		Pass
@@ -13,11 +19,19 @@ Shader "Hidden/Crest/Underwater/Ocean Mask HDRP"
 			// use it for underwater rendering features.
 			Cull Off
 
+			Stencil
+			{
+				Ref [_StencilRef]
+				Comp Equal
+			}
+
 			HLSLPROGRAM
 			#pragma vertex Vert
 			#pragma fragment Frag
 			// for VFACE
 			#pragma target 3.0
+
+			#pragma multi_compile_local _ CREST_WATER_VOLUME
 
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
 			#include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
@@ -33,6 +47,12 @@ Shader "Hidden/Crest/Underwater/Ocean Mask HDRP"
 			ZWrite Off
 			// Horizon must be rendered first or it will overwrite the mask with incorrect values. ZTest not needed.
 			ZTest Always
+
+			Stencil
+			{
+				Ref [_StencilRef]
+				Comp Equal
+			}
 
 			HLSLPROGRAM
 			#pragma vertex Vert
@@ -80,8 +100,8 @@ Shader "Hidden/Crest/Underwater/Ocean Mask HDRP"
 #endif
 
 				return (half4) positions.positionWS.y > _OceanCenterPosWorld.y
-					? UNDERWATER_MASK_ABOVE_SURFACE
-					: UNDERWATER_MASK_BELOW_SURFACE;
+					? CREST_MASK_ABOVE_SURFACE
+					: CREST_MASK_BELOW_SURFACE;
 			}
 
 			ENDHLSL

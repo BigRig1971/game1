@@ -21,6 +21,7 @@ float _Gravity;
 float _SimDeltaTime;
 float _LODChange;
 float _CourantNumber;
+float _AttenuationInShallows;
 CBUFFER_END
 
 float ComputeWaveSpeed(float wavelength, float g)
@@ -40,8 +41,17 @@ void UpdateDynWaves(uint3 id : SV_DispatchThreadID)
 	{
 		_LD_TexArray_DynamicWaves_Source.GetDimensions(width, height, depth);
 	}
+
 	// Slice to sample previous frames data from. LOD change takes into account shifting of the cascades in scale.
-	const float sliceIndexSource = clamp(id.z + _LODChange, 0.0, depth - 1.0);
+	const float sliceIndexSource = id.z + _LODChange;
+
+	// Off either end of the cascade - not useful to sample anything from previous frame. Always initialise
+	// with 0 values.
+	if (sliceIndexSource < 0.0 || sliceIndexSource >= depth - 1.0)
+	{
+		_LD_TexArray_Target[id] = (float2)0;
+		return;
+	}
 
 	const float2 input_uv = IDtoUV(id.xy, width, height);
 	const CascadeParams cascadeData = _CrestCascadeData[sliceIndex];
@@ -72,7 +82,8 @@ void UpdateDynWaves(uint3 id : SV_DispatchThreadID)
 	}
 
 	const half2 velocity = SampleLod(_LD_TexArray_Flow, uv_slice).xy;
-	const float3 uv_source = WorldToUV(worldPosXZ - (dt * velocity), _CrestCascadeDataSource[sliceIndexSource], sliceIndexSource);
+	const float2 worldPosXZFlowed = worldPosXZ - dt * velocity;
+	const float3 uv_source = WorldToUV(worldPosXZFlowed, _CrestCascadeDataSource[sliceIndexSource], sliceIndexSource);
 
 	// weighting for source position - weight 0 for off texture accesses to stop streaky artifacts
 	float2 distToEdge = min(uv_source.xy, 1.0 - uv_source.xy);
@@ -122,13 +133,16 @@ void UpdateDynWaves(uint3 id : SV_DispatchThreadID)
 	float ftp = ft + dt * vtp;
 	ftp *= weightEdge;
 
-	// attenuate waves based on ocean depth. if depth is greater than 0.5*wavelength, water is considered Deep and wave is
-	// unaffected. if depth is less than this, wave velocity decreases. waves will then bunch up and grow in amplitude and
-	// eventually break. i model "Deep" water, but then simply ramp down waves in non-deep water with a linear multiplier.
-	// http://hyperphysics.phy-astr.gsu.edu/hbase/Waves/watwav2.html
-	// http://hyperphysics.phy-astr.gsu.edu/hbase/watwav.html#c1
-	const float depthMul = 1.0 - (1.0 - saturate(2.0 * waterDepth / wavelength)) * dt * 2.0;
-	ftp *= depthMul;
+	if (_AttenuationInShallows > 0.0)
+	{
+		// attenuate waves based on ocean depth. if depth is greater than 0.5*wavelength, water is considered Deep and wave is
+		// unaffected. if depth is less than this, wave velocity decreases. waves will then bunch up and grow in amplitude and
+		// eventually break. i model "Deep" water, but then simply ramp down waves in non-deep water with a linear multiplier.
+		// http://hyperphysics.phy-astr.gsu.edu/hbase/Waves/watwav2.html
+		// http://hyperphysics.phy-astr.gsu.edu/hbase/watwav.html#c1
+		const float depthMul = 1.0 - (1.0 - saturate(2.0 * waterDepth / wavelength)) * dt * 2.0;
+		ftp *= _AttenuationInShallows * depthMul + (1.0 - _AttenuationInShallows);
+	}
 
 	_LD_TexArray_Target[id] = float2(ftp, vtp);
 }

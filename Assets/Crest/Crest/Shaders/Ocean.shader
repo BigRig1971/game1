@@ -71,6 +71,9 @@ Shader "Crest/Ocean"
         [Header(Flow)]
         [Toggle]CREST_FLOW("Enable", Float) = 0
 
+        [Header(Albedo)]
+        [Toggle]CREST_ALBEDO("Enable", Float) = 0
+
         [HideInInspector]_EmissionColor("Color", Color) = (1, 1, 1, 1)
         [HideInInspector]_RenderQueueType("Float", Float) = 4
         [HideInInspector][ToggleUI]_AddPrecomputedVelocity("Boolean", Float) = 0
@@ -177,6 +180,9 @@ Shader "Crest/Ocean"
             #pragma shader_feature_local _ CREST_FOAM_ON
         #pragma shader_feature_local _ CREST_CAUSTICS_ON
         #pragma shader_feature_local _ CREST_FLOW_ON
+        #pragma shader_feature_local _ CREST_ALBEDO_ON
+        #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+        #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
         #define CREST_GENERATED_SHADER_ON 1
 
@@ -1011,7 +1017,7 @@ Shader "Crest/Ocean"
             Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
         }
 
-        // 3580e24b878bbe7a9a98325dcc0474c2
+        // c46fd3ffae69bfdf4a7b13505ef3963f
         #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
         struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -1062,6 +1068,35 @@ Shader "Crest/Ocean"
         {
             Out = min(A, B);
         };
+
+        void Unity_Divide_float(float A, float B, out float Out)
+        {
+            Out = A / B;
+        }
+
+        // c4826bd69adcf43b74845160a7d6f249
+        #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+        struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+        {
+            float4 ScreenPosition;
+        };
+
+        void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+        {
+            float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+            float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+            float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+            float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+            Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+            float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+            CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+            Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+        }
 
             // Graph Vertex
             struct VertexDescription
@@ -1267,7 +1302,13 @@ Shader "Crest/Ocean"
             float _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
             Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
             #endif
-            surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+            #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+            Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+            _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+            float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+            SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+            #endif
+            surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
             surface.AlphaClipThreshold = 0;
             return surface;
         }
@@ -1716,6 +1757,9 @@ Shader "Crest/Ocean"
             #pragma shader_feature_local _ CREST_FOAM_ON
         #pragma shader_feature_local _ CREST_CAUSTICS_ON
         #pragma shader_feature_local _ CREST_FLOW_ON
+        #pragma shader_feature_local _ CREST_ALBEDO_ON
+        #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+        #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
         #define CREST_GENERATED_SHADER_ON 1
 
@@ -2375,7 +2419,7 @@ Shader "Crest/Ocean"
             Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
         }
 
-        // 26ddc131f09006478a3aa1683fa75e74
+        // 6445f72e0f3d2e176e54a9ffb10e1139
         #include "ShadergraphFramework/CrestNodeLightData.hlsl"
 
         struct Bindings_CrestLightData_b74b6e8c0b489314ca7aea3e2cc9c54c
@@ -2443,7 +2487,7 @@ Shader "Crest/Ocean"
             OutBoolean_1 = _Not_7fbe0c504ec6c2819b1994af01ce3988_Out_1;
         }
 
-        // 9b604afea48da2ac64cf6198354cf6ae
+        // a8e5480cb804440107f760ac5393ec2f
         #include "ShadergraphFramework/CrestNodeNormalMapping.hlsl"
 
         void Unity_NormalStrength_float(float3 In, float Strength, out float3 Out)
@@ -2456,7 +2500,7 @@ Shader "Crest/Ocean"
             float FaceSign;
         };
 
-        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3)
+        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3, out float4 Albedo_4)
         {
             float3 _Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0 = Vector3_FE793823;
             float3 _Property_b812768aa4903386b49ba84380e4fa74_Out_0 = Vector3_C8190B61;
@@ -2479,13 +2523,15 @@ Shader "Crest/Ocean"
             half3 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
-            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31);
+            half4 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
+            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33);
             float _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0 = Vector1_C6F526AD;
             float3 _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             Unity_NormalStrength_float(_OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0, _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2);
             Normal_1 = _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             SSS_2 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             Foam_3 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
+            Albedo_4 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
         }
 
         // b4726242738c84550b865a8cd3eafd6e
@@ -2513,7 +2559,7 @@ Shader "Crest/Ocean"
             LightReflected_2 = _CrestNodeApplyFresnelCustomFunction_4a16fb68ad2a518d870d2537aaf1e772_LightReflected_10;
         }
 
-        // 5abfc66ba136f74f6cf58eadabfa3bb1
+        // 0d37dbcf887de5687bdac5097fff713e
         #include "ShadergraphFramework/CrestNodeAmbientLight.hlsl"
 
         struct Bindings_CrestAmbientLight_a6ec89b3ca0ab4e98b300ec3ba0e6013
@@ -2588,10 +2634,10 @@ Shader "Crest/Ocean"
             Out_1 = _CrestNodeLinearEyeDepthCustomFunction_ee1cef135a8e558088e613593ae90486_LinearEyeDepth_1;
         }
 
-        // 3818fb4ea9ebd67663e831ef4a019758
+        // 2ca856c7634fa49c75d73b5ddc1b65ca
         #include "ShadergraphFramework/CrestNodeFoamBubbles.hlsl"
 
-        // 77b1d95beeaa53e1bbdfd7a6e8dd6fa0
+        // b3b317d9da04ee361966ef1a88eac53c
         #include "ShadergraphFramework/CrestNodeVolumeEmission.hlsl"
 
         void Unity_Add_float(float A, float B, out float Out)
@@ -2651,7 +2697,7 @@ Shader "Crest/Ocean"
             Out = A + B;
         }
 
-        // 60cb5e01e8bb25b4c10f8304dd8d25fd
+        // 1547d744048b76728bd6fc66db42da03
         #include "ShadergraphFramework/CrestNodeApplyCaustics.hlsl"
 
         void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
@@ -2817,104 +2863,8 @@ Shader "Crest/Ocean"
             Out = lerp(A, B, T);
         }
 
-        void Unity_Modulo_float(float A, float B, out float Out)
-        {
-            Out = fmod(A, B);
-        }
-
-        void Unity_Multiply_float(float2 A, float2 B, out float2 Out)
-        {
-            Out = A * B;
-        }
-
-        void Unity_Comparison_Greater_float(float A, float B, out float Out)
-        {
-            Out = A > B ? 1 : 0;
-        }
-
-        void Unity_Subtract_float(float A, float B, out float Out)
-        {
-            Out = A - B;
-        }
-
-        void Unity_Branch_float(float Predicate, float True, float False, out float Out)
-        {
-            Out = Predicate ? True : False;
-        }
-
-        struct Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1
-        {
-        };
-
-        void SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(float2 Vector2_B562EFB1, float2 Vector2_83AA31A8, Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 IN, out float2 DisplacedA_1, out float WeightA_3, out float2 DisplacedB_2, out float WeightB_4)
-        {
-            float2 _Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0 = Vector2_83AA31A8;
-            float2 _Property_06123b8dbe81da80934c651a33d13699_Out_0 = Vector2_B562EFB1;
-            Bindings_CrestOceanGlobals_d50a85284893ec447a25a093505a2120 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2;
-            float3 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5;
-            SG_CrestOceanGlobals_d50a85284893ec447a25a093505a2120(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5);
-            float _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2;
-            Unity_Modulo_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2);
-            float2 _Multiply_58400b6ef0b30484913ce941659bac85_Out_2;
-            Unity_Multiply_float(_Property_06123b8dbe81da80934c651a33d13699_Out_0, (_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2.xx), _Multiply_58400b6ef0b30484913ce941659bac85_Out_2);
-            float2 _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            Unity_Subtract_float2(_Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0, _Multiply_58400b6ef0b30484913ce941659bac85_Out_2, _Subtract_22cf6b53c8344888987905efe87043db_Out_2);
-            float2 _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0 = Vector2_83AA31A8;
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            #else
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2;
-            Unity_Comparison_Greater_float(_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, 1, _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2);
-            float _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2;
-            Unity_Subtract_float(2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2);
-            float _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            Unity_Branch_float(_Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            #else
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = 0;
-            #endif
-            float2 _Property_bafd78310cede58a971e08fade5e87ee_Out_0 = Vector2_83AA31A8;
-            float2 _Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0 = Vector2_B562EFB1;
-            float _Add_26a0d41d20a2618d858f292701338a2a_Out_2;
-            Unity_Add_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 1, _Add_26a0d41d20a2618d858f292701338a2a_Out_2);
-            float _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2;
-            Unity_Modulo_float(_Add_26a0d41d20a2618d858f292701338a2a_Out_2, 2, _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2);
-            float2 _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2;
-            Unity_Multiply_float(_Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0, (_Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2.xx), _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2);
-            float2 _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            Unity_Subtract_float2(_Property_bafd78310cede58a971e08fade5e87ee_Out_0, _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2, _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            #else
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            Unity_Subtract_float(1, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3, _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            #else
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = 0;
-            #endif
-            DisplacedA_1 = _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0;
-            WeightA_3 = _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0;
-            DisplacedB_2 = _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0;
-            WeightB_4 = _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0;
-        }
-
-        // 06deca910ff1e1ed1b9ea7fb3513233e
+        // 498816f585b40f3ecd7ee304230793a2
         #include "ShadergraphFramework/CrestNodeFoam.hlsl"
-
-        void Unity_Multiply_float(float A, float B, out float Out)
-        {
-            Out = A * B;
-        }
 
         struct Bindings_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963
         {
@@ -2934,132 +2884,49 @@ Shader "Crest/Ocean"
             float4 _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0 = Vector4_FD283A50;
             float _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0 = Vector1_D6DA4100;
             float _Property_76afb5461ed7c284b6afcbd15025248a_Out_0 = Vector1_13F2A8C8;
-            float2 _Property_20259e8cfd2c2b8288897462f0776174_Out_0 = Vector2_5AD72ED;
-            float2 _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0 = Vector2_28A2C5B9;
-            Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 _CrestFlow_a6f6f004811f6c82be002c7059e670a1;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4;
-            SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(_Property_20259e8cfd2c2b8288897462f0776174_Out_0, _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4);
+            float2 _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0 = Vector2_28A2C5B9;
             float _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0 = Vector1_D80F067A;
             float3 _Property_b2962080c0284b83821815b7263043dc_Out_0 = Vector3_3AD012AA;
             float3 _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0 = Vector3_E4AC4432;
             float _Property_4807b4a03c922b87b201864991b317da_Out_0 = Vector1_3E452608;
+            float2 _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0 = Vector2_5AD72ED;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             half _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
-            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
+            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             #else
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = float3(0, 0, 0);
             #endif
-            float3 _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2;
-            Unity_Multiply_float(_FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2);
-            UnityTexture2D _Property_d34fb0a0645e3e8791a5239873296357_Out_0 = Texture2D_D9E7A343;
-            float2 _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0 = Vector2_C4E9ED58;
-            float _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0 = Vector1_7492C815;
-            float _Property_54ef09feb545b581b0fc27170fef10e2_Out_0 = Vector1_33DC93D;
-            float _Property_7ae039043909cb8eb133acd421012651_Out_0 = Vector1_3439FC0A;
-            float _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0 = Vector1_FB133018;
-            float _Property_fe249f016d4b128ca8400f412655cc5e_Out_0 = Vector1_7CFAFAC1;
-            float _Property_08e0e443debd6186acd988fc67faf954_Out_0 = Vector1_53F45327;
-            float4 _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0 = Vector4_2FA9AEA5;
-            float4 _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0 = Vector4_FD283A50;
-            float _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0 = Vector1_D6DA4100;
-            float _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0 = Vector1_13F2A8C8;
-            float _Property_985518c2ff59e781828129193b83e9fd_Out_0 = Vector1_D80F067A;
-            float3 _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0 = Vector3_3AD012AA;
-            float3 _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0 = Vector3_E4AC4432;
-            float _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0 = Vector1_3E452608;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            half _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            CrestNodeFoam_half(_Property_d34fb0a0645e3e8791a5239873296357_Out_0.tex, _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0, _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0, _Property_54ef09feb545b581b0fc27170fef10e2_Out_0, _Property_7ae039043909cb8eb133acd421012651_Out_0, _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0, _Property_fe249f016d4b128ca8400f412655cc5e_Out_0, _Property_08e0e443debd6186acd988fc67faf954_Out_0, _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0, _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0, _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0, _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _Property_985518c2ff59e781828129193b83e9fd_Out_0, _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0, _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0, _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            #else
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = float3(0, 0, 0);
-            #endif
-            float3 _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2);
-            float3 _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            Unity_Add_float3(_Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2, _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            #else
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
-            #endif
+            float3 _Property_a8190300d5ba483d9365211d7f71abea_Out_0 = Vector3_3AD012AA;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             #else
-            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_b2962080c0284b83821815b7263043dc_Out_0;
+            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_a8190300d5ba483d9365211d7f71abea_Out_0;
             #endif
-            float3 _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2;
-            Unity_Multiply_float(_FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            #else
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0;
-            #endif
-            float3 _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2);
-            float3 _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            Unity_Add_float3(_Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2, _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            #else
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
-            #endif
+            float3 _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0 = Vector3_E4AC4432;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             #else
-            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0;
+            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0;
             #endif
-            float3 _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2;
-            Unity_Multiply_float(_FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            #else
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0;
-            #endif
-            float3 _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2);
-            float3 _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            Unity_Add_float3(_Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2, _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            #else
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
-            #endif
+            float _Property_e0841d7fa2234ff199a94402710821f1_Out_0 = Vector1_3E452608;
             #if defined(CREST_FOAM_ON)
             float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
             #else
-            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_4807b4a03c922b87b201864991b317da_Out_0;
+            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_e0841d7fa2234ff199a94402710821f1_Out_0;
             #endif
-            float _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2;
-            Unity_Multiply_float(_FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            #else
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0;
-            #endif
-            float _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2;
-            Unity_Multiply_float(_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4, _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2);
-            float _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            Unity_Add_float(_Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2, _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            #else
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
-            #endif
-            Albedo_1 = _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0;
-            NormalTS_2 = _FLOW_fad25d47eec395899aad2bf77264462c_Out_0;
-            Emission_3 = _FLOW_02e1cbd391446082893e73b8088ff765_Out_0;
-            Smoothness_4 = _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0;
+            Albedo_1 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
+            NormalTS_2 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
+            Emission_3 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
+            Smoothness_4 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
+        }
+
+        void Unity_OneMinus_float(float In, out float Out)
+        {
+            Out = 1 - In;
         }
 
         struct Bindings_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269
@@ -3107,7 +2974,8 @@ Shader "Crest/Ocean"
             float3 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3;
-            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3);
+            float4 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4;
+            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4);
             float _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0 = Vector1_B01E1A6A;
             float2 _Property_a28ec0be576d4586a46337955b069868_Out_0 = Vector2_9C73A0C6;
             Bindings_CrestIsUnderwater_52f7750f15e114937b54a0fd27f0d2f2 _CrestIsUnderwater_de15825b4853aa85a98b48656eaa15f1;
@@ -3240,11 +3108,27 @@ Shader "Crest/Ocean"
             float3 _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
             float _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             SG_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963(_Property_f78369cae749d18392b19bad30a74e2d_Out_0, _Property_169d4581a8319383a7f62a3435e9b11d_Out_0, _Property_0bdc44463eba328a8c73245f2cf82911_Out_0, _Property_74ea32320c303583ae393e1d0afe7d13_Out_0, _Property_b16935e33ecd688caba81b8b02f388e3_Out_0, _Property_519c0dea6b39f688b95e7c8c336ca9fb_Out_0, _Property_e7473f6e9b7b0f8c8615d7497ee5c4a0_Out_0, _Property_d073850e48b8c485ad0ab20154ed80e8_Out_0, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0, _Property_a28ec0be576d4586a46337955b069868_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _Branch_3776301df9f8888faaee9638ee7f568d_Out_3, _Lerp_d393d46d7b4755838d788bf6a655c1cd_Out_3, _Negate_43b5c19855641787873c549e72cb1032_Out_1, _Property_0f7251ac80636d8eb279b11917792d24_Out_0, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4);
-            Albedo_2 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1;
+            float _Split_e1a3108496a4498a90ecae26cadb6773_R_1 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[0];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_G_2 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[1];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_B_3 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[2];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_A_4 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[3];
+            float3 _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0 = float3(_Split_e1a3108496a4498a90ecae26cadb6773_R_1, _Split_e1a3108496a4498a90ecae26cadb6773_G_2, _Split_e1a3108496a4498a90ecae26cadb6773_B_3);
+            float3 _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
+            Unity_Lerp_float3(_CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0, (_Split_e1a3108496a4498a90ecae26cadb6773_A_4.xxx), _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3);
+            float _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1;
+            Unity_OneMinus_float(_Split_e1a3108496a4498a90ecae26cadb6773_A_4, _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1);
+            float3 _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
+            Unity_Multiply_float((_OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1.xxx), _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2);
+            Albedo_2 = _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
             NormalTS_3 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2;
-            Emission_4 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
+            Emission_4 = _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
             Smoothness_5 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             Specular_6 = _CrestFresnel_4c3e438e27705e81abe6c2e9d80cb8d7_LightReflected_2;
+        }
+
+        void Unity_Subtract_float(float A, float B, out float Out)
+        {
+            Out = A - B;
         }
 
         void Unity_Remap_float(float In, float2 InMinMax, float2 OutMinMax, out float Out)
@@ -3252,7 +3136,7 @@ Shader "Crest/Ocean"
             Out = OutMinMax.x + (In - InMinMax.x) * (OutMinMax.y - OutMinMax.x) / (InMinMax.y - InMinMax.x);
         }
 
-        // 3580e24b878bbe7a9a98325dcc0474c2
+        // c46fd3ffae69bfdf4a7b13505ef3963f
         #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
         struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -3304,6 +3188,30 @@ Shader "Crest/Ocean"
             Out = min(A, B);
         };
 
+        // c4826bd69adcf43b74845160a7d6f249
+        #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+        struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+        {
+            float4 ScreenPosition;
+        };
+
+        void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+        {
+            float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+            float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+            float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+            float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+            Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+            float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+            CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+            Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+        }
+
         // a2b98fadb38e4458b014d449a26401de
         #include "ShadergraphFramework/CrestNodeOcclusion.hlsl"
 
@@ -3322,6 +3230,11 @@ Shader "Crest/Ocean"
             half _CrestNodeOcclusionCustomFunction_93caa61b95dff285b6c3d9ce80c27ea2_OcclusionOut_2;
             CrestNodeOcclusion_half(_Property_aa856bf77773ca89be5d92fef3e00e0b_Out_0, _CrestIsUnderwater_ffc732d9e7e07687b3dca9422dbb4692_OutBoolean_1, _CrestNodeOcclusionCustomFunction_93caa61b95dff285b6c3d9ce80c27ea2_OcclusionOut_2);
             Occlusion_1 = _CrestNodeOcclusionCustomFunction_93caa61b95dff285b6c3d9ce80c27ea2_OcclusionOut_2;
+        }
+
+        void Unity_Multiply_float(float A, float B, out float Out)
+        {
+            Out = A * B;
         }
 
             // Graph Vertex
@@ -3571,6 +3484,12 @@ Shader "Crest/Ocean"
             Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+            Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+            _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+            float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+            SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+            #endif
+            #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
             float _Property_606fa02468b6f8849164940fdce04188_Out_0 = _Occlusion;
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
@@ -3588,7 +3507,7 @@ Shader "Crest/Ocean"
             #endif
             surface.BaseColor = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Albedo_2;
             surface.Emission = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Emission_4;
-            surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+            surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
             surface.AlphaClipThreshold = 0;
             surface.BentNormal = IN.TangentSpaceNormal;
             surface.Smoothness = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5;
@@ -4025,6 +3944,9 @@ Shader "Crest/Ocean"
             #pragma shader_feature_local _ CREST_FOAM_ON
         #pragma shader_feature_local _ CREST_CAUSTICS_ON
         #pragma shader_feature_local _ CREST_FLOW_ON
+        #pragma shader_feature_local _ CREST_ALBEDO_ON
+        #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+        #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
         #define CREST_GENERATED_SHADER_ON 1
 
@@ -4864,7 +4786,7 @@ Shader "Crest/Ocean"
             Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
         }
 
-        // 26ddc131f09006478a3aa1683fa75e74
+        // 6445f72e0f3d2e176e54a9ffb10e1139
         #include "ShadergraphFramework/CrestNodeLightData.hlsl"
 
         struct Bindings_CrestLightData_b74b6e8c0b489314ca7aea3e2cc9c54c
@@ -4903,7 +4825,7 @@ Shader "Crest/Ocean"
             OutBoolean_1 = _Not_7fbe0c504ec6c2819b1994af01ce3988_Out_1;
         }
 
-        // 9b604afea48da2ac64cf6198354cf6ae
+        // a8e5480cb804440107f760ac5393ec2f
         #include "ShadergraphFramework/CrestNodeNormalMapping.hlsl"
 
         void Unity_NormalStrength_float(float3 In, float Strength, out float3 Out)
@@ -4916,7 +4838,7 @@ Shader "Crest/Ocean"
             float FaceSign;
         };
 
-        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3)
+        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3, out float4 Albedo_4)
         {
             float3 _Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0 = Vector3_FE793823;
             float3 _Property_b812768aa4903386b49ba84380e4fa74_Out_0 = Vector3_C8190B61;
@@ -4939,13 +4861,15 @@ Shader "Crest/Ocean"
             half3 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
-            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31);
+            half4 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
+            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33);
             float _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0 = Vector1_C6F526AD;
             float3 _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             Unity_NormalStrength_float(_OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0, _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2);
             Normal_1 = _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             SSS_2 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             Foam_3 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
+            Albedo_4 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
         }
 
         // b4726242738c84550b865a8cd3eafd6e
@@ -4973,7 +4897,7 @@ Shader "Crest/Ocean"
             LightReflected_2 = _CrestNodeApplyFresnelCustomFunction_4a16fb68ad2a518d870d2537aaf1e772_LightReflected_10;
         }
 
-        // 5abfc66ba136f74f6cf58eadabfa3bb1
+        // 0d37dbcf887de5687bdac5097fff713e
         #include "ShadergraphFramework/CrestNodeAmbientLight.hlsl"
 
         struct Bindings_CrestAmbientLight_a6ec89b3ca0ab4e98b300ec3ba0e6013
@@ -5048,10 +4972,10 @@ Shader "Crest/Ocean"
             Out_1 = _CrestNodeLinearEyeDepthCustomFunction_ee1cef135a8e558088e613593ae90486_LinearEyeDepth_1;
         }
 
-        // 3818fb4ea9ebd67663e831ef4a019758
+        // 2ca856c7634fa49c75d73b5ddc1b65ca
         #include "ShadergraphFramework/CrestNodeFoamBubbles.hlsl"
 
-        // 77b1d95beeaa53e1bbdfd7a6e8dd6fa0
+        // b3b317d9da04ee361966ef1a88eac53c
         #include "ShadergraphFramework/CrestNodeVolumeEmission.hlsl"
 
         void Unity_Add_float(float A, float B, out float Out)
@@ -5084,7 +5008,7 @@ Shader "Crest/Ocean"
             SubSurfaceScattering_9 = _CrestNodeSampleOceanDataSingleCustomFunction_a7f8891a8a8e5d8ab9c9a0c34c841749_SSS_17;
         }
 
-        // 60cb5e01e8bb25b4c10f8304dd8d25fd
+        // 1547d744048b76728bd6fc66db42da03
         #include "ShadergraphFramework/CrestNodeApplyCaustics.hlsl"
 
         void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
@@ -5235,93 +5159,7 @@ Shader "Crest/Ocean"
             Out = pow(A, B);
         }
 
-        void Unity_Modulo_float(float A, float B, out float Out)
-        {
-            Out = fmod(A, B);
-        }
-
-        void Unity_Comparison_Greater_float(float A, float B, out float Out)
-        {
-            Out = A > B ? 1 : 0;
-        }
-
-        void Unity_Subtract_float(float A, float B, out float Out)
-        {
-            Out = A - B;
-        }
-
-        void Unity_Branch_float(float Predicate, float True, float False, out float Out)
-        {
-            Out = Predicate ? True : False;
-        }
-
-        struct Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1
-        {
-        };
-
-        void SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(float2 Vector2_B562EFB1, float2 Vector2_83AA31A8, Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 IN, out float2 DisplacedA_1, out float WeightA_3, out float2 DisplacedB_2, out float WeightB_4)
-        {
-            float2 _Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0 = Vector2_83AA31A8;
-            float2 _Property_06123b8dbe81da80934c651a33d13699_Out_0 = Vector2_B562EFB1;
-            Bindings_CrestOceanGlobals_d50a85284893ec447a25a093505a2120 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2;
-            float3 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5;
-            SG_CrestOceanGlobals_d50a85284893ec447a25a093505a2120(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5);
-            float _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2;
-            Unity_Modulo_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2);
-            float2 _Multiply_58400b6ef0b30484913ce941659bac85_Out_2;
-            Unity_Multiply_float(_Property_06123b8dbe81da80934c651a33d13699_Out_0, (_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2.xx), _Multiply_58400b6ef0b30484913ce941659bac85_Out_2);
-            float2 _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            Unity_Subtract_float2(_Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0, _Multiply_58400b6ef0b30484913ce941659bac85_Out_2, _Subtract_22cf6b53c8344888987905efe87043db_Out_2);
-            float2 _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0 = Vector2_83AA31A8;
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            #else
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2;
-            Unity_Comparison_Greater_float(_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, 1, _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2);
-            float _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2;
-            Unity_Subtract_float(2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2);
-            float _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            Unity_Branch_float(_Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            #else
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = 0;
-            #endif
-            float2 _Property_bafd78310cede58a971e08fade5e87ee_Out_0 = Vector2_83AA31A8;
-            float2 _Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0 = Vector2_B562EFB1;
-            float _Add_26a0d41d20a2618d858f292701338a2a_Out_2;
-            Unity_Add_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 1, _Add_26a0d41d20a2618d858f292701338a2a_Out_2);
-            float _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2;
-            Unity_Modulo_float(_Add_26a0d41d20a2618d858f292701338a2a_Out_2, 2, _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2);
-            float2 _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2;
-            Unity_Multiply_float(_Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0, (_Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2.xx), _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2);
-            float2 _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            Unity_Subtract_float2(_Property_bafd78310cede58a971e08fade5e87ee_Out_0, _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2, _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            #else
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            Unity_Subtract_float(1, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3, _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            #else
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = 0;
-            #endif
-            DisplacedA_1 = _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0;
-            WeightA_3 = _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0;
-            DisplacedB_2 = _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0;
-            WeightB_4 = _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0;
-        }
-
-        // 06deca910ff1e1ed1b9ea7fb3513233e
+        // 498816f585b40f3ecd7ee304230793a2
         #include "ShadergraphFramework/CrestNodeFoam.hlsl"
 
         struct Bindings_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963
@@ -5342,132 +5180,49 @@ Shader "Crest/Ocean"
             float4 _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0 = Vector4_FD283A50;
             float _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0 = Vector1_D6DA4100;
             float _Property_76afb5461ed7c284b6afcbd15025248a_Out_0 = Vector1_13F2A8C8;
-            float2 _Property_20259e8cfd2c2b8288897462f0776174_Out_0 = Vector2_5AD72ED;
-            float2 _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0 = Vector2_28A2C5B9;
-            Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 _CrestFlow_a6f6f004811f6c82be002c7059e670a1;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4;
-            SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(_Property_20259e8cfd2c2b8288897462f0776174_Out_0, _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4);
+            float2 _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0 = Vector2_28A2C5B9;
             float _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0 = Vector1_D80F067A;
             float3 _Property_b2962080c0284b83821815b7263043dc_Out_0 = Vector3_3AD012AA;
             float3 _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0 = Vector3_E4AC4432;
             float _Property_4807b4a03c922b87b201864991b317da_Out_0 = Vector1_3E452608;
+            float2 _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0 = Vector2_5AD72ED;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             half _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
-            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
+            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             #else
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = float3(0, 0, 0);
             #endif
-            float3 _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2;
-            Unity_Multiply_float(_FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2);
-            UnityTexture2D _Property_d34fb0a0645e3e8791a5239873296357_Out_0 = Texture2D_D9E7A343;
-            float2 _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0 = Vector2_C4E9ED58;
-            float _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0 = Vector1_7492C815;
-            float _Property_54ef09feb545b581b0fc27170fef10e2_Out_0 = Vector1_33DC93D;
-            float _Property_7ae039043909cb8eb133acd421012651_Out_0 = Vector1_3439FC0A;
-            float _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0 = Vector1_FB133018;
-            float _Property_fe249f016d4b128ca8400f412655cc5e_Out_0 = Vector1_7CFAFAC1;
-            float _Property_08e0e443debd6186acd988fc67faf954_Out_0 = Vector1_53F45327;
-            float4 _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0 = Vector4_2FA9AEA5;
-            float4 _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0 = Vector4_FD283A50;
-            float _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0 = Vector1_D6DA4100;
-            float _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0 = Vector1_13F2A8C8;
-            float _Property_985518c2ff59e781828129193b83e9fd_Out_0 = Vector1_D80F067A;
-            float3 _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0 = Vector3_3AD012AA;
-            float3 _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0 = Vector3_E4AC4432;
-            float _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0 = Vector1_3E452608;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            half _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            CrestNodeFoam_half(_Property_d34fb0a0645e3e8791a5239873296357_Out_0.tex, _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0, _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0, _Property_54ef09feb545b581b0fc27170fef10e2_Out_0, _Property_7ae039043909cb8eb133acd421012651_Out_0, _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0, _Property_fe249f016d4b128ca8400f412655cc5e_Out_0, _Property_08e0e443debd6186acd988fc67faf954_Out_0, _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0, _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0, _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0, _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _Property_985518c2ff59e781828129193b83e9fd_Out_0, _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0, _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0, _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            #else
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = float3(0, 0, 0);
-            #endif
-            float3 _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2);
-            float3 _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            Unity_Add_float3(_Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2, _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            #else
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
-            #endif
+            float3 _Property_a8190300d5ba483d9365211d7f71abea_Out_0 = Vector3_3AD012AA;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             #else
-            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_b2962080c0284b83821815b7263043dc_Out_0;
+            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_a8190300d5ba483d9365211d7f71abea_Out_0;
             #endif
-            float3 _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2;
-            Unity_Multiply_float(_FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            #else
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0;
-            #endif
-            float3 _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2);
-            float3 _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            Unity_Add_float3(_Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2, _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            #else
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
-            #endif
+            float3 _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0 = Vector3_E4AC4432;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             #else
-            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0;
+            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0;
             #endif
-            float3 _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2;
-            Unity_Multiply_float(_FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            #else
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0;
-            #endif
-            float3 _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2);
-            float3 _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            Unity_Add_float3(_Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2, _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            #else
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
-            #endif
+            float _Property_e0841d7fa2234ff199a94402710821f1_Out_0 = Vector1_3E452608;
             #if defined(CREST_FOAM_ON)
             float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
             #else
-            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_4807b4a03c922b87b201864991b317da_Out_0;
+            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_e0841d7fa2234ff199a94402710821f1_Out_0;
             #endif
-            float _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2;
-            Unity_Multiply_float(_FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            #else
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0;
-            #endif
-            float _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2;
-            Unity_Multiply_float(_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4, _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2);
-            float _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            Unity_Add_float(_Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2, _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            #else
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
-            #endif
-            Albedo_1 = _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0;
-            NormalTS_2 = _FLOW_fad25d47eec395899aad2bf77264462c_Out_0;
-            Emission_3 = _FLOW_02e1cbd391446082893e73b8088ff765_Out_0;
-            Smoothness_4 = _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0;
+            Albedo_1 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
+            NormalTS_2 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
+            Emission_3 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
+            Smoothness_4 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
+        }
+
+        void Unity_OneMinus_float(float In, out float Out)
+        {
+            Out = 1 - In;
         }
 
         struct Bindings_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269
@@ -5515,7 +5270,8 @@ Shader "Crest/Ocean"
             float3 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3;
-            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3);
+            float4 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4;
+            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4);
             float _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0 = Vector1_B01E1A6A;
             float2 _Property_a28ec0be576d4586a46337955b069868_Out_0 = Vector2_9C73A0C6;
             Bindings_CrestIsUnderwater_52f7750f15e114937b54a0fd27f0d2f2 _CrestIsUnderwater_de15825b4853aa85a98b48656eaa15f1;
@@ -5648,11 +5404,27 @@ Shader "Crest/Ocean"
             float3 _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
             float _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             SG_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963(_Property_f78369cae749d18392b19bad30a74e2d_Out_0, _Property_169d4581a8319383a7f62a3435e9b11d_Out_0, _Property_0bdc44463eba328a8c73245f2cf82911_Out_0, _Property_74ea32320c303583ae393e1d0afe7d13_Out_0, _Property_b16935e33ecd688caba81b8b02f388e3_Out_0, _Property_519c0dea6b39f688b95e7c8c336ca9fb_Out_0, _Property_e7473f6e9b7b0f8c8615d7497ee5c4a0_Out_0, _Property_d073850e48b8c485ad0ab20154ed80e8_Out_0, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0, _Property_a28ec0be576d4586a46337955b069868_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _Branch_3776301df9f8888faaee9638ee7f568d_Out_3, _Lerp_d393d46d7b4755838d788bf6a655c1cd_Out_3, _Negate_43b5c19855641787873c549e72cb1032_Out_1, _Property_0f7251ac80636d8eb279b11917792d24_Out_0, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4);
-            Albedo_2 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1;
+            float _Split_e1a3108496a4498a90ecae26cadb6773_R_1 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[0];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_G_2 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[1];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_B_3 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[2];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_A_4 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[3];
+            float3 _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0 = float3(_Split_e1a3108496a4498a90ecae26cadb6773_R_1, _Split_e1a3108496a4498a90ecae26cadb6773_G_2, _Split_e1a3108496a4498a90ecae26cadb6773_B_3);
+            float3 _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
+            Unity_Lerp_float3(_CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0, (_Split_e1a3108496a4498a90ecae26cadb6773_A_4.xxx), _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3);
+            float _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1;
+            Unity_OneMinus_float(_Split_e1a3108496a4498a90ecae26cadb6773_A_4, _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1);
+            float3 _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
+            Unity_Multiply_float((_OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1.xxx), _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2);
+            Albedo_2 = _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
             NormalTS_3 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2;
-            Emission_4 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
+            Emission_4 = _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
             Smoothness_5 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             Specular_6 = _CrestFresnel_4c3e438e27705e81abe6c2e9d80cb8d7_LightReflected_2;
+        }
+
+        void Unity_Subtract_float(float A, float B, out float Out)
+        {
+            Out = A - B;
         }
 
         void Unity_Remap_float(float In, float2 InMinMax, float2 OutMinMax, out float Out)
@@ -5660,7 +5432,7 @@ Shader "Crest/Ocean"
             Out = OutMinMax.x + (In - InMinMax.x) * (OutMinMax.y - OutMinMax.x) / (InMinMax.y - InMinMax.x);
         }
 
-        // 3580e24b878bbe7a9a98325dcc0474c2
+        // c46fd3ffae69bfdf4a7b13505ef3963f
         #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
         struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -5711,6 +5483,30 @@ Shader "Crest/Ocean"
         {
             Out = min(A, B);
         };
+
+        // c4826bd69adcf43b74845160a7d6f249
+        #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+        struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+        {
+            float4 ScreenPosition;
+        };
+
+        void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+        {
+            float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+            float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+            float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+            float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+            Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+            float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+            CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+            Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+        }
 
         // a2b98fadb38e4458b014d449a26401de
         #include "ShadergraphFramework/CrestNodeOcclusion.hlsl"
@@ -6107,6 +5903,12 @@ Shader "Crest/Ocean"
             Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+            Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+            _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+            float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+            SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+            #endif
+            #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
             float _Property_606fa02468b6f8849164940fdce04188_Out_0 = _Occlusion;
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
@@ -6124,7 +5926,7 @@ Shader "Crest/Ocean"
             #endif
             surface.BaseColor = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Albedo_2;
             surface.Emission = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Emission_4;
-            surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+            surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
             surface.AlphaClipThreshold = 0;
             surface.BentNormal = IN.TangentSpaceNormal;
             surface.Smoothness = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5;
@@ -6624,6 +6426,9 @@ Shader "Crest/Ocean"
             #pragma shader_feature_local _ CREST_FOAM_ON
         #pragma shader_feature_local _ CREST_CAUSTICS_ON
         #pragma shader_feature_local _ CREST_FLOW_ON
+        #pragma shader_feature_local _ CREST_ALBEDO_ON
+        #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+        #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
         #define CREST_GENERATED_SHADER_ON 1
 
@@ -7466,7 +7271,7 @@ Shader "Crest/Ocean"
             Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
         }
 
-        // 26ddc131f09006478a3aa1683fa75e74
+        // 6445f72e0f3d2e176e54a9ffb10e1139
         #include "ShadergraphFramework/CrestNodeLightData.hlsl"
 
         struct Bindings_CrestLightData_b74b6e8c0b489314ca7aea3e2cc9c54c
@@ -7505,7 +7310,7 @@ Shader "Crest/Ocean"
             OutBoolean_1 = _Not_7fbe0c504ec6c2819b1994af01ce3988_Out_1;
         }
 
-        // 9b604afea48da2ac64cf6198354cf6ae
+        // a8e5480cb804440107f760ac5393ec2f
         #include "ShadergraphFramework/CrestNodeNormalMapping.hlsl"
 
         void Unity_NormalStrength_float(float3 In, float Strength, out float3 Out)
@@ -7518,7 +7323,7 @@ Shader "Crest/Ocean"
             float FaceSign;
         };
 
-        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3)
+        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3, out float4 Albedo_4)
         {
             float3 _Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0 = Vector3_FE793823;
             float3 _Property_b812768aa4903386b49ba84380e4fa74_Out_0 = Vector3_C8190B61;
@@ -7541,13 +7346,15 @@ Shader "Crest/Ocean"
             half3 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
-            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31);
+            half4 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
+            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33);
             float _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0 = Vector1_C6F526AD;
             float3 _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             Unity_NormalStrength_float(_OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0, _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2);
             Normal_1 = _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             SSS_2 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             Foam_3 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
+            Albedo_4 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
         }
 
         // b4726242738c84550b865a8cd3eafd6e
@@ -7575,7 +7382,7 @@ Shader "Crest/Ocean"
             LightReflected_2 = _CrestNodeApplyFresnelCustomFunction_4a16fb68ad2a518d870d2537aaf1e772_LightReflected_10;
         }
 
-        // 5abfc66ba136f74f6cf58eadabfa3bb1
+        // 0d37dbcf887de5687bdac5097fff713e
         #include "ShadergraphFramework/CrestNodeAmbientLight.hlsl"
 
         struct Bindings_CrestAmbientLight_a6ec89b3ca0ab4e98b300ec3ba0e6013
@@ -7650,10 +7457,10 @@ Shader "Crest/Ocean"
             Out_1 = _CrestNodeLinearEyeDepthCustomFunction_ee1cef135a8e558088e613593ae90486_LinearEyeDepth_1;
         }
 
-        // 3818fb4ea9ebd67663e831ef4a019758
+        // 2ca856c7634fa49c75d73b5ddc1b65ca
         #include "ShadergraphFramework/CrestNodeFoamBubbles.hlsl"
 
-        // 77b1d95beeaa53e1bbdfd7a6e8dd6fa0
+        // b3b317d9da04ee361966ef1a88eac53c
         #include "ShadergraphFramework/CrestNodeVolumeEmission.hlsl"
 
         void Unity_Add_float(float A, float B, out float Out)
@@ -7686,7 +7493,7 @@ Shader "Crest/Ocean"
             SubSurfaceScattering_9 = _CrestNodeSampleOceanDataSingleCustomFunction_a7f8891a8a8e5d8ab9c9a0c34c841749_SSS_17;
         }
 
-        // 60cb5e01e8bb25b4c10f8304dd8d25fd
+        // 1547d744048b76728bd6fc66db42da03
         #include "ShadergraphFramework/CrestNodeApplyCaustics.hlsl"
 
         void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
@@ -7837,93 +7644,7 @@ Shader "Crest/Ocean"
             Out = pow(A, B);
         }
 
-        void Unity_Modulo_float(float A, float B, out float Out)
-        {
-            Out = fmod(A, B);
-        }
-
-        void Unity_Comparison_Greater_float(float A, float B, out float Out)
-        {
-            Out = A > B ? 1 : 0;
-        }
-
-        void Unity_Subtract_float(float A, float B, out float Out)
-        {
-            Out = A - B;
-        }
-
-        void Unity_Branch_float(float Predicate, float True, float False, out float Out)
-        {
-            Out = Predicate ? True : False;
-        }
-
-        struct Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1
-        {
-        };
-
-        void SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(float2 Vector2_B562EFB1, float2 Vector2_83AA31A8, Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 IN, out float2 DisplacedA_1, out float WeightA_3, out float2 DisplacedB_2, out float WeightB_4)
-        {
-            float2 _Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0 = Vector2_83AA31A8;
-            float2 _Property_06123b8dbe81da80934c651a33d13699_Out_0 = Vector2_B562EFB1;
-            Bindings_CrestOceanGlobals_d50a85284893ec447a25a093505a2120 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2;
-            float3 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5;
-            SG_CrestOceanGlobals_d50a85284893ec447a25a093505a2120(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5);
-            float _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2;
-            Unity_Modulo_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2);
-            float2 _Multiply_58400b6ef0b30484913ce941659bac85_Out_2;
-            Unity_Multiply_float(_Property_06123b8dbe81da80934c651a33d13699_Out_0, (_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2.xx), _Multiply_58400b6ef0b30484913ce941659bac85_Out_2);
-            float2 _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            Unity_Subtract_float2(_Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0, _Multiply_58400b6ef0b30484913ce941659bac85_Out_2, _Subtract_22cf6b53c8344888987905efe87043db_Out_2);
-            float2 _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0 = Vector2_83AA31A8;
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            #else
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2;
-            Unity_Comparison_Greater_float(_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, 1, _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2);
-            float _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2;
-            Unity_Subtract_float(2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2);
-            float _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            Unity_Branch_float(_Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            #else
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = 0;
-            #endif
-            float2 _Property_bafd78310cede58a971e08fade5e87ee_Out_0 = Vector2_83AA31A8;
-            float2 _Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0 = Vector2_B562EFB1;
-            float _Add_26a0d41d20a2618d858f292701338a2a_Out_2;
-            Unity_Add_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 1, _Add_26a0d41d20a2618d858f292701338a2a_Out_2);
-            float _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2;
-            Unity_Modulo_float(_Add_26a0d41d20a2618d858f292701338a2a_Out_2, 2, _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2);
-            float2 _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2;
-            Unity_Multiply_float(_Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0, (_Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2.xx), _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2);
-            float2 _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            Unity_Subtract_float2(_Property_bafd78310cede58a971e08fade5e87ee_Out_0, _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2, _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            #else
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            Unity_Subtract_float(1, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3, _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            #else
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = 0;
-            #endif
-            DisplacedA_1 = _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0;
-            WeightA_3 = _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0;
-            DisplacedB_2 = _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0;
-            WeightB_4 = _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0;
-        }
-
-        // 06deca910ff1e1ed1b9ea7fb3513233e
+        // 498816f585b40f3ecd7ee304230793a2
         #include "ShadergraphFramework/CrestNodeFoam.hlsl"
 
         struct Bindings_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963
@@ -7944,132 +7665,49 @@ Shader "Crest/Ocean"
             float4 _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0 = Vector4_FD283A50;
             float _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0 = Vector1_D6DA4100;
             float _Property_76afb5461ed7c284b6afcbd15025248a_Out_0 = Vector1_13F2A8C8;
-            float2 _Property_20259e8cfd2c2b8288897462f0776174_Out_0 = Vector2_5AD72ED;
-            float2 _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0 = Vector2_28A2C5B9;
-            Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 _CrestFlow_a6f6f004811f6c82be002c7059e670a1;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4;
-            SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(_Property_20259e8cfd2c2b8288897462f0776174_Out_0, _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4);
+            float2 _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0 = Vector2_28A2C5B9;
             float _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0 = Vector1_D80F067A;
             float3 _Property_b2962080c0284b83821815b7263043dc_Out_0 = Vector3_3AD012AA;
             float3 _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0 = Vector3_E4AC4432;
             float _Property_4807b4a03c922b87b201864991b317da_Out_0 = Vector1_3E452608;
+            float2 _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0 = Vector2_5AD72ED;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             half _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
-            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
+            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             #else
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = float3(0, 0, 0);
             #endif
-            float3 _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2;
-            Unity_Multiply_float(_FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2);
-            UnityTexture2D _Property_d34fb0a0645e3e8791a5239873296357_Out_0 = Texture2D_D9E7A343;
-            float2 _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0 = Vector2_C4E9ED58;
-            float _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0 = Vector1_7492C815;
-            float _Property_54ef09feb545b581b0fc27170fef10e2_Out_0 = Vector1_33DC93D;
-            float _Property_7ae039043909cb8eb133acd421012651_Out_0 = Vector1_3439FC0A;
-            float _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0 = Vector1_FB133018;
-            float _Property_fe249f016d4b128ca8400f412655cc5e_Out_0 = Vector1_7CFAFAC1;
-            float _Property_08e0e443debd6186acd988fc67faf954_Out_0 = Vector1_53F45327;
-            float4 _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0 = Vector4_2FA9AEA5;
-            float4 _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0 = Vector4_FD283A50;
-            float _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0 = Vector1_D6DA4100;
-            float _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0 = Vector1_13F2A8C8;
-            float _Property_985518c2ff59e781828129193b83e9fd_Out_0 = Vector1_D80F067A;
-            float3 _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0 = Vector3_3AD012AA;
-            float3 _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0 = Vector3_E4AC4432;
-            float _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0 = Vector1_3E452608;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            half _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            CrestNodeFoam_half(_Property_d34fb0a0645e3e8791a5239873296357_Out_0.tex, _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0, _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0, _Property_54ef09feb545b581b0fc27170fef10e2_Out_0, _Property_7ae039043909cb8eb133acd421012651_Out_0, _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0, _Property_fe249f016d4b128ca8400f412655cc5e_Out_0, _Property_08e0e443debd6186acd988fc67faf954_Out_0, _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0, _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0, _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0, _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _Property_985518c2ff59e781828129193b83e9fd_Out_0, _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0, _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0, _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            #else
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = float3(0, 0, 0);
-            #endif
-            float3 _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2);
-            float3 _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            Unity_Add_float3(_Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2, _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            #else
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
-            #endif
+            float3 _Property_a8190300d5ba483d9365211d7f71abea_Out_0 = Vector3_3AD012AA;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             #else
-            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_b2962080c0284b83821815b7263043dc_Out_0;
+            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_a8190300d5ba483d9365211d7f71abea_Out_0;
             #endif
-            float3 _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2;
-            Unity_Multiply_float(_FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            #else
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0;
-            #endif
-            float3 _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2);
-            float3 _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            Unity_Add_float3(_Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2, _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            #else
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
-            #endif
+            float3 _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0 = Vector3_E4AC4432;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             #else
-            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0;
+            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0;
             #endif
-            float3 _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2;
-            Unity_Multiply_float(_FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            #else
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0;
-            #endif
-            float3 _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2);
-            float3 _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            Unity_Add_float3(_Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2, _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            #else
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
-            #endif
+            float _Property_e0841d7fa2234ff199a94402710821f1_Out_0 = Vector1_3E452608;
             #if defined(CREST_FOAM_ON)
             float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
             #else
-            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_4807b4a03c922b87b201864991b317da_Out_0;
+            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_e0841d7fa2234ff199a94402710821f1_Out_0;
             #endif
-            float _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2;
-            Unity_Multiply_float(_FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            #else
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0;
-            #endif
-            float _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2;
-            Unity_Multiply_float(_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4, _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2);
-            float _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            Unity_Add_float(_Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2, _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            #else
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
-            #endif
-            Albedo_1 = _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0;
-            NormalTS_2 = _FLOW_fad25d47eec395899aad2bf77264462c_Out_0;
-            Emission_3 = _FLOW_02e1cbd391446082893e73b8088ff765_Out_0;
-            Smoothness_4 = _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0;
+            Albedo_1 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
+            NormalTS_2 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
+            Emission_3 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
+            Smoothness_4 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
+        }
+
+        void Unity_OneMinus_float(float In, out float Out)
+        {
+            Out = 1 - In;
         }
 
         struct Bindings_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269
@@ -8117,7 +7755,8 @@ Shader "Crest/Ocean"
             float3 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3;
-            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3);
+            float4 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4;
+            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4);
             float _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0 = Vector1_B01E1A6A;
             float2 _Property_a28ec0be576d4586a46337955b069868_Out_0 = Vector2_9C73A0C6;
             Bindings_CrestIsUnderwater_52f7750f15e114937b54a0fd27f0d2f2 _CrestIsUnderwater_de15825b4853aa85a98b48656eaa15f1;
@@ -8250,11 +7889,27 @@ Shader "Crest/Ocean"
             float3 _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
             float _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             SG_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963(_Property_f78369cae749d18392b19bad30a74e2d_Out_0, _Property_169d4581a8319383a7f62a3435e9b11d_Out_0, _Property_0bdc44463eba328a8c73245f2cf82911_Out_0, _Property_74ea32320c303583ae393e1d0afe7d13_Out_0, _Property_b16935e33ecd688caba81b8b02f388e3_Out_0, _Property_519c0dea6b39f688b95e7c8c336ca9fb_Out_0, _Property_e7473f6e9b7b0f8c8615d7497ee5c4a0_Out_0, _Property_d073850e48b8c485ad0ab20154ed80e8_Out_0, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0, _Property_a28ec0be576d4586a46337955b069868_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _Branch_3776301df9f8888faaee9638ee7f568d_Out_3, _Lerp_d393d46d7b4755838d788bf6a655c1cd_Out_3, _Negate_43b5c19855641787873c549e72cb1032_Out_1, _Property_0f7251ac80636d8eb279b11917792d24_Out_0, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4);
-            Albedo_2 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1;
+            float _Split_e1a3108496a4498a90ecae26cadb6773_R_1 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[0];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_G_2 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[1];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_B_3 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[2];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_A_4 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[3];
+            float3 _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0 = float3(_Split_e1a3108496a4498a90ecae26cadb6773_R_1, _Split_e1a3108496a4498a90ecae26cadb6773_G_2, _Split_e1a3108496a4498a90ecae26cadb6773_B_3);
+            float3 _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
+            Unity_Lerp_float3(_CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0, (_Split_e1a3108496a4498a90ecae26cadb6773_A_4.xxx), _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3);
+            float _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1;
+            Unity_OneMinus_float(_Split_e1a3108496a4498a90ecae26cadb6773_A_4, _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1);
+            float3 _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
+            Unity_Multiply_float((_OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1.xxx), _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2);
+            Albedo_2 = _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
             NormalTS_3 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2;
-            Emission_4 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
+            Emission_4 = _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
             Smoothness_5 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             Specular_6 = _CrestFresnel_4c3e438e27705e81abe6c2e9d80cb8d7_LightReflected_2;
+        }
+
+        void Unity_Subtract_float(float A, float B, out float Out)
+        {
+            Out = A - B;
         }
 
         void Unity_Remap_float(float In, float2 InMinMax, float2 OutMinMax, out float Out)
@@ -8262,7 +7917,7 @@ Shader "Crest/Ocean"
             Out = OutMinMax.x + (In - InMinMax.x) * (OutMinMax.y - OutMinMax.x) / (InMinMax.y - InMinMax.x);
         }
 
-        // 3580e24b878bbe7a9a98325dcc0474c2
+        // c46fd3ffae69bfdf4a7b13505ef3963f
         #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
         struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -8313,6 +7968,30 @@ Shader "Crest/Ocean"
         {
             Out = min(A, B);
         };
+
+        // c4826bd69adcf43b74845160a7d6f249
+        #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+        struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+        {
+            float4 ScreenPosition;
+        };
+
+        void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+        {
+            float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+            float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+            float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+            float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+            Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+            float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+            CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+            Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+        }
 
         // a2b98fadb38e4458b014d449a26401de
         #include "ShadergraphFramework/CrestNodeOcclusion.hlsl"
@@ -8709,6 +8388,12 @@ Shader "Crest/Ocean"
             Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+            Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+            _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+            float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+            SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+            #endif
+            #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
             float _Property_606fa02468b6f8849164940fdce04188_Out_0 = _Occlusion;
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
@@ -8726,7 +8411,7 @@ Shader "Crest/Ocean"
             #endif
             surface.BaseColor = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Albedo_2;
             surface.Emission = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Emission_4;
-            surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+            surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
             surface.AlphaClipThreshold = 0;
             surface.BentNormal = IN.TangentSpaceNormal;
             surface.Smoothness = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5;
@@ -9239,6 +8924,9 @@ Shader "Crest/Ocean"
             #pragma shader_feature_local _ CREST_FOAM_ON
         #pragma shader_feature_local _ CREST_CAUSTICS_ON
         #pragma shader_feature_local _ CREST_FLOW_ON
+        #pragma shader_feature_local _ CREST_ALBEDO_ON
+        #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+        #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
         #define CREST_GENERATED_SHADER_ON 1
 
@@ -10119,7 +9807,7 @@ Shader "Crest/Ocean"
             Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
         }
 
-        // 26ddc131f09006478a3aa1683fa75e74
+        // 6445f72e0f3d2e176e54a9ffb10e1139
         #include "ShadergraphFramework/CrestNodeLightData.hlsl"
 
         struct Bindings_CrestLightData_b74b6e8c0b489314ca7aea3e2cc9c54c
@@ -10158,7 +9846,7 @@ Shader "Crest/Ocean"
             OutBoolean_1 = _Not_7fbe0c504ec6c2819b1994af01ce3988_Out_1;
         }
 
-        // 9b604afea48da2ac64cf6198354cf6ae
+        // a8e5480cb804440107f760ac5393ec2f
         #include "ShadergraphFramework/CrestNodeNormalMapping.hlsl"
 
         void Unity_NormalStrength_float(float3 In, float Strength, out float3 Out)
@@ -10171,7 +9859,7 @@ Shader "Crest/Ocean"
             float FaceSign;
         };
 
-        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3)
+        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3, out float4 Albedo_4)
         {
             float3 _Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0 = Vector3_FE793823;
             float3 _Property_b812768aa4903386b49ba84380e4fa74_Out_0 = Vector3_C8190B61;
@@ -10194,13 +9882,15 @@ Shader "Crest/Ocean"
             half3 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
-            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31);
+            half4 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
+            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33);
             float _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0 = Vector1_C6F526AD;
             float3 _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             Unity_NormalStrength_float(_OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0, _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2);
             Normal_1 = _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             SSS_2 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             Foam_3 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
+            Albedo_4 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
         }
 
         // b4726242738c84550b865a8cd3eafd6e
@@ -10228,7 +9918,7 @@ Shader "Crest/Ocean"
             LightReflected_2 = _CrestNodeApplyFresnelCustomFunction_4a16fb68ad2a518d870d2537aaf1e772_LightReflected_10;
         }
 
-        // 5abfc66ba136f74f6cf58eadabfa3bb1
+        // 0d37dbcf887de5687bdac5097fff713e
         #include "ShadergraphFramework/CrestNodeAmbientLight.hlsl"
 
         struct Bindings_CrestAmbientLight_a6ec89b3ca0ab4e98b300ec3ba0e6013
@@ -10303,10 +9993,10 @@ Shader "Crest/Ocean"
             Out_1 = _CrestNodeLinearEyeDepthCustomFunction_ee1cef135a8e558088e613593ae90486_LinearEyeDepth_1;
         }
 
-        // 3818fb4ea9ebd67663e831ef4a019758
+        // 2ca856c7634fa49c75d73b5ddc1b65ca
         #include "ShadergraphFramework/CrestNodeFoamBubbles.hlsl"
 
-        // 77b1d95beeaa53e1bbdfd7a6e8dd6fa0
+        // b3b317d9da04ee361966ef1a88eac53c
         #include "ShadergraphFramework/CrestNodeVolumeEmission.hlsl"
 
         void Unity_Add_float(float A, float B, out float Out)
@@ -10339,7 +10029,7 @@ Shader "Crest/Ocean"
             SubSurfaceScattering_9 = _CrestNodeSampleOceanDataSingleCustomFunction_a7f8891a8a8e5d8ab9c9a0c34c841749_SSS_17;
         }
 
-        // 60cb5e01e8bb25b4c10f8304dd8d25fd
+        // 1547d744048b76728bd6fc66db42da03
         #include "ShadergraphFramework/CrestNodeApplyCaustics.hlsl"
 
         void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
@@ -10490,93 +10180,7 @@ Shader "Crest/Ocean"
             Out = pow(A, B);
         }
 
-        void Unity_Modulo_float(float A, float B, out float Out)
-        {
-            Out = fmod(A, B);
-        }
-
-        void Unity_Comparison_Greater_float(float A, float B, out float Out)
-        {
-            Out = A > B ? 1 : 0;
-        }
-
-        void Unity_Subtract_float(float A, float B, out float Out)
-        {
-            Out = A - B;
-        }
-
-        void Unity_Branch_float(float Predicate, float True, float False, out float Out)
-        {
-            Out = Predicate ? True : False;
-        }
-
-        struct Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1
-        {
-        };
-
-        void SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(float2 Vector2_B562EFB1, float2 Vector2_83AA31A8, Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 IN, out float2 DisplacedA_1, out float WeightA_3, out float2 DisplacedB_2, out float WeightB_4)
-        {
-            float2 _Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0 = Vector2_83AA31A8;
-            float2 _Property_06123b8dbe81da80934c651a33d13699_Out_0 = Vector2_B562EFB1;
-            Bindings_CrestOceanGlobals_d50a85284893ec447a25a093505a2120 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2;
-            float3 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5;
-            SG_CrestOceanGlobals_d50a85284893ec447a25a093505a2120(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5);
-            float _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2;
-            Unity_Modulo_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2);
-            float2 _Multiply_58400b6ef0b30484913ce941659bac85_Out_2;
-            Unity_Multiply_float(_Property_06123b8dbe81da80934c651a33d13699_Out_0, (_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2.xx), _Multiply_58400b6ef0b30484913ce941659bac85_Out_2);
-            float2 _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            Unity_Subtract_float2(_Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0, _Multiply_58400b6ef0b30484913ce941659bac85_Out_2, _Subtract_22cf6b53c8344888987905efe87043db_Out_2);
-            float2 _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0 = Vector2_83AA31A8;
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            #else
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2;
-            Unity_Comparison_Greater_float(_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, 1, _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2);
-            float _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2;
-            Unity_Subtract_float(2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2);
-            float _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            Unity_Branch_float(_Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            #else
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = 0;
-            #endif
-            float2 _Property_bafd78310cede58a971e08fade5e87ee_Out_0 = Vector2_83AA31A8;
-            float2 _Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0 = Vector2_B562EFB1;
-            float _Add_26a0d41d20a2618d858f292701338a2a_Out_2;
-            Unity_Add_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 1, _Add_26a0d41d20a2618d858f292701338a2a_Out_2);
-            float _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2;
-            Unity_Modulo_float(_Add_26a0d41d20a2618d858f292701338a2a_Out_2, 2, _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2);
-            float2 _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2;
-            Unity_Multiply_float(_Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0, (_Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2.xx), _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2);
-            float2 _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            Unity_Subtract_float2(_Property_bafd78310cede58a971e08fade5e87ee_Out_0, _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2, _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            #else
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            Unity_Subtract_float(1, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3, _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            #else
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = 0;
-            #endif
-            DisplacedA_1 = _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0;
-            WeightA_3 = _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0;
-            DisplacedB_2 = _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0;
-            WeightB_4 = _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0;
-        }
-
-        // 06deca910ff1e1ed1b9ea7fb3513233e
+        // 498816f585b40f3ecd7ee304230793a2
         #include "ShadergraphFramework/CrestNodeFoam.hlsl"
 
         struct Bindings_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963
@@ -10597,132 +10201,49 @@ Shader "Crest/Ocean"
             float4 _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0 = Vector4_FD283A50;
             float _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0 = Vector1_D6DA4100;
             float _Property_76afb5461ed7c284b6afcbd15025248a_Out_0 = Vector1_13F2A8C8;
-            float2 _Property_20259e8cfd2c2b8288897462f0776174_Out_0 = Vector2_5AD72ED;
-            float2 _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0 = Vector2_28A2C5B9;
-            Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 _CrestFlow_a6f6f004811f6c82be002c7059e670a1;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4;
-            SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(_Property_20259e8cfd2c2b8288897462f0776174_Out_0, _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4);
+            float2 _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0 = Vector2_28A2C5B9;
             float _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0 = Vector1_D80F067A;
             float3 _Property_b2962080c0284b83821815b7263043dc_Out_0 = Vector3_3AD012AA;
             float3 _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0 = Vector3_E4AC4432;
             float _Property_4807b4a03c922b87b201864991b317da_Out_0 = Vector1_3E452608;
+            float2 _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0 = Vector2_5AD72ED;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             half _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
-            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
+            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             #else
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = float3(0, 0, 0);
             #endif
-            float3 _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2;
-            Unity_Multiply_float(_FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2);
-            UnityTexture2D _Property_d34fb0a0645e3e8791a5239873296357_Out_0 = Texture2D_D9E7A343;
-            float2 _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0 = Vector2_C4E9ED58;
-            float _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0 = Vector1_7492C815;
-            float _Property_54ef09feb545b581b0fc27170fef10e2_Out_0 = Vector1_33DC93D;
-            float _Property_7ae039043909cb8eb133acd421012651_Out_0 = Vector1_3439FC0A;
-            float _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0 = Vector1_FB133018;
-            float _Property_fe249f016d4b128ca8400f412655cc5e_Out_0 = Vector1_7CFAFAC1;
-            float _Property_08e0e443debd6186acd988fc67faf954_Out_0 = Vector1_53F45327;
-            float4 _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0 = Vector4_2FA9AEA5;
-            float4 _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0 = Vector4_FD283A50;
-            float _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0 = Vector1_D6DA4100;
-            float _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0 = Vector1_13F2A8C8;
-            float _Property_985518c2ff59e781828129193b83e9fd_Out_0 = Vector1_D80F067A;
-            float3 _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0 = Vector3_3AD012AA;
-            float3 _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0 = Vector3_E4AC4432;
-            float _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0 = Vector1_3E452608;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            half _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            CrestNodeFoam_half(_Property_d34fb0a0645e3e8791a5239873296357_Out_0.tex, _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0, _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0, _Property_54ef09feb545b581b0fc27170fef10e2_Out_0, _Property_7ae039043909cb8eb133acd421012651_Out_0, _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0, _Property_fe249f016d4b128ca8400f412655cc5e_Out_0, _Property_08e0e443debd6186acd988fc67faf954_Out_0, _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0, _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0, _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0, _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _Property_985518c2ff59e781828129193b83e9fd_Out_0, _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0, _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0, _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            #else
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = float3(0, 0, 0);
-            #endif
-            float3 _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2);
-            float3 _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            Unity_Add_float3(_Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2, _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            #else
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
-            #endif
+            float3 _Property_a8190300d5ba483d9365211d7f71abea_Out_0 = Vector3_3AD012AA;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             #else
-            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_b2962080c0284b83821815b7263043dc_Out_0;
+            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_a8190300d5ba483d9365211d7f71abea_Out_0;
             #endif
-            float3 _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2;
-            Unity_Multiply_float(_FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            #else
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0;
-            #endif
-            float3 _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2);
-            float3 _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            Unity_Add_float3(_Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2, _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            #else
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
-            #endif
+            float3 _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0 = Vector3_E4AC4432;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             #else
-            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0;
+            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0;
             #endif
-            float3 _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2;
-            Unity_Multiply_float(_FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            #else
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0;
-            #endif
-            float3 _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2);
-            float3 _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            Unity_Add_float3(_Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2, _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            #else
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
-            #endif
+            float _Property_e0841d7fa2234ff199a94402710821f1_Out_0 = Vector1_3E452608;
             #if defined(CREST_FOAM_ON)
             float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
             #else
-            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_4807b4a03c922b87b201864991b317da_Out_0;
+            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_e0841d7fa2234ff199a94402710821f1_Out_0;
             #endif
-            float _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2;
-            Unity_Multiply_float(_FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            #else
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0;
-            #endif
-            float _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2;
-            Unity_Multiply_float(_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4, _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2);
-            float _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            Unity_Add_float(_Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2, _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            #else
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
-            #endif
-            Albedo_1 = _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0;
-            NormalTS_2 = _FLOW_fad25d47eec395899aad2bf77264462c_Out_0;
-            Emission_3 = _FLOW_02e1cbd391446082893e73b8088ff765_Out_0;
-            Smoothness_4 = _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0;
+            Albedo_1 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
+            NormalTS_2 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
+            Emission_3 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
+            Smoothness_4 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
+        }
+
+        void Unity_OneMinus_float(float In, out float Out)
+        {
+            Out = 1 - In;
         }
 
         struct Bindings_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269
@@ -10770,7 +10291,8 @@ Shader "Crest/Ocean"
             float3 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3;
-            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3);
+            float4 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4;
+            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4);
             float _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0 = Vector1_B01E1A6A;
             float2 _Property_a28ec0be576d4586a46337955b069868_Out_0 = Vector2_9C73A0C6;
             Bindings_CrestIsUnderwater_52f7750f15e114937b54a0fd27f0d2f2 _CrestIsUnderwater_de15825b4853aa85a98b48656eaa15f1;
@@ -10903,11 +10425,27 @@ Shader "Crest/Ocean"
             float3 _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
             float _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             SG_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963(_Property_f78369cae749d18392b19bad30a74e2d_Out_0, _Property_169d4581a8319383a7f62a3435e9b11d_Out_0, _Property_0bdc44463eba328a8c73245f2cf82911_Out_0, _Property_74ea32320c303583ae393e1d0afe7d13_Out_0, _Property_b16935e33ecd688caba81b8b02f388e3_Out_0, _Property_519c0dea6b39f688b95e7c8c336ca9fb_Out_0, _Property_e7473f6e9b7b0f8c8615d7497ee5c4a0_Out_0, _Property_d073850e48b8c485ad0ab20154ed80e8_Out_0, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0, _Property_a28ec0be576d4586a46337955b069868_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _Branch_3776301df9f8888faaee9638ee7f568d_Out_3, _Lerp_d393d46d7b4755838d788bf6a655c1cd_Out_3, _Negate_43b5c19855641787873c549e72cb1032_Out_1, _Property_0f7251ac80636d8eb279b11917792d24_Out_0, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4);
-            Albedo_2 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1;
+            float _Split_e1a3108496a4498a90ecae26cadb6773_R_1 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[0];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_G_2 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[1];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_B_3 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[2];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_A_4 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[3];
+            float3 _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0 = float3(_Split_e1a3108496a4498a90ecae26cadb6773_R_1, _Split_e1a3108496a4498a90ecae26cadb6773_G_2, _Split_e1a3108496a4498a90ecae26cadb6773_B_3);
+            float3 _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
+            Unity_Lerp_float3(_CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0, (_Split_e1a3108496a4498a90ecae26cadb6773_A_4.xxx), _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3);
+            float _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1;
+            Unity_OneMinus_float(_Split_e1a3108496a4498a90ecae26cadb6773_A_4, _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1);
+            float3 _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
+            Unity_Multiply_float((_OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1.xxx), _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2);
+            Albedo_2 = _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
             NormalTS_3 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2;
-            Emission_4 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
+            Emission_4 = _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
             Smoothness_5 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             Specular_6 = _CrestFresnel_4c3e438e27705e81abe6c2e9d80cb8d7_LightReflected_2;
+        }
+
+        void Unity_Subtract_float(float A, float B, out float Out)
+        {
+            Out = A - B;
         }
 
         void Unity_Remap_float(float In, float2 InMinMax, float2 OutMinMax, out float Out)
@@ -10915,7 +10453,7 @@ Shader "Crest/Ocean"
             Out = OutMinMax.x + (In - InMinMax.x) * (OutMinMax.y - OutMinMax.x) / (InMinMax.y - InMinMax.x);
         }
 
-        // 3580e24b878bbe7a9a98325dcc0474c2
+        // c46fd3ffae69bfdf4a7b13505ef3963f
         #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
         struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -10966,6 +10504,30 @@ Shader "Crest/Ocean"
         {
             Out = min(A, B);
         };
+
+        // c4826bd69adcf43b74845160a7d6f249
+        #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+        struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+        {
+            float4 ScreenPosition;
+        };
+
+        void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+        {
+            float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+            float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+            float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+            float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+            Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+            float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+            CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+            Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+        }
 
         // a2b98fadb38e4458b014d449a26401de
         #include "ShadergraphFramework/CrestNodeOcclusion.hlsl"
@@ -11362,6 +10924,12 @@ Shader "Crest/Ocean"
             Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+            Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+            _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+            float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+            SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+            #endif
+            #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
             float _Property_606fa02468b6f8849164940fdce04188_Out_0 = _Occlusion;
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
@@ -11379,7 +10947,7 @@ Shader "Crest/Ocean"
             #endif
             surface.BaseColor = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Albedo_2;
             surface.Emission = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Emission_4;
-            surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+            surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
             surface.AlphaClipThreshold = 0;
             surface.BentNormal = IN.TangentSpaceNormal;
             surface.Smoothness = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5;
@@ -11896,6 +11464,9 @@ Shader "Crest/Ocean"
             #pragma shader_feature_local _ CREST_FOAM_ON
         #pragma shader_feature_local _ CREST_CAUSTICS_ON
         #pragma shader_feature_local _ CREST_FLOW_ON
+        #pragma shader_feature_local _ CREST_ALBEDO_ON
+        #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+        #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
         #define CREST_GENERATED_SHADER_ON 1
 
@@ -12812,7 +12383,7 @@ Shader "Crest/Ocean"
             Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
         }
 
-        // 3580e24b878bbe7a9a98325dcc0474c2
+        // c46fd3ffae69bfdf4a7b13505ef3963f
         #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
         struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -12864,7 +12435,36 @@ Shader "Crest/Ocean"
             Out = min(A, B);
         };
 
-        // 26ddc131f09006478a3aa1683fa75e74
+        void Unity_Divide_float(float A, float B, out float Out)
+        {
+            Out = A / B;
+        }
+
+        // c4826bd69adcf43b74845160a7d6f249
+        #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+        struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+        {
+            float4 ScreenPosition;
+        };
+
+        void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+        {
+            float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+            float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+            float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+            float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+            Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+            float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+            CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+            Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+        }
+
+        // 6445f72e0f3d2e176e54a9ffb10e1139
         #include "ShadergraphFramework/CrestNodeLightData.hlsl"
 
         struct Bindings_CrestLightData_b74b6e8c0b489314ca7aea3e2cc9c54c
@@ -12903,7 +12503,7 @@ Shader "Crest/Ocean"
             OutBoolean_1 = _Not_7fbe0c504ec6c2819b1994af01ce3988_Out_1;
         }
 
-        // 9b604afea48da2ac64cf6198354cf6ae
+        // a8e5480cb804440107f760ac5393ec2f
         #include "ShadergraphFramework/CrestNodeNormalMapping.hlsl"
 
         void Unity_NormalStrength_float(float3 In, float Strength, out float3 Out)
@@ -12916,7 +12516,7 @@ Shader "Crest/Ocean"
             float FaceSign;
         };
 
-        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3)
+        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3, out float4 Albedo_4)
         {
             float3 _Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0 = Vector3_FE793823;
             float3 _Property_b812768aa4903386b49ba84380e4fa74_Out_0 = Vector3_C8190B61;
@@ -12939,13 +12539,15 @@ Shader "Crest/Ocean"
             half3 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
-            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31);
+            half4 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
+            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33);
             float _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0 = Vector1_C6F526AD;
             float3 _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             Unity_NormalStrength_float(_OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0, _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2);
             Normal_1 = _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             SSS_2 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             Foam_3 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
+            Albedo_4 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
         }
 
         // b4726242738c84550b865a8cd3eafd6e
@@ -12973,7 +12575,7 @@ Shader "Crest/Ocean"
             LightReflected_2 = _CrestNodeApplyFresnelCustomFunction_4a16fb68ad2a518d870d2537aaf1e772_LightReflected_10;
         }
 
-        // 5abfc66ba136f74f6cf58eadabfa3bb1
+        // 0d37dbcf887de5687bdac5097fff713e
         #include "ShadergraphFramework/CrestNodeAmbientLight.hlsl"
 
         struct Bindings_CrestAmbientLight_a6ec89b3ca0ab4e98b300ec3ba0e6013
@@ -13023,10 +12625,10 @@ Shader "Crest/Ocean"
             Out = SHADERGRAPH_SAMPLE_SCENE_COLOR(UV.xy);
         }
 
-        // 3818fb4ea9ebd67663e831ef4a019758
+        // 2ca856c7634fa49c75d73b5ddc1b65ca
         #include "ShadergraphFramework/CrestNodeFoamBubbles.hlsl"
 
-        // 77b1d95beeaa53e1bbdfd7a6e8dd6fa0
+        // b3b317d9da04ee361966ef1a88eac53c
         #include "ShadergraphFramework/CrestNodeVolumeEmission.hlsl"
 
         void Unity_Add_float(float A, float B, out float Out)
@@ -13059,7 +12661,7 @@ Shader "Crest/Ocean"
             SubSurfaceScattering_9 = _CrestNodeSampleOceanDataSingleCustomFunction_a7f8891a8a8e5d8ab9c9a0c34c841749_SSS_17;
         }
 
-        // 60cb5e01e8bb25b4c10f8304dd8d25fd
+        // 1547d744048b76728bd6fc66db42da03
         #include "ShadergraphFramework/CrestNodeApplyCaustics.hlsl"
 
         void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
@@ -13195,98 +12797,12 @@ Shader "Crest/Ocean"
             Out = reflect(In, Normal);
         }
 
-        void Unity_Divide_float(float A, float B, out float Out)
-        {
-            Out = A / B;
-        }
-
         void Unity_Power_float(float A, float B, out float Out)
         {
             Out = pow(A, B);
         }
 
-        void Unity_Modulo_float(float A, float B, out float Out)
-        {
-            Out = fmod(A, B);
-        }
-
-        void Unity_Comparison_Greater_float(float A, float B, out float Out)
-        {
-            Out = A > B ? 1 : 0;
-        }
-
-        void Unity_Branch_float(float Predicate, float True, float False, out float Out)
-        {
-            Out = Predicate ? True : False;
-        }
-
-        struct Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1
-        {
-        };
-
-        void SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(float2 Vector2_B562EFB1, float2 Vector2_83AA31A8, Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 IN, out float2 DisplacedA_1, out float WeightA_3, out float2 DisplacedB_2, out float WeightB_4)
-        {
-            float2 _Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0 = Vector2_83AA31A8;
-            float2 _Property_06123b8dbe81da80934c651a33d13699_Out_0 = Vector2_B562EFB1;
-            Bindings_CrestOceanGlobals_d50a85284893ec447a25a093505a2120 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2;
-            float3 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5;
-            SG_CrestOceanGlobals_d50a85284893ec447a25a093505a2120(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5);
-            float _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2;
-            Unity_Modulo_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2);
-            float2 _Multiply_58400b6ef0b30484913ce941659bac85_Out_2;
-            Unity_Multiply_float(_Property_06123b8dbe81da80934c651a33d13699_Out_0, (_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2.xx), _Multiply_58400b6ef0b30484913ce941659bac85_Out_2);
-            float2 _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            Unity_Subtract_float2(_Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0, _Multiply_58400b6ef0b30484913ce941659bac85_Out_2, _Subtract_22cf6b53c8344888987905efe87043db_Out_2);
-            float2 _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0 = Vector2_83AA31A8;
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            #else
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2;
-            Unity_Comparison_Greater_float(_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, 1, _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2);
-            float _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2;
-            Unity_Subtract_float(2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2);
-            float _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            Unity_Branch_float(_Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            #else
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = 0;
-            #endif
-            float2 _Property_bafd78310cede58a971e08fade5e87ee_Out_0 = Vector2_83AA31A8;
-            float2 _Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0 = Vector2_B562EFB1;
-            float _Add_26a0d41d20a2618d858f292701338a2a_Out_2;
-            Unity_Add_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 1, _Add_26a0d41d20a2618d858f292701338a2a_Out_2);
-            float _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2;
-            Unity_Modulo_float(_Add_26a0d41d20a2618d858f292701338a2a_Out_2, 2, _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2);
-            float2 _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2;
-            Unity_Multiply_float(_Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0, (_Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2.xx), _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2);
-            float2 _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            Unity_Subtract_float2(_Property_bafd78310cede58a971e08fade5e87ee_Out_0, _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2, _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            #else
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            Unity_Subtract_float(1, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3, _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            #else
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = 0;
-            #endif
-            DisplacedA_1 = _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0;
-            WeightA_3 = _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0;
-            DisplacedB_2 = _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0;
-            WeightB_4 = _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0;
-        }
-
-        // 06deca910ff1e1ed1b9ea7fb3513233e
+        // 498816f585b40f3ecd7ee304230793a2
         #include "ShadergraphFramework/CrestNodeFoam.hlsl"
 
         struct Bindings_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963
@@ -13307,132 +12823,49 @@ Shader "Crest/Ocean"
             float4 _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0 = Vector4_FD283A50;
             float _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0 = Vector1_D6DA4100;
             float _Property_76afb5461ed7c284b6afcbd15025248a_Out_0 = Vector1_13F2A8C8;
-            float2 _Property_20259e8cfd2c2b8288897462f0776174_Out_0 = Vector2_5AD72ED;
-            float2 _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0 = Vector2_28A2C5B9;
-            Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 _CrestFlow_a6f6f004811f6c82be002c7059e670a1;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4;
-            SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(_Property_20259e8cfd2c2b8288897462f0776174_Out_0, _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4);
+            float2 _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0 = Vector2_28A2C5B9;
             float _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0 = Vector1_D80F067A;
             float3 _Property_b2962080c0284b83821815b7263043dc_Out_0 = Vector3_3AD012AA;
             float3 _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0 = Vector3_E4AC4432;
             float _Property_4807b4a03c922b87b201864991b317da_Out_0 = Vector1_3E452608;
+            float2 _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0 = Vector2_5AD72ED;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             half _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
-            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
+            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             #else
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = float3(0, 0, 0);
             #endif
-            float3 _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2;
-            Unity_Multiply_float(_FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2);
-            UnityTexture2D _Property_d34fb0a0645e3e8791a5239873296357_Out_0 = Texture2D_D9E7A343;
-            float2 _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0 = Vector2_C4E9ED58;
-            float _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0 = Vector1_7492C815;
-            float _Property_54ef09feb545b581b0fc27170fef10e2_Out_0 = Vector1_33DC93D;
-            float _Property_7ae039043909cb8eb133acd421012651_Out_0 = Vector1_3439FC0A;
-            float _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0 = Vector1_FB133018;
-            float _Property_fe249f016d4b128ca8400f412655cc5e_Out_0 = Vector1_7CFAFAC1;
-            float _Property_08e0e443debd6186acd988fc67faf954_Out_0 = Vector1_53F45327;
-            float4 _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0 = Vector4_2FA9AEA5;
-            float4 _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0 = Vector4_FD283A50;
-            float _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0 = Vector1_D6DA4100;
-            float _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0 = Vector1_13F2A8C8;
-            float _Property_985518c2ff59e781828129193b83e9fd_Out_0 = Vector1_D80F067A;
-            float3 _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0 = Vector3_3AD012AA;
-            float3 _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0 = Vector3_E4AC4432;
-            float _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0 = Vector1_3E452608;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            half _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            CrestNodeFoam_half(_Property_d34fb0a0645e3e8791a5239873296357_Out_0.tex, _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0, _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0, _Property_54ef09feb545b581b0fc27170fef10e2_Out_0, _Property_7ae039043909cb8eb133acd421012651_Out_0, _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0, _Property_fe249f016d4b128ca8400f412655cc5e_Out_0, _Property_08e0e443debd6186acd988fc67faf954_Out_0, _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0, _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0, _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0, _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _Property_985518c2ff59e781828129193b83e9fd_Out_0, _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0, _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0, _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            #else
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = float3(0, 0, 0);
-            #endif
-            float3 _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2);
-            float3 _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            Unity_Add_float3(_Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2, _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            #else
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
-            #endif
+            float3 _Property_a8190300d5ba483d9365211d7f71abea_Out_0 = Vector3_3AD012AA;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             #else
-            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_b2962080c0284b83821815b7263043dc_Out_0;
+            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_a8190300d5ba483d9365211d7f71abea_Out_0;
             #endif
-            float3 _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2;
-            Unity_Multiply_float(_FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            #else
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0;
-            #endif
-            float3 _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2);
-            float3 _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            Unity_Add_float3(_Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2, _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            #else
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
-            #endif
+            float3 _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0 = Vector3_E4AC4432;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             #else
-            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0;
+            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0;
             #endif
-            float3 _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2;
-            Unity_Multiply_float(_FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            #else
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0;
-            #endif
-            float3 _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2);
-            float3 _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            Unity_Add_float3(_Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2, _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            #else
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
-            #endif
+            float _Property_e0841d7fa2234ff199a94402710821f1_Out_0 = Vector1_3E452608;
             #if defined(CREST_FOAM_ON)
             float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
             #else
-            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_4807b4a03c922b87b201864991b317da_Out_0;
+            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_e0841d7fa2234ff199a94402710821f1_Out_0;
             #endif
-            float _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2;
-            Unity_Multiply_float(_FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            #else
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0;
-            #endif
-            float _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2;
-            Unity_Multiply_float(_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4, _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2);
-            float _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            Unity_Add_float(_Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2, _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            #else
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
-            #endif
-            Albedo_1 = _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0;
-            NormalTS_2 = _FLOW_fad25d47eec395899aad2bf77264462c_Out_0;
-            Emission_3 = _FLOW_02e1cbd391446082893e73b8088ff765_Out_0;
-            Smoothness_4 = _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0;
+            Albedo_1 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
+            NormalTS_2 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
+            Emission_3 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
+            Smoothness_4 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
+        }
+
+        void Unity_OneMinus_float(float In, out float Out)
+        {
+            Out = 1 - In;
         }
 
         struct Bindings_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269
@@ -13480,7 +12913,8 @@ Shader "Crest/Ocean"
             float3 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3;
-            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3);
+            float4 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4;
+            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4);
             float _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0 = Vector1_B01E1A6A;
             float2 _Property_a28ec0be576d4586a46337955b069868_Out_0 = Vector2_9C73A0C6;
             Bindings_CrestIsUnderwater_52f7750f15e114937b54a0fd27f0d2f2 _CrestIsUnderwater_de15825b4853aa85a98b48656eaa15f1;
@@ -13613,9 +13047,20 @@ Shader "Crest/Ocean"
             float3 _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
             float _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             SG_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963(_Property_f78369cae749d18392b19bad30a74e2d_Out_0, _Property_169d4581a8319383a7f62a3435e9b11d_Out_0, _Property_0bdc44463eba328a8c73245f2cf82911_Out_0, _Property_74ea32320c303583ae393e1d0afe7d13_Out_0, _Property_b16935e33ecd688caba81b8b02f388e3_Out_0, _Property_519c0dea6b39f688b95e7c8c336ca9fb_Out_0, _Property_e7473f6e9b7b0f8c8615d7497ee5c4a0_Out_0, _Property_d073850e48b8c485ad0ab20154ed80e8_Out_0, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0, _Property_a28ec0be576d4586a46337955b069868_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _Branch_3776301df9f8888faaee9638ee7f568d_Out_3, _Lerp_d393d46d7b4755838d788bf6a655c1cd_Out_3, _Negate_43b5c19855641787873c549e72cb1032_Out_1, _Property_0f7251ac80636d8eb279b11917792d24_Out_0, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4);
-            Albedo_2 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1;
+            float _Split_e1a3108496a4498a90ecae26cadb6773_R_1 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[0];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_G_2 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[1];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_B_3 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[2];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_A_4 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[3];
+            float3 _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0 = float3(_Split_e1a3108496a4498a90ecae26cadb6773_R_1, _Split_e1a3108496a4498a90ecae26cadb6773_G_2, _Split_e1a3108496a4498a90ecae26cadb6773_B_3);
+            float3 _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
+            Unity_Lerp_float3(_CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0, (_Split_e1a3108496a4498a90ecae26cadb6773_A_4.xxx), _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3);
+            float _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1;
+            Unity_OneMinus_float(_Split_e1a3108496a4498a90ecae26cadb6773_A_4, _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1);
+            float3 _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
+            Unity_Multiply_float((_OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1.xxx), _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2);
+            Albedo_2 = _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
             NormalTS_3 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2;
-            Emission_4 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
+            Emission_4 = _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
             Smoothness_5 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             Specular_6 = _CrestFresnel_4c3e438e27705e81abe6c2e9d80cb8d7_LightReflected_2;
         }
@@ -13827,6 +13272,12 @@ Shader "Crest/Ocean"
             Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+            Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+            _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+            float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+            SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+            #endif
+            #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
             UnityTexture2D _Property_ed69e91d55e03b84ae7fbac077d064a2_Out_0 = UnityBuildTexture2DStructNoScale(_TextureFoam);
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
@@ -13989,7 +13440,7 @@ Shader "Crest/Ocean"
             float _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Specular_6;
             SG_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269(_Property_ed69e91d55e03b84ae7fbac077d064a2_Out_0, _Vector2_f718c342194d9681a8353dffab94c914_Out_0, _Property_3cae87de8c3ee68dbc17844c3dcf9b38_Out_0, _Property_40d540fea323e282b50dbd18a3f30961_Out_0, _Property_579351d7df64fb87a1015bf1af3c6284_Out_0, _Property_60a130cd0ae22b87bd550d702e3cba0d_Out_0, _Property_50c48dff0ca2e68ca040433e54669a52_Out_0, _Property_a8548996140f508fb82fa93ba713fcf6_Out_0, (_Property_3c48d5103e6f038b92326ba51788d2f9_Out_0.xyz), _Property_d12c758572627780a125a17e688e1028_Out_0, _Property_e1c4108777d76480a6cc4b979f41c2fd_Out_0, _CrestUnpackData_199a47309e956c8a84db3a13a8c7a1eb_PositionXZWSUndisp_2, _CrestUnpackData_199a47309e956c8a84db3a13a8c7a1eb_LodAlpha_1, _CrestUnpackData_199a47309e956c8a84db3a13a8c7a1eb_OceanDepth_3, _CrestUnpackData_199a47309e956c8a84db3a13a8c7a1eb_SeaLevelDerivatives_8, 0, _CrestUnpackData_199a47309e956c8a84db3a13a8c7a1eb_Shadow_5, _CrestUnpackData_199a47309e956c8a84db3a13a8c7a1eb_Flow_6, _CrestUnpackData_199a47309e956c8a84db3a13a8c7a1eb_SubSurfaceScattering_7, _Property_cc4fc24dbab3bb8e80a5fb00a1d7d1e2_Out_0, _Property_131e8eb4d0b1878fbda850ac79281666_Out_0, _Property_9666a388ba2f7186a41d554cb82f4433_Out_0, _Property_4647e2e4fcb387828891890ba88c8848_Out_0, _Property_2ab798d7cdeb8d8c86a160ef62853a3b_Out_0, _Property_4dc252551c973788973a44a6b29851e6_Out_0, _Property_1c191b24f0a11686926e172df7103764_Out_0, _Property_0801aa8238b779888459fcf832453b8f_Out_0, (_Property_01c9db1de628238b906a12c696b942e3_Out_0.xyz), _Property_a9f0ba26d3b6628da48ca92479408ee7_Out_0, _Property_98514b038b7caa80acb73e1695096798_Out_0, _Property_b35cdb1428ea3580b0720183e7cd9184_Out_0, _Property_cce012319834d98d9cac12e50d9ec0b5_Out_0, _Property_1c6b9dfa6bb322839801e11ce027c788_Out_0, _Property_9e9e6d94373e1a85a810fddbe6fc777e_Out_0, _Property_6ba39afa744ee280bb294e3a7e1b6ac3_Out_0, _Property_3c0670c6acfa578cb6545a153ceab0b5_Out_0, _Property_6ce09e6794298b8b8e26d9fdb3376861_Out_0, _CrestLightData_7508c730fdca6f8ea8c8303d19322b35_Direction_1, _CrestLightData_7508c730fdca6f8ea8c8303d19322b35_Intensity_2, _Property_ce2e932519619b8092d97e03d1f5bd5c_Out_0, _Property_1f4dc45446ed818bb238ceabc1c503b1_Out_0, _Property_ae8e3e687e75b685a43ba180ff48780a_Out_0, _Property_089af36b45c533839a8b285dcf778d10_Out_0, _Property_58917fc06f2f7d8eac9c4c60d62119e5_Out_0, _Property_e0227afe59db8c8387c672a28ca1d837_Out_0, _Property_e3062684974da486b4de29cdedcb639e_Out_0, _Property_49cb589b472b6f8db1fd8922d41549ec_Out_0, _Property_8799c0cfc0563f86b85c6fb61fd57f82_Out_0, _Property_a4bcc279e4bd7f828e14425ddbd0b62d_Out_0, 1, _Property_2441a391d0f55f85ac10e967783949cb_Out_0, _Property_2f17372a247bf981ba42b69ba2066e78_Out_0, _CrestOceanPixel_53a629a4551a828680fbb0226eff6089, _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Albedo_2, _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_NormalTS_3, _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Emission_4, _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5, _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Specular_6);
             #endif
-            surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+            surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
             surface.AlphaClipThreshold = 0;
             surface.NormalTS = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_NormalTS_3;
             surface.Smoothness = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5;
@@ -14476,6 +13927,9 @@ Shader "Crest/Ocean"
             #pragma shader_feature_local _ CREST_FOAM_ON
         #pragma shader_feature_local _ CREST_CAUSTICS_ON
         #pragma shader_feature_local _ CREST_FLOW_ON
+        #pragma shader_feature_local _ CREST_ALBEDO_ON
+        #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+        #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
         #define CREST_GENERATED_SHADER_ON 1
 
@@ -15314,7 +14768,7 @@ Shader "Crest/Ocean"
             Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
         }
 
-        // 26ddc131f09006478a3aa1683fa75e74
+        // 6445f72e0f3d2e176e54a9ffb10e1139
         #include "ShadergraphFramework/CrestNodeLightData.hlsl"
 
         struct Bindings_CrestLightData_b74b6e8c0b489314ca7aea3e2cc9c54c
@@ -15353,7 +14807,7 @@ Shader "Crest/Ocean"
             OutBoolean_1 = _Not_7fbe0c504ec6c2819b1994af01ce3988_Out_1;
         }
 
-        // 9b604afea48da2ac64cf6198354cf6ae
+        // a8e5480cb804440107f760ac5393ec2f
         #include "ShadergraphFramework/CrestNodeNormalMapping.hlsl"
 
         void Unity_NormalStrength_float(float3 In, float Strength, out float3 Out)
@@ -15366,7 +14820,7 @@ Shader "Crest/Ocean"
             float FaceSign;
         };
 
-        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3)
+        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3, out float4 Albedo_4)
         {
             float3 _Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0 = Vector3_FE793823;
             float3 _Property_b812768aa4903386b49ba84380e4fa74_Out_0 = Vector3_C8190B61;
@@ -15389,13 +14843,15 @@ Shader "Crest/Ocean"
             half3 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
-            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31);
+            half4 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
+            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33);
             float _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0 = Vector1_C6F526AD;
             float3 _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             Unity_NormalStrength_float(_OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0, _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2);
             Normal_1 = _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             SSS_2 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             Foam_3 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
+            Albedo_4 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
         }
 
         // b4726242738c84550b865a8cd3eafd6e
@@ -15423,7 +14879,7 @@ Shader "Crest/Ocean"
             LightReflected_2 = _CrestNodeApplyFresnelCustomFunction_4a16fb68ad2a518d870d2537aaf1e772_LightReflected_10;
         }
 
-        // 5abfc66ba136f74f6cf58eadabfa3bb1
+        // 0d37dbcf887de5687bdac5097fff713e
         #include "ShadergraphFramework/CrestNodeAmbientLight.hlsl"
 
         struct Bindings_CrestAmbientLight_a6ec89b3ca0ab4e98b300ec3ba0e6013
@@ -15498,10 +14954,10 @@ Shader "Crest/Ocean"
             Out_1 = _CrestNodeLinearEyeDepthCustomFunction_ee1cef135a8e558088e613593ae90486_LinearEyeDepth_1;
         }
 
-        // 3818fb4ea9ebd67663e831ef4a019758
+        // 2ca856c7634fa49c75d73b5ddc1b65ca
         #include "ShadergraphFramework/CrestNodeFoamBubbles.hlsl"
 
-        // 77b1d95beeaa53e1bbdfd7a6e8dd6fa0
+        // b3b317d9da04ee361966ef1a88eac53c
         #include "ShadergraphFramework/CrestNodeVolumeEmission.hlsl"
 
         void Unity_Add_float(float A, float B, out float Out)
@@ -15534,7 +14990,7 @@ Shader "Crest/Ocean"
             SubSurfaceScattering_9 = _CrestNodeSampleOceanDataSingleCustomFunction_a7f8891a8a8e5d8ab9c9a0c34c841749_SSS_17;
         }
 
-        // 60cb5e01e8bb25b4c10f8304dd8d25fd
+        // 1547d744048b76728bd6fc66db42da03
         #include "ShadergraphFramework/CrestNodeApplyCaustics.hlsl"
 
         void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
@@ -15685,93 +15141,7 @@ Shader "Crest/Ocean"
             Out = pow(A, B);
         }
 
-        void Unity_Modulo_float(float A, float B, out float Out)
-        {
-            Out = fmod(A, B);
-        }
-
-        void Unity_Comparison_Greater_float(float A, float B, out float Out)
-        {
-            Out = A > B ? 1 : 0;
-        }
-
-        void Unity_Subtract_float(float A, float B, out float Out)
-        {
-            Out = A - B;
-        }
-
-        void Unity_Branch_float(float Predicate, float True, float False, out float Out)
-        {
-            Out = Predicate ? True : False;
-        }
-
-        struct Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1
-        {
-        };
-
-        void SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(float2 Vector2_B562EFB1, float2 Vector2_83AA31A8, Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 IN, out float2 DisplacedA_1, out float WeightA_3, out float2 DisplacedB_2, out float WeightB_4)
-        {
-            float2 _Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0 = Vector2_83AA31A8;
-            float2 _Property_06123b8dbe81da80934c651a33d13699_Out_0 = Vector2_B562EFB1;
-            Bindings_CrestOceanGlobals_d50a85284893ec447a25a093505a2120 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2;
-            float3 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5;
-            SG_CrestOceanGlobals_d50a85284893ec447a25a093505a2120(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5);
-            float _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2;
-            Unity_Modulo_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2);
-            float2 _Multiply_58400b6ef0b30484913ce941659bac85_Out_2;
-            Unity_Multiply_float(_Property_06123b8dbe81da80934c651a33d13699_Out_0, (_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2.xx), _Multiply_58400b6ef0b30484913ce941659bac85_Out_2);
-            float2 _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            Unity_Subtract_float2(_Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0, _Multiply_58400b6ef0b30484913ce941659bac85_Out_2, _Subtract_22cf6b53c8344888987905efe87043db_Out_2);
-            float2 _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0 = Vector2_83AA31A8;
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            #else
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2;
-            Unity_Comparison_Greater_float(_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, 1, _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2);
-            float _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2;
-            Unity_Subtract_float(2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2);
-            float _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            Unity_Branch_float(_Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            #else
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = 0;
-            #endif
-            float2 _Property_bafd78310cede58a971e08fade5e87ee_Out_0 = Vector2_83AA31A8;
-            float2 _Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0 = Vector2_B562EFB1;
-            float _Add_26a0d41d20a2618d858f292701338a2a_Out_2;
-            Unity_Add_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 1, _Add_26a0d41d20a2618d858f292701338a2a_Out_2);
-            float _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2;
-            Unity_Modulo_float(_Add_26a0d41d20a2618d858f292701338a2a_Out_2, 2, _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2);
-            float2 _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2;
-            Unity_Multiply_float(_Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0, (_Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2.xx), _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2);
-            float2 _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            Unity_Subtract_float2(_Property_bafd78310cede58a971e08fade5e87ee_Out_0, _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2, _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            #else
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            Unity_Subtract_float(1, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3, _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            #else
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = 0;
-            #endif
-            DisplacedA_1 = _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0;
-            WeightA_3 = _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0;
-            DisplacedB_2 = _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0;
-            WeightB_4 = _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0;
-        }
-
-        // 06deca910ff1e1ed1b9ea7fb3513233e
+        // 498816f585b40f3ecd7ee304230793a2
         #include "ShadergraphFramework/CrestNodeFoam.hlsl"
 
         struct Bindings_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963
@@ -15792,132 +15162,49 @@ Shader "Crest/Ocean"
             float4 _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0 = Vector4_FD283A50;
             float _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0 = Vector1_D6DA4100;
             float _Property_76afb5461ed7c284b6afcbd15025248a_Out_0 = Vector1_13F2A8C8;
-            float2 _Property_20259e8cfd2c2b8288897462f0776174_Out_0 = Vector2_5AD72ED;
-            float2 _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0 = Vector2_28A2C5B9;
-            Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 _CrestFlow_a6f6f004811f6c82be002c7059e670a1;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4;
-            SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(_Property_20259e8cfd2c2b8288897462f0776174_Out_0, _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4);
+            float2 _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0 = Vector2_28A2C5B9;
             float _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0 = Vector1_D80F067A;
             float3 _Property_b2962080c0284b83821815b7263043dc_Out_0 = Vector3_3AD012AA;
             float3 _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0 = Vector3_E4AC4432;
             float _Property_4807b4a03c922b87b201864991b317da_Out_0 = Vector1_3E452608;
+            float2 _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0 = Vector2_5AD72ED;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             half _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
-            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
+            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             #else
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = float3(0, 0, 0);
             #endif
-            float3 _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2;
-            Unity_Multiply_float(_FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2);
-            UnityTexture2D _Property_d34fb0a0645e3e8791a5239873296357_Out_0 = Texture2D_D9E7A343;
-            float2 _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0 = Vector2_C4E9ED58;
-            float _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0 = Vector1_7492C815;
-            float _Property_54ef09feb545b581b0fc27170fef10e2_Out_0 = Vector1_33DC93D;
-            float _Property_7ae039043909cb8eb133acd421012651_Out_0 = Vector1_3439FC0A;
-            float _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0 = Vector1_FB133018;
-            float _Property_fe249f016d4b128ca8400f412655cc5e_Out_0 = Vector1_7CFAFAC1;
-            float _Property_08e0e443debd6186acd988fc67faf954_Out_0 = Vector1_53F45327;
-            float4 _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0 = Vector4_2FA9AEA5;
-            float4 _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0 = Vector4_FD283A50;
-            float _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0 = Vector1_D6DA4100;
-            float _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0 = Vector1_13F2A8C8;
-            float _Property_985518c2ff59e781828129193b83e9fd_Out_0 = Vector1_D80F067A;
-            float3 _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0 = Vector3_3AD012AA;
-            float3 _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0 = Vector3_E4AC4432;
-            float _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0 = Vector1_3E452608;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            half _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            CrestNodeFoam_half(_Property_d34fb0a0645e3e8791a5239873296357_Out_0.tex, _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0, _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0, _Property_54ef09feb545b581b0fc27170fef10e2_Out_0, _Property_7ae039043909cb8eb133acd421012651_Out_0, _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0, _Property_fe249f016d4b128ca8400f412655cc5e_Out_0, _Property_08e0e443debd6186acd988fc67faf954_Out_0, _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0, _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0, _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0, _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _Property_985518c2ff59e781828129193b83e9fd_Out_0, _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0, _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0, _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            #else
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = float3(0, 0, 0);
-            #endif
-            float3 _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2);
-            float3 _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            Unity_Add_float3(_Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2, _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            #else
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
-            #endif
+            float3 _Property_a8190300d5ba483d9365211d7f71abea_Out_0 = Vector3_3AD012AA;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             #else
-            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_b2962080c0284b83821815b7263043dc_Out_0;
+            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_a8190300d5ba483d9365211d7f71abea_Out_0;
             #endif
-            float3 _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2;
-            Unity_Multiply_float(_FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            #else
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0;
-            #endif
-            float3 _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2);
-            float3 _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            Unity_Add_float3(_Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2, _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            #else
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
-            #endif
+            float3 _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0 = Vector3_E4AC4432;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             #else
-            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0;
+            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0;
             #endif
-            float3 _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2;
-            Unity_Multiply_float(_FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            #else
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0;
-            #endif
-            float3 _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2);
-            float3 _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            Unity_Add_float3(_Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2, _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            #else
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
-            #endif
+            float _Property_e0841d7fa2234ff199a94402710821f1_Out_0 = Vector1_3E452608;
             #if defined(CREST_FOAM_ON)
             float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
             #else
-            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_4807b4a03c922b87b201864991b317da_Out_0;
+            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_e0841d7fa2234ff199a94402710821f1_Out_0;
             #endif
-            float _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2;
-            Unity_Multiply_float(_FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            #else
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0;
-            #endif
-            float _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2;
-            Unity_Multiply_float(_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4, _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2);
-            float _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            Unity_Add_float(_Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2, _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            #else
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
-            #endif
-            Albedo_1 = _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0;
-            NormalTS_2 = _FLOW_fad25d47eec395899aad2bf77264462c_Out_0;
-            Emission_3 = _FLOW_02e1cbd391446082893e73b8088ff765_Out_0;
-            Smoothness_4 = _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0;
+            Albedo_1 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
+            NormalTS_2 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
+            Emission_3 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
+            Smoothness_4 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
+        }
+
+        void Unity_OneMinus_float(float In, out float Out)
+        {
+            Out = 1 - In;
         }
 
         struct Bindings_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269
@@ -15965,7 +15252,8 @@ Shader "Crest/Ocean"
             float3 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3;
-            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3);
+            float4 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4;
+            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4);
             float _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0 = Vector1_B01E1A6A;
             float2 _Property_a28ec0be576d4586a46337955b069868_Out_0 = Vector2_9C73A0C6;
             Bindings_CrestIsUnderwater_52f7750f15e114937b54a0fd27f0d2f2 _CrestIsUnderwater_de15825b4853aa85a98b48656eaa15f1;
@@ -16098,11 +15386,27 @@ Shader "Crest/Ocean"
             float3 _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
             float _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             SG_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963(_Property_f78369cae749d18392b19bad30a74e2d_Out_0, _Property_169d4581a8319383a7f62a3435e9b11d_Out_0, _Property_0bdc44463eba328a8c73245f2cf82911_Out_0, _Property_74ea32320c303583ae393e1d0afe7d13_Out_0, _Property_b16935e33ecd688caba81b8b02f388e3_Out_0, _Property_519c0dea6b39f688b95e7c8c336ca9fb_Out_0, _Property_e7473f6e9b7b0f8c8615d7497ee5c4a0_Out_0, _Property_d073850e48b8c485ad0ab20154ed80e8_Out_0, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0, _Property_a28ec0be576d4586a46337955b069868_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _Branch_3776301df9f8888faaee9638ee7f568d_Out_3, _Lerp_d393d46d7b4755838d788bf6a655c1cd_Out_3, _Negate_43b5c19855641787873c549e72cb1032_Out_1, _Property_0f7251ac80636d8eb279b11917792d24_Out_0, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4);
-            Albedo_2 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1;
+            float _Split_e1a3108496a4498a90ecae26cadb6773_R_1 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[0];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_G_2 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[1];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_B_3 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[2];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_A_4 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[3];
+            float3 _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0 = float3(_Split_e1a3108496a4498a90ecae26cadb6773_R_1, _Split_e1a3108496a4498a90ecae26cadb6773_G_2, _Split_e1a3108496a4498a90ecae26cadb6773_B_3);
+            float3 _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
+            Unity_Lerp_float3(_CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0, (_Split_e1a3108496a4498a90ecae26cadb6773_A_4.xxx), _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3);
+            float _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1;
+            Unity_OneMinus_float(_Split_e1a3108496a4498a90ecae26cadb6773_A_4, _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1);
+            float3 _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
+            Unity_Multiply_float((_OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1.xxx), _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2);
+            Albedo_2 = _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
             NormalTS_3 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2;
-            Emission_4 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
+            Emission_4 = _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
             Smoothness_5 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             Specular_6 = _CrestFresnel_4c3e438e27705e81abe6c2e9d80cb8d7_LightReflected_2;
+        }
+
+        void Unity_Subtract_float(float A, float B, out float Out)
+        {
+            Out = A - B;
         }
 
         void Unity_Remap_float(float In, float2 InMinMax, float2 OutMinMax, out float Out)
@@ -16110,7 +15414,7 @@ Shader "Crest/Ocean"
             Out = OutMinMax.x + (In - InMinMax.x) * (OutMinMax.y - OutMinMax.x) / (InMinMax.y - InMinMax.x);
         }
 
-        // 3580e24b878bbe7a9a98325dcc0474c2
+        // c46fd3ffae69bfdf4a7b13505ef3963f
         #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
         struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -16161,6 +15465,30 @@ Shader "Crest/Ocean"
         {
             Out = min(A, B);
         };
+
+        // c4826bd69adcf43b74845160a7d6f249
+        #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+        struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+        {
+            float4 ScreenPosition;
+        };
+
+        void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+        {
+            float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+            float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+            float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+            float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+            Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+            float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+            CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+            Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+        }
 
         // a2b98fadb38e4458b014d449a26401de
         #include "ShadergraphFramework/CrestNodeOcclusion.hlsl"
@@ -16557,6 +15885,12 @@ Shader "Crest/Ocean"
             Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+            Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+            _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+            float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+            SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+            #endif
+            #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
             float _Property_606fa02468b6f8849164940fdce04188_Out_0 = _Occlusion;
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
@@ -16574,7 +15908,7 @@ Shader "Crest/Ocean"
             #endif
             surface.BaseColor = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Albedo_2;
             surface.Emission = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Emission_4;
-            surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+            surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
             surface.AlphaClipThreshold = 0;
             surface.BentNormal = IN.TangentSpaceNormal;
             surface.Smoothness = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5;
@@ -17087,6 +16421,9 @@ Shader "Crest/Ocean"
             #pragma shader_feature_local _ CREST_FOAM_ON
         #pragma shader_feature_local _ CREST_CAUSTICS_ON
         #pragma shader_feature_local _ CREST_FLOW_ON
+        #pragma shader_feature_local _ CREST_ALBEDO_ON
+        #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+        #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
         #define CREST_GENERATED_SHADER_ON 1
 
@@ -17967,7 +17304,7 @@ Shader "Crest/Ocean"
             Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
         }
 
-        // 26ddc131f09006478a3aa1683fa75e74
+        // 6445f72e0f3d2e176e54a9ffb10e1139
         #include "ShadergraphFramework/CrestNodeLightData.hlsl"
 
         struct Bindings_CrestLightData_b74b6e8c0b489314ca7aea3e2cc9c54c
@@ -18006,7 +17343,7 @@ Shader "Crest/Ocean"
             OutBoolean_1 = _Not_7fbe0c504ec6c2819b1994af01ce3988_Out_1;
         }
 
-        // 9b604afea48da2ac64cf6198354cf6ae
+        // a8e5480cb804440107f760ac5393ec2f
         #include "ShadergraphFramework/CrestNodeNormalMapping.hlsl"
 
         void Unity_NormalStrength_float(float3 In, float Strength, out float3 Out)
@@ -18019,7 +17356,7 @@ Shader "Crest/Ocean"
             float FaceSign;
         };
 
-        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3)
+        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3, out float4 Albedo_4)
         {
             float3 _Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0 = Vector3_FE793823;
             float3 _Property_b812768aa4903386b49ba84380e4fa74_Out_0 = Vector3_C8190B61;
@@ -18042,13 +17379,15 @@ Shader "Crest/Ocean"
             half3 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
-            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31);
+            half4 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
+            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33);
             float _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0 = Vector1_C6F526AD;
             float3 _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             Unity_NormalStrength_float(_OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0, _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2);
             Normal_1 = _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             SSS_2 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             Foam_3 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
+            Albedo_4 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
         }
 
         // b4726242738c84550b865a8cd3eafd6e
@@ -18076,7 +17415,7 @@ Shader "Crest/Ocean"
             LightReflected_2 = _CrestNodeApplyFresnelCustomFunction_4a16fb68ad2a518d870d2537aaf1e772_LightReflected_10;
         }
 
-        // 5abfc66ba136f74f6cf58eadabfa3bb1
+        // 0d37dbcf887de5687bdac5097fff713e
         #include "ShadergraphFramework/CrestNodeAmbientLight.hlsl"
 
         struct Bindings_CrestAmbientLight_a6ec89b3ca0ab4e98b300ec3ba0e6013
@@ -18151,10 +17490,10 @@ Shader "Crest/Ocean"
             Out_1 = _CrestNodeLinearEyeDepthCustomFunction_ee1cef135a8e558088e613593ae90486_LinearEyeDepth_1;
         }
 
-        // 3818fb4ea9ebd67663e831ef4a019758
+        // 2ca856c7634fa49c75d73b5ddc1b65ca
         #include "ShadergraphFramework/CrestNodeFoamBubbles.hlsl"
 
-        // 77b1d95beeaa53e1bbdfd7a6e8dd6fa0
+        // b3b317d9da04ee361966ef1a88eac53c
         #include "ShadergraphFramework/CrestNodeVolumeEmission.hlsl"
 
         void Unity_Add_float(float A, float B, out float Out)
@@ -18187,7 +17526,7 @@ Shader "Crest/Ocean"
             SubSurfaceScattering_9 = _CrestNodeSampleOceanDataSingleCustomFunction_a7f8891a8a8e5d8ab9c9a0c34c841749_SSS_17;
         }
 
-        // 60cb5e01e8bb25b4c10f8304dd8d25fd
+        // 1547d744048b76728bd6fc66db42da03
         #include "ShadergraphFramework/CrestNodeApplyCaustics.hlsl"
 
         void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
@@ -18338,93 +17677,7 @@ Shader "Crest/Ocean"
             Out = pow(A, B);
         }
 
-        void Unity_Modulo_float(float A, float B, out float Out)
-        {
-            Out = fmod(A, B);
-        }
-
-        void Unity_Comparison_Greater_float(float A, float B, out float Out)
-        {
-            Out = A > B ? 1 : 0;
-        }
-
-        void Unity_Subtract_float(float A, float B, out float Out)
-        {
-            Out = A - B;
-        }
-
-        void Unity_Branch_float(float Predicate, float True, float False, out float Out)
-        {
-            Out = Predicate ? True : False;
-        }
-
-        struct Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1
-        {
-        };
-
-        void SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(float2 Vector2_B562EFB1, float2 Vector2_83AA31A8, Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 IN, out float2 DisplacedA_1, out float WeightA_3, out float2 DisplacedB_2, out float WeightB_4)
-        {
-            float2 _Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0 = Vector2_83AA31A8;
-            float2 _Property_06123b8dbe81da80934c651a33d13699_Out_0 = Vector2_B562EFB1;
-            Bindings_CrestOceanGlobals_d50a85284893ec447a25a093505a2120 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2;
-            float3 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5;
-            SG_CrestOceanGlobals_d50a85284893ec447a25a093505a2120(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5);
-            float _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2;
-            Unity_Modulo_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2);
-            float2 _Multiply_58400b6ef0b30484913ce941659bac85_Out_2;
-            Unity_Multiply_float(_Property_06123b8dbe81da80934c651a33d13699_Out_0, (_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2.xx), _Multiply_58400b6ef0b30484913ce941659bac85_Out_2);
-            float2 _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            Unity_Subtract_float2(_Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0, _Multiply_58400b6ef0b30484913ce941659bac85_Out_2, _Subtract_22cf6b53c8344888987905efe87043db_Out_2);
-            float2 _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0 = Vector2_83AA31A8;
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            #else
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2;
-            Unity_Comparison_Greater_float(_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, 1, _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2);
-            float _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2;
-            Unity_Subtract_float(2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2);
-            float _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            Unity_Branch_float(_Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            #else
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = 0;
-            #endif
-            float2 _Property_bafd78310cede58a971e08fade5e87ee_Out_0 = Vector2_83AA31A8;
-            float2 _Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0 = Vector2_B562EFB1;
-            float _Add_26a0d41d20a2618d858f292701338a2a_Out_2;
-            Unity_Add_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 1, _Add_26a0d41d20a2618d858f292701338a2a_Out_2);
-            float _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2;
-            Unity_Modulo_float(_Add_26a0d41d20a2618d858f292701338a2a_Out_2, 2, _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2);
-            float2 _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2;
-            Unity_Multiply_float(_Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0, (_Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2.xx), _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2);
-            float2 _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            Unity_Subtract_float2(_Property_bafd78310cede58a971e08fade5e87ee_Out_0, _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2, _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            #else
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            Unity_Subtract_float(1, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3, _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            #else
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = 0;
-            #endif
-            DisplacedA_1 = _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0;
-            WeightA_3 = _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0;
-            DisplacedB_2 = _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0;
-            WeightB_4 = _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0;
-        }
-
-        // 06deca910ff1e1ed1b9ea7fb3513233e
+        // 498816f585b40f3ecd7ee304230793a2
         #include "ShadergraphFramework/CrestNodeFoam.hlsl"
 
         struct Bindings_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963
@@ -18445,132 +17698,49 @@ Shader "Crest/Ocean"
             float4 _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0 = Vector4_FD283A50;
             float _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0 = Vector1_D6DA4100;
             float _Property_76afb5461ed7c284b6afcbd15025248a_Out_0 = Vector1_13F2A8C8;
-            float2 _Property_20259e8cfd2c2b8288897462f0776174_Out_0 = Vector2_5AD72ED;
-            float2 _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0 = Vector2_28A2C5B9;
-            Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 _CrestFlow_a6f6f004811f6c82be002c7059e670a1;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4;
-            SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(_Property_20259e8cfd2c2b8288897462f0776174_Out_0, _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4);
+            float2 _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0 = Vector2_28A2C5B9;
             float _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0 = Vector1_D80F067A;
             float3 _Property_b2962080c0284b83821815b7263043dc_Out_0 = Vector3_3AD012AA;
             float3 _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0 = Vector3_E4AC4432;
             float _Property_4807b4a03c922b87b201864991b317da_Out_0 = Vector1_3E452608;
+            float2 _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0 = Vector2_5AD72ED;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             half _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
-            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
+            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             #else
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = float3(0, 0, 0);
             #endif
-            float3 _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2;
-            Unity_Multiply_float(_FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2);
-            UnityTexture2D _Property_d34fb0a0645e3e8791a5239873296357_Out_0 = Texture2D_D9E7A343;
-            float2 _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0 = Vector2_C4E9ED58;
-            float _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0 = Vector1_7492C815;
-            float _Property_54ef09feb545b581b0fc27170fef10e2_Out_0 = Vector1_33DC93D;
-            float _Property_7ae039043909cb8eb133acd421012651_Out_0 = Vector1_3439FC0A;
-            float _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0 = Vector1_FB133018;
-            float _Property_fe249f016d4b128ca8400f412655cc5e_Out_0 = Vector1_7CFAFAC1;
-            float _Property_08e0e443debd6186acd988fc67faf954_Out_0 = Vector1_53F45327;
-            float4 _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0 = Vector4_2FA9AEA5;
-            float4 _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0 = Vector4_FD283A50;
-            float _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0 = Vector1_D6DA4100;
-            float _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0 = Vector1_13F2A8C8;
-            float _Property_985518c2ff59e781828129193b83e9fd_Out_0 = Vector1_D80F067A;
-            float3 _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0 = Vector3_3AD012AA;
-            float3 _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0 = Vector3_E4AC4432;
-            float _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0 = Vector1_3E452608;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            half _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            CrestNodeFoam_half(_Property_d34fb0a0645e3e8791a5239873296357_Out_0.tex, _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0, _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0, _Property_54ef09feb545b581b0fc27170fef10e2_Out_0, _Property_7ae039043909cb8eb133acd421012651_Out_0, _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0, _Property_fe249f016d4b128ca8400f412655cc5e_Out_0, _Property_08e0e443debd6186acd988fc67faf954_Out_0, _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0, _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0, _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0, _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _Property_985518c2ff59e781828129193b83e9fd_Out_0, _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0, _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0, _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            #else
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = float3(0, 0, 0);
-            #endif
-            float3 _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2);
-            float3 _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            Unity_Add_float3(_Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2, _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            #else
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
-            #endif
+            float3 _Property_a8190300d5ba483d9365211d7f71abea_Out_0 = Vector3_3AD012AA;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             #else
-            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_b2962080c0284b83821815b7263043dc_Out_0;
+            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_a8190300d5ba483d9365211d7f71abea_Out_0;
             #endif
-            float3 _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2;
-            Unity_Multiply_float(_FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            #else
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0;
-            #endif
-            float3 _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2);
-            float3 _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            Unity_Add_float3(_Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2, _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            #else
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
-            #endif
+            float3 _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0 = Vector3_E4AC4432;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             #else
-            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0;
+            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0;
             #endif
-            float3 _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2;
-            Unity_Multiply_float(_FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            #else
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0;
-            #endif
-            float3 _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2);
-            float3 _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            Unity_Add_float3(_Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2, _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            #else
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
-            #endif
+            float _Property_e0841d7fa2234ff199a94402710821f1_Out_0 = Vector1_3E452608;
             #if defined(CREST_FOAM_ON)
             float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
             #else
-            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_4807b4a03c922b87b201864991b317da_Out_0;
+            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_e0841d7fa2234ff199a94402710821f1_Out_0;
             #endif
-            float _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2;
-            Unity_Multiply_float(_FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            #else
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0;
-            #endif
-            float _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2;
-            Unity_Multiply_float(_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4, _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2);
-            float _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            Unity_Add_float(_Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2, _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            #else
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
-            #endif
-            Albedo_1 = _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0;
-            NormalTS_2 = _FLOW_fad25d47eec395899aad2bf77264462c_Out_0;
-            Emission_3 = _FLOW_02e1cbd391446082893e73b8088ff765_Out_0;
-            Smoothness_4 = _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0;
+            Albedo_1 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
+            NormalTS_2 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
+            Emission_3 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
+            Smoothness_4 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
+        }
+
+        void Unity_OneMinus_float(float In, out float Out)
+        {
+            Out = 1 - In;
         }
 
         struct Bindings_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269
@@ -18618,7 +17788,8 @@ Shader "Crest/Ocean"
             float3 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3;
-            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3);
+            float4 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4;
+            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4);
             float _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0 = Vector1_B01E1A6A;
             float2 _Property_a28ec0be576d4586a46337955b069868_Out_0 = Vector2_9C73A0C6;
             Bindings_CrestIsUnderwater_52f7750f15e114937b54a0fd27f0d2f2 _CrestIsUnderwater_de15825b4853aa85a98b48656eaa15f1;
@@ -18751,11 +17922,27 @@ Shader "Crest/Ocean"
             float3 _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
             float _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             SG_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963(_Property_f78369cae749d18392b19bad30a74e2d_Out_0, _Property_169d4581a8319383a7f62a3435e9b11d_Out_0, _Property_0bdc44463eba328a8c73245f2cf82911_Out_0, _Property_74ea32320c303583ae393e1d0afe7d13_Out_0, _Property_b16935e33ecd688caba81b8b02f388e3_Out_0, _Property_519c0dea6b39f688b95e7c8c336ca9fb_Out_0, _Property_e7473f6e9b7b0f8c8615d7497ee5c4a0_Out_0, _Property_d073850e48b8c485ad0ab20154ed80e8_Out_0, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0, _Property_a28ec0be576d4586a46337955b069868_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _Branch_3776301df9f8888faaee9638ee7f568d_Out_3, _Lerp_d393d46d7b4755838d788bf6a655c1cd_Out_3, _Negate_43b5c19855641787873c549e72cb1032_Out_1, _Property_0f7251ac80636d8eb279b11917792d24_Out_0, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4);
-            Albedo_2 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1;
+            float _Split_e1a3108496a4498a90ecae26cadb6773_R_1 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[0];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_G_2 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[1];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_B_3 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[2];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_A_4 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[3];
+            float3 _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0 = float3(_Split_e1a3108496a4498a90ecae26cadb6773_R_1, _Split_e1a3108496a4498a90ecae26cadb6773_G_2, _Split_e1a3108496a4498a90ecae26cadb6773_B_3);
+            float3 _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
+            Unity_Lerp_float3(_CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0, (_Split_e1a3108496a4498a90ecae26cadb6773_A_4.xxx), _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3);
+            float _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1;
+            Unity_OneMinus_float(_Split_e1a3108496a4498a90ecae26cadb6773_A_4, _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1);
+            float3 _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
+            Unity_Multiply_float((_OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1.xxx), _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2);
+            Albedo_2 = _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
             NormalTS_3 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2;
-            Emission_4 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
+            Emission_4 = _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
             Smoothness_5 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             Specular_6 = _CrestFresnel_4c3e438e27705e81abe6c2e9d80cb8d7_LightReflected_2;
+        }
+
+        void Unity_Subtract_float(float A, float B, out float Out)
+        {
+            Out = A - B;
         }
 
         void Unity_Remap_float(float In, float2 InMinMax, float2 OutMinMax, out float Out)
@@ -18763,7 +17950,7 @@ Shader "Crest/Ocean"
             Out = OutMinMax.x + (In - InMinMax.x) * (OutMinMax.y - OutMinMax.x) / (InMinMax.y - InMinMax.x);
         }
 
-        // 3580e24b878bbe7a9a98325dcc0474c2
+        // c46fd3ffae69bfdf4a7b13505ef3963f
         #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
         struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -18814,6 +18001,30 @@ Shader "Crest/Ocean"
         {
             Out = min(A, B);
         };
+
+        // c4826bd69adcf43b74845160a7d6f249
+        #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+        struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+        {
+            float4 ScreenPosition;
+        };
+
+        void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+        {
+            float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+            float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+            float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+            float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+            Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+            float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+            CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+            Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+        }
 
         // a2b98fadb38e4458b014d449a26401de
         #include "ShadergraphFramework/CrestNodeOcclusion.hlsl"
@@ -19210,6 +18421,12 @@ Shader "Crest/Ocean"
             Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+            Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+            _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+            float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+            SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+            #endif
+            #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
             float _Property_606fa02468b6f8849164940fdce04188_Out_0 = _Occlusion;
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
@@ -19227,7 +18444,7 @@ Shader "Crest/Ocean"
             #endif
             surface.BaseColor = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Albedo_2;
             surface.Emission = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Emission_4;
-            surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+            surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
             surface.AlphaClipThreshold = 0;
             surface.BentNormal = IN.TangentSpaceNormal;
             surface.Smoothness = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5;
@@ -19751,6 +18968,9 @@ Shader "Crest/Ocean"
             #pragma shader_feature_local _ CREST_FOAM_ON
         #pragma shader_feature_local _ CREST_CAUSTICS_ON
         #pragma shader_feature_local _ CREST_FLOW_ON
+        #pragma shader_feature_local _ CREST_ALBEDO_ON
+        #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+        #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
         #define CREST_GENERATED_SHADER_ON 1
 
@@ -20612,7 +19832,7 @@ Shader "Crest/Ocean"
             Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
         }
 
-        // 26ddc131f09006478a3aa1683fa75e74
+        // 6445f72e0f3d2e176e54a9ffb10e1139
         #include "ShadergraphFramework/CrestNodeLightData.hlsl"
 
         struct Bindings_CrestLightData_b74b6e8c0b489314ca7aea3e2cc9c54c
@@ -20651,7 +19871,7 @@ Shader "Crest/Ocean"
             OutBoolean_1 = _Not_7fbe0c504ec6c2819b1994af01ce3988_Out_1;
         }
 
-        // 9b604afea48da2ac64cf6198354cf6ae
+        // a8e5480cb804440107f760ac5393ec2f
         #include "ShadergraphFramework/CrestNodeNormalMapping.hlsl"
 
         void Unity_NormalStrength_float(float3 In, float Strength, out float3 Out)
@@ -20664,7 +19884,7 @@ Shader "Crest/Ocean"
             float FaceSign;
         };
 
-        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3)
+        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3, out float4 Albedo_4)
         {
             float3 _Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0 = Vector3_FE793823;
             float3 _Property_b812768aa4903386b49ba84380e4fa74_Out_0 = Vector3_C8190B61;
@@ -20687,13 +19907,15 @@ Shader "Crest/Ocean"
             half3 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
-            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31);
+            half4 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
+            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33);
             float _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0 = Vector1_C6F526AD;
             float3 _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             Unity_NormalStrength_float(_OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0, _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2);
             Normal_1 = _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             SSS_2 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             Foam_3 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
+            Albedo_4 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
         }
 
         // b4726242738c84550b865a8cd3eafd6e
@@ -20721,7 +19943,7 @@ Shader "Crest/Ocean"
             LightReflected_2 = _CrestNodeApplyFresnelCustomFunction_4a16fb68ad2a518d870d2537aaf1e772_LightReflected_10;
         }
 
-        // 5abfc66ba136f74f6cf58eadabfa3bb1
+        // 0d37dbcf887de5687bdac5097fff713e
         #include "ShadergraphFramework/CrestNodeAmbientLight.hlsl"
 
         struct Bindings_CrestAmbientLight_a6ec89b3ca0ab4e98b300ec3ba0e6013
@@ -20796,10 +20018,10 @@ Shader "Crest/Ocean"
             Out_1 = _CrestNodeLinearEyeDepthCustomFunction_ee1cef135a8e558088e613593ae90486_LinearEyeDepth_1;
         }
 
-        // 3818fb4ea9ebd67663e831ef4a019758
+        // 2ca856c7634fa49c75d73b5ddc1b65ca
         #include "ShadergraphFramework/CrestNodeFoamBubbles.hlsl"
 
-        // 77b1d95beeaa53e1bbdfd7a6e8dd6fa0
+        // b3b317d9da04ee361966ef1a88eac53c
         #include "ShadergraphFramework/CrestNodeVolumeEmission.hlsl"
 
         void Unity_Add_float(float A, float B, out float Out)
@@ -20832,7 +20054,7 @@ Shader "Crest/Ocean"
             SubSurfaceScattering_9 = _CrestNodeSampleOceanDataSingleCustomFunction_a7f8891a8a8e5d8ab9c9a0c34c841749_SSS_17;
         }
 
-        // 60cb5e01e8bb25b4c10f8304dd8d25fd
+        // 1547d744048b76728bd6fc66db42da03
         #include "ShadergraphFramework/CrestNodeApplyCaustics.hlsl"
 
         void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
@@ -20983,93 +20205,7 @@ Shader "Crest/Ocean"
             Out = pow(A, B);
         }
 
-        void Unity_Modulo_float(float A, float B, out float Out)
-        {
-            Out = fmod(A, B);
-        }
-
-        void Unity_Comparison_Greater_float(float A, float B, out float Out)
-        {
-            Out = A > B ? 1 : 0;
-        }
-
-        void Unity_Subtract_float(float A, float B, out float Out)
-        {
-            Out = A - B;
-        }
-
-        void Unity_Branch_float(float Predicate, float True, float False, out float Out)
-        {
-            Out = Predicate ? True : False;
-        }
-
-        struct Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1
-        {
-        };
-
-        void SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(float2 Vector2_B562EFB1, float2 Vector2_83AA31A8, Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 IN, out float2 DisplacedA_1, out float WeightA_3, out float2 DisplacedB_2, out float WeightB_4)
-        {
-            float2 _Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0 = Vector2_83AA31A8;
-            float2 _Property_06123b8dbe81da80934c651a33d13699_Out_0 = Vector2_B562EFB1;
-            Bindings_CrestOceanGlobals_d50a85284893ec447a25a093505a2120 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2;
-            float3 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5;
-            SG_CrestOceanGlobals_d50a85284893ec447a25a093505a2120(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5);
-            float _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2;
-            Unity_Modulo_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2);
-            float2 _Multiply_58400b6ef0b30484913ce941659bac85_Out_2;
-            Unity_Multiply_float(_Property_06123b8dbe81da80934c651a33d13699_Out_0, (_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2.xx), _Multiply_58400b6ef0b30484913ce941659bac85_Out_2);
-            float2 _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            Unity_Subtract_float2(_Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0, _Multiply_58400b6ef0b30484913ce941659bac85_Out_2, _Subtract_22cf6b53c8344888987905efe87043db_Out_2);
-            float2 _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0 = Vector2_83AA31A8;
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            #else
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2;
-            Unity_Comparison_Greater_float(_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, 1, _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2);
-            float _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2;
-            Unity_Subtract_float(2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2);
-            float _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            Unity_Branch_float(_Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            #else
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = 0;
-            #endif
-            float2 _Property_bafd78310cede58a971e08fade5e87ee_Out_0 = Vector2_83AA31A8;
-            float2 _Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0 = Vector2_B562EFB1;
-            float _Add_26a0d41d20a2618d858f292701338a2a_Out_2;
-            Unity_Add_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 1, _Add_26a0d41d20a2618d858f292701338a2a_Out_2);
-            float _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2;
-            Unity_Modulo_float(_Add_26a0d41d20a2618d858f292701338a2a_Out_2, 2, _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2);
-            float2 _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2;
-            Unity_Multiply_float(_Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0, (_Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2.xx), _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2);
-            float2 _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            Unity_Subtract_float2(_Property_bafd78310cede58a971e08fade5e87ee_Out_0, _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2, _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            #else
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            Unity_Subtract_float(1, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3, _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            #else
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = 0;
-            #endif
-            DisplacedA_1 = _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0;
-            WeightA_3 = _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0;
-            DisplacedB_2 = _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0;
-            WeightB_4 = _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0;
-        }
-
-        // 06deca910ff1e1ed1b9ea7fb3513233e
+        // 498816f585b40f3ecd7ee304230793a2
         #include "ShadergraphFramework/CrestNodeFoam.hlsl"
 
         struct Bindings_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963
@@ -21090,132 +20226,49 @@ Shader "Crest/Ocean"
             float4 _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0 = Vector4_FD283A50;
             float _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0 = Vector1_D6DA4100;
             float _Property_76afb5461ed7c284b6afcbd15025248a_Out_0 = Vector1_13F2A8C8;
-            float2 _Property_20259e8cfd2c2b8288897462f0776174_Out_0 = Vector2_5AD72ED;
-            float2 _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0 = Vector2_28A2C5B9;
-            Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 _CrestFlow_a6f6f004811f6c82be002c7059e670a1;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4;
-            SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(_Property_20259e8cfd2c2b8288897462f0776174_Out_0, _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4);
+            float2 _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0 = Vector2_28A2C5B9;
             float _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0 = Vector1_D80F067A;
             float3 _Property_b2962080c0284b83821815b7263043dc_Out_0 = Vector3_3AD012AA;
             float3 _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0 = Vector3_E4AC4432;
             float _Property_4807b4a03c922b87b201864991b317da_Out_0 = Vector1_3E452608;
+            float2 _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0 = Vector2_5AD72ED;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             half _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
-            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
+            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             #else
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = float3(0, 0, 0);
             #endif
-            float3 _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2;
-            Unity_Multiply_float(_FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2);
-            UnityTexture2D _Property_d34fb0a0645e3e8791a5239873296357_Out_0 = Texture2D_D9E7A343;
-            float2 _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0 = Vector2_C4E9ED58;
-            float _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0 = Vector1_7492C815;
-            float _Property_54ef09feb545b581b0fc27170fef10e2_Out_0 = Vector1_33DC93D;
-            float _Property_7ae039043909cb8eb133acd421012651_Out_0 = Vector1_3439FC0A;
-            float _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0 = Vector1_FB133018;
-            float _Property_fe249f016d4b128ca8400f412655cc5e_Out_0 = Vector1_7CFAFAC1;
-            float _Property_08e0e443debd6186acd988fc67faf954_Out_0 = Vector1_53F45327;
-            float4 _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0 = Vector4_2FA9AEA5;
-            float4 _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0 = Vector4_FD283A50;
-            float _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0 = Vector1_D6DA4100;
-            float _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0 = Vector1_13F2A8C8;
-            float _Property_985518c2ff59e781828129193b83e9fd_Out_0 = Vector1_D80F067A;
-            float3 _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0 = Vector3_3AD012AA;
-            float3 _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0 = Vector3_E4AC4432;
-            float _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0 = Vector1_3E452608;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            half _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            CrestNodeFoam_half(_Property_d34fb0a0645e3e8791a5239873296357_Out_0.tex, _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0, _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0, _Property_54ef09feb545b581b0fc27170fef10e2_Out_0, _Property_7ae039043909cb8eb133acd421012651_Out_0, _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0, _Property_fe249f016d4b128ca8400f412655cc5e_Out_0, _Property_08e0e443debd6186acd988fc67faf954_Out_0, _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0, _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0, _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0, _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _Property_985518c2ff59e781828129193b83e9fd_Out_0, _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0, _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0, _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            #else
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = float3(0, 0, 0);
-            #endif
-            float3 _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2);
-            float3 _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            Unity_Add_float3(_Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2, _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            #else
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
-            #endif
+            float3 _Property_a8190300d5ba483d9365211d7f71abea_Out_0 = Vector3_3AD012AA;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             #else
-            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_b2962080c0284b83821815b7263043dc_Out_0;
+            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_a8190300d5ba483d9365211d7f71abea_Out_0;
             #endif
-            float3 _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2;
-            Unity_Multiply_float(_FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            #else
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0;
-            #endif
-            float3 _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2);
-            float3 _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            Unity_Add_float3(_Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2, _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            #else
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
-            #endif
+            float3 _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0 = Vector3_E4AC4432;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             #else
-            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0;
+            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0;
             #endif
-            float3 _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2;
-            Unity_Multiply_float(_FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            #else
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0;
-            #endif
-            float3 _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2);
-            float3 _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            Unity_Add_float3(_Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2, _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            #else
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
-            #endif
+            float _Property_e0841d7fa2234ff199a94402710821f1_Out_0 = Vector1_3E452608;
             #if defined(CREST_FOAM_ON)
             float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
             #else
-            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_4807b4a03c922b87b201864991b317da_Out_0;
+            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_e0841d7fa2234ff199a94402710821f1_Out_0;
             #endif
-            float _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2;
-            Unity_Multiply_float(_FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            #else
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0;
-            #endif
-            float _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2;
-            Unity_Multiply_float(_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4, _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2);
-            float _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            Unity_Add_float(_Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2, _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            #else
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
-            #endif
-            Albedo_1 = _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0;
-            NormalTS_2 = _FLOW_fad25d47eec395899aad2bf77264462c_Out_0;
-            Emission_3 = _FLOW_02e1cbd391446082893e73b8088ff765_Out_0;
-            Smoothness_4 = _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0;
+            Albedo_1 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
+            NormalTS_2 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
+            Emission_3 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
+            Smoothness_4 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
+        }
+
+        void Unity_OneMinus_float(float In, out float Out)
+        {
+            Out = 1 - In;
         }
 
         struct Bindings_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269
@@ -21263,7 +20316,8 @@ Shader "Crest/Ocean"
             float3 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3;
-            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3);
+            float4 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4;
+            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4);
             float _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0 = Vector1_B01E1A6A;
             float2 _Property_a28ec0be576d4586a46337955b069868_Out_0 = Vector2_9C73A0C6;
             Bindings_CrestIsUnderwater_52f7750f15e114937b54a0fd27f0d2f2 _CrestIsUnderwater_de15825b4853aa85a98b48656eaa15f1;
@@ -21396,11 +20450,27 @@ Shader "Crest/Ocean"
             float3 _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
             float _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             SG_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963(_Property_f78369cae749d18392b19bad30a74e2d_Out_0, _Property_169d4581a8319383a7f62a3435e9b11d_Out_0, _Property_0bdc44463eba328a8c73245f2cf82911_Out_0, _Property_74ea32320c303583ae393e1d0afe7d13_Out_0, _Property_b16935e33ecd688caba81b8b02f388e3_Out_0, _Property_519c0dea6b39f688b95e7c8c336ca9fb_Out_0, _Property_e7473f6e9b7b0f8c8615d7497ee5c4a0_Out_0, _Property_d073850e48b8c485ad0ab20154ed80e8_Out_0, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0, _Property_a28ec0be576d4586a46337955b069868_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _Branch_3776301df9f8888faaee9638ee7f568d_Out_3, _Lerp_d393d46d7b4755838d788bf6a655c1cd_Out_3, _Negate_43b5c19855641787873c549e72cb1032_Out_1, _Property_0f7251ac80636d8eb279b11917792d24_Out_0, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4);
-            Albedo_2 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1;
+            float _Split_e1a3108496a4498a90ecae26cadb6773_R_1 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[0];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_G_2 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[1];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_B_3 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[2];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_A_4 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[3];
+            float3 _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0 = float3(_Split_e1a3108496a4498a90ecae26cadb6773_R_1, _Split_e1a3108496a4498a90ecae26cadb6773_G_2, _Split_e1a3108496a4498a90ecae26cadb6773_B_3);
+            float3 _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
+            Unity_Lerp_float3(_CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0, (_Split_e1a3108496a4498a90ecae26cadb6773_A_4.xxx), _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3);
+            float _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1;
+            Unity_OneMinus_float(_Split_e1a3108496a4498a90ecae26cadb6773_A_4, _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1);
+            float3 _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
+            Unity_Multiply_float((_OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1.xxx), _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2);
+            Albedo_2 = _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
             NormalTS_3 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2;
-            Emission_4 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
+            Emission_4 = _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
             Smoothness_5 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             Specular_6 = _CrestFresnel_4c3e438e27705e81abe6c2e9d80cb8d7_LightReflected_2;
+        }
+
+        void Unity_Subtract_float(float A, float B, out float Out)
+        {
+            Out = A - B;
         }
 
         void Unity_Remap_float(float In, float2 InMinMax, float2 OutMinMax, out float Out)
@@ -21408,7 +20478,7 @@ Shader "Crest/Ocean"
             Out = OutMinMax.x + (In - InMinMax.x) * (OutMinMax.y - OutMinMax.x) / (InMinMax.y - InMinMax.x);
         }
 
-        // 3580e24b878bbe7a9a98325dcc0474c2
+        // c46fd3ffae69bfdf4a7b13505ef3963f
         #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
         struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -21459,6 +20529,30 @@ Shader "Crest/Ocean"
         {
             Out = min(A, B);
         };
+
+        // c4826bd69adcf43b74845160a7d6f249
+        #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+        struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+        {
+            float4 ScreenPosition;
+        };
+
+        void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+        {
+            float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+            float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+            float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+            float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+            Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+            float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+            CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+            Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+        }
 
         // a2b98fadb38e4458b014d449a26401de
         #include "ShadergraphFramework/CrestNodeOcclusion.hlsl"
@@ -21856,6 +20950,12 @@ Shader "Crest/Ocean"
             Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+            Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+            _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+            float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+            SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+            #endif
+            #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
             float _Property_606fa02468b6f8849164940fdce04188_Out_0 = _Occlusion;
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
@@ -21873,7 +20973,7 @@ Shader "Crest/Ocean"
             #endif
             surface.BaseColor = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Albedo_2;
             surface.Emission = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Emission_4;
-            surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+            surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
             surface.AlphaClipThreshold = 0;
             surface.BentNormal = IN.TangentSpaceNormal;
             surface.Smoothness = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5;
@@ -22439,17 +21539,16 @@ Shader "Crest/Ocean"
         #pragma multi_compile _ DYNAMICLIGHTMAP_ON
         #pragma multi_compile _ SHADOWS_SHADOWMASK
         #pragma multi_compile DECALS_OFF DECALS_3RT DECALS_4RT
-        // DE: Disable as we are hardcoding shadow quality below.
-        // #pragma multi_compile SHADOW_LOW SHADOW_MEDIUM SHADOW_HIGH
+        #pragma multi_compile SHADOW_LOW SHADOW_MEDIUM SHADOW_HIGH
         #pragma multi_compile SCREEN_SPACE_SHADOWS_OFF SCREEN_SPACE_SHADOWS_ON
         #pragma multi_compile USE_FPTL_LIGHTLIST USE_CLUSTERED_LIGHTLIST
         #pragma shader_feature_local _REFRACTION_OFF _REFRACTION_PLANE _REFRACTION_SPHERE _REFRACTION_THIN
             #pragma shader_feature_local _ CREST_FOAM_ON
         #pragma shader_feature_local _ CREST_CAUSTICS_ON
         #pragma shader_feature_local _ CREST_FLOW_ON
-
-        // DE: SHADOW_LOW saves ~0.4ms from SHADOW_MEDIUM. SHADOW_ULTRA_LOW saves a further 0.3ms but has no filtering.
-        #define SHADOW_ULTRA_LOW
+        #pragma shader_feature_local _ CREST_ALBEDO_ON
+        #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+        #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
         #define CREST_GENERATED_SHADER_ON 1
 
@@ -23316,7 +22415,7 @@ Shader "Crest/Ocean"
             Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
         }
 
-        // 26ddc131f09006478a3aa1683fa75e74
+        // 6445f72e0f3d2e176e54a9ffb10e1139
         #include "ShadergraphFramework/CrestNodeLightData.hlsl"
 
         struct Bindings_CrestLightData_b74b6e8c0b489314ca7aea3e2cc9c54c
@@ -23355,7 +22454,7 @@ Shader "Crest/Ocean"
             OutBoolean_1 = _Not_7fbe0c504ec6c2819b1994af01ce3988_Out_1;
         }
 
-        // 9b604afea48da2ac64cf6198354cf6ae
+        // a8e5480cb804440107f760ac5393ec2f
         #include "ShadergraphFramework/CrestNodeNormalMapping.hlsl"
 
         void Unity_NormalStrength_float(float3 In, float Strength, out float3 Out)
@@ -23368,7 +22467,7 @@ Shader "Crest/Ocean"
             float FaceSign;
         };
 
-        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3)
+        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3, out float4 Albedo_4)
         {
             float3 _Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0 = Vector3_FE793823;
             float3 _Property_b812768aa4903386b49ba84380e4fa74_Out_0 = Vector3_C8190B61;
@@ -23391,13 +22490,15 @@ Shader "Crest/Ocean"
             half3 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
-            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31);
+            half4 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
+            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33);
             float _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0 = Vector1_C6F526AD;
             float3 _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             Unity_NormalStrength_float(_OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0, _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2);
             Normal_1 = _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             SSS_2 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             Foam_3 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
+            Albedo_4 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
         }
 
         // b4726242738c84550b865a8cd3eafd6e
@@ -23425,7 +22526,7 @@ Shader "Crest/Ocean"
             LightReflected_2 = _CrestNodeApplyFresnelCustomFunction_4a16fb68ad2a518d870d2537aaf1e772_LightReflected_10;
         }
 
-        // 5abfc66ba136f74f6cf58eadabfa3bb1
+        // 0d37dbcf887de5687bdac5097fff713e
         #include "ShadergraphFramework/CrestNodeAmbientLight.hlsl"
 
         struct Bindings_CrestAmbientLight_a6ec89b3ca0ab4e98b300ec3ba0e6013
@@ -23500,10 +22601,10 @@ Shader "Crest/Ocean"
             Out_1 = _CrestNodeLinearEyeDepthCustomFunction_ee1cef135a8e558088e613593ae90486_LinearEyeDepth_1;
         }
 
-        // 3818fb4ea9ebd67663e831ef4a019758
+        // 2ca856c7634fa49c75d73b5ddc1b65ca
         #include "ShadergraphFramework/CrestNodeFoamBubbles.hlsl"
 
-        // 77b1d95beeaa53e1bbdfd7a6e8dd6fa0
+        // b3b317d9da04ee361966ef1a88eac53c
         #include "ShadergraphFramework/CrestNodeVolumeEmission.hlsl"
 
         void Unity_Add_float(float A, float B, out float Out)
@@ -23536,7 +22637,7 @@ Shader "Crest/Ocean"
             SubSurfaceScattering_9 = _CrestNodeSampleOceanDataSingleCustomFunction_a7f8891a8a8e5d8ab9c9a0c34c841749_SSS_17;
         }
 
-        // 60cb5e01e8bb25b4c10f8304dd8d25fd
+        // 1547d744048b76728bd6fc66db42da03
         #include "ShadergraphFramework/CrestNodeApplyCaustics.hlsl"
 
         void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
@@ -23687,93 +22788,7 @@ Shader "Crest/Ocean"
             Out = pow(A, B);
         }
 
-        void Unity_Modulo_float(float A, float B, out float Out)
-        {
-            Out = fmod(A, B);
-        }
-
-        void Unity_Comparison_Greater_float(float A, float B, out float Out)
-        {
-            Out = A > B ? 1 : 0;
-        }
-
-        void Unity_Subtract_float(float A, float B, out float Out)
-        {
-            Out = A - B;
-        }
-
-        void Unity_Branch_float(float Predicate, float True, float False, out float Out)
-        {
-            Out = Predicate ? True : False;
-        }
-
-        struct Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1
-        {
-        };
-
-        void SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(float2 Vector2_B562EFB1, float2 Vector2_83AA31A8, Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 IN, out float2 DisplacedA_1, out float WeightA_3, out float2 DisplacedB_2, out float WeightB_4)
-        {
-            float2 _Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0 = Vector2_83AA31A8;
-            float2 _Property_06123b8dbe81da80934c651a33d13699_Out_0 = Vector2_B562EFB1;
-            Bindings_CrestOceanGlobals_d50a85284893ec447a25a093505a2120 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2;
-            float3 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5;
-            SG_CrestOceanGlobals_d50a85284893ec447a25a093505a2120(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5);
-            float _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2;
-            Unity_Modulo_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2);
-            float2 _Multiply_58400b6ef0b30484913ce941659bac85_Out_2;
-            Unity_Multiply_float(_Property_06123b8dbe81da80934c651a33d13699_Out_0, (_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2.xx), _Multiply_58400b6ef0b30484913ce941659bac85_Out_2);
-            float2 _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            Unity_Subtract_float2(_Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0, _Multiply_58400b6ef0b30484913ce941659bac85_Out_2, _Subtract_22cf6b53c8344888987905efe87043db_Out_2);
-            float2 _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0 = Vector2_83AA31A8;
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            #else
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2;
-            Unity_Comparison_Greater_float(_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, 1, _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2);
-            float _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2;
-            Unity_Subtract_float(2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2);
-            float _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            Unity_Branch_float(_Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            #else
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = 0;
-            #endif
-            float2 _Property_bafd78310cede58a971e08fade5e87ee_Out_0 = Vector2_83AA31A8;
-            float2 _Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0 = Vector2_B562EFB1;
-            float _Add_26a0d41d20a2618d858f292701338a2a_Out_2;
-            Unity_Add_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 1, _Add_26a0d41d20a2618d858f292701338a2a_Out_2);
-            float _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2;
-            Unity_Modulo_float(_Add_26a0d41d20a2618d858f292701338a2a_Out_2, 2, _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2);
-            float2 _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2;
-            Unity_Multiply_float(_Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0, (_Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2.xx), _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2);
-            float2 _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            Unity_Subtract_float2(_Property_bafd78310cede58a971e08fade5e87ee_Out_0, _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2, _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            #else
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            Unity_Subtract_float(1, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3, _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            #else
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = 0;
-            #endif
-            DisplacedA_1 = _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0;
-            WeightA_3 = _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0;
-            DisplacedB_2 = _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0;
-            WeightB_4 = _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0;
-        }
-
-        // 06deca910ff1e1ed1b9ea7fb3513233e
+        // 498816f585b40f3ecd7ee304230793a2
         #include "ShadergraphFramework/CrestNodeFoam.hlsl"
 
         struct Bindings_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963
@@ -23794,132 +22809,49 @@ Shader "Crest/Ocean"
             float4 _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0 = Vector4_FD283A50;
             float _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0 = Vector1_D6DA4100;
             float _Property_76afb5461ed7c284b6afcbd15025248a_Out_0 = Vector1_13F2A8C8;
-            float2 _Property_20259e8cfd2c2b8288897462f0776174_Out_0 = Vector2_5AD72ED;
-            float2 _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0 = Vector2_28A2C5B9;
-            Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 _CrestFlow_a6f6f004811f6c82be002c7059e670a1;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4;
-            SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(_Property_20259e8cfd2c2b8288897462f0776174_Out_0, _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4);
+            float2 _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0 = Vector2_28A2C5B9;
             float _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0 = Vector1_D80F067A;
             float3 _Property_b2962080c0284b83821815b7263043dc_Out_0 = Vector3_3AD012AA;
             float3 _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0 = Vector3_E4AC4432;
             float _Property_4807b4a03c922b87b201864991b317da_Out_0 = Vector1_3E452608;
+            float2 _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0 = Vector2_5AD72ED;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             half _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
-            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
+            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             #else
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = float3(0, 0, 0);
             #endif
-            float3 _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2;
-            Unity_Multiply_float(_FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2);
-            UnityTexture2D _Property_d34fb0a0645e3e8791a5239873296357_Out_0 = Texture2D_D9E7A343;
-            float2 _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0 = Vector2_C4E9ED58;
-            float _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0 = Vector1_7492C815;
-            float _Property_54ef09feb545b581b0fc27170fef10e2_Out_0 = Vector1_33DC93D;
-            float _Property_7ae039043909cb8eb133acd421012651_Out_0 = Vector1_3439FC0A;
-            float _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0 = Vector1_FB133018;
-            float _Property_fe249f016d4b128ca8400f412655cc5e_Out_0 = Vector1_7CFAFAC1;
-            float _Property_08e0e443debd6186acd988fc67faf954_Out_0 = Vector1_53F45327;
-            float4 _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0 = Vector4_2FA9AEA5;
-            float4 _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0 = Vector4_FD283A50;
-            float _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0 = Vector1_D6DA4100;
-            float _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0 = Vector1_13F2A8C8;
-            float _Property_985518c2ff59e781828129193b83e9fd_Out_0 = Vector1_D80F067A;
-            float3 _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0 = Vector3_3AD012AA;
-            float3 _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0 = Vector3_E4AC4432;
-            float _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0 = Vector1_3E452608;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            half _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            CrestNodeFoam_half(_Property_d34fb0a0645e3e8791a5239873296357_Out_0.tex, _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0, _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0, _Property_54ef09feb545b581b0fc27170fef10e2_Out_0, _Property_7ae039043909cb8eb133acd421012651_Out_0, _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0, _Property_fe249f016d4b128ca8400f412655cc5e_Out_0, _Property_08e0e443debd6186acd988fc67faf954_Out_0, _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0, _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0, _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0, _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _Property_985518c2ff59e781828129193b83e9fd_Out_0, _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0, _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0, _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            #else
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = float3(0, 0, 0);
-            #endif
-            float3 _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2);
-            float3 _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            Unity_Add_float3(_Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2, _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            #else
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
-            #endif
+            float3 _Property_a8190300d5ba483d9365211d7f71abea_Out_0 = Vector3_3AD012AA;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             #else
-            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_b2962080c0284b83821815b7263043dc_Out_0;
+            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_a8190300d5ba483d9365211d7f71abea_Out_0;
             #endif
-            float3 _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2;
-            Unity_Multiply_float(_FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            #else
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0;
-            #endif
-            float3 _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2);
-            float3 _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            Unity_Add_float3(_Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2, _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            #else
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
-            #endif
+            float3 _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0 = Vector3_E4AC4432;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             #else
-            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0;
+            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0;
             #endif
-            float3 _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2;
-            Unity_Multiply_float(_FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            #else
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0;
-            #endif
-            float3 _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2);
-            float3 _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            Unity_Add_float3(_Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2, _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            #else
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
-            #endif
+            float _Property_e0841d7fa2234ff199a94402710821f1_Out_0 = Vector1_3E452608;
             #if defined(CREST_FOAM_ON)
             float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
             #else
-            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_4807b4a03c922b87b201864991b317da_Out_0;
+            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_e0841d7fa2234ff199a94402710821f1_Out_0;
             #endif
-            float _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2;
-            Unity_Multiply_float(_FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            #else
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0;
-            #endif
-            float _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2;
-            Unity_Multiply_float(_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4, _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2);
-            float _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            Unity_Add_float(_Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2, _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            #else
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
-            #endif
-            Albedo_1 = _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0;
-            NormalTS_2 = _FLOW_fad25d47eec395899aad2bf77264462c_Out_0;
-            Emission_3 = _FLOW_02e1cbd391446082893e73b8088ff765_Out_0;
-            Smoothness_4 = _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0;
+            Albedo_1 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
+            NormalTS_2 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
+            Emission_3 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
+            Smoothness_4 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
+        }
+
+        void Unity_OneMinus_float(float In, out float Out)
+        {
+            Out = 1 - In;
         }
 
         struct Bindings_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269
@@ -23967,7 +22899,8 @@ Shader "Crest/Ocean"
             float3 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3;
-            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3);
+            float4 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4;
+            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4);
             float _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0 = Vector1_B01E1A6A;
             float2 _Property_a28ec0be576d4586a46337955b069868_Out_0 = Vector2_9C73A0C6;
             Bindings_CrestIsUnderwater_52f7750f15e114937b54a0fd27f0d2f2 _CrestIsUnderwater_de15825b4853aa85a98b48656eaa15f1;
@@ -24100,11 +23033,27 @@ Shader "Crest/Ocean"
             float3 _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
             float _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             SG_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963(_Property_f78369cae749d18392b19bad30a74e2d_Out_0, _Property_169d4581a8319383a7f62a3435e9b11d_Out_0, _Property_0bdc44463eba328a8c73245f2cf82911_Out_0, _Property_74ea32320c303583ae393e1d0afe7d13_Out_0, _Property_b16935e33ecd688caba81b8b02f388e3_Out_0, _Property_519c0dea6b39f688b95e7c8c336ca9fb_Out_0, _Property_e7473f6e9b7b0f8c8615d7497ee5c4a0_Out_0, _Property_d073850e48b8c485ad0ab20154ed80e8_Out_0, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0, _Property_a28ec0be576d4586a46337955b069868_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _Branch_3776301df9f8888faaee9638ee7f568d_Out_3, _Lerp_d393d46d7b4755838d788bf6a655c1cd_Out_3, _Negate_43b5c19855641787873c549e72cb1032_Out_1, _Property_0f7251ac80636d8eb279b11917792d24_Out_0, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4);
-            Albedo_2 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1;
+            float _Split_e1a3108496a4498a90ecae26cadb6773_R_1 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[0];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_G_2 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[1];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_B_3 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[2];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_A_4 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[3];
+            float3 _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0 = float3(_Split_e1a3108496a4498a90ecae26cadb6773_R_1, _Split_e1a3108496a4498a90ecae26cadb6773_G_2, _Split_e1a3108496a4498a90ecae26cadb6773_B_3);
+            float3 _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
+            Unity_Lerp_float3(_CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0, (_Split_e1a3108496a4498a90ecae26cadb6773_A_4.xxx), _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3);
+            float _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1;
+            Unity_OneMinus_float(_Split_e1a3108496a4498a90ecae26cadb6773_A_4, _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1);
+            float3 _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
+            Unity_Multiply_float((_OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1.xxx), _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2);
+            Albedo_2 = _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
             NormalTS_3 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2;
-            Emission_4 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
+            Emission_4 = _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
             Smoothness_5 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             Specular_6 = _CrestFresnel_4c3e438e27705e81abe6c2e9d80cb8d7_LightReflected_2;
+        }
+
+        void Unity_Subtract_float(float A, float B, out float Out)
+        {
+            Out = A - B;
         }
 
         void Unity_Remap_float(float In, float2 InMinMax, float2 OutMinMax, out float Out)
@@ -24112,7 +23061,7 @@ Shader "Crest/Ocean"
             Out = OutMinMax.x + (In - InMinMax.x) * (OutMinMax.y - OutMinMax.x) / (InMinMax.y - InMinMax.x);
         }
 
-        // 3580e24b878bbe7a9a98325dcc0474c2
+        // c46fd3ffae69bfdf4a7b13505ef3963f
         #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
         struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -24163,6 +23112,30 @@ Shader "Crest/Ocean"
         {
             Out = min(A, B);
         };
+
+        // c4826bd69adcf43b74845160a7d6f249
+        #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+        struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+        {
+            float4 ScreenPosition;
+        };
+
+        void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+        {
+            float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+            float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+            float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+            float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+            Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+            float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+            CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+            Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+        }
 
         // a2b98fadb38e4458b014d449a26401de
         #include "ShadergraphFramework/CrestNodeOcclusion.hlsl"
@@ -24560,6 +23533,12 @@ Shader "Crest/Ocean"
             Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+            Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+            _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+            float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+            SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+            #endif
+            #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
             float _Property_606fa02468b6f8849164940fdce04188_Out_0 = _Occlusion;
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
@@ -24577,7 +23556,7 @@ Shader "Crest/Ocean"
             #endif
             surface.BaseColor = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Albedo_2;
             surface.Emission = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Emission_4;
-            surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+            surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
             surface.AlphaClipThreshold = 0;
             surface.BentNormal = IN.TangentSpaceNormal;
             surface.Smoothness = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5;
@@ -25126,6 +24105,9 @@ Shader "Crest/Ocean"
             #pragma shader_feature_local _ CREST_FOAM_ON
         #pragma shader_feature_local _ CREST_CAUSTICS_ON
         #pragma shader_feature_local _ CREST_FLOW_ON
+        #pragma shader_feature_local _ CREST_ALBEDO_ON
+        #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+        #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
         #define CREST_GENERATED_SHADER_ON 1
 
@@ -25967,7 +24949,7 @@ Shader "Crest/Ocean"
             Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
         }
 
-        // 26ddc131f09006478a3aa1683fa75e74
+        // 6445f72e0f3d2e176e54a9ffb10e1139
         #include "ShadergraphFramework/CrestNodeLightData.hlsl"
 
         struct Bindings_CrestLightData_b74b6e8c0b489314ca7aea3e2cc9c54c
@@ -26006,7 +24988,7 @@ Shader "Crest/Ocean"
             OutBoolean_1 = _Not_7fbe0c504ec6c2819b1994af01ce3988_Out_1;
         }
 
-        // 9b604afea48da2ac64cf6198354cf6ae
+        // a8e5480cb804440107f760ac5393ec2f
         #include "ShadergraphFramework/CrestNodeNormalMapping.hlsl"
 
         void Unity_NormalStrength_float(float3 In, float Strength, out float3 Out)
@@ -26019,7 +25001,7 @@ Shader "Crest/Ocean"
             float FaceSign;
         };
 
-        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3)
+        void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3, out float4 Albedo_4)
         {
             float3 _Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0 = Vector3_FE793823;
             float3 _Property_b812768aa4903386b49ba84380e4fa74_Out_0 = Vector3_C8190B61;
@@ -26042,13 +25024,15 @@ Shader "Crest/Ocean"
             half3 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
-            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31);
+            half4 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
+            OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33);
             float _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0 = Vector1_C6F526AD;
             float3 _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             Unity_NormalStrength_float(_OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0, _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2);
             Normal_1 = _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
             SSS_2 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
             Foam_3 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
+            Albedo_4 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
         }
 
         // b4726242738c84550b865a8cd3eafd6e
@@ -26076,7 +25060,7 @@ Shader "Crest/Ocean"
             LightReflected_2 = _CrestNodeApplyFresnelCustomFunction_4a16fb68ad2a518d870d2537aaf1e772_LightReflected_10;
         }
 
-        // 5abfc66ba136f74f6cf58eadabfa3bb1
+        // 0d37dbcf887de5687bdac5097fff713e
         #include "ShadergraphFramework/CrestNodeAmbientLight.hlsl"
 
         struct Bindings_CrestAmbientLight_a6ec89b3ca0ab4e98b300ec3ba0e6013
@@ -26151,10 +25135,10 @@ Shader "Crest/Ocean"
             Out_1 = _CrestNodeLinearEyeDepthCustomFunction_ee1cef135a8e558088e613593ae90486_LinearEyeDepth_1;
         }
 
-        // 3818fb4ea9ebd67663e831ef4a019758
+        // 2ca856c7634fa49c75d73b5ddc1b65ca
         #include "ShadergraphFramework/CrestNodeFoamBubbles.hlsl"
 
-        // 77b1d95beeaa53e1bbdfd7a6e8dd6fa0
+        // b3b317d9da04ee361966ef1a88eac53c
         #include "ShadergraphFramework/CrestNodeVolumeEmission.hlsl"
 
         void Unity_Add_float(float A, float B, out float Out)
@@ -26187,7 +25171,7 @@ Shader "Crest/Ocean"
             SubSurfaceScattering_9 = _CrestNodeSampleOceanDataSingleCustomFunction_a7f8891a8a8e5d8ab9c9a0c34c841749_SSS_17;
         }
 
-        // 60cb5e01e8bb25b4c10f8304dd8d25fd
+        // 1547d744048b76728bd6fc66db42da03
         #include "ShadergraphFramework/CrestNodeApplyCaustics.hlsl"
 
         void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
@@ -26338,93 +25322,7 @@ Shader "Crest/Ocean"
             Out = pow(A, B);
         }
 
-        void Unity_Modulo_float(float A, float B, out float Out)
-        {
-            Out = fmod(A, B);
-        }
-
-        void Unity_Comparison_Greater_float(float A, float B, out float Out)
-        {
-            Out = A > B ? 1 : 0;
-        }
-
-        void Unity_Subtract_float(float A, float B, out float Out)
-        {
-            Out = A - B;
-        }
-
-        void Unity_Branch_float(float Predicate, float True, float False, out float Out)
-        {
-            Out = Predicate ? True : False;
-        }
-
-        struct Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1
-        {
-        };
-
-        void SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(float2 Vector2_B562EFB1, float2 Vector2_83AA31A8, Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 IN, out float2 DisplacedA_1, out float WeightA_3, out float2 DisplacedB_2, out float WeightB_4)
-        {
-            float2 _Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0 = Vector2_83AA31A8;
-            float2 _Property_06123b8dbe81da80934c651a33d13699_Out_0 = Vector2_B562EFB1;
-            Bindings_CrestOceanGlobals_d50a85284893ec447a25a093505a2120 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2;
-            float3 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4;
-            float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5;
-            SG_CrestOceanGlobals_d50a85284893ec447a25a093505a2120(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5);
-            float _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2;
-            Unity_Modulo_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2);
-            float2 _Multiply_58400b6ef0b30484913ce941659bac85_Out_2;
-            Unity_Multiply_float(_Property_06123b8dbe81da80934c651a33d13699_Out_0, (_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2.xx), _Multiply_58400b6ef0b30484913ce941659bac85_Out_2);
-            float2 _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            Unity_Subtract_float2(_Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0, _Multiply_58400b6ef0b30484913ce941659bac85_Out_2, _Subtract_22cf6b53c8344888987905efe87043db_Out_2);
-            float2 _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0 = Vector2_83AA31A8;
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-            #else
-            float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2;
-            Unity_Comparison_Greater_float(_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, 1, _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2);
-            float _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2;
-            Unity_Subtract_float(2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2);
-            float _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            Unity_Branch_float(_Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-            #else
-            float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = 0;
-            #endif
-            float2 _Property_bafd78310cede58a971e08fade5e87ee_Out_0 = Vector2_83AA31A8;
-            float2 _Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0 = Vector2_B562EFB1;
-            float _Add_26a0d41d20a2618d858f292701338a2a_Out_2;
-            Unity_Add_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 1, _Add_26a0d41d20a2618d858f292701338a2a_Out_2);
-            float _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2;
-            Unity_Modulo_float(_Add_26a0d41d20a2618d858f292701338a2a_Out_2, 2, _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2);
-            float2 _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2;
-            Unity_Multiply_float(_Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0, (_Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2.xx), _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2);
-            float2 _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            Unity_Subtract_float2(_Property_bafd78310cede58a971e08fade5e87ee_Out_0, _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2, _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-            #else
-            float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-            #endif
-            float _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            Unity_Subtract_float(1, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3, _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-            #else
-            float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = 0;
-            #endif
-            DisplacedA_1 = _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0;
-            WeightA_3 = _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0;
-            DisplacedB_2 = _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0;
-            WeightB_4 = _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0;
-        }
-
-        // 06deca910ff1e1ed1b9ea7fb3513233e
+        // 498816f585b40f3ecd7ee304230793a2
         #include "ShadergraphFramework/CrestNodeFoam.hlsl"
 
         struct Bindings_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963
@@ -26445,132 +25343,49 @@ Shader "Crest/Ocean"
             float4 _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0 = Vector4_FD283A50;
             float _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0 = Vector1_D6DA4100;
             float _Property_76afb5461ed7c284b6afcbd15025248a_Out_0 = Vector1_13F2A8C8;
-            float2 _Property_20259e8cfd2c2b8288897462f0776174_Out_0 = Vector2_5AD72ED;
-            float2 _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0 = Vector2_28A2C5B9;
-            Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 _CrestFlow_a6f6f004811f6c82be002c7059e670a1;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3;
-            float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2;
-            float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4;
-            SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(_Property_20259e8cfd2c2b8288897462f0776174_Out_0, _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4);
+            float2 _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0 = Vector2_28A2C5B9;
             float _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0 = Vector1_D80F067A;
             float3 _Property_b2962080c0284b83821815b7263043dc_Out_0 = Vector3_3AD012AA;
             float3 _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0 = Vector3_E4AC4432;
             float _Property_4807b4a03c922b87b201864991b317da_Out_0 = Vector1_3E452608;
+            float2 _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0 = Vector2_5AD72ED;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             half _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
-            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
+            CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
             #else
             float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = float3(0, 0, 0);
             #endif
-            float3 _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2;
-            Unity_Multiply_float(_FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2);
-            UnityTexture2D _Property_d34fb0a0645e3e8791a5239873296357_Out_0 = Texture2D_D9E7A343;
-            float2 _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0 = Vector2_C4E9ED58;
-            float _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0 = Vector1_7492C815;
-            float _Property_54ef09feb545b581b0fc27170fef10e2_Out_0 = Vector1_33DC93D;
-            float _Property_7ae039043909cb8eb133acd421012651_Out_0 = Vector1_3439FC0A;
-            float _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0 = Vector1_FB133018;
-            float _Property_fe249f016d4b128ca8400f412655cc5e_Out_0 = Vector1_7CFAFAC1;
-            float _Property_08e0e443debd6186acd988fc67faf954_Out_0 = Vector1_53F45327;
-            float4 _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0 = Vector4_2FA9AEA5;
-            float4 _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0 = Vector4_FD283A50;
-            float _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0 = Vector1_D6DA4100;
-            float _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0 = Vector1_13F2A8C8;
-            float _Property_985518c2ff59e781828129193b83e9fd_Out_0 = Vector1_D80F067A;
-            float3 _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0 = Vector3_3AD012AA;
-            float3 _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0 = Vector3_E4AC4432;
-            float _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0 = Vector1_3E452608;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            half _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            CrestNodeFoam_half(_Property_d34fb0a0645e3e8791a5239873296357_Out_0.tex, _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0, _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0, _Property_54ef09feb545b581b0fc27170fef10e2_Out_0, _Property_7ae039043909cb8eb133acd421012651_Out_0, _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0, _Property_fe249f016d4b128ca8400f412655cc5e_Out_0, _Property_08e0e443debd6186acd988fc67faf954_Out_0, _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0, _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0, _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0, _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _Property_985518c2ff59e781828129193b83e9fd_Out_0, _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0, _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0, _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-            #else
-            float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = float3(0, 0, 0);
-            #endif
-            float3 _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2);
-            float3 _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            Unity_Add_float3(_Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2, _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-            #else
-            float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
-            #endif
+            float3 _Property_a8190300d5ba483d9365211d7f71abea_Out_0 = Vector3_3AD012AA;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
             #else
-            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_b2962080c0284b83821815b7263043dc_Out_0;
+            float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_a8190300d5ba483d9365211d7f71abea_Out_0;
             #endif
-            float3 _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2;
-            Unity_Multiply_float(_FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-            #else
-            float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0;
-            #endif
-            float3 _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2);
-            float3 _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            Unity_Add_float3(_Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2, _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-            #else
-            float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
-            #endif
+            float3 _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0 = Vector3_E4AC4432;
             #if defined(CREST_FOAM_ON)
             float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
             #else
-            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0;
+            float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0;
             #endif
-            float3 _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2;
-            Unity_Multiply_float(_FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-            #else
-            float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0;
-            #endif
-            float3 _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2;
-            Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2);
-            float3 _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            Unity_Add_float3(_Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2, _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-            #else
-            float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
-            #endif
+            float _Property_e0841d7fa2234ff199a94402710821f1_Out_0 = Vector1_3E452608;
             #if defined(CREST_FOAM_ON)
             float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
             #else
-            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_4807b4a03c922b87b201864991b317da_Out_0;
+            float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_e0841d7fa2234ff199a94402710821f1_Out_0;
             #endif
-            float _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2;
-            Unity_Multiply_float(_FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2);
-            #if defined(CREST_FOAM_ON)
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-            #else
-            float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0;
-            #endif
-            float _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2;
-            Unity_Multiply_float(_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4, _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2);
-            float _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            Unity_Add_float(_Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2, _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2);
-            #if defined(CREST_FLOW_ON)
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-            #else
-            float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
-            #endif
-            Albedo_1 = _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0;
-            NormalTS_2 = _FLOW_fad25d47eec395899aad2bf77264462c_Out_0;
-            Emission_3 = _FLOW_02e1cbd391446082893e73b8088ff765_Out_0;
-            Smoothness_4 = _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0;
+            Albedo_1 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
+            NormalTS_2 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
+            Emission_3 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
+            Smoothness_4 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
+        }
+
+        void Unity_OneMinus_float(float In, out float Out)
+        {
+            Out = 1 - In;
         }
 
         struct Bindings_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269
@@ -26618,7 +25433,8 @@ Shader "Crest/Ocean"
             float3 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2;
             float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3;
-            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3);
+            float4 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4;
+            SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4);
             float _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0 = Vector1_B01E1A6A;
             float2 _Property_a28ec0be576d4586a46337955b069868_Out_0 = Vector2_9C73A0C6;
             Bindings_CrestIsUnderwater_52f7750f15e114937b54a0fd27f0d2f2 _CrestIsUnderwater_de15825b4853aa85a98b48656eaa15f1;
@@ -26751,11 +25567,27 @@ Shader "Crest/Ocean"
             float3 _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
             float _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             SG_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963(_Property_f78369cae749d18392b19bad30a74e2d_Out_0, _Property_169d4581a8319383a7f62a3435e9b11d_Out_0, _Property_0bdc44463eba328a8c73245f2cf82911_Out_0, _Property_74ea32320c303583ae393e1d0afe7d13_Out_0, _Property_b16935e33ecd688caba81b8b02f388e3_Out_0, _Property_519c0dea6b39f688b95e7c8c336ca9fb_Out_0, _Property_e7473f6e9b7b0f8c8615d7497ee5c4a0_Out_0, _Property_d073850e48b8c485ad0ab20154ed80e8_Out_0, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0, _Property_a28ec0be576d4586a46337955b069868_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _Branch_3776301df9f8888faaee9638ee7f568d_Out_3, _Lerp_d393d46d7b4755838d788bf6a655c1cd_Out_3, _Negate_43b5c19855641787873c549e72cb1032_Out_1, _Property_0f7251ac80636d8eb279b11917792d24_Out_0, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4);
-            Albedo_2 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1;
+            float _Split_e1a3108496a4498a90ecae26cadb6773_R_1 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[0];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_G_2 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[1];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_B_3 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[2];
+            float _Split_e1a3108496a4498a90ecae26cadb6773_A_4 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[3];
+            float3 _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0 = float3(_Split_e1a3108496a4498a90ecae26cadb6773_R_1, _Split_e1a3108496a4498a90ecae26cadb6773_G_2, _Split_e1a3108496a4498a90ecae26cadb6773_B_3);
+            float3 _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
+            Unity_Lerp_float3(_CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0, (_Split_e1a3108496a4498a90ecae26cadb6773_A_4.xxx), _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3);
+            float _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1;
+            Unity_OneMinus_float(_Split_e1a3108496a4498a90ecae26cadb6773_A_4, _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1);
+            float3 _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
+            Unity_Multiply_float((_OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1.xxx), _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2);
+            Albedo_2 = _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
             NormalTS_3 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2;
-            Emission_4 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
+            Emission_4 = _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
             Smoothness_5 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
             Specular_6 = _CrestFresnel_4c3e438e27705e81abe6c2e9d80cb8d7_LightReflected_2;
+        }
+
+        void Unity_Subtract_float(float A, float B, out float Out)
+        {
+            Out = A - B;
         }
 
         void Unity_Remap_float(float In, float2 InMinMax, float2 OutMinMax, out float Out)
@@ -26763,7 +25595,7 @@ Shader "Crest/Ocean"
             Out = OutMinMax.x + (In - InMinMax.x) * (OutMinMax.y - OutMinMax.x) / (InMinMax.y - InMinMax.x);
         }
 
-        // 3580e24b878bbe7a9a98325dcc0474c2
+        // c46fd3ffae69bfdf4a7b13505ef3963f
         #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
         struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -26814,6 +25646,30 @@ Shader "Crest/Ocean"
         {
             Out = min(A, B);
         };
+
+        // c4826bd69adcf43b74845160a7d6f249
+        #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+        struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+        {
+            float4 ScreenPosition;
+        };
+
+        void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+        {
+            float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+            float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+            float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+            float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+            float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+            Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+            float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+            CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+            Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+        }
 
         // a2b98fadb38e4458b014d449a26401de
         #include "ShadergraphFramework/CrestNodeOcclusion.hlsl"
@@ -27210,6 +26066,12 @@ Shader "Crest/Ocean"
             Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+            Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+            _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+            float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+            SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+            #endif
+            #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
             float _Property_606fa02468b6f8849164940fdce04188_Out_0 = _Occlusion;
             #endif
             #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
@@ -27227,7 +26089,7 @@ Shader "Crest/Ocean"
             #endif
             surface.BaseColor = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Albedo_2;
             surface.Emission = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Emission_4;
-            surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+            surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
             surface.AlphaClipThreshold = 0;
             surface.BentNormal = IN.TangentSpaceNormal;
             surface.Smoothness = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5;
@@ -27735,6 +26597,9 @@ Shader "Crest/Ocean"
     //         #pragma shader_feature_local _ CREST_FOAM_ON
     //     #pragma shader_feature_local _ CREST_CAUSTICS_ON
     //     #pragma shader_feature_local _ CREST_FLOW_ON
+    //     #pragma shader_feature_local _ CREST_ALBEDO_ON
+    //     #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+    //     #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
     //     #define CREST_GENERATED_SHADER_ON 1
 
@@ -28603,7 +27468,7 @@ Shader "Crest/Ocean"
     //         Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
     //     }
 
-    //     // 26ddc131f09006478a3aa1683fa75e74
+    //     // 6445f72e0f3d2e176e54a9ffb10e1139
     //     #include "ShadergraphFramework/CrestNodeLightData.hlsl"
 
     //     struct Bindings_CrestLightData_b74b6e8c0b489314ca7aea3e2cc9c54c
@@ -28642,7 +27507,7 @@ Shader "Crest/Ocean"
     //         OutBoolean_1 = _Not_7fbe0c504ec6c2819b1994af01ce3988_Out_1;
     //     }
 
-    //     // 9b604afea48da2ac64cf6198354cf6ae
+    //     // a8e5480cb804440107f760ac5393ec2f
     //     #include "ShadergraphFramework/CrestNodeNormalMapping.hlsl"
 
     //     void Unity_NormalStrength_float(float3 In, float Strength, out float3 Out)
@@ -28655,7 +27520,7 @@ Shader "Crest/Ocean"
     //         float FaceSign;
     //     };
 
-    //     void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3)
+    //     void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3, out float4 Albedo_4)
     //     {
     //         float3 _Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0 = Vector3_FE793823;
     //         float3 _Property_b812768aa4903386b49ba84380e4fa74_Out_0 = Vector3_C8190B61;
@@ -28678,13 +27543,15 @@ Shader "Crest/Ocean"
     //         half3 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1;
     //         half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
     //         half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
-    //         OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31);
+    //         half4 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
+    //         OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33);
     //         float _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0 = Vector1_C6F526AD;
     //         float3 _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
     //         Unity_NormalStrength_float(_OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0, _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2);
     //         Normal_1 = _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
     //         SSS_2 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
     //         Foam_3 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
+    //         Albedo_4 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
     //     }
 
     //     // b4726242738c84550b865a8cd3eafd6e
@@ -28712,7 +27579,7 @@ Shader "Crest/Ocean"
     //         LightReflected_2 = _CrestNodeApplyFresnelCustomFunction_4a16fb68ad2a518d870d2537aaf1e772_LightReflected_10;
     //     }
 
-    //     // 5abfc66ba136f74f6cf58eadabfa3bb1
+    //     // 0d37dbcf887de5687bdac5097fff713e
     //     #include "ShadergraphFramework/CrestNodeAmbientLight.hlsl"
 
     //     struct Bindings_CrestAmbientLight_a6ec89b3ca0ab4e98b300ec3ba0e6013
@@ -28787,10 +27654,10 @@ Shader "Crest/Ocean"
     //         Out_1 = _CrestNodeLinearEyeDepthCustomFunction_ee1cef135a8e558088e613593ae90486_LinearEyeDepth_1;
     //     }
 
-    //     // 3818fb4ea9ebd67663e831ef4a019758
+    //     // 2ca856c7634fa49c75d73b5ddc1b65ca
     //     #include "ShadergraphFramework/CrestNodeFoamBubbles.hlsl"
 
-    //     // 77b1d95beeaa53e1bbdfd7a6e8dd6fa0
+    //     // b3b317d9da04ee361966ef1a88eac53c
     //     #include "ShadergraphFramework/CrestNodeVolumeEmission.hlsl"
 
     //     void Unity_Add_float(float A, float B, out float Out)
@@ -28823,7 +27690,7 @@ Shader "Crest/Ocean"
     //         SubSurfaceScattering_9 = _CrestNodeSampleOceanDataSingleCustomFunction_a7f8891a8a8e5d8ab9c9a0c34c841749_SSS_17;
     //     }
 
-    //     // 60cb5e01e8bb25b4c10f8304dd8d25fd
+    //     // 1547d744048b76728bd6fc66db42da03
     //     #include "ShadergraphFramework/CrestNodeApplyCaustics.hlsl"
 
     //     void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
@@ -28974,93 +27841,7 @@ Shader "Crest/Ocean"
     //         Out = pow(A, B);
     //     }
 
-    //     void Unity_Modulo_float(float A, float B, out float Out)
-    //     {
-    //         Out = fmod(A, B);
-    //     }
-
-    //     void Unity_Comparison_Greater_float(float A, float B, out float Out)
-    //     {
-    //         Out = A > B ? 1 : 0;
-    //     }
-
-    //     void Unity_Subtract_float(float A, float B, out float Out)
-    //     {
-    //         Out = A - B;
-    //     }
-
-    //     void Unity_Branch_float(float Predicate, float True, float False, out float Out)
-    //     {
-    //         Out = Predicate ? True : False;
-    //     }
-
-    //     struct Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1
-    //     {
-    //     };
-
-    //     void SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(float2 Vector2_B562EFB1, float2 Vector2_83AA31A8, Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 IN, out float2 DisplacedA_1, out float WeightA_3, out float2 DisplacedB_2, out float WeightB_4)
-    //     {
-    //         float2 _Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0 = Vector2_83AA31A8;
-    //         float2 _Property_06123b8dbe81da80934c651a33d13699_Out_0 = Vector2_B562EFB1;
-    //         Bindings_CrestOceanGlobals_d50a85284893ec447a25a093505a2120 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2;
-    //         float3 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5;
-    //         SG_CrestOceanGlobals_d50a85284893ec447a25a093505a2120(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5);
-    //         float _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2;
-    //         Unity_Modulo_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2);
-    //         float2 _Multiply_58400b6ef0b30484913ce941659bac85_Out_2;
-    //         Unity_Multiply_float(_Property_06123b8dbe81da80934c651a33d13699_Out_0, (_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2.xx), _Multiply_58400b6ef0b30484913ce941659bac85_Out_2);
-    //         float2 _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-    //         Unity_Subtract_float2(_Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0, _Multiply_58400b6ef0b30484913ce941659bac85_Out_2, _Subtract_22cf6b53c8344888987905efe87043db_Out_2);
-    //         float2 _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0 = Vector2_83AA31A8;
-    //         #if defined(CREST_FLOW_ON)
-    //         float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-    //         #else
-    //         float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-    //         #endif
-    //         float _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2;
-    //         Unity_Comparison_Greater_float(_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, 1, _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2);
-    //         float _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2;
-    //         Unity_Subtract_float(2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2);
-    //         float _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-    //         Unity_Branch_float(_Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3);
-    //         #if defined(CREST_FLOW_ON)
-    //         float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-    //         #else
-    //         float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = 0;
-    //         #endif
-    //         float2 _Property_bafd78310cede58a971e08fade5e87ee_Out_0 = Vector2_83AA31A8;
-    //         float2 _Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0 = Vector2_B562EFB1;
-    //         float _Add_26a0d41d20a2618d858f292701338a2a_Out_2;
-    //         Unity_Add_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 1, _Add_26a0d41d20a2618d858f292701338a2a_Out_2);
-    //         float _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2;
-    //         Unity_Modulo_float(_Add_26a0d41d20a2618d858f292701338a2a_Out_2, 2, _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2);
-    //         float2 _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2;
-    //         Unity_Multiply_float(_Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0, (_Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2.xx), _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2);
-    //         float2 _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-    //         Unity_Subtract_float2(_Property_bafd78310cede58a971e08fade5e87ee_Out_0, _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2, _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-    //         #else
-    //         float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-    //         #endif
-    //         float _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-    //         Unity_Subtract_float(1, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3, _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-    //         #else
-    //         float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = 0;
-    //         #endif
-    //         DisplacedA_1 = _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0;
-    //         WeightA_3 = _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0;
-    //         DisplacedB_2 = _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0;
-    //         WeightB_4 = _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0;
-    //     }
-
-    //     // 06deca910ff1e1ed1b9ea7fb3513233e
+    //     // 498816f585b40f3ecd7ee304230793a2
     //     #include "ShadergraphFramework/CrestNodeFoam.hlsl"
 
     //     struct Bindings_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963
@@ -29081,132 +27862,49 @@ Shader "Crest/Ocean"
     //         float4 _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0 = Vector4_FD283A50;
     //         float _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0 = Vector1_D6DA4100;
     //         float _Property_76afb5461ed7c284b6afcbd15025248a_Out_0 = Vector1_13F2A8C8;
-    //         float2 _Property_20259e8cfd2c2b8288897462f0776174_Out_0 = Vector2_5AD72ED;
-    //         float2 _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0 = Vector2_28A2C5B9;
-    //         Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 _CrestFlow_a6f6f004811f6c82be002c7059e670a1;
-    //         float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1;
-    //         float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3;
-    //         float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2;
-    //         float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4;
-    //         SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(_Property_20259e8cfd2c2b8288897462f0776174_Out_0, _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4);
+    //         float2 _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0 = Vector2_28A2C5B9;
     //         float _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0 = Vector1_D80F067A;
     //         float3 _Property_b2962080c0284b83821815b7263043dc_Out_0 = Vector3_3AD012AA;
     //         float3 _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0 = Vector3_E4AC4432;
     //         float _Property_4807b4a03c922b87b201864991b317da_Out_0 = Vector1_3E452608;
+    //         float2 _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0 = Vector2_5AD72ED;
     //         half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
     //         half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
     //         half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
     //         half _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
-    //         CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
+    //         CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
     //         #if defined(CREST_FOAM_ON)
     //         float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
     //         #else
     //         float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = float3(0, 0, 0);
     //         #endif
-    //         float3 _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2;
-    //         Unity_Multiply_float(_FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2);
-    //         UnityTexture2D _Property_d34fb0a0645e3e8791a5239873296357_Out_0 = Texture2D_D9E7A343;
-    //         float2 _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0 = Vector2_C4E9ED58;
-    //         float _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0 = Vector1_7492C815;
-    //         float _Property_54ef09feb545b581b0fc27170fef10e2_Out_0 = Vector1_33DC93D;
-    //         float _Property_7ae039043909cb8eb133acd421012651_Out_0 = Vector1_3439FC0A;
-    //         float _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0 = Vector1_FB133018;
-    //         float _Property_fe249f016d4b128ca8400f412655cc5e_Out_0 = Vector1_7CFAFAC1;
-    //         float _Property_08e0e443debd6186acd988fc67faf954_Out_0 = Vector1_53F45327;
-    //         float4 _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0 = Vector4_2FA9AEA5;
-    //         float4 _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0 = Vector4_FD283A50;
-    //         float _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0 = Vector1_D6DA4100;
-    //         float _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0 = Vector1_13F2A8C8;
-    //         float _Property_985518c2ff59e781828129193b83e9fd_Out_0 = Vector1_D80F067A;
-    //         float3 _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0 = Vector3_3AD012AA;
-    //         float3 _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0 = Vector3_E4AC4432;
-    //         float _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0 = Vector1_3E452608;
-    //         half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-    //         half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-    //         half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-    //         half _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-    //         CrestNodeFoam_half(_Property_d34fb0a0645e3e8791a5239873296357_Out_0.tex, _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0, _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0, _Property_54ef09feb545b581b0fc27170fef10e2_Out_0, _Property_7ae039043909cb8eb133acd421012651_Out_0, _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0, _Property_fe249f016d4b128ca8400f412655cc5e_Out_0, _Property_08e0e443debd6186acd988fc67faf954_Out_0, _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0, _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0, _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0, _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _Property_985518c2ff59e781828129193b83e9fd_Out_0, _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0, _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0, _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10);
-    //         #if defined(CREST_FOAM_ON)
-    //         float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-    //         #else
-    //         float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = float3(0, 0, 0);
-    //         #endif
-    //         float3 _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2;
-    //         Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2);
-    //         float3 _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-    //         Unity_Add_float3(_Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2, _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-    //         #else
-    //         float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
-    //         #endif
+    //         float3 _Property_a8190300d5ba483d9365211d7f71abea_Out_0 = Vector3_3AD012AA;
     //         #if defined(CREST_FOAM_ON)
     //         float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
     //         #else
-    //         float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_b2962080c0284b83821815b7263043dc_Out_0;
+    //         float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_a8190300d5ba483d9365211d7f71abea_Out_0;
     //         #endif
-    //         float3 _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2;
-    //         Unity_Multiply_float(_FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2);
-    //         #if defined(CREST_FOAM_ON)
-    //         float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-    //         #else
-    //         float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0;
-    //         #endif
-    //         float3 _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2;
-    //         Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2);
-    //         float3 _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-    //         Unity_Add_float3(_Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2, _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-    //         #else
-    //         float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
-    //         #endif
+    //         float3 _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0 = Vector3_E4AC4432;
     //         #if defined(CREST_FOAM_ON)
     //         float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
     //         #else
-    //         float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0;
+    //         float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0;
     //         #endif
-    //         float3 _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2;
-    //         Unity_Multiply_float(_FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2);
-    //         #if defined(CREST_FOAM_ON)
-    //         float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-    //         #else
-    //         float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0;
-    //         #endif
-    //         float3 _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2;
-    //         Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2);
-    //         float3 _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-    //         Unity_Add_float3(_Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2, _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-    //         #else
-    //         float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
-    //         #endif
+    //         float _Property_e0841d7fa2234ff199a94402710821f1_Out_0 = Vector1_3E452608;
     //         #if defined(CREST_FOAM_ON)
     //         float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
     //         #else
-    //         float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_4807b4a03c922b87b201864991b317da_Out_0;
+    //         float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_e0841d7fa2234ff199a94402710821f1_Out_0;
     //         #endif
-    //         float _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2;
-    //         Unity_Multiply_float(_FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2);
-    //         #if defined(CREST_FOAM_ON)
-    //         float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-    //         #else
-    //         float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0;
-    //         #endif
-    //         float _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2;
-    //         Unity_Multiply_float(_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4, _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2);
-    //         float _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-    //         Unity_Add_float(_Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2, _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-    //         #else
-    //         float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
-    //         #endif
-    //         Albedo_1 = _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0;
-    //         NormalTS_2 = _FLOW_fad25d47eec395899aad2bf77264462c_Out_0;
-    //         Emission_3 = _FLOW_02e1cbd391446082893e73b8088ff765_Out_0;
-    //         Smoothness_4 = _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0;
+    //         Albedo_1 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
+    //         NormalTS_2 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
+    //         Emission_3 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
+    //         Smoothness_4 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
+    //     }
+
+    //     void Unity_OneMinus_float(float In, out float Out)
+    //     {
+    //         Out = 1 - In;
     //     }
 
     //     struct Bindings_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269
@@ -29254,7 +27952,8 @@ Shader "Crest/Ocean"
     //         float3 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1;
     //         float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2;
     //         float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3;
-    //         SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3);
+    //         float4 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4;
+    //         SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4);
     //         float _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0 = Vector1_B01E1A6A;
     //         float2 _Property_a28ec0be576d4586a46337955b069868_Out_0 = Vector2_9C73A0C6;
     //         Bindings_CrestIsUnderwater_52f7750f15e114937b54a0fd27f0d2f2 _CrestIsUnderwater_de15825b4853aa85a98b48656eaa15f1;
@@ -29387,11 +28086,27 @@ Shader "Crest/Ocean"
     //         float3 _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
     //         float _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
     //         SG_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963(_Property_f78369cae749d18392b19bad30a74e2d_Out_0, _Property_169d4581a8319383a7f62a3435e9b11d_Out_0, _Property_0bdc44463eba328a8c73245f2cf82911_Out_0, _Property_74ea32320c303583ae393e1d0afe7d13_Out_0, _Property_b16935e33ecd688caba81b8b02f388e3_Out_0, _Property_519c0dea6b39f688b95e7c8c336ca9fb_Out_0, _Property_e7473f6e9b7b0f8c8615d7497ee5c4a0_Out_0, _Property_d073850e48b8c485ad0ab20154ed80e8_Out_0, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0, _Property_a28ec0be576d4586a46337955b069868_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _Branch_3776301df9f8888faaee9638ee7f568d_Out_3, _Lerp_d393d46d7b4755838d788bf6a655c1cd_Out_3, _Negate_43b5c19855641787873c549e72cb1032_Out_1, _Property_0f7251ac80636d8eb279b11917792d24_Out_0, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4);
-    //         Albedo_2 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1;
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_R_1 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[0];
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_G_2 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[1];
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_B_3 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[2];
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_A_4 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[3];
+    //         float3 _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0 = float3(_Split_e1a3108496a4498a90ecae26cadb6773_R_1, _Split_e1a3108496a4498a90ecae26cadb6773_G_2, _Split_e1a3108496a4498a90ecae26cadb6773_B_3);
+    //         float3 _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
+    //         Unity_Lerp_float3(_CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0, (_Split_e1a3108496a4498a90ecae26cadb6773_A_4.xxx), _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3);
+    //         float _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1;
+    //         Unity_OneMinus_float(_Split_e1a3108496a4498a90ecae26cadb6773_A_4, _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1);
+    //         float3 _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
+    //         Unity_Multiply_float((_OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1.xxx), _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2);
+    //         Albedo_2 = _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
     //         NormalTS_3 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2;
-    //         Emission_4 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
+    //         Emission_4 = _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
     //         Smoothness_5 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
     //         Specular_6 = _CrestFresnel_4c3e438e27705e81abe6c2e9d80cb8d7_LightReflected_2;
+    //     }
+
+    //     void Unity_Subtract_float(float A, float B, out float Out)
+    //     {
+    //         Out = A - B;
     //     }
 
     //     void Unity_Remap_float(float In, float2 InMinMax, float2 OutMinMax, out float Out)
@@ -29399,7 +28114,7 @@ Shader "Crest/Ocean"
     //         Out = OutMinMax.x + (In - InMinMax.x) * (OutMinMax.y - OutMinMax.x) / (InMinMax.y - InMinMax.x);
     //     }
 
-    //     // 3580e24b878bbe7a9a98325dcc0474c2
+    //     // c46fd3ffae69bfdf4a7b13505ef3963f
     //     #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
     //     struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -29450,6 +28165,30 @@ Shader "Crest/Ocean"
     //     {
     //         Out = min(A, B);
     //     };
+
+    //     // c4826bd69adcf43b74845160a7d6f249
+    //     #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+    //     struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+    //     {
+    //         float4 ScreenPosition;
+    //     };
+
+    //     void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+    //     {
+    //         float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+    //         float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+    //         float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+    //         float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+    //         Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+    //         float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+    //         CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+    //         Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+    //     }
 
     //     // a2b98fadb38e4458b014d449a26401de
     //     #include "ShadergraphFramework/CrestNodeOcclusion.hlsl"
@@ -29846,6 +28585,12 @@ Shader "Crest/Ocean"
     //         Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
     //         #endif
     //         #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+    //         Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+    //         _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+    //         float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+    //         SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+    //         #endif
+    //         #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
     //         float _Property_606fa02468b6f8849164940fdce04188_Out_0 = _Occlusion;
     //         #endif
     //         #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
@@ -29863,7 +28608,7 @@ Shader "Crest/Ocean"
     //         #endif
     //         surface.BaseColor = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Albedo_2;
     //         surface.Emission = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Emission_4;
-    //         surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+    //         surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
     //         surface.AlphaClipThreshold = 0;
     //         surface.BentNormal = IN.TangentSpaceNormal;
     //         surface.Smoothness = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5;
@@ -30363,6 +29108,9 @@ Shader "Crest/Ocean"
     //         #pragma shader_feature_local _ CREST_FOAM_ON
     //     #pragma shader_feature_local _ CREST_CAUSTICS_ON
     //     #pragma shader_feature_local _ CREST_FLOW_ON
+    //     #pragma shader_feature_local _ CREST_ALBEDO_ON
+    //     #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+    //     #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
     //     #define CREST_GENERATED_SHADER_ON 1
 
@@ -31206,7 +29954,7 @@ Shader "Crest/Ocean"
     //         Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
     //     }
 
-    //     // 26ddc131f09006478a3aa1683fa75e74
+    //     // 6445f72e0f3d2e176e54a9ffb10e1139
     //     #include "ShadergraphFramework/CrestNodeLightData.hlsl"
 
     //     struct Bindings_CrestLightData_b74b6e8c0b489314ca7aea3e2cc9c54c
@@ -31245,7 +29993,7 @@ Shader "Crest/Ocean"
     //         OutBoolean_1 = _Not_7fbe0c504ec6c2819b1994af01ce3988_Out_1;
     //     }
 
-    //     // 9b604afea48da2ac64cf6198354cf6ae
+    //     // a8e5480cb804440107f760ac5393ec2f
     //     #include "ShadergraphFramework/CrestNodeNormalMapping.hlsl"
 
     //     void Unity_NormalStrength_float(float3 In, float Strength, out float3 Out)
@@ -31258,7 +30006,7 @@ Shader "Crest/Ocean"
     //         float FaceSign;
     //     };
 
-    //     void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3)
+    //     void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3, out float4 Albedo_4)
     //     {
     //         float3 _Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0 = Vector3_FE793823;
     //         float3 _Property_b812768aa4903386b49ba84380e4fa74_Out_0 = Vector3_C8190B61;
@@ -31281,13 +30029,15 @@ Shader "Crest/Ocean"
     //         half3 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1;
     //         half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
     //         half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
-    //         OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31);
+    //         half4 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
+    //         OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33);
     //         float _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0 = Vector1_C6F526AD;
     //         float3 _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
     //         Unity_NormalStrength_float(_OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0, _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2);
     //         Normal_1 = _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
     //         SSS_2 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
     //         Foam_3 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
+    //         Albedo_4 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
     //     }
 
     //     // b4726242738c84550b865a8cd3eafd6e
@@ -31315,7 +30065,7 @@ Shader "Crest/Ocean"
     //         LightReflected_2 = _CrestNodeApplyFresnelCustomFunction_4a16fb68ad2a518d870d2537aaf1e772_LightReflected_10;
     //     }
 
-    //     // 5abfc66ba136f74f6cf58eadabfa3bb1
+    //     // 0d37dbcf887de5687bdac5097fff713e
     //     #include "ShadergraphFramework/CrestNodeAmbientLight.hlsl"
 
     //     struct Bindings_CrestAmbientLight_a6ec89b3ca0ab4e98b300ec3ba0e6013
@@ -31390,10 +30140,10 @@ Shader "Crest/Ocean"
     //         Out_1 = _CrestNodeLinearEyeDepthCustomFunction_ee1cef135a8e558088e613593ae90486_LinearEyeDepth_1;
     //     }
 
-    //     // 3818fb4ea9ebd67663e831ef4a019758
+    //     // 2ca856c7634fa49c75d73b5ddc1b65ca
     //     #include "ShadergraphFramework/CrestNodeFoamBubbles.hlsl"
 
-    //     // 77b1d95beeaa53e1bbdfd7a6e8dd6fa0
+    //     // b3b317d9da04ee361966ef1a88eac53c
     //     #include "ShadergraphFramework/CrestNodeVolumeEmission.hlsl"
 
     //     void Unity_Add_float(float A, float B, out float Out)
@@ -31426,7 +30176,7 @@ Shader "Crest/Ocean"
     //         SubSurfaceScattering_9 = _CrestNodeSampleOceanDataSingleCustomFunction_a7f8891a8a8e5d8ab9c9a0c34c841749_SSS_17;
     //     }
 
-    //     // 60cb5e01e8bb25b4c10f8304dd8d25fd
+    //     // 1547d744048b76728bd6fc66db42da03
     //     #include "ShadergraphFramework/CrestNodeApplyCaustics.hlsl"
 
     //     void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
@@ -31577,93 +30327,7 @@ Shader "Crest/Ocean"
     //         Out = pow(A, B);
     //     }
 
-    //     void Unity_Modulo_float(float A, float B, out float Out)
-    //     {
-    //         Out = fmod(A, B);
-    //     }
-
-    //     void Unity_Comparison_Greater_float(float A, float B, out float Out)
-    //     {
-    //         Out = A > B ? 1 : 0;
-    //     }
-
-    //     void Unity_Subtract_float(float A, float B, out float Out)
-    //     {
-    //         Out = A - B;
-    //     }
-
-    //     void Unity_Branch_float(float Predicate, float True, float False, out float Out)
-    //     {
-    //         Out = Predicate ? True : False;
-    //     }
-
-    //     struct Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1
-    //     {
-    //     };
-
-    //     void SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(float2 Vector2_B562EFB1, float2 Vector2_83AA31A8, Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 IN, out float2 DisplacedA_1, out float WeightA_3, out float2 DisplacedB_2, out float WeightB_4)
-    //     {
-    //         float2 _Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0 = Vector2_83AA31A8;
-    //         float2 _Property_06123b8dbe81da80934c651a33d13699_Out_0 = Vector2_B562EFB1;
-    //         Bindings_CrestOceanGlobals_d50a85284893ec447a25a093505a2120 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2;
-    //         float3 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5;
-    //         SG_CrestOceanGlobals_d50a85284893ec447a25a093505a2120(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5);
-    //         float _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2;
-    //         Unity_Modulo_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2);
-    //         float2 _Multiply_58400b6ef0b30484913ce941659bac85_Out_2;
-    //         Unity_Multiply_float(_Property_06123b8dbe81da80934c651a33d13699_Out_0, (_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2.xx), _Multiply_58400b6ef0b30484913ce941659bac85_Out_2);
-    //         float2 _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-    //         Unity_Subtract_float2(_Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0, _Multiply_58400b6ef0b30484913ce941659bac85_Out_2, _Subtract_22cf6b53c8344888987905efe87043db_Out_2);
-    //         float2 _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0 = Vector2_83AA31A8;
-    //         #if defined(CREST_FLOW_ON)
-    //         float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-    //         #else
-    //         float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-    //         #endif
-    //         float _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2;
-    //         Unity_Comparison_Greater_float(_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, 1, _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2);
-    //         float _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2;
-    //         Unity_Subtract_float(2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2);
-    //         float _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-    //         Unity_Branch_float(_Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3);
-    //         #if defined(CREST_FLOW_ON)
-    //         float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-    //         #else
-    //         float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = 0;
-    //         #endif
-    //         float2 _Property_bafd78310cede58a971e08fade5e87ee_Out_0 = Vector2_83AA31A8;
-    //         float2 _Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0 = Vector2_B562EFB1;
-    //         float _Add_26a0d41d20a2618d858f292701338a2a_Out_2;
-    //         Unity_Add_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 1, _Add_26a0d41d20a2618d858f292701338a2a_Out_2);
-    //         float _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2;
-    //         Unity_Modulo_float(_Add_26a0d41d20a2618d858f292701338a2a_Out_2, 2, _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2);
-    //         float2 _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2;
-    //         Unity_Multiply_float(_Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0, (_Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2.xx), _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2);
-    //         float2 _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-    //         Unity_Subtract_float2(_Property_bafd78310cede58a971e08fade5e87ee_Out_0, _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2, _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-    //         #else
-    //         float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-    //         #endif
-    //         float _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-    //         Unity_Subtract_float(1, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3, _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-    //         #else
-    //         float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = 0;
-    //         #endif
-    //         DisplacedA_1 = _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0;
-    //         WeightA_3 = _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0;
-    //         DisplacedB_2 = _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0;
-    //         WeightB_4 = _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0;
-    //     }
-
-    //     // 06deca910ff1e1ed1b9ea7fb3513233e
+    //     // 498816f585b40f3ecd7ee304230793a2
     //     #include "ShadergraphFramework/CrestNodeFoam.hlsl"
 
     //     struct Bindings_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963
@@ -31684,132 +30348,49 @@ Shader "Crest/Ocean"
     //         float4 _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0 = Vector4_FD283A50;
     //         float _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0 = Vector1_D6DA4100;
     //         float _Property_76afb5461ed7c284b6afcbd15025248a_Out_0 = Vector1_13F2A8C8;
-    //         float2 _Property_20259e8cfd2c2b8288897462f0776174_Out_0 = Vector2_5AD72ED;
-    //         float2 _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0 = Vector2_28A2C5B9;
-    //         Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 _CrestFlow_a6f6f004811f6c82be002c7059e670a1;
-    //         float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1;
-    //         float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3;
-    //         float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2;
-    //         float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4;
-    //         SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(_Property_20259e8cfd2c2b8288897462f0776174_Out_0, _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4);
+    //         float2 _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0 = Vector2_28A2C5B9;
     //         float _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0 = Vector1_D80F067A;
     //         float3 _Property_b2962080c0284b83821815b7263043dc_Out_0 = Vector3_3AD012AA;
     //         float3 _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0 = Vector3_E4AC4432;
     //         float _Property_4807b4a03c922b87b201864991b317da_Out_0 = Vector1_3E452608;
+    //         float2 _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0 = Vector2_5AD72ED;
     //         half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
     //         half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
     //         half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
     //         half _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
-    //         CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
+    //         CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
     //         #if defined(CREST_FOAM_ON)
     //         float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
     //         #else
     //         float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = float3(0, 0, 0);
     //         #endif
-    //         float3 _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2;
-    //         Unity_Multiply_float(_FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2);
-    //         UnityTexture2D _Property_d34fb0a0645e3e8791a5239873296357_Out_0 = Texture2D_D9E7A343;
-    //         float2 _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0 = Vector2_C4E9ED58;
-    //         float _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0 = Vector1_7492C815;
-    //         float _Property_54ef09feb545b581b0fc27170fef10e2_Out_0 = Vector1_33DC93D;
-    //         float _Property_7ae039043909cb8eb133acd421012651_Out_0 = Vector1_3439FC0A;
-    //         float _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0 = Vector1_FB133018;
-    //         float _Property_fe249f016d4b128ca8400f412655cc5e_Out_0 = Vector1_7CFAFAC1;
-    //         float _Property_08e0e443debd6186acd988fc67faf954_Out_0 = Vector1_53F45327;
-    //         float4 _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0 = Vector4_2FA9AEA5;
-    //         float4 _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0 = Vector4_FD283A50;
-    //         float _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0 = Vector1_D6DA4100;
-    //         float _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0 = Vector1_13F2A8C8;
-    //         float _Property_985518c2ff59e781828129193b83e9fd_Out_0 = Vector1_D80F067A;
-    //         float3 _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0 = Vector3_3AD012AA;
-    //         float3 _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0 = Vector3_E4AC4432;
-    //         float _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0 = Vector1_3E452608;
-    //         half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-    //         half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-    //         half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-    //         half _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-    //         CrestNodeFoam_half(_Property_d34fb0a0645e3e8791a5239873296357_Out_0.tex, _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0, _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0, _Property_54ef09feb545b581b0fc27170fef10e2_Out_0, _Property_7ae039043909cb8eb133acd421012651_Out_0, _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0, _Property_fe249f016d4b128ca8400f412655cc5e_Out_0, _Property_08e0e443debd6186acd988fc67faf954_Out_0, _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0, _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0, _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0, _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _Property_985518c2ff59e781828129193b83e9fd_Out_0, _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0, _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0, _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10);
-    //         #if defined(CREST_FOAM_ON)
-    //         float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-    //         #else
-    //         float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = float3(0, 0, 0);
-    //         #endif
-    //         float3 _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2;
-    //         Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2);
-    //         float3 _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-    //         Unity_Add_float3(_Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2, _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-    //         #else
-    //         float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
-    //         #endif
+    //         float3 _Property_a8190300d5ba483d9365211d7f71abea_Out_0 = Vector3_3AD012AA;
     //         #if defined(CREST_FOAM_ON)
     //         float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
     //         #else
-    //         float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_b2962080c0284b83821815b7263043dc_Out_0;
+    //         float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_a8190300d5ba483d9365211d7f71abea_Out_0;
     //         #endif
-    //         float3 _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2;
-    //         Unity_Multiply_float(_FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2);
-    //         #if defined(CREST_FOAM_ON)
-    //         float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-    //         #else
-    //         float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0;
-    //         #endif
-    //         float3 _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2;
-    //         Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2);
-    //         float3 _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-    //         Unity_Add_float3(_Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2, _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-    //         #else
-    //         float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
-    //         #endif
+    //         float3 _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0 = Vector3_E4AC4432;
     //         #if defined(CREST_FOAM_ON)
     //         float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
     //         #else
-    //         float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0;
+    //         float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0;
     //         #endif
-    //         float3 _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2;
-    //         Unity_Multiply_float(_FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2);
-    //         #if defined(CREST_FOAM_ON)
-    //         float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-    //         #else
-    //         float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0;
-    //         #endif
-    //         float3 _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2;
-    //         Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2);
-    //         float3 _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-    //         Unity_Add_float3(_Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2, _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-    //         #else
-    //         float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
-    //         #endif
+    //         float _Property_e0841d7fa2234ff199a94402710821f1_Out_0 = Vector1_3E452608;
     //         #if defined(CREST_FOAM_ON)
     //         float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
     //         #else
-    //         float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_4807b4a03c922b87b201864991b317da_Out_0;
+    //         float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_e0841d7fa2234ff199a94402710821f1_Out_0;
     //         #endif
-    //         float _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2;
-    //         Unity_Multiply_float(_FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2);
-    //         #if defined(CREST_FOAM_ON)
-    //         float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-    //         #else
-    //         float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0;
-    //         #endif
-    //         float _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2;
-    //         Unity_Multiply_float(_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4, _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2);
-    //         float _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-    //         Unity_Add_float(_Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2, _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-    //         #else
-    //         float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
-    //         #endif
-    //         Albedo_1 = _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0;
-    //         NormalTS_2 = _FLOW_fad25d47eec395899aad2bf77264462c_Out_0;
-    //         Emission_3 = _FLOW_02e1cbd391446082893e73b8088ff765_Out_0;
-    //         Smoothness_4 = _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0;
+    //         Albedo_1 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
+    //         NormalTS_2 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
+    //         Emission_3 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
+    //         Smoothness_4 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
+    //     }
+
+    //     void Unity_OneMinus_float(float In, out float Out)
+    //     {
+    //         Out = 1 - In;
     //     }
 
     //     struct Bindings_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269
@@ -31857,7 +30438,8 @@ Shader "Crest/Ocean"
     //         float3 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1;
     //         float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2;
     //         float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3;
-    //         SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3);
+    //         float4 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4;
+    //         SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4);
     //         float _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0 = Vector1_B01E1A6A;
     //         float2 _Property_a28ec0be576d4586a46337955b069868_Out_0 = Vector2_9C73A0C6;
     //         Bindings_CrestIsUnderwater_52f7750f15e114937b54a0fd27f0d2f2 _CrestIsUnderwater_de15825b4853aa85a98b48656eaa15f1;
@@ -31990,11 +30572,27 @@ Shader "Crest/Ocean"
     //         float3 _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
     //         float _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
     //         SG_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963(_Property_f78369cae749d18392b19bad30a74e2d_Out_0, _Property_169d4581a8319383a7f62a3435e9b11d_Out_0, _Property_0bdc44463eba328a8c73245f2cf82911_Out_0, _Property_74ea32320c303583ae393e1d0afe7d13_Out_0, _Property_b16935e33ecd688caba81b8b02f388e3_Out_0, _Property_519c0dea6b39f688b95e7c8c336ca9fb_Out_0, _Property_e7473f6e9b7b0f8c8615d7497ee5c4a0_Out_0, _Property_d073850e48b8c485ad0ab20154ed80e8_Out_0, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0, _Property_a28ec0be576d4586a46337955b069868_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _Branch_3776301df9f8888faaee9638ee7f568d_Out_3, _Lerp_d393d46d7b4755838d788bf6a655c1cd_Out_3, _Negate_43b5c19855641787873c549e72cb1032_Out_1, _Property_0f7251ac80636d8eb279b11917792d24_Out_0, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4);
-    //         Albedo_2 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1;
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_R_1 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[0];
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_G_2 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[1];
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_B_3 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[2];
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_A_4 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[3];
+    //         float3 _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0 = float3(_Split_e1a3108496a4498a90ecae26cadb6773_R_1, _Split_e1a3108496a4498a90ecae26cadb6773_G_2, _Split_e1a3108496a4498a90ecae26cadb6773_B_3);
+    //         float3 _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
+    //         Unity_Lerp_float3(_CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0, (_Split_e1a3108496a4498a90ecae26cadb6773_A_4.xxx), _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3);
+    //         float _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1;
+    //         Unity_OneMinus_float(_Split_e1a3108496a4498a90ecae26cadb6773_A_4, _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1);
+    //         float3 _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
+    //         Unity_Multiply_float((_OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1.xxx), _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2);
+    //         Albedo_2 = _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
     //         NormalTS_3 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2;
-    //         Emission_4 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
+    //         Emission_4 = _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
     //         Smoothness_5 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
     //         Specular_6 = _CrestFresnel_4c3e438e27705e81abe6c2e9d80cb8d7_LightReflected_2;
+    //     }
+
+    //     void Unity_Subtract_float(float A, float B, out float Out)
+    //     {
+    //         Out = A - B;
     //     }
 
     //     void Unity_Remap_float(float In, float2 InMinMax, float2 OutMinMax, out float Out)
@@ -32002,7 +30600,7 @@ Shader "Crest/Ocean"
     //         Out = OutMinMax.x + (In - InMinMax.x) * (OutMinMax.y - OutMinMax.x) / (InMinMax.y - InMinMax.x);
     //     }
 
-    //     // 3580e24b878bbe7a9a98325dcc0474c2
+    //     // c46fd3ffae69bfdf4a7b13505ef3963f
     //     #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
     //     struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -32053,6 +30651,30 @@ Shader "Crest/Ocean"
     //     {
     //         Out = min(A, B);
     //     };
+
+    //     // c4826bd69adcf43b74845160a7d6f249
+    //     #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+    //     struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+    //     {
+    //         float4 ScreenPosition;
+    //     };
+
+    //     void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+    //     {
+    //         float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+    //         float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+    //         float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+    //         float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+    //         Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+    //         float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+    //         CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+    //         Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+    //     }
 
     //     // a2b98fadb38e4458b014d449a26401de
     //     #include "ShadergraphFramework/CrestNodeOcclusion.hlsl"
@@ -32449,6 +31071,12 @@ Shader "Crest/Ocean"
     //         Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
     //         #endif
     //         #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+    //         Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+    //         _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+    //         float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+    //         SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+    //         #endif
+    //         #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
     //         float _Property_606fa02468b6f8849164940fdce04188_Out_0 = _Occlusion;
     //         #endif
     //         #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
@@ -32466,7 +31094,7 @@ Shader "Crest/Ocean"
     //         #endif
     //         surface.BaseColor = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Albedo_2;
     //         surface.Emission = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Emission_4;
-    //         surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+    //         surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
     //         surface.AlphaClipThreshold = 0;
     //         surface.BentNormal = IN.TangentSpaceNormal;
     //         surface.Smoothness = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5;
@@ -32964,6 +31592,9 @@ Shader "Crest/Ocean"
     //         #pragma shader_feature_local _ CREST_FOAM_ON
     //     #pragma shader_feature_local _ CREST_CAUSTICS_ON
     //     #pragma shader_feature_local _ CREST_FLOW_ON
+    //     #pragma shader_feature_local _ CREST_ALBEDO_ON
+    //     #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+    //     #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
     //     #define CREST_GENERATED_SHADER_ON 1
 
@@ -33832,7 +32463,7 @@ Shader "Crest/Ocean"
     //         Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
     //     }
 
-    //     // 26ddc131f09006478a3aa1683fa75e74
+    //     // 6445f72e0f3d2e176e54a9ffb10e1139
     //     #include "ShadergraphFramework/CrestNodeLightData.hlsl"
 
     //     struct Bindings_CrestLightData_b74b6e8c0b489314ca7aea3e2cc9c54c
@@ -33871,7 +32502,7 @@ Shader "Crest/Ocean"
     //         OutBoolean_1 = _Not_7fbe0c504ec6c2819b1994af01ce3988_Out_1;
     //     }
 
-    //     // 9b604afea48da2ac64cf6198354cf6ae
+    //     // a8e5480cb804440107f760ac5393ec2f
     //     #include "ShadergraphFramework/CrestNodeNormalMapping.hlsl"
 
     //     void Unity_NormalStrength_float(float3 In, float Strength, out float3 Out)
@@ -33884,7 +32515,7 @@ Shader "Crest/Ocean"
     //         float FaceSign;
     //     };
 
-    //     void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3)
+    //     void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3, out float4 Albedo_4)
     //     {
     //         float3 _Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0 = Vector3_FE793823;
     //         float3 _Property_b812768aa4903386b49ba84380e4fa74_Out_0 = Vector3_C8190B61;
@@ -33907,13 +32538,15 @@ Shader "Crest/Ocean"
     //         half3 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1;
     //         half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
     //         half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
-    //         OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31);
+    //         half4 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
+    //         OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33);
     //         float _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0 = Vector1_C6F526AD;
     //         float3 _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
     //         Unity_NormalStrength_float(_OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0, _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2);
     //         Normal_1 = _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
     //         SSS_2 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
     //         Foam_3 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
+    //         Albedo_4 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
     //     }
 
     //     // b4726242738c84550b865a8cd3eafd6e
@@ -33941,7 +32574,7 @@ Shader "Crest/Ocean"
     //         LightReflected_2 = _CrestNodeApplyFresnelCustomFunction_4a16fb68ad2a518d870d2537aaf1e772_LightReflected_10;
     //     }
 
-    //     // 5abfc66ba136f74f6cf58eadabfa3bb1
+    //     // 0d37dbcf887de5687bdac5097fff713e
     //     #include "ShadergraphFramework/CrestNodeAmbientLight.hlsl"
 
     //     struct Bindings_CrestAmbientLight_a6ec89b3ca0ab4e98b300ec3ba0e6013
@@ -34016,10 +32649,10 @@ Shader "Crest/Ocean"
     //         Out_1 = _CrestNodeLinearEyeDepthCustomFunction_ee1cef135a8e558088e613593ae90486_LinearEyeDepth_1;
     //     }
 
-    //     // 3818fb4ea9ebd67663e831ef4a019758
+    //     // 2ca856c7634fa49c75d73b5ddc1b65ca
     //     #include "ShadergraphFramework/CrestNodeFoamBubbles.hlsl"
 
-    //     // 77b1d95beeaa53e1bbdfd7a6e8dd6fa0
+    //     // b3b317d9da04ee361966ef1a88eac53c
     //     #include "ShadergraphFramework/CrestNodeVolumeEmission.hlsl"
 
     //     void Unity_Add_float(float A, float B, out float Out)
@@ -34052,7 +32685,7 @@ Shader "Crest/Ocean"
     //         SubSurfaceScattering_9 = _CrestNodeSampleOceanDataSingleCustomFunction_a7f8891a8a8e5d8ab9c9a0c34c841749_SSS_17;
     //     }
 
-    //     // 60cb5e01e8bb25b4c10f8304dd8d25fd
+    //     // 1547d744048b76728bd6fc66db42da03
     //     #include "ShadergraphFramework/CrestNodeApplyCaustics.hlsl"
 
     //     void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
@@ -34203,93 +32836,7 @@ Shader "Crest/Ocean"
     //         Out = pow(A, B);
     //     }
 
-    //     void Unity_Modulo_float(float A, float B, out float Out)
-    //     {
-    //         Out = fmod(A, B);
-    //     }
-
-    //     void Unity_Comparison_Greater_float(float A, float B, out float Out)
-    //     {
-    //         Out = A > B ? 1 : 0;
-    //     }
-
-    //     void Unity_Subtract_float(float A, float B, out float Out)
-    //     {
-    //         Out = A - B;
-    //     }
-
-    //     void Unity_Branch_float(float Predicate, float True, float False, out float Out)
-    //     {
-    //         Out = Predicate ? True : False;
-    //     }
-
-    //     struct Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1
-    //     {
-    //     };
-
-    //     void SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(float2 Vector2_B562EFB1, float2 Vector2_83AA31A8, Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 IN, out float2 DisplacedA_1, out float WeightA_3, out float2 DisplacedB_2, out float WeightB_4)
-    //     {
-    //         float2 _Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0 = Vector2_83AA31A8;
-    //         float2 _Property_06123b8dbe81da80934c651a33d13699_Out_0 = Vector2_B562EFB1;
-    //         Bindings_CrestOceanGlobals_d50a85284893ec447a25a093505a2120 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2;
-    //         float3 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5;
-    //         SG_CrestOceanGlobals_d50a85284893ec447a25a093505a2120(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5);
-    //         float _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2;
-    //         Unity_Modulo_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2);
-    //         float2 _Multiply_58400b6ef0b30484913ce941659bac85_Out_2;
-    //         Unity_Multiply_float(_Property_06123b8dbe81da80934c651a33d13699_Out_0, (_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2.xx), _Multiply_58400b6ef0b30484913ce941659bac85_Out_2);
-    //         float2 _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-    //         Unity_Subtract_float2(_Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0, _Multiply_58400b6ef0b30484913ce941659bac85_Out_2, _Subtract_22cf6b53c8344888987905efe87043db_Out_2);
-    //         float2 _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0 = Vector2_83AA31A8;
-    //         #if defined(CREST_FLOW_ON)
-    //         float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-    //         #else
-    //         float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-    //         #endif
-    //         float _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2;
-    //         Unity_Comparison_Greater_float(_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, 1, _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2);
-    //         float _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2;
-    //         Unity_Subtract_float(2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2);
-    //         float _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-    //         Unity_Branch_float(_Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3);
-    //         #if defined(CREST_FLOW_ON)
-    //         float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-    //         #else
-    //         float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = 0;
-    //         #endif
-    //         float2 _Property_bafd78310cede58a971e08fade5e87ee_Out_0 = Vector2_83AA31A8;
-    //         float2 _Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0 = Vector2_B562EFB1;
-    //         float _Add_26a0d41d20a2618d858f292701338a2a_Out_2;
-    //         Unity_Add_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 1, _Add_26a0d41d20a2618d858f292701338a2a_Out_2);
-    //         float _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2;
-    //         Unity_Modulo_float(_Add_26a0d41d20a2618d858f292701338a2a_Out_2, 2, _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2);
-    //         float2 _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2;
-    //         Unity_Multiply_float(_Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0, (_Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2.xx), _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2);
-    //         float2 _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-    //         Unity_Subtract_float2(_Property_bafd78310cede58a971e08fade5e87ee_Out_0, _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2, _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-    //         #else
-    //         float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-    //         #endif
-    //         float _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-    //         Unity_Subtract_float(1, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3, _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-    //         #else
-    //         float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = 0;
-    //         #endif
-    //         DisplacedA_1 = _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0;
-    //         WeightA_3 = _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0;
-    //         DisplacedB_2 = _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0;
-    //         WeightB_4 = _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0;
-    //     }
-
-    //     // 06deca910ff1e1ed1b9ea7fb3513233e
+    //     // 498816f585b40f3ecd7ee304230793a2
     //     #include "ShadergraphFramework/CrestNodeFoam.hlsl"
 
     //     struct Bindings_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963
@@ -34310,132 +32857,49 @@ Shader "Crest/Ocean"
     //         float4 _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0 = Vector4_FD283A50;
     //         float _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0 = Vector1_D6DA4100;
     //         float _Property_76afb5461ed7c284b6afcbd15025248a_Out_0 = Vector1_13F2A8C8;
-    //         float2 _Property_20259e8cfd2c2b8288897462f0776174_Out_0 = Vector2_5AD72ED;
-    //         float2 _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0 = Vector2_28A2C5B9;
-    //         Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 _CrestFlow_a6f6f004811f6c82be002c7059e670a1;
-    //         float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1;
-    //         float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3;
-    //         float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2;
-    //         float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4;
-    //         SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(_Property_20259e8cfd2c2b8288897462f0776174_Out_0, _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4);
+    //         float2 _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0 = Vector2_28A2C5B9;
     //         float _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0 = Vector1_D80F067A;
     //         float3 _Property_b2962080c0284b83821815b7263043dc_Out_0 = Vector3_3AD012AA;
     //         float3 _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0 = Vector3_E4AC4432;
     //         float _Property_4807b4a03c922b87b201864991b317da_Out_0 = Vector1_3E452608;
+    //         float2 _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0 = Vector2_5AD72ED;
     //         half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
     //         half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
     //         half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
     //         half _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
-    //         CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
+    //         CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
     //         #if defined(CREST_FOAM_ON)
     //         float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
     //         #else
     //         float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = float3(0, 0, 0);
     //         #endif
-    //         float3 _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2;
-    //         Unity_Multiply_float(_FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2);
-    //         UnityTexture2D _Property_d34fb0a0645e3e8791a5239873296357_Out_0 = Texture2D_D9E7A343;
-    //         float2 _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0 = Vector2_C4E9ED58;
-    //         float _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0 = Vector1_7492C815;
-    //         float _Property_54ef09feb545b581b0fc27170fef10e2_Out_0 = Vector1_33DC93D;
-    //         float _Property_7ae039043909cb8eb133acd421012651_Out_0 = Vector1_3439FC0A;
-    //         float _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0 = Vector1_FB133018;
-    //         float _Property_fe249f016d4b128ca8400f412655cc5e_Out_0 = Vector1_7CFAFAC1;
-    //         float _Property_08e0e443debd6186acd988fc67faf954_Out_0 = Vector1_53F45327;
-    //         float4 _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0 = Vector4_2FA9AEA5;
-    //         float4 _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0 = Vector4_FD283A50;
-    //         float _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0 = Vector1_D6DA4100;
-    //         float _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0 = Vector1_13F2A8C8;
-    //         float _Property_985518c2ff59e781828129193b83e9fd_Out_0 = Vector1_D80F067A;
-    //         float3 _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0 = Vector3_3AD012AA;
-    //         float3 _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0 = Vector3_E4AC4432;
-    //         float _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0 = Vector1_3E452608;
-    //         half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-    //         half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-    //         half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-    //         half _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-    //         CrestNodeFoam_half(_Property_d34fb0a0645e3e8791a5239873296357_Out_0.tex, _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0, _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0, _Property_54ef09feb545b581b0fc27170fef10e2_Out_0, _Property_7ae039043909cb8eb133acd421012651_Out_0, _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0, _Property_fe249f016d4b128ca8400f412655cc5e_Out_0, _Property_08e0e443debd6186acd988fc67faf954_Out_0, _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0, _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0, _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0, _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _Property_985518c2ff59e781828129193b83e9fd_Out_0, _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0, _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0, _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10);
-    //         #if defined(CREST_FOAM_ON)
-    //         float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-    //         #else
-    //         float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = float3(0, 0, 0);
-    //         #endif
-    //         float3 _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2;
-    //         Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2);
-    //         float3 _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-    //         Unity_Add_float3(_Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2, _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-    //         #else
-    //         float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
-    //         #endif
+    //         float3 _Property_a8190300d5ba483d9365211d7f71abea_Out_0 = Vector3_3AD012AA;
     //         #if defined(CREST_FOAM_ON)
     //         float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
     //         #else
-    //         float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_b2962080c0284b83821815b7263043dc_Out_0;
+    //         float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_a8190300d5ba483d9365211d7f71abea_Out_0;
     //         #endif
-    //         float3 _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2;
-    //         Unity_Multiply_float(_FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2);
-    //         #if defined(CREST_FOAM_ON)
-    //         float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-    //         #else
-    //         float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0;
-    //         #endif
-    //         float3 _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2;
-    //         Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2);
-    //         float3 _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-    //         Unity_Add_float3(_Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2, _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-    //         #else
-    //         float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
-    //         #endif
+    //         float3 _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0 = Vector3_E4AC4432;
     //         #if defined(CREST_FOAM_ON)
     //         float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
     //         #else
-    //         float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0;
+    //         float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0;
     //         #endif
-    //         float3 _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2;
-    //         Unity_Multiply_float(_FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2);
-    //         #if defined(CREST_FOAM_ON)
-    //         float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-    //         #else
-    //         float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0;
-    //         #endif
-    //         float3 _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2;
-    //         Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2);
-    //         float3 _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-    //         Unity_Add_float3(_Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2, _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-    //         #else
-    //         float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
-    //         #endif
+    //         float _Property_e0841d7fa2234ff199a94402710821f1_Out_0 = Vector1_3E452608;
     //         #if defined(CREST_FOAM_ON)
     //         float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
     //         #else
-    //         float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_4807b4a03c922b87b201864991b317da_Out_0;
+    //         float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_e0841d7fa2234ff199a94402710821f1_Out_0;
     //         #endif
-    //         float _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2;
-    //         Unity_Multiply_float(_FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2);
-    //         #if defined(CREST_FOAM_ON)
-    //         float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-    //         #else
-    //         float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0;
-    //         #endif
-    //         float _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2;
-    //         Unity_Multiply_float(_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4, _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2);
-    //         float _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-    //         Unity_Add_float(_Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2, _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-    //         #else
-    //         float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
-    //         #endif
-    //         Albedo_1 = _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0;
-    //         NormalTS_2 = _FLOW_fad25d47eec395899aad2bf77264462c_Out_0;
-    //         Emission_3 = _FLOW_02e1cbd391446082893e73b8088ff765_Out_0;
-    //         Smoothness_4 = _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0;
+    //         Albedo_1 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
+    //         NormalTS_2 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
+    //         Emission_3 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
+    //         Smoothness_4 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
+    //     }
+
+    //     void Unity_OneMinus_float(float In, out float Out)
+    //     {
+    //         Out = 1 - In;
     //     }
 
     //     struct Bindings_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269
@@ -34483,7 +32947,8 @@ Shader "Crest/Ocean"
     //         float3 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1;
     //         float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2;
     //         float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3;
-    //         SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3);
+    //         float4 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4;
+    //         SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4);
     //         float _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0 = Vector1_B01E1A6A;
     //         float2 _Property_a28ec0be576d4586a46337955b069868_Out_0 = Vector2_9C73A0C6;
     //         Bindings_CrestIsUnderwater_52f7750f15e114937b54a0fd27f0d2f2 _CrestIsUnderwater_de15825b4853aa85a98b48656eaa15f1;
@@ -34616,11 +33081,27 @@ Shader "Crest/Ocean"
     //         float3 _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
     //         float _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
     //         SG_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963(_Property_f78369cae749d18392b19bad30a74e2d_Out_0, _Property_169d4581a8319383a7f62a3435e9b11d_Out_0, _Property_0bdc44463eba328a8c73245f2cf82911_Out_0, _Property_74ea32320c303583ae393e1d0afe7d13_Out_0, _Property_b16935e33ecd688caba81b8b02f388e3_Out_0, _Property_519c0dea6b39f688b95e7c8c336ca9fb_Out_0, _Property_e7473f6e9b7b0f8c8615d7497ee5c4a0_Out_0, _Property_d073850e48b8c485ad0ab20154ed80e8_Out_0, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0, _Property_a28ec0be576d4586a46337955b069868_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _Branch_3776301df9f8888faaee9638ee7f568d_Out_3, _Lerp_d393d46d7b4755838d788bf6a655c1cd_Out_3, _Negate_43b5c19855641787873c549e72cb1032_Out_1, _Property_0f7251ac80636d8eb279b11917792d24_Out_0, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4);
-    //         Albedo_2 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1;
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_R_1 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[0];
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_G_2 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[1];
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_B_3 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[2];
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_A_4 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[3];
+    //         float3 _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0 = float3(_Split_e1a3108496a4498a90ecae26cadb6773_R_1, _Split_e1a3108496a4498a90ecae26cadb6773_G_2, _Split_e1a3108496a4498a90ecae26cadb6773_B_3);
+    //         float3 _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
+    //         Unity_Lerp_float3(_CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0, (_Split_e1a3108496a4498a90ecae26cadb6773_A_4.xxx), _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3);
+    //         float _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1;
+    //         Unity_OneMinus_float(_Split_e1a3108496a4498a90ecae26cadb6773_A_4, _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1);
+    //         float3 _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
+    //         Unity_Multiply_float((_OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1.xxx), _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2);
+    //         Albedo_2 = _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
     //         NormalTS_3 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2;
-    //         Emission_4 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
+    //         Emission_4 = _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
     //         Smoothness_5 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
     //         Specular_6 = _CrestFresnel_4c3e438e27705e81abe6c2e9d80cb8d7_LightReflected_2;
+    //     }
+
+    //     void Unity_Subtract_float(float A, float B, out float Out)
+    //     {
+    //         Out = A - B;
     //     }
 
     //     void Unity_Remap_float(float In, float2 InMinMax, float2 OutMinMax, out float Out)
@@ -34628,7 +33109,7 @@ Shader "Crest/Ocean"
     //         Out = OutMinMax.x + (In - InMinMax.x) * (OutMinMax.y - OutMinMax.x) / (InMinMax.y - InMinMax.x);
     //     }
 
-    //     // 3580e24b878bbe7a9a98325dcc0474c2
+    //     // c46fd3ffae69bfdf4a7b13505ef3963f
     //     #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
     //     struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -34679,6 +33160,30 @@ Shader "Crest/Ocean"
     //     {
     //         Out = min(A, B);
     //     };
+
+    //     // c4826bd69adcf43b74845160a7d6f249
+    //     #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+    //     struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+    //     {
+    //         float4 ScreenPosition;
+    //     };
+
+    //     void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+    //     {
+    //         float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+    //         float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+    //         float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+    //         float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+    //         Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+    //         float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+    //         CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+    //         Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+    //     }
 
     //     // a2b98fadb38e4458b014d449a26401de
     //     #include "ShadergraphFramework/CrestNodeOcclusion.hlsl"
@@ -35075,6 +33580,12 @@ Shader "Crest/Ocean"
     //         Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
     //         #endif
     //         #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+    //         Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+    //         _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+    //         float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+    //         SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+    //         #endif
+    //         #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
     //         float _Property_606fa02468b6f8849164940fdce04188_Out_0 = _Occlusion;
     //         #endif
     //         #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
@@ -35092,7 +33603,7 @@ Shader "Crest/Ocean"
     //         #endif
     //         surface.BaseColor = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Albedo_2;
     //         surface.Emission = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Emission_4;
-    //         surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+    //         surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
     //         surface.AlphaClipThreshold = 0;
     //         surface.BentNormal = IN.TangentSpaceNormal;
     //         surface.Smoothness = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5;
@@ -35595,6 +34106,9 @@ Shader "Crest/Ocean"
     //         #pragma shader_feature_local _ CREST_FOAM_ON
     //     #pragma shader_feature_local _ CREST_CAUSTICS_ON
     //     #pragma shader_feature_local _ CREST_FLOW_ON
+    //     #pragma shader_feature_local _ CREST_ALBEDO_ON
+    //     #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+    //     #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
     //     #define CREST_GENERATED_SHADER_ON 1
 
@@ -36460,7 +34974,7 @@ Shader "Crest/Ocean"
     //         Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
     //     }
 
-    //     // 26ddc131f09006478a3aa1683fa75e74
+    //     // 6445f72e0f3d2e176e54a9ffb10e1139
     //     #include "ShadergraphFramework/CrestNodeLightData.hlsl"
 
     //     struct Bindings_CrestLightData_b74b6e8c0b489314ca7aea3e2cc9c54c
@@ -36499,7 +35013,7 @@ Shader "Crest/Ocean"
     //         OutBoolean_1 = _Not_7fbe0c504ec6c2819b1994af01ce3988_Out_1;
     //     }
 
-    //     // 9b604afea48da2ac64cf6198354cf6ae
+    //     // a8e5480cb804440107f760ac5393ec2f
     //     #include "ShadergraphFramework/CrestNodeNormalMapping.hlsl"
 
     //     void Unity_NormalStrength_float(float3 In, float Strength, out float3 Out)
@@ -36512,7 +35026,7 @@ Shader "Crest/Ocean"
     //         float FaceSign;
     //     };
 
-    //     void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3)
+    //     void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3, out float4 Albedo_4)
     //     {
     //         float3 _Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0 = Vector3_FE793823;
     //         float3 _Property_b812768aa4903386b49ba84380e4fa74_Out_0 = Vector3_C8190B61;
@@ -36535,13 +35049,15 @@ Shader "Crest/Ocean"
     //         half3 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1;
     //         half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
     //         half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
-    //         OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31);
+    //         half4 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
+    //         OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33);
     //         float _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0 = Vector1_C6F526AD;
     //         float3 _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
     //         Unity_NormalStrength_float(_OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0, _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2);
     //         Normal_1 = _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
     //         SSS_2 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
     //         Foam_3 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
+    //         Albedo_4 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
     //     }
 
     //     // b4726242738c84550b865a8cd3eafd6e
@@ -36569,7 +35085,7 @@ Shader "Crest/Ocean"
     //         LightReflected_2 = _CrestNodeApplyFresnelCustomFunction_4a16fb68ad2a518d870d2537aaf1e772_LightReflected_10;
     //     }
 
-    //     // 5abfc66ba136f74f6cf58eadabfa3bb1
+    //     // 0d37dbcf887de5687bdac5097fff713e
     //     #include "ShadergraphFramework/CrestNodeAmbientLight.hlsl"
 
     //     struct Bindings_CrestAmbientLight_a6ec89b3ca0ab4e98b300ec3ba0e6013
@@ -36644,10 +35160,10 @@ Shader "Crest/Ocean"
     //         Out_1 = _CrestNodeLinearEyeDepthCustomFunction_ee1cef135a8e558088e613593ae90486_LinearEyeDepth_1;
     //     }
 
-    //     // 3818fb4ea9ebd67663e831ef4a019758
+    //     // 2ca856c7634fa49c75d73b5ddc1b65ca
     //     #include "ShadergraphFramework/CrestNodeFoamBubbles.hlsl"
 
-    //     // 77b1d95beeaa53e1bbdfd7a6e8dd6fa0
+    //     // b3b317d9da04ee361966ef1a88eac53c
     //     #include "ShadergraphFramework/CrestNodeVolumeEmission.hlsl"
 
     //     void Unity_Add_float(float A, float B, out float Out)
@@ -36680,7 +35196,7 @@ Shader "Crest/Ocean"
     //         SubSurfaceScattering_9 = _CrestNodeSampleOceanDataSingleCustomFunction_a7f8891a8a8e5d8ab9c9a0c34c841749_SSS_17;
     //     }
 
-    //     // 60cb5e01e8bb25b4c10f8304dd8d25fd
+    //     // 1547d744048b76728bd6fc66db42da03
     //     #include "ShadergraphFramework/CrestNodeApplyCaustics.hlsl"
 
     //     void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
@@ -36831,93 +35347,7 @@ Shader "Crest/Ocean"
     //         Out = pow(A, B);
     //     }
 
-    //     void Unity_Modulo_float(float A, float B, out float Out)
-    //     {
-    //         Out = fmod(A, B);
-    //     }
-
-    //     void Unity_Comparison_Greater_float(float A, float B, out float Out)
-    //     {
-    //         Out = A > B ? 1 : 0;
-    //     }
-
-    //     void Unity_Subtract_float(float A, float B, out float Out)
-    //     {
-    //         Out = A - B;
-    //     }
-
-    //     void Unity_Branch_float(float Predicate, float True, float False, out float Out)
-    //     {
-    //         Out = Predicate ? True : False;
-    //     }
-
-    //     struct Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1
-    //     {
-    //     };
-
-    //     void SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(float2 Vector2_B562EFB1, float2 Vector2_83AA31A8, Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 IN, out float2 DisplacedA_1, out float WeightA_3, out float2 DisplacedB_2, out float WeightB_4)
-    //     {
-    //         float2 _Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0 = Vector2_83AA31A8;
-    //         float2 _Property_06123b8dbe81da80934c651a33d13699_Out_0 = Vector2_B562EFB1;
-    //         Bindings_CrestOceanGlobals_d50a85284893ec447a25a093505a2120 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2;
-    //         float3 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5;
-    //         SG_CrestOceanGlobals_d50a85284893ec447a25a093505a2120(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5);
-    //         float _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2;
-    //         Unity_Modulo_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2);
-    //         float2 _Multiply_58400b6ef0b30484913ce941659bac85_Out_2;
-    //         Unity_Multiply_float(_Property_06123b8dbe81da80934c651a33d13699_Out_0, (_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2.xx), _Multiply_58400b6ef0b30484913ce941659bac85_Out_2);
-    //         float2 _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-    //         Unity_Subtract_float2(_Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0, _Multiply_58400b6ef0b30484913ce941659bac85_Out_2, _Subtract_22cf6b53c8344888987905efe87043db_Out_2);
-    //         float2 _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0 = Vector2_83AA31A8;
-    //         #if defined(CREST_FLOW_ON)
-    //         float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-    //         #else
-    //         float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-    //         #endif
-    //         float _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2;
-    //         Unity_Comparison_Greater_float(_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, 1, _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2);
-    //         float _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2;
-    //         Unity_Subtract_float(2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2);
-    //         float _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-    //         Unity_Branch_float(_Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3);
-    //         #if defined(CREST_FLOW_ON)
-    //         float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-    //         #else
-    //         float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = 0;
-    //         #endif
-    //         float2 _Property_bafd78310cede58a971e08fade5e87ee_Out_0 = Vector2_83AA31A8;
-    //         float2 _Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0 = Vector2_B562EFB1;
-    //         float _Add_26a0d41d20a2618d858f292701338a2a_Out_2;
-    //         Unity_Add_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 1, _Add_26a0d41d20a2618d858f292701338a2a_Out_2);
-    //         float _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2;
-    //         Unity_Modulo_float(_Add_26a0d41d20a2618d858f292701338a2a_Out_2, 2, _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2);
-    //         float2 _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2;
-    //         Unity_Multiply_float(_Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0, (_Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2.xx), _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2);
-    //         float2 _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-    //         Unity_Subtract_float2(_Property_bafd78310cede58a971e08fade5e87ee_Out_0, _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2, _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-    //         #else
-    //         float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-    //         #endif
-    //         float _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-    //         Unity_Subtract_float(1, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3, _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-    //         #else
-    //         float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = 0;
-    //         #endif
-    //         DisplacedA_1 = _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0;
-    //         WeightA_3 = _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0;
-    //         DisplacedB_2 = _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0;
-    //         WeightB_4 = _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0;
-    //     }
-
-    //     // 06deca910ff1e1ed1b9ea7fb3513233e
+    //     // 498816f585b40f3ecd7ee304230793a2
     //     #include "ShadergraphFramework/CrestNodeFoam.hlsl"
 
     //     struct Bindings_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963
@@ -36938,132 +35368,49 @@ Shader "Crest/Ocean"
     //         float4 _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0 = Vector4_FD283A50;
     //         float _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0 = Vector1_D6DA4100;
     //         float _Property_76afb5461ed7c284b6afcbd15025248a_Out_0 = Vector1_13F2A8C8;
-    //         float2 _Property_20259e8cfd2c2b8288897462f0776174_Out_0 = Vector2_5AD72ED;
-    //         float2 _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0 = Vector2_28A2C5B9;
-    //         Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 _CrestFlow_a6f6f004811f6c82be002c7059e670a1;
-    //         float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1;
-    //         float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3;
-    //         float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2;
-    //         float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4;
-    //         SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(_Property_20259e8cfd2c2b8288897462f0776174_Out_0, _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4);
+    //         float2 _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0 = Vector2_28A2C5B9;
     //         float _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0 = Vector1_D80F067A;
     //         float3 _Property_b2962080c0284b83821815b7263043dc_Out_0 = Vector3_3AD012AA;
     //         float3 _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0 = Vector3_E4AC4432;
     //         float _Property_4807b4a03c922b87b201864991b317da_Out_0 = Vector1_3E452608;
+    //         float2 _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0 = Vector2_5AD72ED;
     //         half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
     //         half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
     //         half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
     //         half _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
-    //         CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
+    //         CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
     //         #if defined(CREST_FOAM_ON)
     //         float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
     //         #else
     //         float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = float3(0, 0, 0);
     //         #endif
-    //         float3 _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2;
-    //         Unity_Multiply_float(_FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2);
-    //         UnityTexture2D _Property_d34fb0a0645e3e8791a5239873296357_Out_0 = Texture2D_D9E7A343;
-    //         float2 _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0 = Vector2_C4E9ED58;
-    //         float _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0 = Vector1_7492C815;
-    //         float _Property_54ef09feb545b581b0fc27170fef10e2_Out_0 = Vector1_33DC93D;
-    //         float _Property_7ae039043909cb8eb133acd421012651_Out_0 = Vector1_3439FC0A;
-    //         float _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0 = Vector1_FB133018;
-    //         float _Property_fe249f016d4b128ca8400f412655cc5e_Out_0 = Vector1_7CFAFAC1;
-    //         float _Property_08e0e443debd6186acd988fc67faf954_Out_0 = Vector1_53F45327;
-    //         float4 _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0 = Vector4_2FA9AEA5;
-    //         float4 _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0 = Vector4_FD283A50;
-    //         float _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0 = Vector1_D6DA4100;
-    //         float _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0 = Vector1_13F2A8C8;
-    //         float _Property_985518c2ff59e781828129193b83e9fd_Out_0 = Vector1_D80F067A;
-    //         float3 _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0 = Vector3_3AD012AA;
-    //         float3 _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0 = Vector3_E4AC4432;
-    //         float _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0 = Vector1_3E452608;
-    //         half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-    //         half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-    //         half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-    //         half _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-    //         CrestNodeFoam_half(_Property_d34fb0a0645e3e8791a5239873296357_Out_0.tex, _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0, _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0, _Property_54ef09feb545b581b0fc27170fef10e2_Out_0, _Property_7ae039043909cb8eb133acd421012651_Out_0, _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0, _Property_fe249f016d4b128ca8400f412655cc5e_Out_0, _Property_08e0e443debd6186acd988fc67faf954_Out_0, _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0, _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0, _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0, _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _Property_985518c2ff59e781828129193b83e9fd_Out_0, _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0, _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0, _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10);
-    //         #if defined(CREST_FOAM_ON)
-    //         float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-    //         #else
-    //         float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = float3(0, 0, 0);
-    //         #endif
-    //         float3 _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2;
-    //         Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2);
-    //         float3 _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-    //         Unity_Add_float3(_Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2, _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-    //         #else
-    //         float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
-    //         #endif
+    //         float3 _Property_a8190300d5ba483d9365211d7f71abea_Out_0 = Vector3_3AD012AA;
     //         #if defined(CREST_FOAM_ON)
     //         float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
     //         #else
-    //         float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_b2962080c0284b83821815b7263043dc_Out_0;
+    //         float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_a8190300d5ba483d9365211d7f71abea_Out_0;
     //         #endif
-    //         float3 _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2;
-    //         Unity_Multiply_float(_FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2);
-    //         #if defined(CREST_FOAM_ON)
-    //         float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-    //         #else
-    //         float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0;
-    //         #endif
-    //         float3 _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2;
-    //         Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2);
-    //         float3 _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-    //         Unity_Add_float3(_Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2, _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-    //         #else
-    //         float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
-    //         #endif
+    //         float3 _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0 = Vector3_E4AC4432;
     //         #if defined(CREST_FOAM_ON)
     //         float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
     //         #else
-    //         float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0;
+    //         float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0;
     //         #endif
-    //         float3 _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2;
-    //         Unity_Multiply_float(_FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2);
-    //         #if defined(CREST_FOAM_ON)
-    //         float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-    //         #else
-    //         float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0;
-    //         #endif
-    //         float3 _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2;
-    //         Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2);
-    //         float3 _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-    //         Unity_Add_float3(_Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2, _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-    //         #else
-    //         float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
-    //         #endif
+    //         float _Property_e0841d7fa2234ff199a94402710821f1_Out_0 = Vector1_3E452608;
     //         #if defined(CREST_FOAM_ON)
     //         float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
     //         #else
-    //         float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_4807b4a03c922b87b201864991b317da_Out_0;
+    //         float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_e0841d7fa2234ff199a94402710821f1_Out_0;
     //         #endif
-    //         float _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2;
-    //         Unity_Multiply_float(_FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2);
-    //         #if defined(CREST_FOAM_ON)
-    //         float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-    //         #else
-    //         float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0;
-    //         #endif
-    //         float _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2;
-    //         Unity_Multiply_float(_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4, _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2);
-    //         float _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-    //         Unity_Add_float(_Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2, _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-    //         #else
-    //         float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
-    //         #endif
-    //         Albedo_1 = _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0;
-    //         NormalTS_2 = _FLOW_fad25d47eec395899aad2bf77264462c_Out_0;
-    //         Emission_3 = _FLOW_02e1cbd391446082893e73b8088ff765_Out_0;
-    //         Smoothness_4 = _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0;
+    //         Albedo_1 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
+    //         NormalTS_2 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
+    //         Emission_3 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
+    //         Smoothness_4 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
+    //     }
+
+    //     void Unity_OneMinus_float(float In, out float Out)
+    //     {
+    //         Out = 1 - In;
     //     }
 
     //     struct Bindings_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269
@@ -37111,7 +35458,8 @@ Shader "Crest/Ocean"
     //         float3 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1;
     //         float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2;
     //         float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3;
-    //         SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3);
+    //         float4 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4;
+    //         SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4);
     //         float _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0 = Vector1_B01E1A6A;
     //         float2 _Property_a28ec0be576d4586a46337955b069868_Out_0 = Vector2_9C73A0C6;
     //         Bindings_CrestIsUnderwater_52f7750f15e114937b54a0fd27f0d2f2 _CrestIsUnderwater_de15825b4853aa85a98b48656eaa15f1;
@@ -37244,11 +35592,27 @@ Shader "Crest/Ocean"
     //         float3 _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
     //         float _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
     //         SG_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963(_Property_f78369cae749d18392b19bad30a74e2d_Out_0, _Property_169d4581a8319383a7f62a3435e9b11d_Out_0, _Property_0bdc44463eba328a8c73245f2cf82911_Out_0, _Property_74ea32320c303583ae393e1d0afe7d13_Out_0, _Property_b16935e33ecd688caba81b8b02f388e3_Out_0, _Property_519c0dea6b39f688b95e7c8c336ca9fb_Out_0, _Property_e7473f6e9b7b0f8c8615d7497ee5c4a0_Out_0, _Property_d073850e48b8c485ad0ab20154ed80e8_Out_0, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0, _Property_a28ec0be576d4586a46337955b069868_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _Branch_3776301df9f8888faaee9638ee7f568d_Out_3, _Lerp_d393d46d7b4755838d788bf6a655c1cd_Out_3, _Negate_43b5c19855641787873c549e72cb1032_Out_1, _Property_0f7251ac80636d8eb279b11917792d24_Out_0, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4);
-    //         Albedo_2 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1;
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_R_1 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[0];
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_G_2 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[1];
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_B_3 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[2];
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_A_4 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[3];
+    //         float3 _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0 = float3(_Split_e1a3108496a4498a90ecae26cadb6773_R_1, _Split_e1a3108496a4498a90ecae26cadb6773_G_2, _Split_e1a3108496a4498a90ecae26cadb6773_B_3);
+    //         float3 _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
+    //         Unity_Lerp_float3(_CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0, (_Split_e1a3108496a4498a90ecae26cadb6773_A_4.xxx), _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3);
+    //         float _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1;
+    //         Unity_OneMinus_float(_Split_e1a3108496a4498a90ecae26cadb6773_A_4, _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1);
+    //         float3 _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
+    //         Unity_Multiply_float((_OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1.xxx), _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2);
+    //         Albedo_2 = _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
     //         NormalTS_3 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2;
-    //         Emission_4 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
+    //         Emission_4 = _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
     //         Smoothness_5 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
     //         Specular_6 = _CrestFresnel_4c3e438e27705e81abe6c2e9d80cb8d7_LightReflected_2;
+    //     }
+
+    //     void Unity_Subtract_float(float A, float B, out float Out)
+    //     {
+    //         Out = A - B;
     //     }
 
     //     void Unity_Remap_float(float In, float2 InMinMax, float2 OutMinMax, out float Out)
@@ -37256,7 +35620,7 @@ Shader "Crest/Ocean"
     //         Out = OutMinMax.x + (In - InMinMax.x) * (OutMinMax.y - OutMinMax.x) / (InMinMax.y - InMinMax.x);
     //     }
 
-    //     // 3580e24b878bbe7a9a98325dcc0474c2
+    //     // c46fd3ffae69bfdf4a7b13505ef3963f
     //     #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
     //     struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -37307,6 +35671,30 @@ Shader "Crest/Ocean"
     //     {
     //         Out = min(A, B);
     //     };
+
+    //     // c4826bd69adcf43b74845160a7d6f249
+    //     #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+    //     struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+    //     {
+    //         float4 ScreenPosition;
+    //     };
+
+    //     void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+    //     {
+    //         float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+    //         float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+    //         float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+    //         float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+    //         Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+    //         float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+    //         CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+    //         Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+    //     }
 
     //     // a2b98fadb38e4458b014d449a26401de
     //     #include "ShadergraphFramework/CrestNodeOcclusion.hlsl"
@@ -37703,6 +36091,12 @@ Shader "Crest/Ocean"
     //         Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
     //         #endif
     //         #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+    //         Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+    //         _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+    //         float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+    //         SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+    //         #endif
+    //         #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
     //         float _Property_606fa02468b6f8849164940fdce04188_Out_0 = _Occlusion;
     //         #endif
     //         #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
@@ -37720,7 +36114,7 @@ Shader "Crest/Ocean"
     //         #endif
     //         surface.BaseColor = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Albedo_2;
     //         surface.Emission = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Emission_4;
-    //         surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+    //         surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
     //         surface.AlphaClipThreshold = 0;
     //         surface.BentNormal = IN.TangentSpaceNormal;
     //         surface.Smoothness = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5;
@@ -38219,6 +36613,9 @@ Shader "Crest/Ocean"
     //         #pragma shader_feature_local _ CREST_FOAM_ON
     //     #pragma shader_feature_local _ CREST_CAUSTICS_ON
     //     #pragma shader_feature_local _ CREST_FLOW_ON
+    //     #pragma shader_feature_local _ CREST_ALBEDO_ON
+    //     #pragma multi_compile _ CREST_WATER_VOLUME_2D CREST_WATER_VOLUME_HAS_BACKFACE
+    //     #pragma multi_compile _ CREST_FLOATING_ORIGIN
 
     //     #define CREST_GENERATED_SHADER_ON 1
 
@@ -39066,7 +37463,7 @@ Shader "Crest/Ocean"
     //         Sea_Level_Derivatives_8 = _GENERATEDSHADER_13a5882898c943a484a7960527dc585c_Out_0;
     //     }
 
-    //     // 26ddc131f09006478a3aa1683fa75e74
+    //     // 6445f72e0f3d2e176e54a9ffb10e1139
     //     #include "ShadergraphFramework/CrestNodeLightData.hlsl"
 
     //     struct Bindings_CrestLightData_b74b6e8c0b489314ca7aea3e2cc9c54c
@@ -39105,7 +37502,7 @@ Shader "Crest/Ocean"
     //         OutBoolean_1 = _Not_7fbe0c504ec6c2819b1994af01ce3988_Out_1;
     //     }
 
-    //     // 9b604afea48da2ac64cf6198354cf6ae
+    //     // a8e5480cb804440107f760ac5393ec2f
     //     #include "ShadergraphFramework/CrestNodeNormalMapping.hlsl"
 
     //     void Unity_NormalStrength_float(float3 In, float Strength, out float3 Out)
@@ -39118,7 +37515,7 @@ Shader "Crest/Ocean"
     //         float FaceSign;
     //     };
 
-    //     void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3)
+    //     void SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(float3 Vector3_FE793823, float3 Vector3_C8190B61, float4 Vector4_F18E4948, float4 Vector4_43DD8E03, float Vector1_8771A258, UnityTexture2D Texture2D_6CA3A26C, float Vector1_418D6270, float Vector1_6EC9A7C0, float Vector1_5D9D8139, float2 Vector2_3ED47A62, float2 Vector2_891575B0, float3 Vector3_A9F402BF, float Vector1_2ABAF0E6, float Vector1_C6F526AD, float2 Vector2_e4d436e04aa24494a758eff4fee94f84, Bindings_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a IN, out float3 Normal_1, out float SSS_2, out float Foam_3, out float4 Albedo_4)
     //     {
     //         float3 _Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0 = Vector3_FE793823;
     //         float3 _Property_b812768aa4903386b49ba84380e4fa74_Out_0 = Vector3_C8190B61;
@@ -39141,13 +37538,15 @@ Shader "Crest/Ocean"
     //         half3 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1;
     //         half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
     //         half _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
-    //         OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31);
+    //         half4 _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
+    //         OceanNormals_half(_Property_4af6034197f3cc8aaeb792d9cf6d352c_Out_0, _Property_b812768aa4903386b49ba84380e4fa74_Out_0, _Property_d028c0ff81ba4c87a8cc8c32bed35d22_Out_0, _Property_05ca77893f0ae787a96c25c4fe234e02_Out_0, _Property_888b4c74e675888d94be32cb92f81efd_Out_0, _Property_9218ed6e7f6d818caa31b2e56362493b_Out_0.tex, _Property_c1c77efe7bd8ef84a7ed1c59dc00a256_Out_0, _Property_514e0cbf2f395d8ea1f8a71520eeadc8_Out_0, _Property_68b7fab6c4055a80b7c8c1c178bba0c7_Out_0, _Property_9247a90cea904a8bbc20fdfe0bf1d8c6_Out_0, _Property_eb746fc21ccb6f8590cd528db11f452c_Out_0, _Property_35a4a3c6e72a1282b5137b0f82b8c0f3_Out_0, _CrestIsUnderwater_36402df65183aa8c8d669a6010c0f410_OutBoolean_1, _Property_0c89523aeaecfc84891a6ea5a0e3ed06_Out_0, _Property_c58a0631b57c485b814aba0ed3741cc6_Out_0, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31, _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33);
     //         float _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0 = Vector1_C6F526AD;
     //         float3 _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
     //         Unity_NormalStrength_float(_OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_NormalTS_1, _Property_834a9e67d7d5c28da7a0bc8f73df9c3b_Out_0, _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2);
     //         Normal_1 = _NormalStrength_6521f2679a377685a528ce5f8790bb12_Out_2;
     //         SSS_2 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_SSS_30;
     //         Foam_3 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Foam_31;
+    //         Albedo_4 = _OceanNormalsCustomFunction_19f4d59664180484a5b5eaf61d2623da_Albedo_33;
     //     }
 
     //     // b4726242738c84550b865a8cd3eafd6e
@@ -39175,7 +37574,7 @@ Shader "Crest/Ocean"
     //         LightReflected_2 = _CrestNodeApplyFresnelCustomFunction_4a16fb68ad2a518d870d2537aaf1e772_LightReflected_10;
     //     }
 
-    //     // 5abfc66ba136f74f6cf58eadabfa3bb1
+    //     // 0d37dbcf887de5687bdac5097fff713e
     //     #include "ShadergraphFramework/CrestNodeAmbientLight.hlsl"
 
     //     struct Bindings_CrestAmbientLight_a6ec89b3ca0ab4e98b300ec3ba0e6013
@@ -39250,10 +37649,10 @@ Shader "Crest/Ocean"
     //         Out_1 = _CrestNodeLinearEyeDepthCustomFunction_ee1cef135a8e558088e613593ae90486_LinearEyeDepth_1;
     //     }
 
-    //     // 3818fb4ea9ebd67663e831ef4a019758
+    //     // 2ca856c7634fa49c75d73b5ddc1b65ca
     //     #include "ShadergraphFramework/CrestNodeFoamBubbles.hlsl"
 
-    //     // 77b1d95beeaa53e1bbdfd7a6e8dd6fa0
+    //     // b3b317d9da04ee361966ef1a88eac53c
     //     #include "ShadergraphFramework/CrestNodeVolumeEmission.hlsl"
 
     //     void Unity_Add_float(float A, float B, out float Out)
@@ -39286,7 +37685,7 @@ Shader "Crest/Ocean"
     //         SubSurfaceScattering_9 = _CrestNodeSampleOceanDataSingleCustomFunction_a7f8891a8a8e5d8ab9c9a0c34c841749_SSS_17;
     //     }
 
-    //     // 60cb5e01e8bb25b4c10f8304dd8d25fd
+    //     // 1547d744048b76728bd6fc66db42da03
     //     #include "ShadergraphFramework/CrestNodeApplyCaustics.hlsl"
 
     //     void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
@@ -39437,93 +37836,7 @@ Shader "Crest/Ocean"
     //         Out = pow(A, B);
     //     }
 
-    //     void Unity_Modulo_float(float A, float B, out float Out)
-    //     {
-    //         Out = fmod(A, B);
-    //     }
-
-    //     void Unity_Comparison_Greater_float(float A, float B, out float Out)
-    //     {
-    //         Out = A > B ? 1 : 0;
-    //     }
-
-    //     void Unity_Subtract_float(float A, float B, out float Out)
-    //     {
-    //         Out = A - B;
-    //     }
-
-    //     void Unity_Branch_float(float Predicate, float True, float False, out float Out)
-    //     {
-    //         Out = Predicate ? True : False;
-    //     }
-
-    //     struct Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1
-    //     {
-    //     };
-
-    //     void SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(float2 Vector2_B562EFB1, float2 Vector2_83AA31A8, Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 IN, out float2 DisplacedA_1, out float WeightA_3, out float2 DisplacedB_2, out float WeightB_4)
-    //     {
-    //         float2 _Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0 = Vector2_83AA31A8;
-    //         float2 _Property_06123b8dbe81da80934c651a33d13699_Out_0 = Vector2_B562EFB1;
-    //         Bindings_CrestOceanGlobals_d50a85284893ec447a25a093505a2120 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2;
-    //         float3 _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4;
-    //         float _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5;
-    //         SG_CrestOceanGlobals_d50a85284893ec447a25a093505a2120(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_TexelsPerWave_2, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_OceanCenterPosWorld_3, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_SliceCount_4, _CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_MeshScaleLerp_5);
-    //         float _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2;
-    //         Unity_Modulo_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2);
-    //         float2 _Multiply_58400b6ef0b30484913ce941659bac85_Out_2;
-    //         Unity_Multiply_float(_Property_06123b8dbe81da80934c651a33d13699_Out_0, (_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2.xx), _Multiply_58400b6ef0b30484913ce941659bac85_Out_2);
-    //         float2 _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-    //         Unity_Subtract_float2(_Property_0ea40366c9acd78cb92a9993bf6ff7b3_Out_0, _Multiply_58400b6ef0b30484913ce941659bac85_Out_2, _Subtract_22cf6b53c8344888987905efe87043db_Out_2);
-    //         float2 _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0 = Vector2_83AA31A8;
-    //         #if defined(CREST_FLOW_ON)
-    //         float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Subtract_22cf6b53c8344888987905efe87043db_Out_2;
-    //         #else
-    //         float2 _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-    //         #endif
-    //         float _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2;
-    //         Unity_Comparison_Greater_float(_Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, 1, _Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2);
-    //         float _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2;
-    //         Unity_Subtract_float(2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2);
-    //         float _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-    //         Unity_Branch_float(_Comparison_e4c96875ff5c468abb098184998cd9d5_Out_2, _Subtract_d55acfea2d4e1c84b9e2414dbd2dd732_Out_2, _Modulo_591c73fc57276b8d9ed52844e5357e43_Out_2, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3);
-    //         #if defined(CREST_FLOW_ON)
-    //         float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3;
-    //         #else
-    //         float _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0 = 0;
-    //         #endif
-    //         float2 _Property_bafd78310cede58a971e08fade5e87ee_Out_0 = Vector2_83AA31A8;
-    //         float2 _Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0 = Vector2_B562EFB1;
-    //         float _Add_26a0d41d20a2618d858f292701338a2a_Out_2;
-    //         Unity_Add_float(_CrestOceanGlobals_59f124a51aa49b8c9fbaa6e31ee99643_CrestTime_1, 1, _Add_26a0d41d20a2618d858f292701338a2a_Out_2);
-    //         float _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2;
-    //         Unity_Modulo_float(_Add_26a0d41d20a2618d858f292701338a2a_Out_2, 2, _Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2);
-    //         float2 _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2;
-    //         Unity_Multiply_float(_Property_4385e977fb32b28d89caad9bf4ea0a5f_Out_0, (_Modulo_a7a449e20fc31d8db9c03484a3cdb42d_Out_2.xx), _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2);
-    //         float2 _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-    //         Unity_Subtract_float2(_Property_bafd78310cede58a971e08fade5e87ee_Out_0, _Multiply_cba71be637dd9c8e85fbb961a2a06fd5_Out_2, _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Subtract_3b0c3c22993bb3879391c3fe9e971e63_Out_2;
-    //         #else
-    //         float2 _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0 = _Property_622a3ede04e64a8cbc68a5dc6cc6632b_Out_0;
-    //         #endif
-    //         float _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-    //         Unity_Subtract_float(1, _Branch_b99a88fbba701a8c9cf3b5881d5fc774_Out_3, _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = _Subtract_5effe12411e50d8fae971df8c33eea34_Out_2;
-    //         #else
-    //         float _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0 = 0;
-    //         #endif
-    //         DisplacedA_1 = _FLOW_1f662426fab4ad8697aa33f613c4565a_Out_0;
-    //         WeightA_3 = _FLOW_09d99f5601eb2e8ea5c5907212d21873_Out_0;
-    //         DisplacedB_2 = _FLOW_cd5acfd64e064c87bc5719c6e40e7602_Out_0;
-    //         WeightB_4 = _FLOW_8c1a9fbb3fe27281ab4d0b8e47ef16bf_Out_0;
-    //     }
-
-    //     // 06deca910ff1e1ed1b9ea7fb3513233e
+    //     // 498816f585b40f3ecd7ee304230793a2
     //     #include "ShadergraphFramework/CrestNodeFoam.hlsl"
 
     //     struct Bindings_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963
@@ -39544,132 +37857,49 @@ Shader "Crest/Ocean"
     //         float4 _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0 = Vector4_FD283A50;
     //         float _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0 = Vector1_D6DA4100;
     //         float _Property_76afb5461ed7c284b6afcbd15025248a_Out_0 = Vector1_13F2A8C8;
-    //         float2 _Property_20259e8cfd2c2b8288897462f0776174_Out_0 = Vector2_5AD72ED;
-    //         float2 _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0 = Vector2_28A2C5B9;
-    //         Bindings_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1 _CrestFlow_a6f6f004811f6c82be002c7059e670a1;
-    //         float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1;
-    //         float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3;
-    //         float2 _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2;
-    //         float _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4;
-    //         SG_CrestFlow_f9c7f2c7774dd4b5bad87d6a350b47f1(_Property_20259e8cfd2c2b8288897462f0776174_Out_0, _Property_64ef7c2ca6bab08ab9065e5dde5577ae_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4);
+    //         float2 _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0 = Vector2_28A2C5B9;
     //         float _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0 = Vector1_D80F067A;
     //         float3 _Property_b2962080c0284b83821815b7263043dc_Out_0 = Vector3_3AD012AA;
     //         float3 _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0 = Vector3_E4AC4432;
     //         float _Property_4807b4a03c922b87b201864991b317da_Out_0 = Vector1_3E452608;
+    //         float2 _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0 = Vector2_5AD72ED;
     //         half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
     //         half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
     //         half3 _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
     //         half _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
-    //         CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedA_1, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
+    //         CrestNodeFoam_half(_Property_927f07beed0b69898768df68f91e6f75_Out_0.tex, _Property_a245bf81c1e81687810c4b5b6671e378_Out_0, _Property_35da445f1aaaa1818e6cd4498076b799_Out_0, _Property_b977b9bbe0fb7b86b062cc5b540daaab_Out_0, _Property_c4d4b1cbb9708180a41c3c9cdc1a14f2_Out_0, _Property_8d187171121a0183b6f33526db3ca58d_Out_0, _Property_6d634298c7513e8c85dcc64bab2e79a5_Out_0, _Property_37f8f8eaf76529879d05cda44a37c6e1_Out_0, _Property_85733ab2c4c0ab82b9480d4463d8cec4_Out_0, _Property_ab20a9f7b130d28881e05190dabb74e1_Out_0, _Property_9d1f9c5c601a9e8f852b3b06425b0804_Out_0, _Property_76afb5461ed7c284b6afcbd15025248a_Out_0, _Property_0170cb5a6f984645b3cc68f4cfd812ed_Out_0, _Property_279b3bacf01b728c8dc8210f69e789cb_Out_0, _Property_b2962080c0284b83821815b7263043dc_Out_0, _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0, _Property_4807b4a03c922b87b201864991b317da_Out_0, _Property_f5463aea460b4fc68990e00fc9aa269e_Out_0, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9, _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10);
     //         #if defined(CREST_FOAM_ON)
     //         float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Albedo_8;
     //         #else
     //         float3 _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0 = float3(0, 0, 0);
     //         #endif
-    //         float3 _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2;
-    //         Unity_Multiply_float(_FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2);
-    //         UnityTexture2D _Property_d34fb0a0645e3e8791a5239873296357_Out_0 = Texture2D_D9E7A343;
-    //         float2 _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0 = Vector2_C4E9ED58;
-    //         float _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0 = Vector1_7492C815;
-    //         float _Property_54ef09feb545b581b0fc27170fef10e2_Out_0 = Vector1_33DC93D;
-    //         float _Property_7ae039043909cb8eb133acd421012651_Out_0 = Vector1_3439FC0A;
-    //         float _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0 = Vector1_FB133018;
-    //         float _Property_fe249f016d4b128ca8400f412655cc5e_Out_0 = Vector1_7CFAFAC1;
-    //         float _Property_08e0e443debd6186acd988fc67faf954_Out_0 = Vector1_53F45327;
-    //         float4 _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0 = Vector4_2FA9AEA5;
-    //         float4 _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0 = Vector4_FD283A50;
-    //         float _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0 = Vector1_D6DA4100;
-    //         float _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0 = Vector1_13F2A8C8;
-    //         float _Property_985518c2ff59e781828129193b83e9fd_Out_0 = Vector1_D80F067A;
-    //         float3 _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0 = Vector3_3AD012AA;
-    //         float3 _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0 = Vector3_E4AC4432;
-    //         float _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0 = Vector1_3E452608;
-    //         half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-    //         half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-    //         half3 _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-    //         half _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-    //         CrestNodeFoam_half(_Property_d34fb0a0645e3e8791a5239873296357_Out_0.tex, _Property_84bb00ca8ad30e8f8ad138e194862897_Out_0, _Property_8bccee0833da358baf56d3d9dbbf39c3_Out_0, _Property_54ef09feb545b581b0fc27170fef10e2_Out_0, _Property_7ae039043909cb8eb133acd421012651_Out_0, _Property_1b24034f5524878b8f84bb8a0715f07c_Out_0, _Property_fe249f016d4b128ca8400f412655cc5e_Out_0, _Property_08e0e443debd6186acd988fc67faf954_Out_0, _Property_876868a7ab50e9848ddecdc7dfca3516_Out_0, _Property_17c4322d07f9b18ca635ea9a216331f1_Out_0, _Property_4d9f0889210eab80b401ec5e83d26d63_Out_0, _Property_60f9e0f62928f6809368e89c4fbe74dc_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_DisplacedB_2, _Property_985518c2ff59e781828129193b83e9fd_Out_0, _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0, _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0, _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9, _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10);
-    //         #if defined(CREST_FOAM_ON)
-    //         float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Albedo_8;
-    //         #else
-    //         float3 _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0 = float3(0, 0, 0);
-    //         #endif
-    //         float3 _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2;
-    //         Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5102cf02f41ae08283effacf98b439a6_Out_0, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2);
-    //         float3 _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-    //         Unity_Add_float3(_Multiply_f3e32ea7c8d6b089856c95e0c36f8046_Out_2, _Multiply_152919e4a5b86c8aa63506fae7def904_Out_2, _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _Add_8aabc2cb4508eb84b315f46840e1f311_Out_2;
-    //         #else
-    //         float3 _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
-    //         #endif
+    //         float3 _Property_a8190300d5ba483d9365211d7f71abea_Out_0 = Vector3_3AD012AA;
     //         #if defined(CREST_FOAM_ON)
     //         float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_NormalTS_7;
     //         #else
-    //         float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_b2962080c0284b83821815b7263043dc_Out_0;
+    //         float3 _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0 = _Property_a8190300d5ba483d9365211d7f71abea_Out_0;
     //         #endif
-    //         float3 _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2;
-    //         Unity_Multiply_float(_FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2);
-    //         #if defined(CREST_FOAM_ON)
-    //         float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_NormalTS_7;
-    //         #else
-    //         float3 _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0 = _Property_dea518fee69d1e8e99e6f7980dd96567_Out_0;
-    //         #endif
-    //         float3 _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2;
-    //         Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_5dd6d1a0048efe8bba988996e0b67ee0_Out_0, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2);
-    //         float3 _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-    //         Unity_Add_float3(_Multiply_b8a66eaf86e14b8d8d4bc81dc3dc9f79_Out_2, _Multiply_9575bfa4ea89e88f88cc532e09b3d9ae_Out_2, _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _Add_2851e6d7125ee78bb53c096c4b2b70c0_Out_2;
-    //         #else
-    //         float3 _FLOW_fad25d47eec395899aad2bf77264462c_Out_0 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
-    //         #endif
+    //         float3 _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0 = Vector3_E4AC4432;
     //         #if defined(CREST_FOAM_ON)
     //         float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Emission_9;
     //         #else
-    //         float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_3282b0e7ad363b83a9f0b019094dbd70_Out_0;
+    //         float3 _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0 = _Property_72d0f70d7a5e4e0d9a3615cd24933294_Out_0;
     //         #endif
-    //         float3 _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2;
-    //         Unity_Multiply_float(_FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0, (_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3.xxx), _Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2);
-    //         #if defined(CREST_FOAM_ON)
-    //         float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Emission_9;
-    //         #else
-    //         float3 _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0 = _Property_54a70292c24b8f8fa8d2cbc15a7bc141_Out_0;
-    //         #endif
-    //         float3 _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2;
-    //         Unity_Multiply_float((_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4.xxx), _FOAM_39991c8c536d3b8a8a1de9f578f39c16_Out_0, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2);
-    //         float3 _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-    //         Unity_Add_float3(_Multiply_c6ddce7959b87586aecceaf11dbd0f2b_Out_2, _Multiply_3779ad724189918cbdd91c05b5b8644f_Out_2, _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _Add_5b1b0a8a3b51b988b90f39525b4fa0da_Out_2;
-    //         #else
-    //         float3 _FLOW_02e1cbd391446082893e73b8088ff765_Out_0 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
-    //         #endif
+    //         float _Property_e0841d7fa2234ff199a94402710821f1_Out_0 = Vector1_3E452608;
     //         #if defined(CREST_FOAM_ON)
     //         float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _CrestNodeFoamCustomFunction_8f4d8e1916bedd89afd8fd143a06fdf2_Smoothness_10;
     //         #else
-    //         float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_4807b4a03c922b87b201864991b317da_Out_0;
+    //         float _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0 = _Property_e0841d7fa2234ff199a94402710821f1_Out_0;
     //         #endif
-    //         float _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2;
-    //         Unity_Multiply_float(_FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0, _CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightA_3, _Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2);
-    //         #if defined(CREST_FOAM_ON)
-    //         float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _CrestNodeFoamCustomFunction_e07553b28759028f9e7041604484bf29_Smoothness_10;
-    //         #else
-    //         float _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0 = _Property_7b69030af9d5f18c93d72c5f6875c936_Out_0;
-    //         #endif
-    //         float _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2;
-    //         Unity_Multiply_float(_CrestFlow_a6f6f004811f6c82be002c7059e670a1_WeightB_4, _FOAM_7c4f0c60ee2cc4809ef8b7542b671daf_Out_0, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2);
-    //         float _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-    //         Unity_Add_float(_Multiply_39d1473305de3282ab3ae705194e5e4c_Out_2, _Multiply_6ca59df0691ecf8f8ba67f17d7254898_Out_2, _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2);
-    //         #if defined(CREST_FLOW_ON)
-    //         float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _Add_ec0b0c84f1b2bf81b5be5eb105d5e689_Out_2;
-    //         #else
-    //         float _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
-    //         #endif
-    //         Albedo_1 = _FLOW_850c52da6567b48a942c1e6ecab56abe_Out_0;
-    //         NormalTS_2 = _FLOW_fad25d47eec395899aad2bf77264462c_Out_0;
-    //         Emission_3 = _FLOW_02e1cbd391446082893e73b8088ff765_Out_0;
-    //         Smoothness_4 = _FLOW_dee1193c26e34584b7d1fe628eb99941_Out_0;
+    //         Albedo_1 = _FOAM_80c417f36a49a68a97db71b1e99523c1_Out_0;
+    //         NormalTS_2 = _FOAM_1cc814995d6f3384b3b5d2897f16c031_Out_0;
+    //         Emission_3 = _FOAM_238ad172e66c4e8b89e77b9260ea64f4_Out_0;
+    //         Smoothness_4 = _FOAM_5ab455ff0145e9898cb82414ff92cffd_Out_0;
+    //     }
+
+    //     void Unity_OneMinus_float(float In, out float Out)
+    //     {
+    //         Out = 1 - In;
     //     }
 
     //     struct Bindings_CrestOceanPixel_6f6706d805d8e8649adddaaa94260269
@@ -39717,7 +37947,8 @@ Shader "Crest/Ocean"
     //         float3 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1;
     //         float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2;
     //         float _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3;
-    //         SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3);
+    //         float4 _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4;
+    //         SG_CrestComputeNormal_61b9efc6612ab3b4f84174344af5e12a(_CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale0_3, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanPosScale1_4, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_SliceIndex0_7, _Property_35d25e14151ce887bf6dd261b41f2552_Out_0, _Property_424537295591978ba994218f2b2a4f23_Out_0, _Property_b68191f2603f488c9f3894b821bbdd8e_Out_0, _Property_02110d971f4eb28d98e1cbfd0cebe1b6_Out_0, _Property_c11c08dcd729e0859b72ecb435df7d01_Out_0, _Property_e0103d7aacf50b83aa47a5e13b59a8f0_Out_0, _Normalize_7c5b99185f11ee88a7bd6a9c2e4ae4fc_Out_1, _Property_f0c46df75e05938d887de1e5cd3ed866_Out_0, _Property_cf71005397c3328ea6249ea841e495e1_Out_0, _Property_1d003b8ee59d45d5b2fe37dc1b002023_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_SSS_2, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4);
     //         float _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0 = Vector1_B01E1A6A;
     //         float2 _Property_a28ec0be576d4586a46337955b069868_Out_0 = Vector2_9C73A0C6;
     //         Bindings_CrestIsUnderwater_52f7750f15e114937b54a0fd27f0d2f2 _CrestIsUnderwater_de15825b4853aa85a98b48656eaa15f1;
@@ -39850,11 +38081,27 @@ Shader "Crest/Ocean"
     //         float3 _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
     //         float _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
     //         SG_CrestFoamWithFlow_3a6c22dceac0847a2a31cb05a577b963(_Property_f78369cae749d18392b19bad30a74e2d_Out_0, _Property_169d4581a8319383a7f62a3435e9b11d_Out_0, _Property_0bdc44463eba328a8c73245f2cf82911_Out_0, _Property_74ea32320c303583ae393e1d0afe7d13_Out_0, _Property_b16935e33ecd688caba81b8b02f388e3_Out_0, _Property_519c0dea6b39f688b95e7c8c336ca9fb_Out_0, _Property_e7473f6e9b7b0f8c8615d7497ee5c4a0_Out_0, _Property_d073850e48b8c485ad0ab20154ed80e8_Out_0, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams0_5, _CrestDrivenData_18fbc7f6d697e280bdb26018dae6003c_OceanParams1_6, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Foam_3, _Property_f9ca912248ef1f8c8313c98892c09ca1_Out_0, _Property_a28ec0be576d4586a46337955b069868_Out_0, _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Normal_1, _Branch_3776301df9f8888faaee9638ee7f568d_Out_3, _Lerp_d393d46d7b4755838d788bf6a655c1cd_Out_3, _Negate_43b5c19855641787873c549e72cb1032_Out_1, _Property_0f7251ac80636d8eb279b11917792d24_Out_0, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4);
-    //         Albedo_2 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1;
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_R_1 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[0];
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_G_2 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[1];
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_B_3 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[2];
+    //         float _Split_e1a3108496a4498a90ecae26cadb6773_A_4 = _CrestComputeNormal_983fae9e2eeace88b407bb1f47b6b3b2_Albedo_4[3];
+    //         float3 _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0 = float3(_Split_e1a3108496a4498a90ecae26cadb6773_R_1, _Split_e1a3108496a4498a90ecae26cadb6773_G_2, _Split_e1a3108496a4498a90ecae26cadb6773_B_3);
+    //         float3 _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
+    //         Unity_Lerp_float3(_CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Albedo_1, _Vector3_2b8b350aa63a49278b9c2e210fcac0d9_Out_0, (_Split_e1a3108496a4498a90ecae26cadb6773_A_4.xxx), _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3);
+    //         float _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1;
+    //         Unity_OneMinus_float(_Split_e1a3108496a4498a90ecae26cadb6773_A_4, _OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1);
+    //         float3 _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
+    //         Unity_Multiply_float((_OneMinus_a6c7235a8bf24007ae95bbfa26a9a94d_Out_1.xxx), _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3, _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2);
+    //         Albedo_2 = _Lerp_558926b1a5a34ddd9c2ef8d0af45a00a_Out_3;
     //         NormalTS_3 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_NormalTS_2;
-    //         Emission_4 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Emission_3;
+    //         Emission_4 = _Multiply_03193bf1490e4db7b96b6c47fb7bf848_Out_2;
     //         Smoothness_5 = _CrestFoamWithFlow_83760eafee37438d8b76e35761f9881f_Smoothness_4;
     //         Specular_6 = _CrestFresnel_4c3e438e27705e81abe6c2e9d80cb8d7_LightReflected_2;
+    //     }
+
+    //     void Unity_Subtract_float(float A, float B, out float Out)
+    //     {
+    //         Out = A - B;
     //     }
 
     //     void Unity_Remap_float(float In, float2 InMinMax, float2 OutMinMax, out float Out)
@@ -39862,7 +38109,7 @@ Shader "Crest/Ocean"
     //         Out = OutMinMax.x + (In - InMinMax.x) * (OutMinMax.y - OutMinMax.x) / (InMinMax.y - InMinMax.x);
     //     }
 
-    //     // 3580e24b878bbe7a9a98325dcc0474c2
+    //     // c46fd3ffae69bfdf4a7b13505ef3963f
     //     #include "ShadergraphFramework/CrestNodeSampleClipSurfaceData.hlsl"
 
     //     struct Bindings_CrestClipSurface_8c73b4813486448849bd38d01267f186
@@ -39913,6 +38160,30 @@ Shader "Crest/Ocean"
     //     {
     //         Out = min(A, B);
     //     };
+
+    //     // c4826bd69adcf43b74845160a7d6f249
+    //     #include "ShadergraphFramework/CrestNodeWaterVolume.hlsl"
+
+    //     struct Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a
+    //     {
+    //         float4 ScreenPosition;
+    //     };
+
+    //     void SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(float Vector1_700cbde2aa654f358f668b6966ed96d9, Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a IN, out float Clip_1)
+    //     {
+    //         float _Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0 = Vector1_700cbde2aa654f358f668b6966ed96d9;
+    //         float4 _ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0 = float4(IN.ScreenPosition.xy / IN.ScreenPosition.w, 0, 0);
+    //         float4 _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0 = IN.ScreenPosition;
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_R_1 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[0];
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_G_2 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[1];
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[2];
+    //         float _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4 = _ScreenPosition_eb46ef0afb9a4df0a81a7cc6353e741b_Out_0[3];
+    //         float _Divide_804ded6eb46d4f538096392a481fec80_Out_2;
+    //         Unity_Divide_float(_Split_bffbeea2c8414b41acdf2943c0aba1a7_B_3, _Split_bffbeea2c8414b41acdf2943c0aba1a7_A_4, _Divide_804ded6eb46d4f538096392a481fec80_Out_2);
+    //         float _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+    //         CrestNodeWaterVolume_float(_Property_de9fbc9e69fa45d1ba1a73d26efffcfa_Out_0, (_ScreenPosition_ffa6144f718c4700b8dcbfe54e60926c_Out_0.xy), _Divide_804ded6eb46d4f538096392a481fec80_Out_2, _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3);
+    //         Clip_1 = _CrestNodeWaterVolumeCustomFunction_657bcb12ad5b4cbe8129fbe4d942774b_Clip1_3;
+    //     }
 
     //     // a2b98fadb38e4458b014d449a26401de
     //     #include "ShadergraphFramework/CrestNodeOcclusion.hlsl"
@@ -40309,6 +38580,12 @@ Shader "Crest/Ocean"
     //         Unity_Minimum_float(_Subtract_9dd00d9702420683a158b5abac3c05f2_Out_2, 1, _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2);
     //         #endif
     //         #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
+    //         Bindings_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884;
+    //         _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884.ScreenPosition = IN.ScreenPosition;
+    //         float _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
+    //         SG_CrestWaterVolume_75e99e7ba3efc024b89d555442b4614a(_Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884, _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1);
+    //         #endif
+    //         #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
     //         float _Property_606fa02468b6f8849164940fdce04188_Out_0 = _Occlusion;
     //         #endif
     //         #if defined(KEYWORD_PERMUTATION_0) || defined(KEYWORD_PERMUTATION_1) || defined(KEYWORD_PERMUTATION_2) || defined(KEYWORD_PERMUTATION_3) || defined(KEYWORD_PERMUTATION_4) || defined(KEYWORD_PERMUTATION_5) || defined(KEYWORD_PERMUTATION_6) || defined(KEYWORD_PERMUTATION_7)
@@ -40326,7 +38603,7 @@ Shader "Crest/Ocean"
     //         #endif
     //         surface.BaseColor = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Albedo_2;
     //         surface.Emission = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Emission_4;
-    //         surface.Alpha = _Minimum_36dc73d0756c439699fa81b1ecd2d7a5_Out_2;
+    //         surface.Alpha = _CrestWaterVolume_610bd32621444cb59dd9ac3dc795b884_Clip_1;
     //         surface.AlphaClipThreshold = 0;
     //         surface.BentNormal = IN.TangentSpaceNormal;
     //         surface.Smoothness = _CrestOceanPixel_53a629a4551a828680fbb0226eff6089_Smoothness_5;
@@ -40784,7 +39061,7 @@ Shader "Crest/Ocean"
     //     }
     // }
     // DE: Set custom shader GUI to fix inspector for 2021. If running 2020 and want old inspector, swap these editors.
-    CustomEditor "Crest.OceanShaderGUI"
-    // CustomEditor "Rendering.HighDefinition.LitShaderGraphGUI"
+    // CustomEditor "Crest.OceanShaderGUI"
+    CustomEditor "Rendering.HighDefinition.LitShaderGraphGUI"
     FallBack "Hidden/Shader Graph/FallbackError"
 }

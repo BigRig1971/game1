@@ -55,6 +55,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - CREST_ALBEDO: 0
     - CREST_CAUSTICS: 1
     - CREST_FLOW: 0
     - CREST_FOAM: 1
@@ -92,7 +93,7 @@ Material:
     - _FoamSmoothness: 0.7
     - _MinReflectionDirectionY: 0
     - _NormalsScale: 40
-    - _NormalsStrength: 0.387
+    - _NormalsStrength: 0
     - _NormalsStrengthOverall: 1
     - _Occlusion: 1
     - _OpaqueCullMode: 2
@@ -104,8 +105,8 @@ Material:
     - _RefractiveIndexOfWater: 1.33
     - _RenderQueueType: 4
     - _RequireSplitLighting: 0
-    - _SSSIntensityBase: 0.11
-    - _SSSIntensitySun: 2.19
+    - _SSSIntensityBase: 0
+    - _SSSIntensitySun: 0
     - _SSSSunFalloff: 10.24
     - _ScatterColourShallowDepthFalloff: 2.57
     - _ScatterColourShallowDepthMax: 7
@@ -145,8 +146,8 @@ Material:
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _FoamBubbleColor: {r: 0.6392157, g: 0.8313726, b: 0.8196079, a: 0}
     - _SSSTint: {r: 0.0763862, g: 0.426, b: 0.39074484, a: 0}
-    - _ScatterColourBase: {r: 0, g: 0.107907996, b: 0.16470589, a: 0}
-    - _ScatterColourShadow: {r: 0, g: 0.03921569, b: 0.078431346, a: 1}
-    - _ScatterColourShallow: {r: 0.1313141, g: 0.241, b: 0.241, a: 1}
+    - _ScatterColourBase: {r: 0.003921569, g: 0, b: 0.12156863, a: 0}
+    - _ScatterColourShadow: {r: 0.0013548374, g: 0, b: 0.042, a: 0}
+    - _ScatterColourShallow: {r: 0.003921569, g: 0, b: 0.12156863, a: 0}
     - _Specular: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

@@ -4,10 +4,13 @@
 
 #include "OceanGraphConstants.hlsl"
 #include "../OceanGlobals.hlsl"
+#include "../ShaderLibrary/Texture.hlsl"
 
+#ifndef SHADERGRAPH_PREVIEW
 #if CREST_HDRP_FORWARD_PASS
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/HDShadow.hlsl"
-#endif
+#endif // CREST_HDRP_FORWARD_PASS
+#endif // SHADERGRAPH_PREVIEW
 
 void CrestNodeApplyCaustics_float
 (
@@ -33,6 +36,19 @@ void CrestNodeApplyCaustics_float
 {
 	o_sceneColour = i_sceneColour;
 
+#ifdef SHADERGRAPH_PREVIEW
+	// Samplers are not defined in shader graph. Silence errors.
+	SamplerState sampler_CausticsTexture = LODData_linear_clamp_sampler;
+	SamplerState sampler_CausticsDistortionTexture = LODData_linear_clamp_sampler;
+	float4 _CausticsTexture_TexelSize = (float4)0.0;
+	float4 _CausticsDistortionTexture_TexelSize = (float4)0.0;
+#endif
+
+	const WaveHarmonic::Crest::TiledTexture causticsTexture =
+		WaveHarmonic::Crest::TiledTexture::Make(i_texture, sampler_CausticsTexture, _CausticsTexture_TexelSize, i_textureScale);
+	const WaveHarmonic::Crest::TiledTexture distortionTexture =
+		WaveHarmonic::Crest::TiledTexture::Make(i_distortion, sampler_CausticsDistortionTexture, _CausticsDistortionTexture_TexelSize, i_distortionScale);
+
 	// @HACK: When used by the underwater effect, either scene position or surface height is out of sync leading to
 	// caustics rendering short of the surface. CREST_GENERATED_SHADER_ON limits this to the ocean shader.
 #if CREST_GENERATED_SHADER_ON
@@ -52,14 +68,46 @@ void CrestNodeApplyCaustics_float
 	// caustics come from many directions and don't exhibit such a strong directonality
 	// Removing the fudge factor (4.0) will cause the caustics to move around more with the waves. But this will also
 	// result in stretched/dilated caustics in certain areas. This is especially noticeable on angled surfaces.
-	float2 surfacePosXZ = i_scenePos.xz + i_lightDir.xz * sceneDepth / (4.0*i_lightDir.y);
-	float2 cuv1 = surfacePosXZ / i_textureScale + float2(0.044*_CrestTime + 17.16, -0.169*_CrestTime);
-	float2 cuv2 = 1.37*surfacePosXZ / i_textureScale + float2(0.248*_CrestTime, 0.117*_CrestTime);
+	float2 lightProjection = i_lightDir.xz * sceneDepth / (4.0 * i_lightDir.y);
+
+	float3 cuv1 = 0.0; float3 cuv2 = 0.0;
+	{
+		float2 surfacePosXZ = i_scenePos.xz;
+		float surfacePosScale = 1.37;
+
+#if CREST_FLOATING_ORIGIN
+		// Apply tiled floating origin offset. Always needed.
+		surfacePosXZ -= causticsTexture.FloatingOriginOffset();
+		// Scale was causing popping.
+		surfacePosScale = 1.0;
+#endif
+
+		surfacePosXZ += lightProjection;
+
+		cuv1 = float3
+		(
+			surfacePosXZ / causticsTexture._scale + float2(0.044 * _CrestTime + 17.16, -0.169 * _CrestTime),
+			mipLod
+		);
+		cuv2 = float3
+		(
+			surfacePosScale * surfacePosXZ / causticsTexture._scale + float2(0.248 * _CrestTime, 0.117 * _CrestTime),
+			mipLod
+		);
+	}
 
 	if (i_underwater)
 	{
-		// Add distortion if we're not getting the refraction
-		half2 causticN = i_distortionStrength  * UnpackNormal(i_distortion.Sample(sampler_Crest_linear_repeat, surfacePosXZ / i_distortionScale)).xy;
+		float2 surfacePosXZ = i_scenePos.xz;
+
+#if CREST_FLOATING_ORIGIN
+		// Apply tiled floating origin offset. Always needed.
+		surfacePosXZ -= distortionTexture.FloatingOriginOffset();
+#endif
+
+		surfacePosXZ += lightProjection;
+
+		half2 causticN = i_distortionStrength * UnpackNormal(distortionTexture.Sample(surfacePosXZ / distortionTexture._scale)).xy;
 		cuv1.xy += 1.30 * causticN;
 		cuv2.xy += 1.77 * causticN;
 	}
@@ -75,6 +123,7 @@ void CrestNodeApplyCaustics_float
 		causticsStrength *= mainLight.shadowAttenuation;
 #endif // CREST_URP
 
+#ifndef SHADERGRAPH_PREVIEW
 #if CREST_HDRP_FORWARD_PASS
 		DirectionalLightData light = _DirectionalLightDatas[_DirectionalShadowIndex];
 		HDShadowContext context = InitShadowContext();
@@ -102,11 +151,12 @@ void CrestNodeApplyCaustics_float
 
 		causticsStrength *= shadows;
 #endif // CREST_HDRP_FORWARD_PASS
+#endif // SHADERGRAPH_PREVIEW
 	}
 // #endif // CREST_SHADOWS_ON
 
 	o_sceneColour.xyz *= 1.0 + causticsStrength * (
-		0.5 * i_texture.SampleLevel(sampler_Crest_linear_repeat, cuv1, mipLod).xyz +
-		0.5 * i_texture.SampleLevel(sampler_Crest_linear_repeat, cuv2, mipLod).xyz
+		0.5 * causticsTexture.SampleLevel(cuv1.xy, cuv1.z).xyz +
+		0.5 * causticsTexture.SampleLevel(cuv2.xy, cuv2.z).xyz
 		- i_textureAverage);
 }

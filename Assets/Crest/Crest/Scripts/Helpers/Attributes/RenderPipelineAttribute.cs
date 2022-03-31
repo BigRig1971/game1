@@ -12,26 +12,28 @@ namespace Crest
 
     public class RenderPipelineAttribute : DecoratorAttribute
     {
-        readonly RenderPipeline pipeline;
+        readonly RenderPipeline _pipeline;
+        readonly bool _inverted;
 
-        public RenderPipelineAttribute(RenderPipeline pipeline)
+        public RenderPipelineAttribute(RenderPipeline pipeline, bool inverted = false)
         {
-            this.pipeline = pipeline;
+            _pipeline = pipeline;
+            _inverted = inverted;
         }
 
 #if UNITY_EDITOR
         internal override void Decorate(Rect position, SerializedProperty property, GUIContent label, DecoratedDrawer drawer)
         {
-            switch (pipeline)
+            switch (_pipeline)
             {
                 case RenderPipeline.Legacy:
-                    if (!RenderPipelineHelper.IsLegacy) DecoratedDrawer.s_HideInInspector = true;
+                    if (RenderPipelineHelper.IsLegacy == _inverted) DecoratedDrawer.s_HideInInspector = true;
                     break;
                 case RenderPipeline.HighDefinition:
-                    if (!RenderPipelineHelper.IsHighDefinition) DecoratedDrawer.s_HideInInspector = true;
+                    if (RenderPipelineHelper.IsHighDefinition == _inverted) DecoratedDrawer.s_HideInInspector = true;
                     break;
                 case RenderPipeline.Universal:
-                    if (!RenderPipelineHelper.IsUniversal) DecoratedDrawer.s_HideInInspector = true;
+                    if (RenderPipelineHelper.IsUniversal == _inverted) DecoratedDrawer.s_HideInInspector = true;
                     break;
                 default: break;
             }

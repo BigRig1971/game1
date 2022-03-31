@@ -12,6 +12,7 @@ namespace RealisticEyeMovements {
 			readonly EyeAndHeadAnimator eyeAndHeadAnimator;
 				
 			float timeTillNextBlink;
+			public float timeSinceLastBlinkFinished { get; private set; }
 
 				enum BlinkState {
 					Idle,
@@ -64,17 +65,18 @@ namespace RealisticEyeMovements {
 			if ( blinkState != BlinkState.Idle )
 				return;
 
+			timeSinceLastBlinkFinished = 0;
 			this.isShortBlink = isShortBlink;
 			blinkState = BlinkState.Closing;
 			blinkStateTime = 0;
 			blinkLerpStart = 0;
 			blinkLerpEnd = 1;
 			
-			blinkStateDuration = 1/eyeAndHeadAnimator.blinkSpeed * (isShortBlink ? kShortBlinkFactor : 1) * kBlinkCloseDuration;
+			blinkStateDuration = (isShortBlink ? kShortBlinkFactor : 1) * kBlinkCloseDuration;
 
 			blinkLerpMaxSpeedClosing = (blinkLerpEnd -blinkLerpStart)/blinkStateDuration;
 			
-			float lateOpenDuration = 1/eyeAndHeadAnimator.blinkSpeed * (isShortBlink ? kShortBlinkFactor : 1) * kBlinkLateOpenDuration;
+			float lateOpenDuration = (isShortBlink ? kShortBlinkFactor : 1) * kBlinkLateOpenDuration;
 			blinkLerpAccelerationLateOpening = 2 * (0 - kBlinkLerpAtEarlyOpenDecelerationEnd)/(lateOpenDuration*lateOpenDuration);
 			blinkLerpEndSpeedForEarlyOpening = blinkLerpAccelerationLateOpening * lateOpenDuration;
 			
@@ -93,6 +95,7 @@ namespace RealisticEyeMovements {
 		{
 			if ( blinkState == BlinkState.Idle )
 			{
+				timeSinceLastBlinkFinished += deltaTime;
 				timeTillNextBlink -= deltaTime;
 				if ( timeTillNextBlink <= 0 )
 					Blink();
@@ -100,7 +103,8 @@ namespace RealisticEyeMovements {
 				return;
 			}
 			
-			blinkStateTime = Mathf.Min(blinkStateDuration, blinkStateTime + deltaTime);
+			float modifiedDeltaTime = deltaTime*eyeAndHeadAnimator.blinkSpeed;
+			blinkStateTime = Mathf.Min(blinkStateDuration, blinkStateTime + modifiedDeltaTime);
 			
 			if ( blinkState == BlinkState.Closing )
 			{
@@ -116,7 +120,7 @@ namespace RealisticEyeMovements {
 				{
 					blinkState = BlinkState.Closed;
 					blinkStateTime = 0;
-					blinkStateDuration = 1/eyeAndHeadAnimator.blinkSpeed * (isShortBlink ? kShortBlinkFactor : 1) * kBlinkClosedDuration;
+					blinkStateDuration = (isShortBlink ? kShortBlinkFactor : 1) * kBlinkClosedDuration;
 				}
 			}
 			if ( blinkState == BlinkState.Closed )
@@ -126,7 +130,7 @@ namespace RealisticEyeMovements {
 					blinkState = BlinkState.EarlyOpeningAccelerating;
 					blinkStateTime = 0;
 					blinkLerpStart = 1;
-					blinkStateDuration = 1/eyeAndHeadAnimator.blinkSpeed * (isShortBlink ? kShortBlinkFactor : 1) * kBlinkEarlyOpenAccelerationDuration;
+					blinkStateDuration = (isShortBlink ? kShortBlinkFactor : 1) * kBlinkEarlyOpenAccelerationDuration;
 					blinkLerpAccelerationEarlyOpening1 = 2 * (kBlinkLerpAtEarlyOpenAccelerationEnd - 1) / (blinkStateDuration*blinkStateDuration);
 				}
 			}
@@ -139,18 +143,18 @@ namespace RealisticEyeMovements {
 					blinkState = BlinkState.EarlyOpeningDecelerating;
 					blinkStateTime = 0;
 					blinkLerpSpeed = blinkLerpMaxSpeedForEarlyOpening = blinkLerpAccelerationEarlyOpening1 * blinkStateDuration;
-					blinkStateDuration = 1/eyeAndHeadAnimator.blinkSpeed * (isShortBlink ? kShortBlinkFactor : 1) * kBlinkEarlyOpenDecelerationDuration;
+					blinkStateDuration = (isShortBlink ? kShortBlinkFactor : 1) * kBlinkEarlyOpenDecelerationDuration;
 				}
 			}
 			if ( blinkState == BlinkState.EarlyOpeningDecelerating )
 			{
-				blink01 = Mathf.Clamp01(blink01 + blinkLerpSpeed * deltaTime);
+				blink01 = Mathf.Clamp01(blink01 + blinkLerpSpeed * modifiedDeltaTime);
 				blinkLerpSpeed = Mathf.Lerp(blinkLerpMaxSpeedForEarlyOpening, blinkLerpEndSpeedForEarlyOpening, Mathf.InverseLerp(kBlinkLerpAtEarlyOpenAccelerationEnd, kBlinkLerpAtEarlyOpenDecelerationEnd, blink01));
 				
 				if ( blink01 <= kBlinkLerpAtEarlyOpenDecelerationEnd )
 				{
 					blinkState = BlinkState.LateOpening;
-					blinkStateDuration = 1/eyeAndHeadAnimator.blinkSpeed * (isShortBlink ? kShortBlinkFactor : 1) * kBlinkLateOpenDuration;
+					blinkStateDuration = (isShortBlink ? kShortBlinkFactor : 1) * kBlinkLateOpenDuration;
 					float lateOpeningTime = Mathf.Sqrt(2 * blink01/Mathf.Abs(blinkLerpAccelerationLateOpening));
 					blinkStateTime = Mathf.Max(0, blinkStateDuration - lateOpeningTime);
 				}
@@ -164,6 +168,7 @@ namespace RealisticEyeMovements {
 				{
 					blink01 = 0;
 					blinkState = BlinkState.Idle;
+					timeSinceLastBlinkFinished = 0;
 					
 					ResetBlinking();
 				}

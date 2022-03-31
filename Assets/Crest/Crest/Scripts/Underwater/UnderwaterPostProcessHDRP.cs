@@ -42,6 +42,11 @@ namespace Crest
         [Tooltip("Add a meniscus to the boundary between water and air.")]
         public BoolParameter _meniscus = new BoolParameter(true);
 
+        [SerializeField]
+        [Tooltip("Scales the depth fog density. Useful to reduce the intensity of the depth fog when underwater water only.")]
+        ClampedFloatParameter _depthFogDensityFactor = new ClampedFloatParameter(1f, 0.01f, 1f);
+        public float DepthFogDensityFactor => _depthFogDensityFactor.value;
+
         [Header("Debug Options")]
         public BoolParameter _viewOceanMask = new BoolParameter(false);
         public BoolParameter _disableOceanMask = new BoolParameter(false);
@@ -51,6 +56,8 @@ namespace Crest
 
         UnderwaterRenderer.UnderwaterSphericalHarmonicsData _sphericalHarmonicsData = new UnderwaterRenderer.UnderwaterSphericalHarmonicsData();
         Camera _camera;
+
+        Material _currentOceanMaterial;
 
         static int s_xrPassIndex = -1;
 
@@ -147,18 +154,22 @@ namespace Crest
             UnderwaterMaskPassHDRP.Enable(null);
 
             UnderwaterRenderer.UpdatePostProcessMaterial(
+                UnderwaterRenderer.Mode.FullScreen,
                 camera.camera,
                 _underwaterPostProcessMaterialWrapper,
                 _sphericalHarmonicsData,
                 _meniscus.value,
                 _firstRender || _copyOceanMaterialParamsEachFrame.value,
                 _viewOceanMask.value,
-                _filterOceanData.value
+                false,
+                _filterOceanData.value,
+                ref _currentOceanMaterial,
+                setGlobalShaderData: false
             );
 
-            _underwaterPostProcessMaterial.SetTexture(UnderwaterRenderer.sp_CrestCameraColorTexture, source);
-            // Shader pass 0 is post processing.
-            HDUtils.DrawFullScreen(commandBuffer, _underwaterPostProcessMaterial, destination, properties: null, shaderPassId: 0);
+            _underwaterPostProcessMaterial.SetTexture(UnderwaterRenderer.ShaderIDs.s_CrestCameraColorTexture, source);
+            // Shader pass 6 is post processing.
+            HDUtils.DrawFullScreen(commandBuffer, _underwaterPostProcessMaterial, destination, properties: null, shaderPassId: 6);
 
             _firstRender = false;
         }

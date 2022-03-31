@@ -109,13 +109,18 @@ namespace Crest
                 // Detect first update and populate the render data if so - otherwise it can give divide by 0s and other nastiness.
                 if (isFirstUpdate && _renderData[lodIdx].Size > 1)
                 {
+                    // Cache to prevent captured variable allocation.
+                    var posSnapped = _renderData[lodIdx].Current._posSnapped;
+                    var texelWidth = _renderData[lodIdx].Current._texelWidth;
+                    var textureRes = _renderData[lodIdx].Current._textureRes;
+                    var maxWavelength = _renderData[lodIdx].Current._maxWavelength;
                     // We are writing to "Current" again. But it is okay since only once.
                     _renderData[lodIdx].RunLambda(buffer =>
                     {
-                        buffer._posSnapped = _renderData[lodIdx].Current._posSnapped;
-                        buffer._texelWidth = _renderData[lodIdx].Current._texelWidth;
-                        buffer._textureRes = _renderData[lodIdx].Current._textureRes;
-                        buffer._maxWavelength = _renderData[lodIdx].Current._maxWavelength;
+                        buffer._posSnapped = posSnapped;
+                        buffer._texelWidth = texelWidth;
+                        buffer._textureRes = textureRes;
+                        buffer._maxWavelength = maxWavelength;
                     });
                 }
 
@@ -127,7 +132,8 @@ namespace Crest
             UpdateScaleDifference();
         }
 
-        // Borrowed from SRP code: https://github.com/Unity-Technologies/ScriptableRenderPipeline/blob/2a68d8073c4eeef7af3be9e4811327a522434d5f/com.unity.render-pipelines.high-definition/Runtime/Core/Utilities/GeometryUtils.cs
+        // Borrowed from SRP code:
+        // https://github.com/Unity-Technologies/Graphics/blob/7d292932bec3b4257a4defaf698fc7d77e2027f5/com.unity.render-pipelines.high-definition/Runtime/Core/Utilities/GeometryUtils.cs#L181-L184
         public static Matrix4x4 CalculateWorldToCameraMatrixRHS(Vector3 position, Quaternion rotation)
         {
             return Matrix4x4.Scale(new Vector3(1, 1, -1)) * Matrix4x4.TRS(position, rotation, Vector3.one).inverse;
@@ -135,7 +141,7 @@ namespace Crest
 
         public void SetViewProjectionMatrices(int lodIdx, CommandBuffer buf)
         {
-            // This will work for CG but not for HDRP hlsl files
+            // This will work for CG but not for HDRP hlsl files.
             buf.SetViewProjectionMatrices(GetWorldToCameraMatrix(lodIdx), GetProjectionMatrix(lodIdx));
         }
 
@@ -171,8 +177,14 @@ namespace Crest
         {
             for (int lodIdx = 0; lodIdx < OceanRenderer.Instance.CurrentLodCount; lodIdx++)
             {
-                cascadeParams.Current[lodIdx]._posSnapped[0] = _renderData[lodIdx].Current._posSnapped[0];
-                cascadeParams.Current[lodIdx]._posSnapped[1] = _renderData[lodIdx].Current._posSnapped[2];
+                // All _posSnapped values will be updated on Floating Origin shift so we need to recopy them.
+                var frames = FloatingOrigin.HasTeleportedThisFrame ? _renderData[lodIdx].Size : 1;
+                for (var frame = 0; frame < frames; frame++)
+                {
+                    cascadeParams.Previous(frame)[lodIdx]._posSnapped[0] = _renderData[lodIdx].Previous(frame)._posSnapped[0];
+                    cascadeParams.Previous(frame)[lodIdx]._posSnapped[1] = _renderData[lodIdx].Previous(frame)._posSnapped[2];
+                }
+
                 // NOTE: Current scale was assigned to current and previous frame, but not sure why. 2021.10.17
                 cascadeParams.Current[lodIdx]._scale = OceanRenderer.Instance.CalcLodScale(lodIdx);
                 cascadeParams.Current[lodIdx]._textureRes = _renderData[lodIdx].Current._textureRes;

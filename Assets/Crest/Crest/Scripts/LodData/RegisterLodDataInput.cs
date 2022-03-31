@@ -35,7 +35,7 @@ namespace Crest
         /// <summary>
         /// Draw the input (the render target will be bound)
         /// </summary>
-        void Draw(CommandBuffer buf, float weight, int isTransition, int lodIdx);
+        void Draw(LodDataMgr lodData, CommandBuffer buf, float weight, int isTransition, int lodIdx);
 
         /// <summary>
         /// The wavelength of the input - used to choose which level of detail to apply the input to.
@@ -58,8 +58,12 @@ namespace Crest
     {
 #if UNITY_EDITOR
         [SerializeField, Tooltip("Check that the shader applied to this object matches the input type (so e.g. an Animated Waves input object has an Animated Waves input shader.")]
-        [Predicated(typeof(MeshRenderer)), DecoratedField]
+        [Predicated(typeof(Renderer)), DecoratedField]
         bool _checkShaderName = true;
+
+        [SerializeField, Tooltip("Check that the shader applied to this object has only a single pass as only the first pass is executed for most inputs.")]
+        [Predicated(typeof(Renderer)), DecoratedField]
+        bool _checkShaderPasses = true;
 #endif
 
         public const string MENU_PREFIX = Internal.Constants.MENU_SCRIPTS + "LOD Inputs/Crest Register ";
@@ -90,12 +94,15 @@ namespace Crest
             return registered;
         }
 
-        protected Renderer _renderer;
+        internal Renderer _renderer;
         protected Material _material;
+        // We pass this to GetSharedMaterials to avoid allocations.
+        protected List<Material> _sharedMaterials = new List<Material>();
         SampleHeightHelper _sampleHelper = new SampleHeightHelper();
 
         // If this is true, then the renderer should not be there as input source is from something else.
         protected virtual bool RendererRequired => true;
+        protected virtual bool SupportsMultiPassShaders => false;
 
         void InitRendererAndMaterial(bool verifyShader)
         {
@@ -104,9 +111,9 @@ namespace Crest
             if (RendererRequired && _renderer != null)
             {
 #if UNITY_EDITOR
-                if (Application.isPlaying && _checkShaderName && verifyShader)
+                if (Application.isPlaying && verifyShader)
                 {
-                    ValidatedHelper.ValidateRenderer(gameObject, ValidatedHelper.DebugLog, ShaderPrefix);
+                    ValidatedHelper.ValidateRenderer<Renderer>(gameObject, ValidatedHelper.DebugLog, _checkShaderName ? ShaderPrefix : String.Empty);
                 }
 #endif
 
@@ -129,7 +136,7 @@ namespace Crest
 #endif
         }
 
-        public virtual void Draw(CommandBuffer buf, float weight, int isTransition, int lodIdx)
+        public virtual void Draw(LodDataMgr lodData, CommandBuffer buf, float weight, int isTransition, int lodIdx)
         {
             if (_renderer && _material && weight > 0f)
             {
@@ -148,7 +155,20 @@ namespace Crest
                     buf.SetGlobalVector(sp_DisplacementAtInputPosition, Vector3.zero);
                 }
 
-                buf.DrawRenderer(_renderer, _material);
+                _renderer.GetSharedMaterials(_sharedMaterials);
+                for (var i = 0; i < _sharedMaterials.Count; i++)
+                {
+                    // Empty material slots is a user error, but skip so we do not spam errors.
+                    if (_sharedMaterials[i] == null)
+                    {
+                        continue;
+                    }
+
+                    // By default, shaderPass is -1 which is all passes. Shader Graph will produce multi-pass shaders
+                    // for depth etc so we should only render one pass. Unlit SG will have the unlit pass first.
+                    // Submesh count generally must equal number of materials.
+                    buf.DrawRenderer(_renderer, _sharedMaterials[i], submeshIndex: i, shaderPass: 0);
+                }
             }
         }
 
@@ -183,7 +203,7 @@ namespace Crest
     {
         protected const string k_displacementCorrectionTooltip = "Whether this input data should displace horizontally with waves. If false, data will not move from side to side with the waves. Adds a small performance overhead when disabled.";
 
-        [SerializeField, Predicated(typeof(MeshRenderer)), DecoratedField]
+        [SerializeField, Predicated(typeof(Renderer)), DecoratedField]
         bool _disableRenderer = true;
 
         protected abstract Color GizmoColor { get; }
@@ -209,7 +229,17 @@ namespace Crest
                 var rend = GetComponent<Renderer>();
                 if (rend)
                 {
-                    rend.enabled = false;
+                    if (rend is TrailRenderer || rend is LineRenderer)
+                    {
+                        // If we disable using "enabled" then the line/trail positions will not be updated. This keeps
+                        // the scripting side of the component running and just disables the rendering. Similar to
+                        // disabling the Renderer module on the Particle System.
+                        rend.forceRenderingOff = true;
+                    }
+                    else
+                    {
+                        rend.enabled = false;
+                    }
                 }
             }
 
@@ -308,12 +338,17 @@ namespace Crest
 
                 if (_splineMaterial == null)
                 {
-                    _splineMaterial = new Material(Shader.Find(SplineShaderName));
+                    CreateSplineMaterial();
                 }
             }
         }
 
-        public override void Draw(CommandBuffer buf, float weight, int isTransition, int lodIdx)
+        protected virtual void CreateSplineMaterial()
+        {
+            _splineMaterial = new Material(Shader.Find(SplineShaderName));
+        }
+
+        public override void Draw(LodDataMgr lodData, CommandBuffer buf, float weight, int isTransition, int lodIdx)
         {
             if (weight <= 0f) return;
 
@@ -326,7 +361,7 @@ namespace Crest
             }
             else
             {
-                base.Draw(buf, weight, isTransition, lodIdx);
+                base.Draw(lodData, buf, weight, isTransition, lodIdx);
             }
         }
 
@@ -370,7 +405,7 @@ namespace Crest
 
                     if (_splineMaterial == null)
                     {
-                        _splineMaterial = new Material(Shader.Find(SplineShaderName));
+                        CreateSplineMaterial();
                     }
                 }
                 else
@@ -412,7 +447,36 @@ namespace Crest
 
         public virtual bool Validate(OceanRenderer ocean, ValidatedHelper.ShowMessage showMessage)
         {
-            var isValid = ValidatedHelper.ValidateRenderer(gameObject, showMessage, RendererRequired, RendererOptional, ShaderPrefix);
+            var isValid = ValidatedHelper.ValidateRenderer<Renderer>(gameObject, showMessage, RendererRequired, RendererOptional, _checkShaderName ? ShaderPrefix : String.Empty);
+
+            if (_checkShaderPasses && _material != null && _material.passCount > 1 && !SupportsMultiPassShaders)
+            {
+                showMessage
+                (
+                    $"The shader <i>{_material.shader.name}</i> for material <i>{_material.name}</i> has multiple passes which might not work as expected as only the first pass is executed. " +
+                    "See documentation for more information on what multi-pass shaders work or",
+                    "use a shader with a single pass.",
+                    ValidatedHelper.MessageType.Warning, this
+                );
+            }
+
+            if (_renderer != null)
+            {
+                _renderer.GetSharedMaterials(_sharedMaterials);
+                for (var i = 0; i < _sharedMaterials.Count; i++)
+                {
+                    // Empty material slots is a user error. Unity complains about it so we should too.
+                    if (_sharedMaterials[i] == null)
+                    {
+                        showMessage
+                        (
+                            $"<i>{_renderer.GetType().Name}</i> used by this input (<i>{GetType().Name}</i>) has empty material slots.",
+                            "Remove these slots or fill them with a material.",
+                            ValidatedHelper.MessageType.Warning, _renderer
+                        );
+                    }
+                }
+            }
 
             if (ocean != null && !FeatureEnabled(ocean))
             {
@@ -437,7 +501,25 @@ namespace Crest
     }
 
     [CustomEditor(typeof(RegisterLodDataInputBase), true), CanEditMultipleObjects]
-    class RegisterLodDataInputBaseEditor : ValidatedEditor { }
+    class RegisterLodDataInputBaseEditor : ValidatedEditor
+    {
+        public override void OnInspectorGUI()
+        {
+            // Show a note of what renderer we are currently using.
+            var target = this.target as RegisterLodDataInputBase;
+            if (target._renderer != null)
+            {
+                // Enable rich text in help boxes. Store original so we can revert since this might be a "hack".
+                var styleRichText = GUI.skin.GetStyle("HelpBox").richText;
+                GUI.skin.GetStyle("HelpBox").richText = true;
+                EditorGUILayout.HelpBox($"Using renderer of type <i>{target._renderer.GetType()}</i>", MessageType.Info);
+                // Revert skin since it persists.
+                GUI.skin.GetStyle("HelpBox").richText = styleRichText;
+            }
+
+            base.OnInspectorGUI();
+        }
+    }
 
     public abstract partial class RegisterLodDataInputWithSplineSupport<LodDataType, SplinePointCustomData>
     {
@@ -447,12 +529,12 @@ namespace Crest
         {
             bool isValid = base.Validate(ocean, showMessage);
 
-            // Will be invalid if no renderer and no spline.
-            if (RendererRequired && !TryGetComponent<Renderer>(out _))
+            // Is there a renderer? Check spline explicitly as the renderer may not be created (eg GO is inactive).
+            if (RendererRequired && !TryGetComponent<Renderer>(out _) && !TryGetComponent<Spline.Spline>(out _))
             {
                 showMessage
                 (
-                    "A <i>Crest Spline</i> component is required to drive this data. Alternatively a <i>MeshRenderer</i> can be added. Neither is currently attached to ocean input.",
+                    "A <i>Crest Spline</i> component is required to drive this data. Alternatively a <i>Renderer</i> can be added. Neither is currently attached to ocean input.",
                     "Attach a <i>Crest Spline</i> component.",
                     ValidatedHelper.MessageType.Error, gameObject,
                     ValidatedHelper.FixAttachComponent<Spline.Spline>

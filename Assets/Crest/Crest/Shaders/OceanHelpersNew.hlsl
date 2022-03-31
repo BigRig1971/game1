@@ -21,6 +21,19 @@ float3 WorldToUV(in float2 i_samplePos, in CascadeParams i_cascadeParams, in flo
 	return float3(uv, i_sliceIndex);
 }
 
+// Moves to the next LOD slice if out of bounds of current LOD slice.
+float3 WorldToSafeUV(in float2 i_samplePos, in CascadeParams i_cascadeParams, in float i_sliceIndex)
+{
+	float2 uv = WorldToUV(i_samplePos, i_cascadeParams);
+	if (uv.x > 1.0 || uv.y > 1.0 || uv.x < 0.0 || uv.y < 0.0)
+	{
+		i_sliceIndex += 1.0;
+		i_cascadeParams = _CrestCascadeData[i_sliceIndex];
+		uv = WorldToUV(i_samplePos, i_cascadeParams);
+	}
+	return float3(uv, i_sliceIndex);
+}
+
 float2 UVToWorld(in float2 i_uv, in float i_sliceIndex, in CascadeParams i_cascadeParams)
 {
 	const float texelSize = i_cascadeParams._texelWidth;
@@ -104,6 +117,11 @@ void SampleFlow(in Texture2DArray i_oceanFlowSampler, in float3 i_uv_slice, in f
 	io_flow += i_wt * i_oceanFlowSampler.SampleLevel(LODData_linear_clamp_sampler, i_uv_slice, 0.0).xy;
 }
 
+void SampleAlbedo(in Texture2DArray i_oceanAlbedoSampler, in float3 i_uv_slice, in float i_wt, inout half4 io_albedo)
+{
+	io_albedo += i_wt * i_oceanAlbedoSampler.SampleLevel(LODData_linear_clamp_sampler, i_uv_slice, 0.0);
+}
+
 void SampleSeaDepth(in Texture2DArray i_oceanDepthSampler, in float3 i_uv_slice, in float i_wt, inout half io_oceanDepth)
 {
 	const half2 terrainHeight_seaLevelOffset = i_oceanDepthSampler.SampleLevel(LODData_linear_clamp_sampler, i_uv_slice.xyz, 0.0).xy;
@@ -136,6 +154,11 @@ void SampleSeaDepth(in Texture2DArray i_oceanDepthSampler, in float3 i_uv_slice,
 		io_seaLevelDerivs.x += i_wt * (seaLevelOffset_x - terrainHeight_seaLevelOffset.y) / i_cascadeParams._texelWidth;
 		io_seaLevelDerivs.y += i_wt * (seaLevelOffset_z - terrainHeight_seaLevelOffset.y) / i_cascadeParams._texelWidth;
 	}
+}
+
+void SampleTerrainHeight(const Texture2DArray i_texture, const float3 i_uv, inout half io_terrainHeight)
+{
+	io_terrainHeight = i_texture.SampleLevel(LODData_linear_clamp_sampler, i_uv, 0.0).x;
 }
 
 void SampleSeaLevelOffset(in Texture2DArray i_oceanDepthSampler, in float3 i_uv_slice, in float i_wt, inout half io_seaLevelOffset)
@@ -176,7 +199,7 @@ void PosToSliceIndices
 	const float BLACK_POINT = 0.15, WHITE_POINT = 0.85;
 	lodAlpha = saturate((lodAlpha - BLACK_POINT) / (WHITE_POINT - BLACK_POINT));
 
-	if (slice0 == 0.0)
+	if (slice0 == 0)
 	{
 		// blend out lod0 when viewpoint gains altitude. we're using the global _MeshScaleLerp so check for LOD0 is necessary
 		lodAlpha = min(lodAlpha + _MeshScaleLerp, 1.0);
@@ -234,7 +257,29 @@ void ApplyOceanClipSurface(in const float3 io_positionWS, in const float i_lodAl
 
 bool IsUnderwater(const bool i_isFrontFace, const float i_forceUnderwater)
 {
-	return !i_isFrontFace || i_forceUnderwater > 0.0;
+	// We are well below water.
+	if (i_forceUnderwater > 0.0)
+	{
+		return true;
+	}
+
+	// We are well above water.
+	if (i_forceUnderwater < 0.0)
+	{
+		return false;
+	}
+
+	return !i_isFrontFace;
+}
+
+half UnderwaterShadowSSS(const float2 i_positionXZ)
+{
+	const int index = clamp(_CrestDataSliceOffset, 0, _SliceCount - 2);
+	const float3 uv = WorldToUV(i_positionXZ, _CrestCascadeData[index], index);
+	// Camera should be at center of LOD system so no need for blending (alpha, weights, etc). This might not be
+	// the case if there is large horizontal displacement, but the _DataSliceOffset should help by setting a
+	// large enough slice as minimum.
+	return saturate(1.0 - _LD_TexArray_Shadow.SampleLevel(LODData_linear_clamp_sampler, uv, 0.0).x);
 }
 
 float FeatherWeightFromUV(const float2 i_uv, const half i_featherWidth)

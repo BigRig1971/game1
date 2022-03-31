@@ -78,6 +78,11 @@ namespace Crest
         // The clip surface samples at the displaced position in the ocean shader, so the displacement correction is not needed.
         protected override bool FollowHorizontalMotion => true;
 
+        // Cache shader name to prevent allocations.
+        protected override bool SupportsMultiPassShaders => _currentShaderName == "Crest/Inputs/Clip Surface/Convex Hull";
+        Material _currentMaterial;
+        string _currentShaderName;
+
         PropertyWrapperMPB _mpb;
         SampleHeightHelper _sampleHeightHelper = new SampleHeightHelper();
 
@@ -154,7 +159,7 @@ namespace Crest
             }
         }
 
-        public override void Draw(CommandBuffer buf, float weight, int isTransition, int lodIdx)
+        public override void Draw(LodDataMgr lodData, CommandBuffer buf, float weight, int isTransition, int lodIdx)
         {
             if (weight <= 0f)
             {
@@ -187,7 +192,19 @@ namespace Crest
             }
             else
             {
-                buf.DrawRenderer(_renderer, _material);
+                var shaderPass = SupportsMultiPassShaders ? -1 : 0;
+                _renderer.GetSharedMaterials(_sharedMaterials);
+                for (var i = 0; i < _sharedMaterials.Count; i++)
+                {
+                    // Empty material slots is a user error, but skip so we do not spam errors.
+                    if (_sharedMaterials[i] == null)
+                    {
+                        continue;
+                    }
+
+                    buf.DrawRenderer(_renderer, _sharedMaterials[i], submeshIndex: i, shaderPass);
+                }
+
             }
         }
 
@@ -196,6 +213,13 @@ namespace Crest
             if (OceanRenderer.Instance == null || (_mode == Mode.Geometry && _renderer == null))
             {
                 return;
+            }
+
+            if (_currentMaterial != _material)
+            {
+                _currentMaterial = _material;
+                // GC allocation hence the caching.
+                _currentShaderName = _currentMaterial.shader.name;
             }
 
             // Prevents possible conflicts since overlapping doesn't work for every case for convex null.
@@ -233,15 +257,7 @@ namespace Crest
                 }
                 else
                 {
-                    if (_inverted)
-                    {
-                        _signedDistancedMaterial.EnableKeyword("_INVERTED");
-                    }
-                    else
-                    {
-                        _signedDistancedMaterial.DisableKeyword("_INVERTED");
-                    }
-
+                    _signedDistancedMaterial.SetKeyword("_INVERTED", _inverted);
                     _signedDistancedMaterial.SetInt(sp_BlendOp, (int)(_inverted ? BlendOp.Min : BlendOp.Max));
                 }
 

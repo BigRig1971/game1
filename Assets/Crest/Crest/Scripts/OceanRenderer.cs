@@ -2,11 +2,16 @@
 
 // Copyright 2020 Wave Harmonic Ltd
 
+using System.Collections.Generic;
 using Unity.Collections.LowLevel.Unsafe;
 using Crest.Internal;
 #if UNITY_EDITOR
 using UnityEditor;
+#if UNITY_2021_2_OR_NEWER
+using UnityEditor.SceneManagement;
+#else
 using UnityEditor.Experimental.SceneManagement;
+#endif
 #endif
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -16,7 +21,6 @@ using UnityEngine.Rendering.Universal;
 #if CREST_HDRP
 using UnityEngine.Rendering.HighDefinition;
 #endif
-using System.Collections.Generic;
 
 #if !UNITY_2020_3_OR_NEWER
 #error This version of Crest requires Unity 2020.3 or later.
@@ -113,6 +117,13 @@ namespace Crest
             }
         }
 
+        [Tooltip("The height where detail is focused is smoothed to avoid popping which is undesireable after a teleport. Threshold is in Unity units."), SerializeField]
+        float _teleportThreshold = 10f;
+        float _teleportTimerForHeightQueries = 0f;
+        bool _isFirstFrameSinceEnabled = true;
+        internal bool _hasTeleportedThisFrame = false;
+        Vector3 _oldViewerPosition = Vector3.zero;
+
         public Transform Root { get; private set; }
 
         // does not respond to _timeProvider changing in inspector
@@ -185,6 +196,9 @@ namespace Crest
         float _gravityMultiplier = 1f;
         public float Gravity => _gravityMultiplier * Physics.gravity.magnitude;
 
+        [Tooltip("Whether 'Water Body' components will cull the ocean tiles. Disable if you want to use the 'Water Body' 'Material Override' feature and still have an ocean.")]
+        public bool _waterBodyCulling = true;
+
 
         [Header("Detail Params")]
 
@@ -197,8 +211,8 @@ namespace Crest
         [Tooltip("Drops the height for maximum ocean detail based on waves. This means if there are big waves, max detail level is reached at a lower height, which can help visual range when there are very large waves and camera is at sea level."), SerializeField, Range(0f, 1f)]
         float _dropDetailHeightBasedOnWaves = 0.2f;
 
-        [SerializeField, Delayed, Tooltip("Resolution of ocean LOD data. Use even numbers like 256 or 384. This is 4x the old 'Base Vert Density' param, so if you used 64 for this param, set this to 256.")]
-        int _lodDataResolution = 256;
+        [SerializeField, Delayed, Tooltip("Resolution of ocean LOD data. Use even numbers like 256 or 384.")]
+        int _lodDataResolution = 384;
         public int LodDataResolution => _lodDataResolution;
 
         [SerializeField, Delayed, Tooltip("How much of the water shape gets tessellated by geometry. If set to e.g. 4, every geometry quad will span 4x4 LOD data texels. Use power of 2 values like 1, 2, 4...")]
@@ -207,18 +221,13 @@ namespace Crest
         [SerializeField, Tooltip("Number of ocean tile scales/LODs to generate."), Range(2, LodDataMgr.MAX_LOD_COUNT)]
         int _lodCount = 7;
 
-        [SerializeField, Range(UNDERWATER_CULL_LIMIT_MINIMUM, UNDERWATER_CULL_LIMIT_MAXIMUM)]
-        [Tooltip("Proportion of visibility below which ocean will be culled underwater. The larger the number, the closer to the camera the ocean tiles will be culled.")]
-        public float _underwaterCullLimit = 0.001f;
-        internal const float UNDERWATER_CULL_LIMIT_MINIMUM = 0.000001f;
-        internal const float UNDERWATER_CULL_LIMIT_MAXIMUM = 0.01f;
 
 #if CREST_HDRP
         [Header("Rendering Params")]
 
         [RenderPipeline(RenderPipeline.HighDefinition), DecoratedField]
         [Tooltip("Layer mask for lights and shadows. Please read the HDRP documentation on light layers for more information."), SerializeField]
-        LightLayerEnum _renderingLayerMask = LightLayerEnum.Everything;
+        UnityEngine.Rendering.HighDefinition.LightLayerEnum _renderingLayerMask = UnityEngine.Rendering.HighDefinition.LightLayerEnum.Everything;
 #else
         // A 'creative' way to save the value of the _renderingLayerMask enum when SRP is compiled out. Perhaps
         // a little too creative, but seems to work! Defaults to 0xFF which is 'LightLayerEnum.Everything' - at time
@@ -254,6 +263,7 @@ namespace Crest
         public bool CreateDynamicWaveSim => _createDynamicWaveSim;
         [Predicated("_createDynamicWaveSim"), Embedded]
         public SimSettingsWave _simSettingsDynamicWaves;
+        public SimSettingsWave SimSettingsDynamicWaves { get => _simSettingsDynamicWaves; set => _simSettingsDynamicWaves = value; }
 
         [Tooltip("Horizontal motion of water body, akin to water currents."), SerializeField]
         bool _createFlowSim = false;
@@ -283,11 +293,37 @@ namespace Crest
         [Predicated("_createClipSurfaceData"), DecoratedField]
         public DefaultClippingState _defaultClippingState = DefaultClippingState.NothingClipped;
 
+        [Tooltip("Albedo - a colour layer composited onto the water surface."), SerializeField]
+        bool _createAlbedoData = false;
+        public bool CreateAlbedoData => _createAlbedoData;
+        [Predicated("_createAlbedoData"), Embedded]
+        public SimSettingsAlbedo _settingsAlbedo;
+
+
+        [Header("Advanced")]
+
+        [SerializeField]
+        [Tooltip("How Crest should handle self-intersections of the ocean surface caused by choppy waves which can cause a flipped underwater effect. Automatic will disable the fix if portals/volumes are used which is the recommend setting.")]
+        SurfaceSelfIntersectionFixMode _surfaceSelfIntersectionFixMode = SurfaceSelfIntersectionFixMode.Automatic;
+        public enum SurfaceSelfIntersectionFixMode
+        {
+            Off,
+            On,
+            Automatic,
+        }
+
+        [SerializeField, Range(UNDERWATER_CULL_LIMIT_MINIMUM, UNDERWATER_CULL_LIMIT_MAXIMUM)]
+        [Tooltip("Proportion of visibility below which ocean will be culled underwater. The larger the number, the closer to the camera the ocean tiles will be culled.")]
+        public float _underwaterCullLimit = 0.001f;
+        internal const float UNDERWATER_CULL_LIMIT_MINIMUM = 0.000001f;
+        internal const float UNDERWATER_CULL_LIMIT_MAXIMUM = 0.01f;
+
+
         [Header("Edit Mode Params")]
 
         [SerializeField]
 #pragma warning disable 414
-        bool _showOceanProxyPlane = false;
+        internal bool _showOceanProxyPlane = false;
 #pragma warning restore 414
 #if UNITY_EDITOR
         GameObject _proxyPlane;
@@ -353,6 +389,7 @@ namespace Crest
         [HideInInspector] public LodDataMgrFlow _lodDataFlow;
         [HideInInspector] public LodDataMgrFoam _lodDataFoam;
         [HideInInspector] public LodDataMgrShadow _lodDataShadow;
+        [HideInInspector] public LodDataMgrAlbedo _lodDataAlbedo;
 
         /// <summary>
         /// The number of LODs/scales that the ocean is currently using.
@@ -363,6 +400,11 @@ namespace Crest
         /// Vertical offset of camera vs water surface.
         /// </summary>
         public float ViewerHeightAboveWater { get; private set; }
+
+        /// <summary>
+        /// Depth Fog Density with factor applied for underwater.
+        /// </summary>
+        public Vector3 UnderwaterDepthFogDensity { get; private set; }
 
         List<LodDataMgr> _lodDatas = new List<LodDataMgr>();
 
@@ -419,7 +461,7 @@ namespace Crest
         readonly static int sp_lodAlphaBlackPointFade = Shader.PropertyToID("_CrestLodAlphaBlackPointFade");
         readonly static int sp_lodAlphaBlackPointWhitePointFade = Shader.PropertyToID("_CrestLodAlphaBlackPointWhitePointFade");
         readonly static int sp_CrestDepthTextureOffset = Shader.PropertyToID("_CrestDepthTextureOffset");
-        readonly static int sp_ForceUnderwater = Shader.PropertyToID("_ForceUnderwater");
+        public static readonly int sp_CrestForceUnderwater = Shader.PropertyToID("_CrestForceUnderwater");
 
         readonly static int sp_OceanCenterPosWorldDelta = Shader.PropertyToID("_OceanCenterPosWorldDelta");
         readonly static int sp_CrestScaleChange = Shader.PropertyToID("_CrestScaleChange");
@@ -429,6 +471,29 @@ namespace Crest
 
         // @Hack: Work around to unity_CameraToWorld._13_23_33 not being set correctly in URP 7.4+
         static readonly int sp_CameraForward = Shader.PropertyToID("_CameraForward");
+
+        public static class ShaderIDs
+        {
+            // Shader properties.
+            public static readonly int s_DepthFogDensity = Shader.PropertyToID("_DepthFogDensity");
+
+            // Shader Lab.
+            public static readonly int s_Diffuse = Shader.PropertyToID("_Diffuse");
+            public static readonly int s_DiffuseGrazing = Shader.PropertyToID("_DiffuseGrazing");
+            public static readonly int s_DiffuseShadow = Shader.PropertyToID("_DiffuseShadow");
+            public static readonly int s_SubSurfaceColour = Shader.PropertyToID("_SubSurfaceColour");
+            public static readonly int s_SubSurfaceSun = Shader.PropertyToID("_SubSurfaceSun");
+            public static readonly int s_SubSurfaceBase = Shader.PropertyToID("_SubSurfaceBase");
+            public static readonly int s_SubSurfaceSunFallOff = Shader.PropertyToID("_SubSurfaceSunFallOff");
+
+            // Shader Graph.
+            public static readonly int s_ScatterColourBase = Shader.PropertyToID("_ScatterColourBase");
+            public static readonly int s_ScatterColourShadow = Shader.PropertyToID("_ScatterColourShadow");
+            public static readonly int s_SSSIntensityBase = Shader.PropertyToID("_SSSIntensityBase");
+            public static readonly int s_SSSIntensitySun = Shader.PropertyToID("_SSSIntensitySun");
+            public static readonly int s_SSSTint = Shader.PropertyToID("_SSSTint");
+            public static readonly int s_SSSSunFalloff = Shader.PropertyToID("_SSSSunFalloff");
+        }
 
 #if UNITY_EDITOR
         static float _lastUpdateEditorTime = -1f;
@@ -494,6 +559,8 @@ namespace Crest
             }
 #endif
 
+            _isFirstFrameSinceEnabled = true;
+
             // Setup a default time provider, and add the override one (from the inspector)
             _timeProviderStack.Clear();
 
@@ -535,12 +602,14 @@ namespace Crest
             LodDataMgrFoam.BindNullToGraphicsShaders();
             LodDataMgrSeaFloorDepth.BindNullToGraphicsShaders();
             LodDataMgrShadow.BindNullToGraphicsShaders();
+            LodDataMgrAlbedo.BindNullToGraphicsShaders();
 
             CreateDestroySubSystems();
 
             // TODO: Have a BufferCount which will be the run-time buffer size or prune data.
+            // NOTE: Hardcode minimum (2) to avoid breaking server builds and LodData* toggles.
             // Gather the buffer size for shared data.
-            BufferSize = 0;
+            BufferSize = 2;
             foreach (var lodData in _lodDatas)
             {
                 if (lodData.enabled)
@@ -595,6 +664,12 @@ namespace Crest
             _canSkipCulling = false;
 
             _generatedSettingsHash = CalculateSettingsHash();
+        }
+
+        internal void Rebuild()
+        {
+            enabled = false;
+            enabled = true;
         }
 
         private void OnDisable()
@@ -791,6 +866,24 @@ namespace Crest
                         _lodDataShadow = null;
                     }
                 }
+
+                if (CreateAlbedoData)
+                {
+                    if (_lodDataAlbedo == null)
+                    {
+                        _lodDataAlbedo = new LodDataMgrAlbedo(this);
+                        _lodDatas.Add(_lodDataAlbedo);
+                    }
+                }
+                else
+                {
+                    if (_lodDataAlbedo != null)
+                    {
+                        _lodDataAlbedo.OnDisable();
+                        _lodDatas.Remove(_lodDataAlbedo);
+                        _lodDataAlbedo = null;
+                    }
+                }
             }
 
             // Potential extension - add 'type' field to collprovider and change provider if settings have changed - this would support runtime changes.
@@ -939,22 +1032,10 @@ namespace Crest
             // Rebuild if needed. Needs to run in builds (for MVs at the very least).
             if (CalculateSettingsHash() != _generatedSettingsHash)
             {
-                enabled = false;
-                enabled = true;
+                Rebuild();
             }
 
             BuildCommandBuffer.FlipDataBuffers(this);
-
-            // Run queries *before* changing the ocean position, as it needs the current LOD positions to associate with the current queries
-#if UNITY_EDITOR
-            // Issue #630 - seems to be a terrible memory leak coming from creating async gpu readbacks. We don't rely on queries in edit mode AFAIK
-            // so knock this out.
-            if (EditorApplication.isPlaying)
-#endif
-            {
-                CollisionProvider?.UpdateQueries();
-                FlowProvider?.UpdateQueries();
-            }
 
             // Set global shader params
             Shader.SetGlobalFloat(sp_crestTime, CurrentTime);
@@ -962,10 +1043,13 @@ namespace Crest
             Shader.SetGlobalFloat(sp_clipByDefault, _defaultClippingState == DefaultClippingState.EverythingClipped ? 1f : 0f);
             Shader.SetGlobalFloat(sp_lodAlphaBlackPointFade, _lodAlphaBlackPointFade);
             Shader.SetGlobalFloat(sp_lodAlphaBlackPointWhitePointFade, _lodAlphaBlackPointWhitePointFade);
-            Shader.SetGlobalInt(sp_CrestDepthTextureOffset, Helpers.IsMSAAEnabled(ViewCamera) ? 1 : 0);
+            Shader.SetGlobalInt(sp_CrestDepthTextureOffset, ViewCamera != null && Helpers.IsMSAAEnabled(ViewCamera) ? 1 : 0);
 
-            // @Hack: Work around to unity_CameraToWorld._13_23_33 not being set correctly in URP 7.4+
-            OceanMaterial.SetVector(sp_CameraForward, Viewpoint.forward);
+            if (OceanMaterial != null)
+            {
+                // @Hack: Work around to unity_CameraToWorld._13_23_33 not being set correctly in URP 7.4+
+                OceanMaterial.SetVector(sp_CameraForward, Viewpoint.forward);
+            }
 
             // LOD 0 is blended in/out when scale changes, to eliminate pops. Here we set it as a global, whereas in OceanChunkRenderer it
             // is applied to LOD0 tiles only through instance data. This global can be used in compute, where we only apply this factor for slice 0.
@@ -1028,17 +1112,52 @@ namespace Crest
                 }
             }
 #endif
+
+            // Run queries at end of update. For CollProviderBakedFFT calling this kicks off
+            // collision processing job, and the next call to Query() will force a complete, and
+            // we don't want that to happen until they've had a chance to run, so schedule them
+            // late.
+#if UNITY_EDITOR
+            // Issue #630 - seems to be a terrible memory leak coming from creating async gpu readbacks. We don't rely on queries in edit mode AFAIK
+            // so knock this out.
+            if (EditorApplication.isPlaying)
+#endif
+            {
+                CollisionProvider?.UpdateQueries();
+                FlowProvider?.UpdateQueries();
+            }
+
+            _isFirstFrameSinceEnabled = false;
         }
 
         void WritePerFrameMaterialParams()
         {
             if (OceanMaterial != null)
             {
+                // Override isFrontFace when camera is far enough from the ocean surface to fix self-intersecting waves.
                 // Hack - due to SV_IsFrontFace occasionally coming through as true for back faces,
                 // add a param here that forces ocean to be in underwater state. I think the root
                 // cause here might be imprecision or numerical issues at ocean tile boundaries, although
                 // i'm not sure why cracks are not visible in this case.
-                OceanMaterial.SetFloat(sp_ForceUnderwater, ViewerHeightAboveWater < -2f ? 1f : 0f);
+                var height = ViewerHeightAboveWater;
+                var value = 0f;
+
+                switch (_surfaceSelfIntersectionFixMode)
+                {
+                    case SurfaceSelfIntersectionFixMode.Off:
+                        break;
+                    case SurfaceSelfIntersectionFixMode.On:
+                        value = height < -2f ? 1f : height > 2f ? -1f : 0f;
+                        break;
+                    case SurfaceSelfIntersectionFixMode.Automatic:
+                        // Skip if UnderwaterRenderer is not full-screen (ocean will be clipped).
+                        var skip = UnderwaterRenderer.Instance != null && UnderwaterRenderer.Instance.IsActive &&
+                            UnderwaterRenderer.Instance._mode != UnderwaterRenderer.Mode.FullScreen;
+                        value = skip ? 0f : height < -2f ? 1f : height > 2f ? -1f : 0f;
+                        break;
+                }
+
+                Shader.SetGlobalFloat(sp_CrestForceUnderwater, value);
             }
 
             _cascadeParams.Flip();
@@ -1050,6 +1169,21 @@ namespace Crest
             WritePerCascadeInstanceData(_perCascadeInstanceData);
             _bufPerCascadeInstanceData.SetData(_perCascadeInstanceData.Current);
             _bufPerCascadeInstanceDataSource.SetData(_perCascadeInstanceData.Previous(1));
+        }
+
+        /// <summary>
+        /// Sets the SurfaceSelfIntersectionFixMode using a string. Only useful for UnityEvents.
+        /// </summary>
+        public void SetSurfaceSelfIntersectionFixMode(string mode)
+        {
+            if (System.Enum.TryParse<SurfaceSelfIntersectionFixMode>(mode, out var result))
+            {
+                _surfaceSelfIntersectionFixMode = result;
+            }
+            else
+            {
+                Debug.LogError($"Crest: {mode} is not a valid value");
+            }
         }
 
         void WritePerCascadeInstanceData(BufferedData<PerCascadeInstanceData[]> instanceData)
@@ -1169,9 +1303,40 @@ namespace Crest
 
             ViewerHeightAboveWater = camera.transform.position.y - waterHeight;
 
+            // Calculate teleport distance and create window for height queries to return a height change.
+            {
+                if (_teleportTimerForHeightQueries > 0f)
+                {
+                    _teleportTimerForHeightQueries -= Time.deltaTime;
+                }
+
+                var hasTeleported = _isFirstFrameSinceEnabled;
+                if (!_isFirstFrameSinceEnabled)
+                {
+                    // Find the distance. Adding the FO offset will exclude FO shifts so we can determine a normal teleport.
+                    // FO shifts are visually the same position and it is incorrect to treat it as a normal teleport.
+                    var teleportDistanceSqr = (_oldViewerPosition - camera.transform.position - FloatingOrigin.TeleportOriginThisFrame).sqrMagnitude;
+                    // Threshold as sqrMagnitude.
+                    var thresholdSqr = _teleportThreshold * _teleportThreshold;
+                    hasTeleported = teleportDistanceSqr > thresholdSqr;
+                }
+
+                if (hasTeleported)
+                {
+                    // Height queries can take a few frames so a one second window should be plenty.
+                    _teleportTimerForHeightQueries = 1f;
+                }
+
+                _hasTeleportedThisFrame = hasTeleported;
+
+                _oldViewerPosition = camera.transform.position;
+            }
+
             // Smoothly varying version of viewer height to combat sudden changes in water level that are possible
             // when there are local bodies of water
-            _viewerHeightAboveWaterSmooth = Mathf.Lerp(_viewerHeightAboveWaterSmooth, ViewerHeightAboveWater, 0.05f);
+            _viewerHeightAboveWaterSmooth = _teleportTimerForHeightQueries > 0f
+                ? ViewerHeightAboveWater
+                : Mathf.Lerp(_viewerHeightAboveWaterSmooth, ViewerHeightAboveWater, 0.05f);
         }
 
         void LateUpdateLods()
@@ -1187,6 +1352,7 @@ namespace Crest
             _lodDataFoam?.UpdateLodData();
             _lodDataSeaDepths?.UpdateLodData();
             _lodDataShadow?.UpdateLodData();
+            _lodDataAlbedo?.UpdateLodData();
         }
 
         void LateUpdateTiles()
@@ -1202,14 +1368,26 @@ namespace Crest
 
             var definitelyUnderwater = false;
             var volumeExtinctionLength = 0f;
+            var isUnderwaterCullingEnabled = false;
 
-            if (isUnderwaterActive)
+            if (isUnderwaterActive && OceanMaterial != null)
             {
                 definitelyUnderwater = ViewerHeightAboveWater < -5f;
-                var density = _material.GetVector("_DepthFogDensity");
-                var minimumFogDensity = Mathf.Min(Mathf.Min(density.x, density.y), density.z);
-                var underwaterCullLimit = Mathf.Clamp(_underwaterCullLimit, UNDERWATER_CULL_LIMIT_MINIMUM, UNDERWATER_CULL_LIMIT_MAXIMUM);
-                volumeExtinctionLength = -Mathf.Log(underwaterCullLimit) / minimumFogDensity;
+                var density = UnderwaterDepthFogDensity = OceanMaterial.GetVector(ShaderIDs.s_DepthFogDensity) * UnderwaterRenderer.DepthFogDensityFactor;
+                // Only run optimisation in play mode due to shared height above water.
+                if (Application.isPlaying && UnderwaterRenderer.IsCullable)
+                {
+                    var minimumFogDensity = Mathf.Min(Mathf.Min(density.x, density.y), density.z);
+                    var underwaterCullLimit = Mathf.Clamp(_underwaterCullLimit, UNDERWATER_CULL_LIMIT_MINIMUM, UNDERWATER_CULL_LIMIT_MAXIMUM);
+                    volumeExtinctionLength = -Mathf.Log(underwaterCullLimit) / minimumFogDensity;
+                    isUnderwaterCullingEnabled = true;
+                }
+
+                foreach (var body in WaterBody.WaterBodies)
+                {
+                    // Will update depth fog density for underwater and volume extinction length for culling.
+                    body.UpdateDepthFogDensityParameters();
+                }
             }
 
             var canSkipCulling = WaterBody.WaterBodies.Count == 0 && _canSkipCulling;
@@ -1222,6 +1400,8 @@ namespace Crest
                 }
 
                 var isCulled = false;
+                tile.MaterialOverridden = false;
+                WaterBody dominantWaterBody = null;
 
                 // If there are local bodies of water, this will do overlap tests between the ocean tiles
                 // and the water bodies and turn off any that don't overlap.
@@ -1229,9 +1409,17 @@ namespace Crest
                 {
                     var chunkBounds = tile.Rend.bounds;
 
+                    var largestOverlap = 0f;
                     var overlappingOne = false;
                     foreach (var body in WaterBody.WaterBodies)
                     {
+                        // If tile has already been excluded from culling, then skip this iteration. But finish this
+                        // iteration if the water body has a material override to work out most influential water body.
+                        if (overlappingOne && body._overrideMaterial == null)
+                        {
+                            continue;
+                        }
+
                         var bounds = body.AABB;
 
                         bool overlapping =
@@ -1243,25 +1431,44 @@ namespace Crest
 
                             if (body._overrideMaterial != null)
                             {
-                                tile.Rend.sharedMaterial = body._overrideMaterial;
-                                tile.MaterialOverridden = true;
+                                var overlap = 0f;
+                                {
+                                    var xMin = Mathf.Max(bounds.min.x, chunkBounds.min.x);
+                                    var xMax = Mathf.Min(bounds.max.x, chunkBounds.max.x);
+                                    var zMin = Mathf.Max(bounds.min.z, chunkBounds.min.z);
+                                    var zMax = Mathf.Min(bounds.max.z, chunkBounds.max.z);
+                                    if (xMin < xMax && zMin < zMax)
+                                    {
+                                        overlap = (xMax - xMin) * (zMax - zMin);
+                                    }
+                                }
+
+                                // If this water body has the most overlap, then the chunk will get its material.
+                                if (overlap > largestOverlap)
+                                {
+                                    tile.Rend.sharedMaterial = body._overrideMaterial;
+                                    tile.MaterialOverridden = true;
+                                    largestOverlap = overlap;
+                                    dominantWaterBody = body;
+                                }
                             }
                             else
                             {
                                 tile.MaterialOverridden = false;
                             }
-
-                            break;
                         }
                     }
 
-                    isCulled = !overlappingOne && WaterBody.WaterBodies.Count > 0;
+                    isCulled = _waterBodyCulling && !overlappingOne && WaterBody.WaterBodies.Count > 0;
                 }
 
                 // Cull tiles the viewer cannot see through the underwater fog.
-                if (!isCulled && isUnderwaterActive)
+                // Only run optimisation in play mode due to shared height above water.
+                if (!isCulled && isUnderwaterCullingEnabled)
                 {
-                    isCulled = definitelyUnderwater && (Viewpoint.position - tile.Rend.bounds.ClosestPoint(Viewpoint.position)).magnitude >= volumeExtinctionLength;
+                    isCulled = definitelyUnderwater &&
+                        (ViewCamera.transform.position - tile.Rend.bounds.ClosestPoint(ViewCamera.transform.position)).magnitude >=
+                        (dominantWaterBody == null ? volumeExtinctionLength : dominantWaterBody.VolumeExtinctionLength);
                 }
 
                 tile.Rend.enabled = !isCulled;
@@ -1349,6 +1556,7 @@ namespace Crest
             _lodDataFoam = null;
             _lodDataSeaDepths = null;
             _lodDataShadow = null;
+            _lodDataAlbedo = null;
 
             if (CollisionProvider != null)
             {
@@ -1368,6 +1576,18 @@ namespace Crest
             _bufCascadeDataTgt?.Dispose();
             _bufCascadeDataSrc?.Dispose();
             _bufPerCascadeInstanceDataSource?.Dispose();
+        }
+
+        /// <summary>
+        /// Clears persistent LOD data. Some simulations have persistent data which can linger for a little while after
+        /// being disabled. This will manually clear that data.
+        /// </summary>
+        public void ClearLodData()
+        {
+            foreach (var lodData in _lodDatas)
+            {
+                lodData.ClearLodData();
+            }
         }
 
 #if UNITY_EDITOR
@@ -1496,17 +1716,6 @@ namespace Crest
             {
                 component.Validate(ocean, ValidatedHelper.DebugLog);
             }
-
-#pragma warning disable 0618
-            // UnderwaterEffect
-#if CREST_URP
-            var underwaters = FindObjectsOfType<UnderwaterEffect>();
-            foreach (var underwater in underwaters)
-            {
-                underwater.Validate(ocean, ValidatedHelper.DebugLog);
-            }
-#endif
-#pragma warning restore 0618
 
             // OceanDepthCache
             var depthCaches = FindObjectsOfType<OceanDepthCache>();
@@ -1784,23 +1993,35 @@ namespace Crest
                 }
             }
 
+            if (ocean.OceanMaterial.HasProperty(LodDataMgrAlbedo.MATERIAL_KEYWORD_PROPERTY) && ocean.CreateAlbedoData != ocean.OceanMaterial.IsKeywordEnabled(LodDataMgrAlbedo.MATERIAL_KEYWORD))
+            {
+                if (ocean.CreateAlbedoData)
+                {
+                    showMessage(LodDataMgrAlbedo.ERROR_MATERIAL_KEYWORD_MISSING, LodDataMgrAlbedo.ERROR_MATERIAL_KEYWORD_MISSING_FIX,
+                        ValidatedHelper.MessageType.Error, ocean.OceanMaterial,
+                        (material) => ValidatedHelper.FixSetMaterialOptionEnabled(material, LodDataMgrAlbedo.MATERIAL_KEYWORD, LodDataMgrAlbedo.MATERIAL_KEYWORD_PROPERTY, true));
+                }
+                else
+                {
+                    showMessage(LodDataMgrAlbedo.ERROR_MATERIAL_KEYWORD_ON_FEATURE_OFF, LodDataMgrAlbedo.ERROR_MATERIAL_KEYWORD_ON_FEATURE_OFF_FIX,
+                        ValidatedHelper.MessageType.Info, ocean);
+                }
+            }
+
 #if CREST_HDRP
             // Validate rendering layer mask property.
-            if (RenderPipelineHelper.IsHighDefinition && _renderingLayerMask != LightLayerEnum.Everything)
+            if (RenderPipelineHelper.IsHighDefinition && _renderingLayerMask != UnityEngine.Rendering.HighDefinition.LightLayerEnum.Everything)
             {
+                var asset = (HDRenderPipelineAsset)GraphicsSettings.currentRenderPipeline;
                 // Check that light layers are enabled on pipeline asset.
-                var pipelineAsset = (HDRenderPipelineAsset)GraphicsSettings.renderPipelineAsset;
-                if (pipelineAsset != null)
+                if (!asset.currentPlatformRenderPipelineSettings.supportLightLayers)
                 {
-                    if (!pipelineAsset.currentPlatformRenderPipelineSettings.supportLightLayers)
-                    {
-                        showMessage
-                        (
-                            "The rendering layer mask has been set, but light layers have not been enabled on the pipeline asset.",
-                            "Enable light layers on the camera.",
-                            ValidatedHelper.MessageType.Warning, ocean
-                        );
-                    }
+                    showMessage
+                    (
+                        "The rendering layer mask has been set, but light layers have not been enabled on the pipeline asset.",
+                        "Enable light layers on the render pipeline asset.",
+                        ValidatedHelper.MessageType.Warning, ocean
+                    );
                 }
 
                 // Doesn't work in edit mode. The frame settings are not populated.

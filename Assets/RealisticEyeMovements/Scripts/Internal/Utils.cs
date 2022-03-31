@@ -168,14 +168,11 @@ namespace RealisticEyeMovements {
 	    {
 		    #if UNITY_2020_0_OR_NEWER || UNITY_2020_1_OR_NEWER
 		        var xrDisplaySubsystems = new List<XRDisplaySubsystem>();
-		        SubsystemManager.GetInstances<XRDisplaySubsystem>(xrDisplaySubsystems);
+		        SubsystemManager.GetInstances(xrDisplaySubsystems);
 		        foreach (var xrDisplay in xrDisplaySubsystems)
-		        {
 		            if (xrDisplay.running)
-		            {
 		                return true;
-		            }
-		        }
+		        
 		        return false;
 			#else
 				return XRDevice.isPresent;

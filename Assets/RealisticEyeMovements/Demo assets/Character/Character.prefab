@@ -3184,8 +3184,8 @@ GameObject:
   - component: {fileID: 4601254985850796004}
   - component: {fileID: 4601254985850796001}
   - component: {fileID: 4601254985850796002}
-  - component: {fileID: 4601254985850796003}
   - component: {fileID: 6212107134049471547}
+  - component: {fileID: 74330432}
   m_Layer: 0
   m_Name: Character
   m_TagString: Untagged
@@ -3265,7 +3265,21 @@ MonoBehaviour:
   OnLookAwayFromShyness:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &4601254985850796003
+--- !u!136 &6212107134049471547
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4601254985850796005}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.3
+  m_Height: 1.8
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &74330432
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3277,22 +3291,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0359b2b84d8484d2281221cfda5470e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainWeight: 1
   headChangeToNewTargetSpeed: 1
   headTrackTargetSpeed: 1
   headSpeedModifier: 0
   headWeight: 1
   bodyWeight: 0.1
-  neckHorizWeight: 1
-  neckVertWeight: 1
+  neckHorizWeight: 0.5
+  neckVertWeight: 0.5
+  headPitchAngle: 0
+  headRollAngle: 0
+  headYawAngle: 0
+  neckPitchAngle: 0
+  neckRollAngle: 0
+  neckYawAngle: 0
+  resetHeadAtFrameStart: 0
   headBoneNonMecanim: {fileID: 0}
   headTarget: {fileID: 0}
   neckBoneNonMecanim: {fileID: 0}
   spineBoneNonMecanim: {fileID: 0}
-  headControl: 1
+  headComponent:
+    headControl: 1
+    headAnimationType: 0
+  eyesWeight: 1
   useMicroSaccades: 1
   useMacroSaccades: 1
+  saccadeSpeed: 0.5
+  macroSaccadesPerMinute: 10
+  microSaccadesPerMinuteLookingIdle: 45
+  microSaccadesPerMinuteLookingAtPOI: 80
   useHeadJitter: 1
-  kDrawSightlinesInEditor: 1
+  headJitterFrequency: 0.2
+  headJitterAmplitude: 1
+  kDrawSightlinesInEditor: 0
   areUpdatedControlledExternally: 0
   updateType: 0
   controlData:
@@ -3312,19 +3343,19 @@ MonoBehaviour:
     leftBoneEyeRotationLimiter:
       transform: {fileID: 4601254984872118939}
       defaultQ: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-      lookUpQ: {x: 0.000000011029638, y: -0.5998508, z: -0.0000000688762, w: 0.80011195}
-      lookDownQ: {x: -0.0000000603274, y: -0.78457236, z: 0.00000008997918, w: 0.6200373}
-      maxUpAngle: 16.281584
-      maxDownAngle: 13.362274
+      lookUpQ: {x: 0.000000059604616, y: -0.5596158, z: -0.00000011920925, w: 0.82875216}
+      lookDownQ: {x: -0.000000059604623, y: -0.8099899, z: 0.000000029802305, w: 0.58644384}
+      maxUpAngle: 21.941538
+      maxDownAngle: 18.18988
       isLookUpSet: 1
       isLookDownSet: 1
     rightBoneEyeRotationLimiter:
       transform: {fileID: 4601254984247314814}
       defaultQ: {x: 1.5700926e-16, y: -0.7071068, z: 1.5700926e-16, w: 0.7071068}
-      lookUpQ: {x: 0.00000001195775, y: -0.5998508, z: -0.00000007085752, w: 0.80011195}
-      lookDownQ: {x: -0.000000060651224, y: -0.78457236, z: 0.00000009273138, w: 0.6200373}
-      maxUpAngle: 16.281584
-      maxDownAngle: 13.362274
+      lookUpQ: {x: 0.000000059604616, y: -0.5596158, z: -0.00000011920925, w: 0.82875216}
+      lookDownQ: {x: 0.00000014901157, y: -0.80998987, z: -0.000000089406946, w: 0.58644396}
+      maxUpAngle: 21.941538
+      maxDownAngle: 18.18988
       isLookUpSet: 1
       isLookDownSet: 1
     leftEyeballEyeRotationLimiter:
@@ -3347,7 +3378,6 @@ MonoBehaviour:
       isLookDownSet: 0
     eyelidControl: 1
     eyelidBoneMode: 0
-    eyelidsFollowEyesVertically: 0
     upperEyeLidLeft: {fileID: 0}
     upperEyeLidRight: {fileID: 0}
     lowerEyeLidLeft: {fileID: 0}
@@ -3442,12 +3472,12 @@ MonoBehaviour:
       closedQ: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -6.123234e-17}
       lookUpQ: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -6.123234e-17}
       lookDownQ: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -6.123234e-17}
-      eyeMaxDownAngle: 13.362274
-      eyeMaxUpAngle: 16.281586
+      eyeMaxDownAngle: 18.18988
+      eyeMaxUpAngle: 21.941538
       defaultPos: {x: -0.06280681, y: 0.031235198, z: -0.08631288}
       closedPos: {x: -0.0538, y: 0.0312, z: -0.0863}
       lookUpPos: {x: -0.0671, y: 0.0312, z: -0.0863}
-      lookDownPos: {x: -0.0603, y: 0.0312, z: -0.0863}
+      lookDownPos: {x: -0.055, y: 0.0312, z: -0.0863}
       isLookUpSet: 1
       isLookDownSet: 1
       isDefaultPosSet: 1
@@ -3460,12 +3490,12 @@ MonoBehaviour:
       closedQ: {x: 0, y: 0, z: 0, w: 1}
       lookUpQ: {x: 0, y: 0, z: 0, w: 1}
       lookDownQ: {x: 0, y: 0, z: 0, w: 1}
-      eyeMaxDownAngle: 13.362274
-      eyeMaxUpAngle: 16.281586
+      eyeMaxDownAngle: 18.18988
+      eyeMaxUpAngle: 21.941538
       defaultPos: {x: -0.06280535, y: -0.031235177, z: -0.086313084}
       closedPos: {x: -0.0538, y: -0.0312, z: -0.0863}
       lookUpPos: {x: -0.0671, y: -0.0312, z: -0.0863}
-      lookDownPos: {x: -0.0603, y: -0.0312, z: -0.0863}
+      lookDownPos: {x: -0.055, y: -0.0312, z: -0.0863}
       isLookUpSet: 1
       isLookDownSet: 1
       isDefaultPosSet: 1
@@ -3478,8 +3508,8 @@ MonoBehaviour:
       closedQ: {x: -0.040539574, y: 0.999178, z: 0.000000022331818, w: -0.0000000118292665}
       lookUpQ: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -6.123234e-17}
       lookDownQ: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -6.123234e-17}
-      eyeMaxDownAngle: 13.362274
-      eyeMaxUpAngle: 16.281586
+      eyeMaxDownAngle: 18.18988
+      eyeMaxUpAngle: 21.941538
       defaultPos: {x: -0.048016805, y: 0.031235198, z: -0.08568788}
       closedPos: {x: -0.0532, y: 0.0312, z: -0.0857}
       lookUpPos: {x: -0.0517, y: 0.0312, z: -0.0857}
@@ -3496,8 +3526,8 @@ MonoBehaviour:
       closedQ: {x: 7.438311e-10, y: -0.000000009161493, z: -0.03382085, w: 0.9994279}
       lookUpQ: {x: 0, y: 0, z: 0, w: 1}
       lookDownQ: {x: 0, y: 0, z: 0, w: 1}
-      eyeMaxDownAngle: 13.362274
-      eyeMaxUpAngle: 16.281586
+      eyeMaxDownAngle: 18.18988
+      eyeMaxUpAngle: 21.941538
       defaultPos: {x: -0.0480208, y: -0.031235177, z: -0.0856883}
       closedPos: {x: -0.0533, y: -0.0312, z: -0.0857}
       lookUpPos: {x: -0.0517, y: -0.0312, z: -0.0857}
@@ -3517,29 +3547,16 @@ MonoBehaviour:
     isEyelidBlendshapeClosedSet: 0
     isEyelidBlendshapeLookUpSet: 0
     isEyelidBlendshapeLookDownSet: 0
+  eyelidsWeight: 1
   kMinNextBlinkTime: 3
   kMaxNextBlinkTime: 15
   blinkSpeed: 1
   eyelidsFollowEyesVertically: 1
-  maxEyeHorizAngle: 35
-  maxEyeHorizAngleTowardsNose: 20
+  maxEyeHorizAngle: 33
+  maxEyeHorizAngleTowardsNose: 33
+  idleTargetHorizAngle: 12
   crossEyeCorrection: 1
-  nervousness: 0
   limitHeadAngle: 0
---- !u!136 &6212107134049471547
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4601254985850796005}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.3
-  m_Height: 1.8
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!1 &4601254985895103492
 GameObject:
   m_ObjectHideFlags: 0

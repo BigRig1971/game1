@@ -27,13 +27,27 @@ namespace Crest
         int _version = 0;
 #pragma warning restore 414
 
-        [Range(0.01f, 50f), SerializeField]
-        float _radius = 1f;
+        [Range(0.01f, 50f), Tooltip("Radius of the sphere that is modelled.")]
+        public float _radius = 1f;
 
-        [Range(-4f, 4f), SerializeField]
-        float _weight = 1f;
-        [Range(0f, 2f), SerializeField]
-        float _weightUpDownMul = 0.5f;
+        [Range(-40f, 40f), Tooltip("Intensity of the forces.")]
+        public float _weight = 1f;
+        [Range(0f, 2f), Tooltip("Intensity of the forces from vertical motion of the sphere.")]
+        public float _weightUpDownMul = 0.5f;
+
+        [Range(0f, 10f), Tooltip("Model parameter that can be used to modify the shape of the interaction.")]
+        public float _innerSphereMultiplier = 1.55f;
+        [Range(0f, 1f), Tooltip("Model parameter that can be used to modify the shape of the interaction.")]
+        public float _innerSphereOffset = 0.109f;
+
+        [Range(0f, 2f), Tooltip("Offset in direction of motion to help ripples appear in front of sphere.")]
+        public float _velocityOffset = 0.04f;
+
+        [Range(0f, 1f), Tooltip("Correct for wave displacement. Increasing this can fix issues where the dynamic wave input visibly drifts away from the boat in the presence of large waves. However in some cases enabling this option results in a feedback loop causing visible rings on the surface so a balance may need to be struck to minimize both issues.")]
+        public float _compensateForWaveMotion = 0.45f;
+
+        [Tooltip("If the dynamic waves are not visible far enough in the distance from the camera, this can be used to boost the output.")]
+        public bool _boostLargeWaves = false;
 
         [Header("Limits")]
         [Tooltip("Teleport speed (km/h) - if the calculated speed is larger than this amount, the object is deemed to have teleported and the computed velocity is discarded."), SerializeField]
@@ -45,6 +59,14 @@ namespace Crest
         [SerializeField]
         bool _warnOnSpeedClamp = false;
 
+#if UNITY_EDITOR
+        [Header("Debug")]
+        [Tooltip("Draws debug lines at each substep position. Editor only."), SerializeField]
+        bool _debugSubsteps = false;
+#endif
+
+        Vector3 _velocity;
+        Vector3 _velocityClamped;
         Vector3 _posLast;
 
         float _weightThisFrame;
@@ -60,6 +82,9 @@ namespace Crest
         static int sp_weight = Shader.PropertyToID("_Weight");
         static int sp_simDeltaTime = Shader.PropertyToID("_SimDeltaTime");
         static int sp_radius = Shader.PropertyToID("_Radius");
+        static int sp_innerSphereOffset = Shader.PropertyToID("_InnerSphereOffset");
+        static int sp_innerSphereMultiplier = Shader.PropertyToID("_InnerSphereMultiplier");
+        static int sp_largeWaveMultiplier = Shader.PropertyToID("_LargeWaveMultiplier");
 
         public float Wavelength => 2f * _radius;
 
@@ -100,11 +125,17 @@ namespace Crest
             _sampleHeightHelper.Init(transform.position, 2f * _radius);
             _sampleHeightHelper.Sample(out Vector3 disp, out _, out _);
 
-            // Enforce upwards
-            transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+            LateUpdateComputeVel(ocean);
 
             // Velocity relative to water
-            Vector3 relativeVelocity = LateUpdateComputeVelRelativeToWater(ocean);
+            var relativeVelocity = _velocityClamped;
+            {
+                _sampleFlowHelper.Init(transform.position, 2f * _radius);
+                _sampleFlowHelper.Sample(out var surfaceFlow);
+                relativeVelocity -= new Vector3(surfaceFlow.x, 0, surfaceFlow.y);
+
+                relativeVelocity.y *= _weightUpDownMul;
+            }
 
             var dt = 1f / ocean._lodDataDynWaves.Settings._simulationFrequency;
 
@@ -116,8 +147,15 @@ namespace Crest
 
             _mpb.SetVector(sp_velocity, relativeVelocity);
             _mpb.SetFloat(sp_simDeltaTime, dt);
-            _mpb.SetFloat(sp_radius, _radius);
-            _mpb.SetVector(RegisterLodDataInputBase.sp_DisplacementAtInputPosition, disp);
+
+            // Enlarge radius slightly - this tends to help waves 'wrap' the sphere slightly better
+            float radiusScale = 1.1f;
+            _mpb.SetFloat(sp_radius, _radius * radiusScale);
+
+            _mpb.SetFloat(sp_innerSphereOffset, _innerSphereOffset);
+            _mpb.SetFloat(sp_innerSphereMultiplier, _innerSphereMultiplier);
+            _mpb.SetFloat(sp_largeWaveMultiplier, _boostLargeWaves ? 2f : 1f);
+            _mpb.SetVector(RegisterLodDataInputBase.sp_DisplacementAtInputPosition, _compensateForWaveMotion * disp);
 
             // Weighting with this value helps keep ripples consistent for different gravity values
             var gravityMul = Mathf.Sqrt(ocean._lodDataDynWaves.Settings._gravityMultiplier) / 5f;
@@ -137,47 +175,43 @@ namespace Crest
         }
 
         // Velocity of the sphere, relative to the water. Computes on the fly, discards if teleport detected.
-        Vector3 LateUpdateComputeVelRelativeToWater(OceanRenderer ocean)
+        void LateUpdateComputeVel(OceanRenderer ocean)
         {
-            Vector3 vel;
-
-            // feed in water velocity
-            vel = (transform.position - _posLast) / ocean.DeltaTimeDynamics;
+            // Compue vel using finite difference
+            _velocity = (transform.position - _posLast) / ocean.DeltaTimeDynamics;
             if (ocean.DeltaTimeDynamics < 0.0001f)
             {
-                vel = Vector3.zero;
+                _velocity = Vector3.zero;
             }
 
-            {
-                _sampleFlowHelper.Init(transform.position, 2f * _radius);
-                _sampleFlowHelper.Sample(out var surfaceFlow);
-                vel -= new Vector3(surfaceFlow.x, 0, surfaceFlow.y);
-            }
-            vel.y *= _weightUpDownMul;
-
-            var speedKmh = vel.magnitude * 3.6f;
+            var speedKmh = _velocity.magnitude * 3.6f;
             if (speedKmh > _teleportSpeed)
             {
                 // teleport detected
-                vel *= 0f;
+                _velocity *= 0f;
 
                 if (_warnOnTeleport)
                 {
                     Debug.LogWarning("Crest: Teleport detected (speed = " + speedKmh.ToString() + "), velocity discarded.", this);
                 }
+
+                speedKmh = _velocity.magnitude * 3.6f;
             }
-            else if (speedKmh > _maxSpeed)
+
+            if (speedKmh > _maxSpeed)
             {
                 // limit speed to max
-                vel *= _maxSpeed / speedKmh;
+                _velocityClamped = _velocity * _maxSpeed / speedKmh;
 
                 if (_warnOnSpeedClamp)
                 {
                     Debug.LogWarning("Crest: Speed (" + speedKmh.ToString() + ") exceeded max limited, clamped.", this);
                 }
             }
-
-            return vel;
+            else
+            {
+                _velocityClamped = _velocity;
+            }
         }
 
         // Weight based on submerged-amount of sphere
@@ -216,13 +250,34 @@ namespace Crest
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = new Color(0f, 1f, 0f, 0.5f);
-            Gizmos.DrawWireSphere(transform.position, _radius);
+            Gizmos.DrawWireSphere(transform.position + _velocityOffset * _velocity, _radius);
         }
 
-        public void Draw(CommandBuffer buf, float weight, int isTransition, int lodIdx)
+        public void Draw(LodDataMgr lodData, CommandBuffer buf, float weight, int isTransition, int lodIdx)
         {
+            var timeBeforeCurrentTime = (lodData as LodDataMgrDynWaves).TimeLeftToSimulate;
+
+#if UNITY_EDITOR
+            // Draw debug lines at each substep position. Alternate colours each frame so that substeps are clearly visible.
+            if (_debugSubsteps)
+            {
+                var col = 0.7f * (Time.frameCount % 2 == 1 ? Color.green : Color.red);
+                var pos = transform.position - _velocity * (timeBeforeCurrentTime - _velocityOffset);
+                Debug.DrawLine(pos - transform.right + transform.up, pos + transform.right + transform.up, col, 0.5f);
+            }
+#endif
+
+            // _renderMatrix is only updated at the frame update rate, whereas this input wants to apply
+            // to substeps. Reconstruct the position of this input at the current substep time. This produces
+            // much smoother interaction shapes for moving objects. Increasing sim freq helps further.
+            var renderMatrix = _renderMatrix;
+            var offset = _velocity * (timeBeforeCurrentTime - _velocityOffset);
+            renderMatrix.m03 -= offset.x;
+            renderMatrix.m13 -= offset.y;
+            renderMatrix.m23 -= offset.z;
+
             _mpb.SetFloat(sp_weight, weight * _weightThisFrame);
-            buf.DrawMesh(RegisterLodDataInputBase.QuadMesh, _renderMatrix, _mat, 0, 0, _mpb);
+            buf.DrawMesh(RegisterLodDataInputBase.QuadMesh, renderMatrix, _mat, 0, 0, _mpb);
         }
     }
 
