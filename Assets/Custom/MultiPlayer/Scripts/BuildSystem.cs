@@ -109,8 +109,8 @@ public class BuildSystem : MonoBehaviour
 			
 			foreach (ItemSO item in buildItems)
 			{
-				Debug.Log(item.name);
-				Debug.Log(hit.transform.name);
+				//Debug.Log(item.name);
+				//Debug.Log(hit.transform.name);
 				if (hit.transform.name == item.name)
 				{
 
