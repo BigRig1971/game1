@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.AI;
 
-namespace AIBehavior
+namespace UnityEngine.AI
 {
     [ExecuteInEditMode]
     [DefaultExecutionOrder(-101)]

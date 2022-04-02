@@ -1,8 +1,6 @@
 using UnityEngine.AI;
-using UnityEditor;
-using UnityEditor.AI;
 
-namespace AIBehavior
+namespace UnityEditor.AI
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(NavMeshModifier))]
