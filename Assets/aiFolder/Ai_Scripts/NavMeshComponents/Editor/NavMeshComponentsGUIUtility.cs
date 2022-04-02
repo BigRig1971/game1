@@ -1,7 +1,9 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEditor;
+using UnityEditor.AI;
 
-namespace UnityEditor.AI
+namespace AIBehavior
 {
     public static class NavMeshComponentsGUIUtility
     {
