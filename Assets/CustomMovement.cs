@@ -120,6 +120,7 @@ namespace StarterAssets
 		}
 		void TreadingWater()
 		{
+			OnDisableRootMotion();
 			_tpc.GroundedOffset = -1;
 			_verticalMovement = false;
 			_tpc._animator.SetBool(_swim, true);
@@ -128,6 +129,7 @@ namespace StarterAssets
 		}
 		void Swimming()
 		{
+			OnDisableRootMotion();
 			_tpc.GroundedOffset = -1;
 			_verticalMovement = true;
 			_tpc._animator.SetBool(_swim, true);
@@ -136,6 +138,7 @@ namespace StarterAssets
 		}
 		void Walking()
 		{
+			OnApplyRootMotion();
 			_tpc.GroundedOffset = 0;
 			_verticalMovement = false;
 			_tpc._animator.SetBool(_swim, false);
@@ -161,12 +164,12 @@ namespace StarterAssets
 				footStep?.Play();
 			}
 		}
-		public void OnApplyRootMotion()
+		 void OnApplyRootMotion()
 		{
 			if(!_tpc._animator.applyRootMotion)
 			_tpc._animator.applyRootMotion = true;
 		}
-		public void OnDisableRootMotion()
+		 void OnDisableRootMotion()
 		{
 			if(_tpc._animator.applyRootMotion)
 			_tpc._animator.applyRootMotion = false;

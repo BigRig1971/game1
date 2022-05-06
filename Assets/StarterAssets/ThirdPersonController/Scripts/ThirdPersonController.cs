@@ -2,6 +2,7 @@
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 using UnityEngine.InputSystem;
 using System.Collections;
+using Photon.Pun;
 #endif
 
 /* Note: animations are called via the controller for both the character and capsule using animator null checks
@@ -65,6 +66,7 @@ namespace StarterAssets
 		private float _cinemachineTargetPitch;
 
 		// player
+		public PhotonView view;
 		public bool _rootMotion = false;
 		public float _speed;
 		private float _animationBlend;
@@ -129,10 +131,11 @@ namespace StarterAssets
 
 			JumpAndGravity();
 			GroundedCheck();
-			if (_animator.GetBool("Attack") != true)
-			{
-				Move();
-			}
+           
+				if (_animator.GetBool("Attack") != true && view.IsMine)
+				{
+					Move();
+				}
 
 		}
 
@@ -180,7 +183,7 @@ namespace StarterAssets
 			// Cinemachine will follow this target
 			CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride, _cinemachineTargetYaw, 0.0f);
 		}
-
+		
 		public void Move()
 		{
 
@@ -228,7 +231,7 @@ namespace StarterAssets
 				float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, RotationSmoothTime);
 				if (_customMovement._verticalMovement)
 				{
-					_verticalVelocity = _mainCamera.transform.forward.y * 5;
+					_verticalVelocity = _mainCamera.transform.forward.y * 2;
 
 
 					transform.rotation = Quaternion.Euler(_mainCamera.transform.eulerAngles.x, rotation, 0.0f);
@@ -245,15 +248,25 @@ namespace StarterAssets
 			}
 
 
-			Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+			//Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
 			// move the player
 
 
-			_controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+			//if(!_animator.applyRootMotion) _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+
 
 
 			// update animator if using character
+			if (!_animator.applyRootMotion)
+			{
+				Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+				_controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+			}
+			else
+			{
+				//this.transform.position = _animator.deltaPosition;
+			}
 
 
 			if (_hasAnimator)
@@ -262,8 +275,12 @@ namespace StarterAssets
 				_animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
 			}
 		}
+       
 
-		private void JumpAndGravity()
+			
+
+		
+        private void JumpAndGravity()
 		{
 			if (Grounded)
 			{
@@ -275,6 +292,7 @@ namespace StarterAssets
 				{
 					_animator.SetBool(_animIDJump, false);
 					_animator.SetBool(_animIDFreeFall, false);
+					if (!_animator.applyRootMotion) _animator.applyRootMotion = true;
 				}
 
 				// stop our velocity dropping infinitely when grounded
@@ -286,14 +304,16 @@ namespace StarterAssets
 				// Jump
 				if (_input.jump && _jumpTimeoutDelta <= 0.0f)
 				{
+					_animator.applyRootMotion = false;
 					// the square root of H * -2 * G = how much velocity needed to reach desired height
-
-					StartCoroutine(JumpDelay());
+					
+					
 					// update animator if using character
 					if (_hasAnimator)
 					{
-
 						_animator.SetBool(_animIDJump, true);
+						StartCoroutine(JumpDelay());
+						
 					}
 				}
 
@@ -308,6 +328,7 @@ namespace StarterAssets
 			{
 				// reset the jump timeout timer
 				_jumpTimeoutDelta = JumpTimeout;
+				
 
 				// fall timeout
 				if (_fallTimeoutDelta >= 0.0f)
@@ -336,8 +357,12 @@ namespace StarterAssets
 		}
 		private IEnumerator JumpDelay()
 		{
+			
 			yield return new WaitForSeconds(.3f);
+			
 			_verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
+			
+
 		}
 
 		private static float ClampAngle(float lfAngle, float lfMin, float lfMax)

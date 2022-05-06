@@ -7,6 +7,7 @@ public class LootStuff : MonoBehaviour
 	Animator anim;
 	LootableItem itemPickup;
 	ItemPickupable droppedItemPickup;
+
 	public string scriptToPause;
 	private void Start()
 	{
@@ -15,10 +16,11 @@ public class LootStuff : MonoBehaviour
 	private void OnTriggerEnter(Collider other)
 	{
 		if (other.CompareTag("Lootable"))
-		{	
+		{
+			Debug.Log("lootstuff");
 			itemPickup = other.gameObject.GetComponent<LootableItem>();
 			droppedItemPickup = other.gameObject.GetComponent<ItemPickupable>();
-			StartCoroutine(LootItem());
+			if(itemPickup.readyToLoot) StartCoroutine(LootItem());
 		}
 		
 	}

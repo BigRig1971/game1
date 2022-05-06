@@ -38,6 +38,7 @@ public class BuildSystem : MonoBehaviour
 			BuildTheFucker();
 		}
 		if (InventoryManager.IsOpen() && Input.GetMouseButtonDown(2))
+		
 		{
 			removeItemFromField();
 		}
@@ -109,20 +110,15 @@ public class BuildSystem : MonoBehaviour
 			
 			foreach (ItemSO item in buildItems)
 			{
-				//Debug.Log(item.name);
-				//Debug.Log(hit.transform.name);
-				if (hit.transform.name == item.name)
+				Debug.Log(item.name + " item name");
+				Debug.Log(hit.collider.name + " transform name");
+				if (hit.collider.name == item.name + "(Clone)")
 				{
-
 					
 					InventoryManager.AddItemToInventory(item, 1);
 					Destroy(hit.transform.gameObject);
 				}
-
-
 			}
-
-
 		}
 	}
 

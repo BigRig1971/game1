@@ -7,12 +7,21 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"last_search.83F126EB" = "foot"
+	"last_search.83F126EB" = ""
 	"InspectorPreview.83F126EB" = "0"
 	"currentGroup.83F126EB" = "asset"
 	"last_search.7F95D817" = ""
 	"InspectorPreview.7F95D817" = "0"
 	"currentGroup.7F95D817" = "asset"
+	"last_search.7BEC51F9" = ""
+	"OpenInspectorPreview.7BEC51F9" = "0"
+	"currentGroup.7BEC51F9" = "asset"
+	"last_search.8440E7BB" = "githu"
+	"OpenInspectorPreview.8440E7BB" = "0"
+	"currentGroup.8440E7BB" = "all"
+	"last_search.8788AF05" = ""
+	"OpenInspectorPreview.8788AF05" = "0"
+	"currentGroup.8788AF05" = "scene"
 }
 providers = {
 	asset = {
@@ -50,10 +59,27 @@ providers = {
 		priority = 100
 		defaultAction = null
 	}
+	adb = {
+		active = false
+		priority = 2500
+		defaultAction = null
+	}
+	performance = {
+		active = false
+		priority = 100
+		defaultAction = null
+	}
 }
 recentSearches = [
+	"foot"
 ]
 searchItemFavorites = [
 ]
 savedSearchesSortOrder = 0
 showSavedSearchPanel = false
+expandedQueries = [
+]
+queryBuilder = false
+ignoredProperties = "id;name;classname;imagecontentshash"
+helperWidgetCurrentArea = "all"
+disabledIndexers = ""

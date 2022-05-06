@@ -7,14 +7,14 @@ using UnityEngine;
 public class ObjectSpawner : MonoBehaviour
 {
  
-    public GameObject prefab; 
+    public GameObject[] prefab; 
     public float delay = .1f;
     public int maximum = 15;
 	GameObject go;
     
 
 
-    public List<GameObject> list = new List<GameObject>();
+    List<GameObject> list = new List<GameObject>();
     private float m_internalTimer = 5f;
     void Start()
     {
@@ -39,13 +39,17 @@ public class ObjectSpawner : MonoBehaviour
         m_internalTimer = Mathf.Max(m_internalTimer, 0f);
         if (m_internalTimer == 0f)
         {
-            Vector3 offset = GetOffset();
-			GameObject obj = Instantiate(prefab, transform.position + offset, Quaternion.identity) as GameObject;
-      
+            foreach(GameObject _prefab in prefab)
+            {
+                
+                Vector3 offset = GetOffset();
+                GameObject obj = Instantiate(_prefab, transform.position + offset, Quaternion.identity) as GameObject;
 
-            list.Add(obj);
-            go = obj;
-            m_internalTimer = delay;
+                list.Add(obj);
+                go = obj;
+                m_internalTimer = delay;
+            }
+                   
         }
     }
 

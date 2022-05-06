@@ -1,15 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using Photon.Pun;
+using Lowscope.Saving;
+
 
 
 public class Preview : MonoBehaviour
 {
 
+	
 	public GameObject prefab;//the prefab that represents this preview ie, a foundation, wall....
 
 	private MeshRenderer myRend;
-
+	
+	
+	private Transform spawnedTransform;
 	public Material goodMat;//green material
 	public Material badMat;//red material
 	private BuildSystem buildSystem;
@@ -22,34 +29,31 @@ public class Preview : MonoBehaviour
 
 	public List<string> tagsISnapTo = new List<string>();//list of all of the SnapPoint tags this particular preview can snap too
 														 //this allows this previewObject to be able to snap to multiple snap points
+	
 	private void Start()
 	{
+		
 		//Debug.Log("it works!");
 		//Camera.main.transform.localPosition = new Vector3(Camera.main.transform.localPosition.x, Camera.main.transform.localPosition.y, Camera.main.transform.localPosition.z - 5);
 		buildSystem = GameObject.FindObjectOfType<BuildSystem>();
 		myRend = GetComponent<MeshRenderer>();
 
 		ChangeColor();
+		
 	}
+	
 	public void Place()
 	{
-		//var spawnedObject = SaveMaster.SpawnSavedPrefab(Lowscope.Saving.Enums.InstanceSource.Resources, prefab.name);
-		var spawnedObjcect = Instantiate(prefab, transform.position, transform.rotation);
-		//spawnedObject.transform.position = transform.position;
-		//spawnedObject.transform.rotation = transform.rotation;
-		//spawnedObject.transform.localScale = transform.localScale;
-
-		//var allColliders = spawnedObject.GetComponentsInChildren<Collider>();
-
-		//foreach (var childCollider in allColliders) Destroy(childCollider);
-
-		//Instantiate(prefab, transform.position, transform.rotation);
-		//spawnedObject.AddComponent<ItemOnObject>(); //////////////////////////////
-		//spawnedObject.GetComponent<PickUpItem>().item = this.gameObject.GetComponent<ItemOnObject>().item; /////////////////// testing
+		
+		//var spawnedObjcect = Instantiate(prefab, transform.position, transform.rotation);
+		//var spawnedObject = PhotonNetwork.Instantiate(prefab.name, this.transform.position, this.transform.rotation);
+		var spawnedObject = SaveMaster.SpawnSavedPrefab(InstanceSource.Resources, prefab.name);
+		spawnedObject.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+		spawnedObject.transform.rotation = this.transform.rotation;
+		PhotonNetwork.AddCallbackTarget(spawnedObject);
+	 
 		Destroy(gameObject);
-		//GameObject dropItem = (GameObject)Instantiate(GetComponent<ItemOnObject>().item.itemModel);
-		//dropItem.AddComponent<PickUpItem>();
-		//dropItem.GetComponent<PickUpItem>().item = this.gameObject.GetComponent<ItemOnObject>().item;
+		
 	}
 	private void ChangeColor()//changes between red and greed depending if this preview is/is not snapped to anything
 	{
@@ -110,7 +114,6 @@ public class Preview : MonoBehaviour
 
 		}
 	}
-
 	private void OnTriggerExit(Collider other)//this is what determins if you are no longer snapped to a snap point
 	{
 		for (int i = 0; i < tagsISnapTo.Count; i++)//loop through all tags
@@ -124,11 +127,10 @@ public class Preview : MonoBehaviour
 			}
 		}
 	}
-
-
 	public bool GetSnapped()//accessor for the isSnapped bool. 
 	{
-		return isSnapped;
-		
+		return isSnapped;	
 	}
+
+   
 }
