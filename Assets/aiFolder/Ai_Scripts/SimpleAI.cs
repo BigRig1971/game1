@@ -31,7 +31,7 @@ public class SimpleAI : MonoBehaviour
 
     //Attacking
     public float timeBetweenAttacks;
-    bool alreadyAttacked = false;
+    bool canAttack = true;
     public GameObject projectile;
 
     //States
@@ -69,7 +69,7 @@ public class SimpleAI : MonoBehaviour
 
         if (!wayPointSet)
         {
-            ChangeAnimation(previousSpeed);
+            SpeedAndAnim(previousSpeed);
             WayPoint();
         }
     }
@@ -80,25 +80,25 @@ public class SimpleAI : MonoBehaviour
         float distance = Vector3.Distance(transform.position, wayPoint);
         float randomX = Random.Range(-wayPointRange, wayPointRange);
         float travelTime = Random.Range(1f, 3f);
-        
+
         if (canSwimOrFly)
         {
             posY = Random.Range(-wayPointRange, wayPointRange);
             wayPoint = new Vector3(transform.position.x + randomX, transform.position.y + posY, transform.position.z) + transform.forward * 5f;
-           
+
 
             if (distance < .3f) wayPointSet = false;
             Invoke(nameof(ResetWaypoint), travelTime);
-           
+
         }
         else
         {
             posY = Terrain.activeTerrain.SampleHeight(wayPoint);
             wayPoint = new Vector3(transform.position.x + randomX, posY, transform.position.z) + transform.forward * 5f;
-           
+
             if (distance < .3f) wayPointSet = false;
             Invoke(nameof(ResetWaypoint), travelTime);
-
+         
         }
     }
     void ResetWaypoint()
@@ -108,39 +108,52 @@ public class SimpleAI : MonoBehaviour
 
     void ChasePlayer()
     {
-        ChangeAnimation(previousSpeed * 2f);
+        SpeedAndAnim(previousSpeed * 2f);
         wayPoint = player.transform.position;
     }
 
     void AttackPlayer()
     {
-        ChangeAnimation(0);
+        
 
-        if (!alreadyAttacked)
+        if (canAttack)
         {
+            bool timer = false;
+            SpeedAndAnim(0);
+            canAttack = false;
             attackSound?.Play();
+            animator.SetTrigger("Attack");
             /* ///Attack code here
              Rigidbody rb = Instantiate(projectile, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
              rb.AddForce(transform.forward * 32f, ForceMode.Impulse);
              rb.AddForce(transform.up * 8f, ForceMode.Impulse);
              ///End of attack code*/
-
-            alreadyAttacked = true;
-            Invoke(nameof(ResetAttack), timeBetweenAttacks * Random.Range(.8f, 1.2f));
+            Invoke(nameof(TimerReset), timeBetweenAttacks * Random.Range(1f, 2f));
+            if(timer) canAttack = true;
         }
     }
     void Idle()
     {
 
-        if (RandomNumberGenerator(1000) == 5)
+      /*  if (RandomNumberGenerator(1000))
         {
-            StartCoroutine(IdleTime());
+            ChangeAnimation(0f);
+            Invoke(nameof(ResetIdleTime), 1 * Random.Range(2f, 5f));
+        }*/
+        if (RandomNumberGenerator(1000))
+        {
+            bool timer = false;
+            speed = 0;
+           Invoke(nameof(TimerReset), 1 * Random.Range(2f, 5f));
+            if(timer) SpeedAndAnim(previousSpeed);
+           
         }
 
     }
+   
     void ResetAttack()
     {
-        alreadyAttacked = false;
+        canAttack = true;
     }
 
     private void OnDrawGizmos()
@@ -157,7 +170,7 @@ public class SimpleAI : MonoBehaviour
         Gizmos.DrawWireSphere(wayPoint, .5f);
     }
 
-    void ChangeAnimation(float animSpeed)
+    void SpeedAndAnim(float animSpeed)
     {
         bool changeAnim = true;
         speed = animSpeed;
@@ -186,7 +199,6 @@ public class SimpleAI : MonoBehaviour
             qto = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * turnSpeed);
             transform.rotation = qto;
             transform.position += transform.forward * Time.deltaTime * speed;
-
         }
     }
     void AlignWithGround()
@@ -225,21 +237,26 @@ public class SimpleAI : MonoBehaviour
     {
         wayPoint = homePosition;
     }
-    IEnumerator IdleTime()
+    static bool RandomNumberGenerator(int rn)
     {
-        ChangeAnimation(0f);
-        yield return new WaitForSeconds(Random.Range(3f, 10f));
-        speed = previousSpeed;
-    }
-    static int RandomNumberGenerator(int rn)
-    {
-        return Random.Range(1, rn);
+        int rnd = Random.Range(0, rn);
+        if (rnd == 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     void RandomSound()
     {
-        if (RandomNumberGenerator(200) == 1) randomSound?.Play();
+        if (RandomNumberGenerator(200)) randomSound?.Play();
     }
-
+    bool TimerReset()
+    {
+       return true;
+    }
 }
 
 

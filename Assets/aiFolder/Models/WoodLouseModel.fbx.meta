@@ -1,11 +1,17 @@
 fileFormatVersion: 2
 guid: 22f7c3a66cc950344ad2b7309fc25217
 ModelImporter:
-  serializedVersion: 20200
+  serializedVersion: 21202
   internalIDToNameTable:
   - first:
       74: 6647985264079981431
     second: WoodlouseWalk
+  - first:
+      74: 7140714154124711958
+    second: spine|Attack
+  - first:
+      74: 4052898304636039551
+    second: spine|LouseWalk
   externalObjects: {}
   materials:
     materialImportMode: 0
@@ -17,6 +23,7 @@ ModelImporter:
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
     motionNodeName: 
     rigImportErrors: 
     rigImportWarnings: 
@@ -35,8 +42,37 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: WoodlouseWalk
-      takeName: spine|spine|CINEMA_4D_Main|Layer0
+      name: spine|Attack
+      takeName: spine|Attack
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 19
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: spine|LouseWalk
+      takeName: spine|LouseWalk
       internalID: 0
       firstFrame: 0
       lastFrame: 1000
@@ -46,7 +82,7 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 1
+      loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
@@ -75,6 +111,7 @@ ModelImporter:
     importBlendShapes: 1
     importCameras: 1
     importLights: 1
+    nodeNameCollisionStrategy: 0
     fileIdsGeneration: 2
     swapUVChannels: 0
     generateSecondaryUV: 0
@@ -86,6 +123,7 @@ ModelImporter:
     skinWeightsMode: 0
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
+    optimizeBones: 1
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
