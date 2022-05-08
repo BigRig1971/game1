@@ -124,6 +124,18 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4824876032485328, guid: 5ef6cda3c62fbd94ea7530448a7a94ef, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4824876032485328, guid: 5ef6cda3c62fbd94ea7530448a7a94ef, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4824876032485328, guid: 5ef6cda3c62fbd94ea7530448a7a94ef, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4824876032485328, guid: 5ef6cda3c62fbd94ea7530448a7a94ef, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -163,6 +175,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4824876032485328, guid: 5ef6cda3c62fbd94ea7530448a7a94ef, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5ef6cda3c62fbd94ea7530448a7a94ef, type: 3}
 --- !u!4 &444798280579841745 stripped
@@ -175,51 +191,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1911605819255016, guid: 5ef6cda3c62fbd94ea7530448a7a94ef, type: 3}
   m_PrefabInstance: {fileID: 449543708642777345}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2366390221507689281
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 449184616505717225}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fd79320e670b434cbc40edbaa330123, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  randomSound: {fileID: 0}
-  attackSound: {fileID: 0}
-  patrol: 1
-  chase: 1
-  attack: 1
-  idle: 1
-  scale: 1
-  canSwimOrFly: 0
-  player: {fileID: 0}
-  whatIsGround:
-    serializedVersion: 2
-    m_Bits: 1024
-  whatIsPlayer:
-    serializedVersion: 2
-    m_Bits: 8192
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 6967
-  speed: 1
-  turnSpeed: 2
-  wayPoint: {x: 0, y: 0, z: 0}
-  wayPointSet: 0
-  timeBetweenAttacks: 3
-  projectile: {fileID: 0}
-  sightRange: 3
-  attackRange: 0.5
-  ObstacleHit: 1
-  maxRange: 20
-  maxAltitude: 195
-  minAltitude: 0
-  playerInSightRange: 0
-  playerInAttackRange: 0
-  obstacle: 0
 --- !u!95 &2802937171290857791
 Animator:
   serializedVersion: 4
@@ -240,3 +211,42 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &2366390221507689281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 449184616505717225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fd79320e670b434cbc40edbaa330123, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  randomSound: {fileID: 0}
+  attackSound: {fileID: 0}
+  patrol: 1
+  chase: 1
+  attack: 0
+  idle: 0
+  scale: 1
+  canSwimOrFly: 1
+  player: {fileID: 0}
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 1024
+  whatIsPlayer:
+    serializedVersion: 2
+    m_Bits: 8192
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 24375
+  turnSpeed: 2
+  timeBetweenAttacks: 3
+  projectile: {fileID: 0}
+  sightRange: 3
+  attackRange: 0.5
+  ObstacleHit: 0.5
+  maxRange: 20
+  maxAltitude: 87
+  minAltitude: 0

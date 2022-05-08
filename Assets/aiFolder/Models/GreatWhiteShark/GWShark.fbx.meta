@@ -1,20 +1,25 @@
 fileFormatVersion: 2
-guid: 22f7c3a66cc950344ad2b7309fc25217
+guid: ceb600f490ced814f9f02b2d89447b66
 ModelImporter:
   serializedVersion: 21202
   internalIDToNameTable:
   - first:
-      74: 6647985264079981431
-    second: WoodlouseWalk
+      74: 2168158240166368719
+    second: GreatWhiteSharkBite
   - first:
-      74: 7140714154124711958
-    second: spine|Attack
+      74: 2971980700333074589
+    second: skeletal.3|circling_skeletal.3
   - first:
-      74: 4052898304636039551
-    second: spine|LouseWalk
-  externalObjects: {}
+      74: 4697196278055011064
+    second: GreatWhiteSharkSwim
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material_0
+    second: {fileID: 2100000, guid: 89eb9374691830a44b9efd24bd672ae7, type: 2}
   materials:
-    materialImportMode: 0
+    materialImportMode: 2
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -23,7 +28,7 @@ ModelImporter:
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
-    removeConstantScaleCurves: 0
+    removeConstantScaleCurves: 1
     motionNodeName: 
     rigImportErrors: 
     rigImportWarnings: 
@@ -42,11 +47,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: spine|Attack
-      takeName: spine|Attack
+      name: GreatWhiteSharkBite
+      takeName: skeletal.3|bite_skeletal.3
       internalID: 0
       firstFrame: 0
-      lastFrame: 19
+      lastFrame: 24
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -71,11 +76,40 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: spine|LouseWalk
-      takeName: spine|LouseWalk
+      name: skeletal.3|circling_skeletal.3
+      takeName: skeletal.3|circling_skeletal.3
       internalID: 0
       firstFrame: 0
-      lastFrame: 1000
+      lastFrame: 767
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: GreatWhiteSharkSwim
+      takeName: skeletal.3|swimming_skeletal.3
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 47
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -111,7 +145,7 @@ ModelImporter:
     importBlendShapes: 1
     importCameras: 1
     importLights: 1
-    nodeNameCollisionStrategy: 0
+    nodeNameCollisionStrategy: 1
     fileIdsGeneration: 2
     swapUVChannels: 0
     generateSecondaryUV: 0

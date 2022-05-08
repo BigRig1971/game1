@@ -7,6 +7,8 @@ public class SimpleAI : MonoBehaviour
 
 
 {
+    Vector3 prevPos;
+    Vector3 currVel;
     public AudioSource randomSound;
     public AudioSource attackSound;
     public bool patrol = true, chase = true, attack = true, idle = true;
@@ -22,13 +24,12 @@ public class SimpleAI : MonoBehaviour
 
 
     //Patroling
-    public float speed = 5f, turnSpeed = 5f;
-    float previousSpeed;
+    public float turnSpeed;
+    float previousSpeed, speed;
 
-    public Vector3 wayPoint;
-    public bool wayPointSet = false;
-    float wayPointRange = 10f;
-
+    Vector3 wayPoint;
+    bool wayPointSet = false;
+    
     //Attacking
     public float timeBetweenAttacks;
     bool canAttack = true;
@@ -36,40 +37,49 @@ public class SimpleAI : MonoBehaviour
 
     //States
     public float sightRange, attackRange, ObstacleHit, maxRange, maxAltitude, minAltitude;
-    public bool playerInSightRange, playerInAttackRange, obstacle, OutOfRange;
+    bool playerInSightRange, playerInAttackRange, obstacle, OutOfRange;
     //animation
     Animator animator;
+    bool changeAnim = false;
+    Vector3 CreatureSize;
 
+    private void Awake()
+    {
+        
+    }
 
     private void Start()
     {
-        transform.localScale = new Vector3(scale, scale, scale) * Random.Range(.5f, 2f);
-        speed = speed * Random.Range(.9f, 1.2f);
+     
+        StartCoroutine(CalcVelocity());
+        //transform.localScale = new Vector3(scale, scale, scale) * Random.Range(.5f, 2f);
+       
+        animator = GetComponent<Animator>();
+        player = GameObject.FindGameObjectWithTag("Player").transform;    
+        speed = ObstacleHit * 2 * Random.Range(.9f, 1.2f);
         homePosition = transform.parent.position;
         previousSpeed = speed;
-        animator = GetComponent<Animator>();
-        player = GameObject.FindGameObjectWithTag("Player").transform;
-
-    }
+    } 
 
     private void Update()
     {
         AiController();
-        MoveAndRotate();
+
     }
     private void FixedUpdate()
     {
         RandomSound();
-
+        Move();
+        
     }
 
     private void Patrolling()
     {
-
+        speed = previousSpeed;
 
         if (!wayPointSet)
         {
-            SpeedAndAnim(previousSpeed);
+
             WayPoint();
         }
     }
@@ -78,13 +88,13 @@ public class SimpleAI : MonoBehaviour
     {
         wayPointSet = true;
         float distance = Vector3.Distance(transform.position, wayPoint);
-        float randomX = Random.Range(-wayPointRange, wayPointRange);
+        float randomX = Random.Range(-sightRange/2f, sightRange/2f);
         float travelTime = Random.Range(1f, 3f);
 
         if (canSwimOrFly)
         {
-            posY = Random.Range(-wayPointRange, wayPointRange);
-            wayPoint = new Vector3(transform.position.x + randomX, transform.position.y + posY, transform.position.z) + transform.forward * 5f;
+            posY = Random.Range(-sightRange, sightRange);
+            wayPoint = new Vector3(transform.position.x + randomX, transform.position.y + posY, transform.position.z) + transform.forward * sightRange;
 
 
             if (distance < .3f) wayPointSet = false;
@@ -94,12 +104,17 @@ public class SimpleAI : MonoBehaviour
         else
         {
             posY = Terrain.activeTerrain.SampleHeight(wayPoint);
-            wayPoint = new Vector3(transform.position.x + randomX, posY, transform.position.z) + transform.forward * 5f;
+            wayPoint = new Vector3(transform.position.x + randomX, posY, transform.position.z) + transform.forward * sightRange;
 
             if (distance < .3f) wayPointSet = false;
             Invoke(nameof(ResetWaypoint), travelTime);
-         
+
         }
+    }
+    void MoveBack(float move)
+    {
+        wayPoint = new Vector3(transform.position.x, transform.position.y, transform.position.z) -transform.forward * move;
+        SetSpeed(previousSpeed);
     }
     void ResetWaypoint()
     {
@@ -108,100 +123,73 @@ public class SimpleAI : MonoBehaviour
 
     void ChasePlayer()
     {
-        SpeedAndAnim(previousSpeed * 2f);
+        SetSpeed(previousSpeed * 1.5f);
         wayPoint = player.transform.position;
     }
 
     void AttackPlayer()
     {
-        
-
+        SetSpeed (0);
         if (canAttack)
         {
-            bool timer = false;
-            SpeedAndAnim(0);
             canAttack = false;
-            attackSound?.Play();
-            animator.SetTrigger("Attack");
+            SetSpeed(0);
+            StartCoroutine(AttackRoutine());
             /* ///Attack code here
              Rigidbody rb = Instantiate(projectile, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
              rb.AddForce(transform.forward * 32f, ForceMode.Impulse);
              rb.AddForce(transform.up * 8f, ForceMode.Impulse);
              ///End of attack code*/
-            Invoke(nameof(TimerReset), timeBetweenAttacks * Random.Range(1f, 2f));
-            if(timer) canAttack = true;
+            
+            
+            
         }
     }
-    void Idle()
+    IEnumerator Idle()
     {
-
-      /*  if (RandomNumberGenerator(1000))
+        SetSpeed(0);
+        yield return new WaitForSeconds(Random.Range(2f, 5f));
+        SetSpeed(previousSpeed);
+    }
+    IEnumerator AttackRoutine()
+    {
+        attackSound?.Play();
+        animator.SetTrigger("Attack");
+        while (!canAttack)
         {
-            ChangeAnimation(0f);
-            Invoke(nameof(ResetIdleTime), 1 * Random.Range(2f, 5f));
-        }*/
-        if (RandomNumberGenerator(1000))
-        {
-            bool timer = false;
-            speed = 0;
-           Invoke(nameof(TimerReset), 1 * Random.Range(2f, 5f));
-            if(timer) SpeedAndAnim(previousSpeed);
-           
+            yield return new WaitForSeconds(.2f);
+            MoveBack(5);
+            yield return new WaitForSeconds(timeBetweenAttacks * Random.Range(1f, 2f));
+            canAttack = true;
         }
-
+        yield return null;
+               
     }
-   
-    void ResetAttack()
+    void SetSpeed(float _speed)
     {
-        canAttack = true;
+        speed = _speed;     
     }
-
-    private void OnDrawGizmos()
+    void Move()
     {
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawWireSphere(transform.parent.position, maxRange);
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, sightRange);
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, ObstacleHit);
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(wayPoint, .5f);
-    }
-
-    void SpeedAndAnim(float animSpeed)
-    {
-        bool changeAnim = true;
-        speed = animSpeed;
-        if (changeAnim)
-        {
-            changeAnim = false;
-            animator.SetFloat("Blend", speed);
-        }
-    }
-    void MoveAndRotate()
-    {
-
         if (canSwimOrFly)
         {
             var qto = Quaternion.LookRotation(wayPoint - transform.position).normalized;
             qto = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * turnSpeed);
             transform.rotation = qto;
-            Debug.Log(qto);
+            
             transform.position += transform.forward * Time.deltaTime * speed;
         }
         else
         {
-            AlignWithGround();
             Vector3 newWay = new Vector3(wayPoint.x, transform.position.y, wayPoint.z);
             var qto = Quaternion.LookRotation(newWay - transform.position).normalized;
             qto = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * turnSpeed);
             transform.rotation = qto;
             transform.position += transform.forward * Time.deltaTime * speed;
+            HugTheGround();
         }
     }
-    void AlignWithGround()
+    void HugTheGround()
     {
         Vector3 position = transform.position;
 
@@ -210,8 +198,8 @@ public class SimpleAI : MonoBehaviour
             -transform.up, out hit, 20, whatIsGround))
         {
             targetRot = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime / 0.05f);
-            position.y = Terrain.activeTerrain.SampleHeight(transform.position) + .01f;
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime / 0.15f);
+            position.y = Terrain.activeTerrain.SampleHeight(transform.position) + .02f;
             transform.position = position;
         }
     }
@@ -225,19 +213,20 @@ public class SimpleAI : MonoBehaviour
 
         obstacle = Physics.CheckSphere(transform.position, ObstacleHit, obstacleLayer);
         if (!playerInSightRange && !playerInAttackRange && patrol) Patrolling();
-        if (!playerInSightRange && !playerInAttackRange && idle) Idle();
+        if (!playerInSightRange && !playerInAttackRange && idle && RandomBool(1000)) StartCoroutine(Idle());
         if (playerInSightRange && !playerInAttackRange && chase && dist <= maxRange) ChasePlayer();
         if (playerInAttackRange && playerInSightRange && attack && dist <= maxRange) AttackPlayer();
-        if (obstacle && !playerInAttackRange && !playerInSightRange) GoToHomePosition();
-        if (dist >= maxRange) GoToHomePosition();
-        if (transform.position.y >= maxAltitude && !playerInSightRange) GoToHomePosition();
-        if (transform.position.y <= minAltitude && !playerInSightRange) GoToHomePosition();
+        if (obstacle && !playerInAttackRange && !playerInSightRange) Home();
+        if (dist >= maxRange) Home();
+        if (transform.position.y >= maxAltitude && !playerInSightRange) Home();
+        if (transform.position.y <= minAltitude && !playerInSightRange) Home();
     }
-    void GoToHomePosition()
+    void Home()
     {
+        SetSpeed(previousSpeed * 1.5f);
         wayPoint = homePosition;
     }
-    static bool RandomNumberGenerator(int rn)
+    static bool RandomBool(int rn)
     {
         int rnd = Random.Range(0, rn);
         if (rnd == 0)
@@ -251,12 +240,38 @@ public class SimpleAI : MonoBehaviour
     }
     void RandomSound()
     {
-        if (RandomNumberGenerator(200)) randomSound?.Play();
+        if (RandomBool(500)) randomSound?.Play();
     }
     bool TimerReset()
     {
-       return true;
+        return true;
     }
+   
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.parent.position, maxRange);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, sightRange);
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, ObstacleHit);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(wayPoint, .5f);
+    }
+   
+    IEnumerator CalcVelocity()
+    {
+        while (Application.isPlaying)
+        {
+            prevPos = transform.position;
+            yield return new WaitForEndOfFrame();     
+            currVel = (prevPos - transform.position) / Time.deltaTime;      
+            animator.SetFloat("Blend", currVel.sqrMagnitude);
+        }
+    }
+
 }
 
 
