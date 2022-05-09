@@ -23,20 +23,22 @@ public class GenericAI : MonoBehaviour
     float previousSpeed;
     bool wentTooFar = false;
     bool canChangeState = true;
+   
     Animator animator;
+    public SkinnedMeshRenderer meshReference;
     
     
 
     void Start()
     {
         animator = GetComponent<Animator>();
-        
+        meshReference = GetComponentInChildren<SkinnedMeshRenderer>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         scale = scale * Random.Range(.5f, 1.5f);
         transform.localScale = new Vector3(scale,scale,scale);
         transform.rotation = Quaternion.Euler(new Vector3(0, Random.Range(0f, 360f), 0));
         _state = state.patrol;
-        boundSize =(GetComponentInChildren<SkinnedMeshRenderer>().bounds.size.magnitude);
+        boundSize =(meshReference.bounds.size.magnitude);
 
         animationMultiplier = (speed * animationMultiplier) / boundSize;
         animator.SetFloat("AnimationSpeed", animationMultiplier);
@@ -135,11 +137,8 @@ public class GenericAI : MonoBehaviour
         } 
         
     }
-    
-
     void ChaseState()
-    {
-        
+    {     
         if (!chase) NextState();
         wayPoint = player.position;
         Move(previousSpeed * 1.2f);
@@ -154,8 +153,7 @@ public class GenericAI : MonoBehaviour
         {
             canChangeState = true;
             _state = state.home;
-        };
-        
+        };       
     }
     void AttackState()
     {
@@ -178,8 +176,6 @@ public class GenericAI : MonoBehaviour
             canChangeState = true;
             _state = state.home;
         };
-      
-
     }
     void AttackStateReset()
     {
@@ -221,7 +217,7 @@ public class GenericAI : MonoBehaviour
     {
         NextState();
     }
-    
+   
     void NextState()
     {
         canChangeState = true;
@@ -231,8 +227,6 @@ public class GenericAI : MonoBehaviour
             _state = state.patrol;
         }    
     }
-    
-   
     void Move(float speed)
     {
         if (canSwimOrFly)
@@ -250,8 +244,7 @@ public class GenericAI : MonoBehaviour
             var qto = Quaternion.LookRotation(newWay - transform.position).normalized;
             qto = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * turnSpeed);
             transform.rotation = qto;
-            transform.position += transform.forward * Time.deltaTime * speed;
-            
+            transform.position += transform.forward * Time.deltaTime * speed;       
         }
     }
     void HugTheGround()
@@ -304,16 +297,22 @@ public class GenericAI : MonoBehaviour
         }
     }
     private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawWireSphere(transform.parent.position, maxRange);
+    {         
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, sightRange);
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, boundSize);
-        Gizmos.color = Color.cyan;
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(new Vector3(transform.position.x, maxAltitude, transform.position.z), new Vector3(maxRange*2f, .01f, maxRange*2f));
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(new Vector3(transform.position.x, minAltitude, transform.position.z), new Vector3(maxRange*2f, .01f, maxRange*2f));
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(new Vector3(transform.position.x, (minAltitude+maxAltitude)/2, transform.position.z - maxRange), new Vector3(maxRange *2f, maxAltitude - minAltitude, .01f));
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(new Vector3(transform.position.x, (minAltitude + maxAltitude) / 2, transform.position.z + maxRange), new Vector3(maxRange*2f, maxAltitude - minAltitude, .01f));
         Gizmos.DrawWireSphere(wayPoint, .5f);
+        Gizmos.color = Color.red;    
     }
 }

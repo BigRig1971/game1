@@ -134,14 +134,20 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 23351
-  sightRange: 3.51
+  sightRange: 3.62
   attackRange: 0.8
   boundSize: 0
-  maxRange: 9.4
-  maxAltitude: 200
-  minAltitude: 0
+  maxRange: 10
+  maxAltitude: 116.8
+  minAltitude: 87.33
   turnSpeed: 3
   attackSpeed: 5
   animationMultiplier: 5
   speed: 2
   wayPointDistance: 0
+  meshReference: {fileID: 5020100256123839250}
+--- !u!137 &5020100256123839250 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 4969393327785131633, guid: 22f7c3a66cc950344ad2b7309fc25217, type: 3}
+  m_PrefabInstance: {fileID: 98004362358414691}
+  m_PrefabAsset: {fileID: 0}
