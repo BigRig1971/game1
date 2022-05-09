@@ -45,15 +45,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ceb600f490ced814f9f02b2d89447b66, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.25
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ceb600f490ced814f9f02b2d89447b66, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.25
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ceb600f490ced814f9f02b2d89447b66, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.25
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ceb600f490ced814f9f02b2d89447b66, type: 3}
       propertyPath: m_LocalPosition.x
@@ -147,6 +147,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af1f050af78b42c4ebc4641effb97678, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scale: 0.3
   canSwimOrFly: 1
   patrol: 1
   chase: 1
@@ -161,11 +162,14 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 24375
-  sightRange: 6.74
-  attackRange: 2.37
-  obstacleHit: 2.02
+  sightRange: 6.57
+  attackRange: 2.79
+  boundSize: 0
   maxRange: 22
   maxAltitude: 87
   minAltitude: 0
   turnSpeed: 3
   attackSpeed: 5
+  animationMultiplier: 5
+  speed: 3
+  wayPointDistance: 0

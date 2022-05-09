@@ -163,7 +163,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5163876641032078635}
   m_Father: {fileID: 8181756077974035174}
@@ -214,15 +214,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 27b56e9e5563d994a8a26761334bd019, type: 3}
       propertyPath: m_LocalScale.x
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 27b56e9e5563d994a8a26761334bd019, type: 3}
       propertyPath: m_LocalScale.y
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 27b56e9e5563d994a8a26761334bd019, type: 3}
       propertyPath: m_LocalScale.z
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 27b56e9e5563d994a8a26761334bd019, type: 3}
       propertyPath: m_LocalPosition.x
@@ -308,7 +308,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 27b56e9e5563d994a8a26761334bd019, type: 3}
   m_PrefabInstance: {fileID: 8503313625609698573}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8503313626084782268
+--- !u!114 &8377105937697540599
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -317,33 +317,32 @@ MonoBehaviour:
   m_GameObject: {fileID: 8845280092565880924}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fd79320e670b434cbc40edbaa330123, type: 3}
+  m_Script: {fileID: 11500000, guid: af1f050af78b42c4ebc4641effb97678, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  randomSound: {fileID: 7199591492816987557}
-  attackSound: {fileID: 0}
+  scale: 5
+  canSwimOrFly: 1
   patrol: 1
   chase: 1
   attack: 1
   idle: 0
-  scale: 2
-  canSwimOrFly: 1
-  player: {fileID: 0}
   whatIsGround:
     serializedVersion: 2
-    m_Bits: 7991
+    m_Bits: 1024
   whatIsPlayer:
     serializedVersion: 2
     m_Bits: 8192
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 24375
-  turnSpeed: 2
-  timeBetweenAttacks: 2
-  projectile: {fileID: 0}
   sightRange: 5
-  attackRange: 0.65
-  ObstacleHit: 1.12
-  maxRange: 30
+  attackRange: 0.97
+  boundSize: 0
+  maxRange: 20
   maxAltitude: 150
-  minAltitude: 110
+  minAltitude: 105
+  turnSpeed: 3
+  attackSpeed: 5
+  animationMultiplier: 5
+  speed: 5
+  wayPointDistance: 0

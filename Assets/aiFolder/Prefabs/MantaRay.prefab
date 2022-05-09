@@ -103,7 +103,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 13ff9b98158a0934ba70928b94670b7f, type: 3}
   m_PrefabInstance: {fileID: 279289987499199319}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &3658114442666577279
+--- !u!114 &2408234609670948442
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -112,18 +112,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1090246122380441094}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fd79320e670b434cbc40edbaa330123, type: 3}
+  m_Script: {fileID: 11500000, guid: af1f050af78b42c4ebc4641effb97678, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  randomSound: {fileID: 0}
-  attackSound: {fileID: 0}
-  patrol: 1
-  chase: 1
-  attack: 0
-  idle: 0
   scale: 1
   canSwimOrFly: 1
-  player: {fileID: 0}
+  patrol: 1
+  chase: 1
+  attack: 1
+  idle: 0
   whatIsGround:
     serializedVersion: 2
     m_Bits: 1024
@@ -133,12 +130,14 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 24375
-  turnSpeed: 3
-  timeBetweenAttacks: 2
-  projectile: {fileID: 0}
-  sightRange: 3
-  attackRange: 0.5
-  ObstacleHit: 1
-  maxRange: 15
+  sightRange: 6.57
+  attackRange: 2.79
+  boundSize: 0
+  maxRange: 22
   maxAltitude: 87
   minAltitude: 0
+  turnSpeed: 3
+  attackSpeed: 5
+  animationMultiplier: 5
+  speed: 3
+  wayPointDistance: 0
