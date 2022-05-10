@@ -105,6 +105,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ceb600f490ced814f9f02b2d89447b66, type: 3}
+--- !u!137 &4539525497308257797 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -3586445338127451667, guid: ceb600f490ced814f9f02b2d89447b66, type: 3}
+  m_PrefabInstance: {fileID: 8126112844907128808}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8597224257116749827 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: ceb600f490ced814f9f02b2d89447b66, type: 3}
@@ -149,6 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scale: 0.3
   canSwimOrFly: 1
+  groundHugging: 0
   patrol: 1
   chase: 1
   attack: 1
@@ -162,14 +168,15 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 24375
-  sightRange: 6.57
-  attackRange: 2.79
+  sightRange: 7
+  attackRange: 0
   boundSize: 0
-  maxRange: 22
+  maxRange: 50
   maxAltitude: 87
   minAltitude: 0
   turnSpeed: 3
   attackSpeed: 5
-  animationMultiplier: 5
-  speed: 3
-  wayPointDistance: 0
+  animationSpeed: 3
+  moveSpeed: 5
+  _state: 0
+  meshReference: {fileID: 4539525497308257797}

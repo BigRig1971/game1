@@ -119,8 +119,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af1f050af78b42c4ebc4641effb97678, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scale: 2
+  rootMotion: 0
+  scale: 1
   canSwimOrFly: 0
+  groundHugging: 1
   patrol: 1
   chase: 1
   attack: 1
@@ -134,17 +136,17 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 23351
-  sightRange: 3.62
+  sightRange: 4.2
   attackRange: 0.8
   boundSize: 0
-  maxRange: 10
-  maxAltitude: 116.8
+  maxRange: 15.57
+  maxAltitude: 103.08
   minAltitude: 87.33
   turnSpeed: 3
   attackSpeed: 5
-  animationMultiplier: 5
-  speed: 2
-  wayPointDistance: 0
+  animationSpeed: 2
+  moveSpeed: 2
+  _state: 0
   meshReference: {fileID: 5020100256123839250}
 --- !u!137 &5020100256123839250 stripped
 SkinnedMeshRenderer:

@@ -322,6 +322,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scale: 5
   canSwimOrFly: 1
+  groundHugging: 0
   patrol: 1
   chase: 1
   attack: 1
@@ -343,7 +344,7 @@ MonoBehaviour:
   minAltitude: 110
   turnSpeed: 3
   attackSpeed: 5
-  animationMultiplier: 5
-  speed: 5
-  wayPointDistance: 0
+  animationSpeed: 1
+  moveSpeed: 3
+  _state: 0
   meshReference: {fileID: 0}
