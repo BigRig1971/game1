@@ -152,6 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af1f050af78b42c4ebc4641effb97678, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rootMotion: 0
   scale: 0.3
   canSwimOrFly: 1
   groundHugging: 0
@@ -162,7 +163,7 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 1024
-  whatIsPlayer:
+  playerLayer:
     serializedVersion: 2
     m_Bits: 8192
   obstacleLayer:
@@ -171,11 +172,11 @@ MonoBehaviour:
   sightRange: 7
   attackRange: 0
   boundSize: 0
-  maxRange: 50
+  maxRange: 30
   maxAltitude: 87
   minAltitude: 0
   turnSpeed: 3
-  attackSpeed: 5
+  attackSpeed: 3
   animationSpeed: 3
   moveSpeed: 5
   _state: 0
