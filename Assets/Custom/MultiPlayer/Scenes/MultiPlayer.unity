@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 8900000, guid: 619e305f5165a9946b7f72464e44ca4a, type: 3}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 1429.3843, g: 1188.1816, b: 1492.375, a: 1}
+  m_IndirectSpecularColor: {r: 1429.3892, g: 1188.2363, b: 1492.6191, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1129,6 +1129,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2052331350149989069, guid: be4bd83c1c1facc41888927139036691, type: 3}
+      propertyPath: meshReference
+      value: 
+      objectReference: {fileID: 828939640}
+    - target: {fileID: 2052331350149989069, guid: be4bd83c1c1facc41888927139036691, type: 3}
       propertyPath: animClip.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -1150,6 +1154,11 @@ PrefabInstance:
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2412816610735298415, guid: 501dc7df8dc084644a5ce8f733bb2fb9, type: 3}
   m_PrefabInstance: {fileID: 324645738}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &828939640 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3119032518967284782, guid: 21481c66cdb07b34fbd598fb22320849, type: 3}
+  m_PrefabInstance: {fileID: 8052387118756265809}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &943303693 stripped
 MonoBehaviour:
@@ -2993,6 +3002,10 @@ PrefabInstance:
       propertyPath: sceneViewId
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 39955068156676067, guid: 87d3dd4ddd23a6847ab7813a7cd6a347, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 886253915588631919, guid: 87d3dd4ddd23a6847ab7813a7cd6a347, type: 3}
       propertyPath: boat
       value: 
@@ -3096,6 +3109,10 @@ PrefabInstance:
     - target: {fileID: 1312712127846117316, guid: 87d3dd4ddd23a6847ab7813a7cd6a347, type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3106616612095262805, guid: 87d3dd4ddd23a6847ab7813a7cd6a347, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5478352429706496138, guid: 87d3dd4ddd23a6847ab7813a7cd6a347, type: 3}
       propertyPath: m_IsActive
