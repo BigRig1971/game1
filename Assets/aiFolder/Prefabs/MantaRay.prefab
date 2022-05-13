@@ -115,10 +115,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af1f050af78b42c4ebc4641effb97678, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rootMotion: 0
   scale: 1
   canSwimOrFly: 1
-  groundHugging: 0
   patrol: 1
   chase: 1
   attack: 1
@@ -126,26 +124,20 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 1024
-  playerLayer:
+  whatIsPlayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8192
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 24375
-  sightRange: 5
-  attackRange: 0
+  sightRange: 6.57
+  attackRange: 2.79
   boundSize: 0
-  maxRange: 30
+  maxRange: 22
   maxAltitude: 87
   minAltitude: 0
   turnSpeed: 3
   attackSpeed: 5
-  animationSpeed: 3
-  moveSpeed: 3
-  _state: 0
-  meshReference: {fileID: 6306698922901831578}
---- !u!137 &6306698922901831578 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 6081506024249914573, guid: 13ff9b98158a0934ba70928b94670b7f, type: 3}
-  m_PrefabInstance: {fileID: 279289987499199319}
-  m_PrefabAsset: {fileID: 0}
+  animationMultiplier: 5
+  speed: 3
+  wayPointDistance: 0

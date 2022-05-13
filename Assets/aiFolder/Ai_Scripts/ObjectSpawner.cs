@@ -62,7 +62,7 @@ public class ObjectSpawner : MonoBehaviour
 
     Vector3 GetOffset()
     {
-        Vector3 offset = new Vector3(Random.Range(-3,3), 0, Random.Range(-3, 3));
-        return offset;
+        // here goes your random offset, please implement this by yourself
+        return Vector3.zero;
     }
 }
