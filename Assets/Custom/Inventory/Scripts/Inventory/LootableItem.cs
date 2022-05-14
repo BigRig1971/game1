@@ -23,7 +23,7 @@ namespace EZInventory
 		public class Item
 		{
 			public ItemSO _item;
-			public int _itemAmount;
+			public int _itemAmount =1;
 		}
 		public Item[] _listOfItems;
 

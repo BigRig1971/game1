@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.AI;
 using UnityEngine;
 
-public class SimpleAI : MonoBehaviour
+public class SimpleAI : MonoBehaviour, IDamagable
 
 
 {
@@ -42,6 +42,9 @@ public class SimpleAI : MonoBehaviour
     Animator animator;
     bool changeAnim = false;
     Vector3 CreatureSize;
+
+    public float Armor { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+    public float Health { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
     private void Awake()
     {
@@ -272,6 +275,10 @@ public class SimpleAI : MonoBehaviour
         }
     }
 
+    public void Damage(float amount)
+    {
+        throw new System.NotImplementedException();
+    }
 }
 
 

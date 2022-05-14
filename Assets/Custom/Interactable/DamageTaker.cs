@@ -23,7 +23,7 @@ public class DamageTaker : MonoBehaviour, IGenericInteractable, IDamagable
 
 	public void Interact()
 	{
-		gameObject.GetComponent<Renderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+		//gameObject.GetComponent<Renderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
 
 	}
 }

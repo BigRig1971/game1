@@ -6,12 +6,14 @@ using StarterAssets;
 
 public class DamageGiver : MonoBehaviour
 {
+	
 	public float damage = 1;
 	public float rayRange = 10;
+	public string enemyTag;
 	ThirdPersonController _tpc;
-
 	private void Start()
 	{
+		
 		_tpc = GetComponent<ThirdPersonController>();
 	}
 	void Update()
@@ -24,7 +26,7 @@ public class DamageGiver : MonoBehaviour
 		if (_tpc._input.interaction)
 		{
 			RaycastHit hitInfo = new RaycastHit();
-			bool hit = Physics.Raycast(transform.position, transform.forward, out hitInfo, rayRange);
+			bool hit = Physics.Raycast(transform.position + transform.up * 1, transform.forward, out hitInfo, rayRange);
 			_tpc._input.interaction = false;
 			if (hit)
 

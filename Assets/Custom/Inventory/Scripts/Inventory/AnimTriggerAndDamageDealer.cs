@@ -11,28 +11,14 @@ public class AnimTriggerAndDamageDealer : MonoBehaviour
     public KeyCode _keyCode = KeyCode.Mouse0;
     public int damagePower = 5;
     public string _triggerName;
-    public string _animationName;
-    public string _floatName;
-    public string _boolName;
+    public string _animationName;  
     public float delayImpact = .3f;
     [SerializeField] Animator _animator;
     LootableItem damagableGo;
     bool canCauseDamage = false;
     bool canClickAttackButton = true;
 
-    private void OnEnable()
-    {
-        if (_boolName == "") return;
-
-        if (_animator) _animator.SetBool(_boolName, true);
-    }
-    private void OnDisable()
-    {
-        if (_boolName == "") return;
-
-        if (_animator) _animator.SetBool(_boolName, false);
-
-    }
+    
     private void Start()
     {
         if (TryGetComponent<Rigidbody>(out rb))

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7307567282928058719}
   m_Layer: 0
-  m_Name: RobotKyle
+  m_Name: RobotRed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -274,7 +274,7 @@ PrefabInstance:
     - target: {fileID: -4825055136811793210, guid: 830028658ee97ee4b8a341fe30f5619d, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 0aa851515cd3747d6b3b3e461199a2ed, type: 2}
+      objectReference: {fileID: 2100000, guid: f6b67a2dfa972e347a818a67b208920b, type: 2}
     - target: {fileID: -4666771291203119408, guid: 830028658ee97ee4b8a341fe30f5619d, type: 3}
       propertyPath: m_Layer
       value: 14
@@ -454,8 +454,8 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.14
-  m_Height: 1.81
+  m_Radius: 0.3
+  m_Height: 1.6
   m_Direction: 1
   m_Center: {x: 0, y: 0.88, z: 0}
 --- !u!114 &7307567283965195345
@@ -479,15 +479,16 @@ MonoBehaviour:
   canSwimOrFly: 0
   groundHugging: 0
   patrol: 1
-  chase: 1
+  chaseOrFlee: 1
   attack: 1
   idle: 1
+  _ChaseOrFlee: 5
   groundLayer:
     serializedVersion: 2
     m_Bits: 1024
   playerLayer:
     serializedVersion: 2
-    m_Bits: 8192
+    m_Bits: 40960
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 1
@@ -495,10 +496,10 @@ MonoBehaviour:
   attackSpeed: 2
   animationSpeed: 1
   moveSpeed: 2
-  attackRange: 0.6
+  attackRange: 0.3
   sightRange: 3
   maxRange: 20
   maxAltitude: 103.9
-  minAltitude: 95
+  minAltitude: 0
   _state: 0
   meshReference: {fileID: 6368164986226513524}
