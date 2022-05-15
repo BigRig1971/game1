@@ -29,7 +29,7 @@ public class LootStuff : MonoBehaviour
                 Debug.Log("lootstuff");
                 itemPickup = other.gameObject.GetComponent<LootableItem>();
                 droppedItemPickup = other.gameObject.GetComponent<ItemPickupable>();
-                if(itemPickup.readyToLoot) StartCoroutine(LootItem());
+                StartCoroutine(LootItem());
             }
 
         }

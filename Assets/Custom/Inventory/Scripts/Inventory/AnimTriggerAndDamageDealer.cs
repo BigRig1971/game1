@@ -6,6 +6,7 @@ using Photon.Pun;
 public class AnimTriggerAndDamageDealer : MonoBehaviour
 {
     Rigidbody rb;
+    public LayerMask lootableLayer;
     public Vector3 colliderSize = Vector3.one;
     public Vector3 colliderCenter = Vector3.zero;
     public KeyCode _keyCode = KeyCode.Mouse0;
@@ -15,12 +16,14 @@ public class AnimTriggerAndDamageDealer : MonoBehaviour
     public float delayImpact = .3f;
     [SerializeField] Animator _animator;
     LootableItem damagableGo;
-    bool canCauseDamage = false;
-    bool canClickAttackButton = true;
-
     
+   
+    
+
+
     private void Start()
     {
+     
         if (TryGetComponent<Rigidbody>(out rb))
         {
             rb = GetComponent<Rigidbody>();
@@ -35,60 +38,32 @@ public class AnimTriggerAndDamageDealer : MonoBehaviour
         boxCollider.center = (Vector3.zero + colliderCenter);
         boxCollider.isTrigger = true;
     }
+   
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Lootable") && canCauseDamage)///
+       
+        if (other.CompareTag("Lootable"))///
 		{
-            canCauseDamage = false;
+            _animator.SetTrigger("Interrupt");
             damagableGo = other.gameObject.GetComponent<LootableItem>();
-            StartCoroutine(CauseSomeDamage());
+            damagableGo.TakeDamage(damagePower);
+           
+            if (damagableGo.lootable)
+            {
+                damagableGo.LootableItems();
+            }
         }
     }
+
     void Update()
     {
-        if (_animator.GetCurrentAnimatorStateInfo(0).IsName(_animationName) || _animator.GetCurrentAnimatorStateInfo(1).IsName(_animationName) || _animator.GetCurrentAnimatorStateInfo(2).IsName(_animationName))
+      
+        if (Input.GetKeyDown(_keyCode) && !InventoryManager.IsOpen())
         {
-            if (!_animator.GetBool("Attack"))
-                _animator.SetBool("Attack", true);
-        }
-        else
-        {
-            if (_animator.GetBool("Attack"))
-                _animator.SetBool("Attack", false);
-        }
-        if (Input.GetKey(_keyCode) && !InventoryManager.IsOpen() && canClickAttackButton)
-        {
-            StartCoroutine(CanClicAttackButton());
+            _animator.SetTrigger(_triggerName);
         }
     }
-    private IEnumerator CauseSomeDamage()
-    {
-        canClickAttackButton = true;
-        damagableGo.TakeDamage(damagePower);
-        _animator.SetTrigger("Interrupt");
-        _animator.speed = 0f;
-        yield return new WaitForSeconds(.2f);
-        _animator.speed = 1;
-        if (damagableGo.health <= 0)
-        {
-            damagableGo.LootableItems();
-        }
-    }
-    private IEnumerator CanClicAttackButton()
-    {
-        //if (!_animator.GetCurrentAnimatorStateInfo(0).IsName(_triggerName))
-
-        _animator.SetTrigger(_triggerName);
-        canCauseDamage = true;
-
-        while ((_animator.GetCurrentAnimatorStateInfo(0).normalizedTime) % 1 < 0.99f)
-        {
-            canClickAttackButton = false;
-            yield return null;
-            canClickAttackButton = true;
-        }
-
-    }
+   
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;

@@ -10,9 +10,9 @@ namespace EZInventory
 	{
 		public Vector3 colliderSize = Vector3.one;
 		public Vector3 colliderCenter = Vector3.zero;
+		public bool isTree = false;	
 		
-		
-		public bool readyToLoot = false;
+		public bool lootable = true;
 		public AudioSource impactSound;
 		public AudioSource _treeFall;
 		public bool isDamagable = false;
@@ -49,7 +49,9 @@ namespace EZInventory
 		}
 		public void LootableItems()
 		{
-			foreach (Item loi in _listOfItems)
+			if (!lootable) return;
+            
+			foreach (Item loi in _listOfItems) 
 			{
 				int remaining = InventoryManager.AddItemToInventory(loi._item, loi._itemAmount);
 
@@ -60,8 +62,7 @@ namespace EZInventory
 				else
 				{
 					if (!isDamagable)
-					{
-						//readyToLoot = true;	
+					{						
 						Destroy(transform.gameObject, .3f);
 					}
                     
@@ -70,28 +71,33 @@ namespace EZInventory
 		}
 		public void TakeDamage(int amount)
 		{
-			//readyToLoot = false;	
+			if (!isDamagable) return;
+			lootable = false;
 			impactSound?.Play();
 			health -= amount;
-			if(health <= 0 && !readyToLoot)
+			if(health <= 0)
 			{
-				StartCoroutine(TreeFall());
+				
+				isDamagable = false;	
+				_treeFall?.Play();
+				rb.useGravity = true;
+				rb.isKinematic = false;
+				Invoke(nameof(DestroyItem), 3f);
 			}
 		}
-		private IEnumerator TreeFall()
-        {
-			readyToLoot = true;
-			_treeFall?.Play();
-			rb.useGravity = true;
-			rb.isKinematic = false;
-			yield return new WaitForSeconds(5);
-			Destroy(transform.gameObject, .1f);
-		}
+		
 		void OnDrawGizmos()
 		{
 			Gizmos.color = Color.yellow;
 			Gizmos.matrix = transform.localToWorldMatrix;
 			Gizmos.DrawWireCube(Vector3.zero + colliderCenter, colliderSize);
 		}
+		void DestroyItem()
+        {
+			lootable = true;
+			LootableItems();
+			Destroy(transform.gameObject);
+		}
 	}
+
 }
