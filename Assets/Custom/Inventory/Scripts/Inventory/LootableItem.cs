@@ -23,14 +23,10 @@ namespace EZInventory
 		public class Item
 		{
 			public ItemSO _item;
-			public int _itemAmount =1;
+			public int _itemAmount = 1;
 		}
 		public Item[] _listOfItems;
 
-        private void Awake()
-        {
-			
-		}
         private void Start()
 		{
 			if (TryGetComponent<Rigidbody>(out rb))

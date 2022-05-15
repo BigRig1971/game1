@@ -12,18 +12,14 @@ public class AnimTriggerAndDamageDealer : MonoBehaviour
     public KeyCode _keyCode = KeyCode.Mouse0;
     public int damagePower = 5;
     public string _triggerName;
-    public string _animationName;  
+    public string _animationName;
     public float delayImpact = .3f;
     [SerializeField] Animator _animator;
-    LootableItem damagableGo;
-    
-   
-    
-
+    bool canDamageStuff = false;
 
     private void Start()
     {
-     
+
         if (TryGetComponent<Rigidbody>(out rb))
         {
             rb = GetComponent<Rigidbody>();
@@ -38,32 +34,29 @@ public class AnimTriggerAndDamageDealer : MonoBehaviour
         boxCollider.center = (Vector3.zero + colliderCenter);
         boxCollider.isTrigger = true;
     }
-   
+
     private void OnTriggerEnter(Collider other)
     {
-       
         if (other.CompareTag("Lootable"))///
 		{
+            if (!canDamageStuff) return;
+            canDamageStuff = false;
             _animator.SetTrigger("Interrupt");
-            damagableGo = other.gameObject.GetComponent<LootableItem>();
-            damagableGo.TakeDamage(damagePower);
-           
-            if (damagableGo.lootable)
-            {
-                damagableGo.LootableItems();
-            }
+            other.gameObject.GetComponent<LootableItem>().TakeDamage(damagePower);
+            other.gameObject.GetComponent<LootableItem>().LootableItems();
         }
     }
 
     void Update()
     {
-      
+
         if (Input.GetKeyDown(_keyCode) && !InventoryManager.IsOpen())
         {
+            canDamageStuff = true;
             _animator.SetTrigger(_triggerName);
         }
     }
-   
+
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
