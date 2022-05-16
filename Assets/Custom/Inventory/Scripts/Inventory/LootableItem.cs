@@ -8,16 +8,15 @@ namespace EZInventory
 
 	public class LootableItem : MonoBehaviour
 	{
-		public Vector3 colliderSize = Vector3.one;
-		public Vector3 colliderCenter = Vector3.zero;
-		public bool isTree = false;	
 		
+		public bool isTree = false;
+		public bool addRigidBody = false;
 		public bool lootable = true;
 		public AudioSource impactSound;
 		public AudioSource _treeFall;
 		public bool isDamagable = false;
 		public int health = 30;
-	
+		CapsuleCollider collider;
 		Rigidbody rb;
 		[System.Serializable]
 		public class Item
@@ -27,22 +26,45 @@ namespace EZInventory
 		}
 		public Item[] _listOfItems;
 
+
+
         private void Start()
 		{
 			if (TryGetComponent<Rigidbody>(out rb))
 			{
 				rb = GetComponent<Rigidbody>();
 			}
-			else
+			else if(addRigidBody)
 			{
 				rb = gameObject.AddComponent<Rigidbody>() as Rigidbody;
-				rb.isKinematic = true;
-			}			
-			BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>() as BoxCollider;
-			boxCollider.size = colliderSize;
-			boxCollider.center = (Vector3.zero + colliderCenter);
-			boxCollider.isTrigger = true;
+				rb.isKinematic = false;
+				rb.useGravity = false;
+				rb.freezeRotation = true;	
+			}	
+			if(TryGetComponent<CapsuleCollider>(out collider))
+            {
+				collider = GetComponent<CapsuleCollider>();
+            }
+            else
+            {
+				collider = gameObject.AddComponent<CapsuleCollider>() as CapsuleCollider;
+				
+			}					
 		}
+#if UNITY_EDITOR
+		private void OnValidate()
+    {
+			if (TryGetComponent<CapsuleCollider>(out collider))
+			{
+				collider = GetComponent<CapsuleCollider>();
+			}
+			else
+			{
+				collider = gameObject.AddComponent<CapsuleCollider>() as CapsuleCollider;
+				
+			}
+		}
+#endif
 		public void LootableItems()
 		{
 			if (!lootable) return;
@@ -86,7 +108,7 @@ namespace EZInventory
 		{
 			Gizmos.color = Color.yellow;
 			Gizmos.matrix = transform.localToWorldMatrix;
-			Gizmos.DrawWireCube(Vector3.zero + colliderCenter, colliderSize);
+			//Gizmos.(Vector3.zero + colliderCenter, colliderSize);
 		}
 		void DestroyItem()
         {

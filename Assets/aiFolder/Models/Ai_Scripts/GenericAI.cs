@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class GenericAI : MonoBehaviour
 {
-   
+    Rigidbody rb;
     bool _moveTowards = true;
-    Vector3 wayPoint, homePosition ;
+    Vector3 wayPoint, homePosition;
     Quaternion targetRot;
     float posY;
     float previousSpeed, wayPointDistance, boundSize;
@@ -26,29 +26,30 @@ public class GenericAI : MonoBehaviour
     [SerializeField] bool patrol = true, chaseOrFlee = true, attack = true, idle = true;
     [SerializeField, Range(1, 10)] int _ChaseOrFlee = 5;
     [SerializeField] LayerMask groundLayer, playerLayer, obstacleLayer;
-    [SerializeField, Range(0f, 10)] float    turnSpeed = 3f, attackSpeed = 3f, animationSpeed = 3f, moveSpeed = 3f;
+    [SerializeField, Range(0f, 10)] float turnSpeed = 3f, attackSpeed = 3f, animationSpeed = 3f, moveSpeed = 3f;
     [SerializeField, Range(0f, 50)] float attackRange = 2f;
     [SerializeField, Range(0f, 100)] float sightRange = 5f;
     [SerializeField, Range(0f, 300)] float maxRange = 20f, maxAltitude = 200f, minAltitude = 0f;
     [SerializeField] state _state;
     [SerializeField] SkinnedMeshRenderer meshReference;
+    [SerializeField] string[] obstacleTags;
 
-    
+
 
     void Start()
     {
-       
+        rb = GetComponent<Rigidbody>();
         boundSize = (GetComponentInChildren<SkinnedMeshRenderer>().bounds.size.z);
         animator = GetComponent<Animator>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         transform.rotation = Quaternion.Euler(new Vector3(0, Random.Range(0f, 360f), 0));
-        _state = state.patrol;     
+        _state = state.patrol;
         animator.SetFloat("AnimationSpeed", animationSpeed);
-        wayPointDistance = boundSize * 50f;
+        wayPointDistance = 10f;
         homePosition = transform.parent.position;
         previousSpeed = moveSpeed;
         attackRange = (boundSize / 2) + attackRange;
-        sightRange = (boundSize/1.5f) + sightRange;
+        sightRange = (boundSize / 1.5f) + sightRange;
         sizeOfObject = new Vector3(scale, scale, scale) * Random.Range(.9f, 1.1f);
         transform.localScale = sizeOfObject;
 
@@ -66,17 +67,19 @@ public class GenericAI : MonoBehaviour
     {
         boundSize = (GetComponentInChildren<SkinnedMeshRenderer>().bounds.size.z);
         sizeOfObject = new Vector3(scale, scale, scale);
-      
+
         transform.localScale = sizeOfObject;
     }
 #endif
     private void FixedUpdate()
     {
-        if (canSwimOrFly) SwimOrFly(); else MoveOnGround();
         OnHitObstacle();
+        if (canSwimOrFly) SwimOrFly(); else MoveOnGround();
+
     }
     void Update()
     {
+
         switch (_state)
         {
             case state.patrol:
@@ -110,7 +113,7 @@ public class GenericAI : MonoBehaviour
         RandomWaypoint();
         if (canChangeState)
         {
-              
+
             canChangeState = false;
             moveSpeed = previousSpeed * .5f;
             animator.SetFloat("Blend", .5f);
@@ -121,12 +124,12 @@ public class GenericAI : MonoBehaviour
             moveSpeed = previousSpeed * rnd;
             animator.SetFloat("Blend", rnd);
         }
-        if (idle && RandomBool(1500))
-        {
-            canChangeState = true;
-            _state = state.idle;
-        }
-        if(RandomBool(100))
+           if (idle && RandomBool(1500))
+           {
+               canChangeState = true;
+               _state = state.idle;
+           }
+        if (RandomBool(100))
         {
             RNDSound()?.Play();
         }
@@ -138,7 +141,7 @@ public class GenericAI : MonoBehaviour
     }
     bool WentTooFar()
     {
-        
+
         float distanceToHome = Vector3.Distance(homePosition, transform.position);
         if (distanceToHome >= maxRange || transform.position.y > maxAltitude || transform.position.y < minAltitude)
         {
@@ -151,19 +154,18 @@ public class GenericAI : MonoBehaviour
     }
     void ChaseState()
     {
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, sightRange, playerLayer);
-        foreach (Collider col in hitColliders)
-        {
-            wayPoint = col.transform.position;
-        }
-            
+
+
         moveSpeed = previousSpeed;
+        wayPoint = player.position;
+
         if (canChangeState)
         {
+
             ChaseOrFlee();
             animator.SetTrigger("Interrupt");
             canChangeState = false;
-            animator.SetFloat("Blend", 1f);          
+            animator.SetFloat("Blend", 1f);
         }
         if (WentTooFar() && canSwimOrFly)
         {
@@ -177,7 +179,7 @@ public class GenericAI : MonoBehaviour
         {
             _moveTowards = true;
             moveSpeed = 0f;
-            animator.SetFloat("Blend", 0f);           
+            animator.SetFloat("Blend", 0f);
             canChangeState = false;
         }
         if (WentTooFar() && canSwimOrFly)
@@ -185,7 +187,7 @@ public class GenericAI : MonoBehaviour
             wayPoint = homePosition;
             NextState();
         };
-        RandomAttackAnimations();       
+        RandomAttackAnimations();
     }
     void TimedStateReset()
     {
@@ -196,13 +198,13 @@ public class GenericAI : MonoBehaviour
         moveSpeed = 0f;
         if (canChangeState)
         {
-            
+
             RandomIdleAnimations();
             animator.SetFloat("Blend", 0f);
             Debug.Log("idle");
             canChangeState = false;
             Invoke(nameof(IdleStateReset), Random.Range(3f, 5f));
-        }       
+        }
     }
     void IdleStateReset()
     {
@@ -210,7 +212,7 @@ public class GenericAI : MonoBehaviour
     }
     void NextState()
     {
-       
+
         canChangeState = true;
         _state++;
         if ((int)_state >= 3)
@@ -232,13 +234,14 @@ public class GenericAI : MonoBehaviour
             qto = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * turnSpeed);
             transform.rotation = qto;
         }
-      
+
         transform.position += transform.forward * Time.deltaTime * moveSpeed;
     }
     void MoveOnGround()
     {
         float groundSpeed = moveSpeed;
         Vector3 position = transform.position;
+        DistanceToWaypoint();
         RaycastHit hit;
         if (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + transform.up.y, transform.position.z),
             -transform.up, out hit, 20, groundLayer))
@@ -259,19 +262,19 @@ public class GenericAI : MonoBehaviour
             var qto = Quaternion.LookRotation(transform.position - newWay).normalized;
             transform.rotation = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * turnSpeed);
         }
-        
-        
+
+
         if (!rootMotion) transform.position += transform.forward * Time.deltaTime * groundSpeed;
     }
-    
-    
+
+
     void RandomWaypoint()
     {
         if (wayPointIsSet) { return; }
         wayPointIsSet = true;
         float randomX = Random.Range(-wayPointDistance, wayPointDistance);
-        float travelTime = Random.Range(1f, 3f);
-        Invoke(nameof(ResetWaypoint), travelTime);
+
+        Invoke(nameof(ResetWaypoint), 10f);
         if (canSwimOrFly)
         {
             posY = Random.Range(-wayPointDistance * .5f, wayPointDistance * .5f);
@@ -279,8 +282,18 @@ public class GenericAI : MonoBehaviour
         }
         else
         {
-            posY = Terrain.activeTerrain.SampleHeight(wayPoint);
-            wayPoint = new Vector3(transform.position.x + randomX, posY, transform.position.z) + transform.forward * wayPointDistance;
+
+            wayPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z) + transform.forward * wayPointDistance;
+            wayPoint.y = Terrain.activeTerrain.SampleHeight(wayPoint);
+        }
+
+    }
+    void DistanceToWaypoint()
+    {
+        float distance = Vector3.Distance(transform.position, wayPoint);
+        if (distance < 1f)
+        {
+            ResetWaypoint();
         }
     }
     void ResetWaypoint()
@@ -302,22 +315,24 @@ public class GenericAI : MonoBehaviour
     }
     void OnHitObstacle()
     {
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, boundSize, obstacleLayer);
-        foreach(Collider col in hitColliders)
-        {           
-            Vector3 delta = (col.transform.position-transform.position).normalized;
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position + transform.up, attackRange, obstacleLayer);
+        foreach (Collider col in hitColliders)
+        {
+            
+            Vector3 delta = (col.ClosestPoint(transform.position) - transform.position).normalized;
             Vector3 cross = Vector3.Cross(delta, transform.forward);
-            if (cross.y > 0) wayPoint = transform.forward *5 -transform.right * 1f; //left
-            if (cross.y < 0) wayPoint = transform.forward * 5+transform.right * 1f; //right
-            // return cross.y;
+            if (cross.y > 0f && cross.y< .5f) wayPoint = transform.position + transform.forward *3+ transform.right * 3f; //left
+            if (cross.y < 0f && cross.y > -.5f) wayPoint = transform.position + transform.forward *3- transform.right * 3f; //right
+            
         }
+       
     }
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position,(boundSize/2f)+ attackRange);
+        Gizmos.DrawWireSphere(transform.position, (boundSize / 2f) + attackRange);
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, (boundSize/1.5f)+ sightRange );
+        Gizmos.DrawWireSphere(transform.position, (boundSize / 1.5f) + sightRange);
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, boundSize);
         Gizmos.color = Color.green;
@@ -336,7 +351,7 @@ public class GenericAI : MonoBehaviour
         if (randomSound.Length == 0f) return null;
         AudioSource rs;
         rs = randomSound[Random.Range(0, randomSound.Length)];
-       return rs;
+        return rs;
     }
     public void AiFootStepsAudio()
     {
@@ -348,7 +363,7 @@ public class GenericAI : MonoBehaviour
     {
         if (animator == null) return;
         int rnd = Random.Range(0, 8);
-       
+
         animator.SetInteger("IdleInt", rnd);
         animator.SetTrigger("IdleTrigger");
         Invoke(nameof(TimedStateReset), Random.Range(1f, 2f));
@@ -367,10 +382,10 @@ public class GenericAI : MonoBehaviour
 
         int a = Random.Range(1, Random.Range(1, _ChaseOrFlee));
         if (a == 1) _moveTowards = true;
-        else if (a!=1 ||_ChaseOrFlee == 10) _moveTowards = false;
+        else if (a != 1 || _ChaseOrFlee == 10) _moveTowards = false;
         Invoke(nameof(OnFleeReset), 3f);
 
-    } 
+    }
     void OnFleeReset()
     {
         _moveTowards = true;
