@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 95223181692301454}
   - component: {fileID: 4360605853238831618}
   - component: {fileID: 7943831602050698928}
-  m_Layer: 10
+  m_Layer: 12
   m_Name: Doorway
   m_TagString: Buildable
   m_Icon: {fileID: 0}
@@ -232,6 +232,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 2
     m_TransformParent: {fileID: 5091032195866460062}
     m_Modifications:
     - target: {fileID: 828465770733780055, guid: f17661a8f3c0a9646950ae0609a8fb30, type: 3}
@@ -284,13 +285,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2036489951703125026, guid: f17661a8f3c0a9646950ae0609a8fb30, type: 3}
       propertyPath: m_Layer
-      value: 10
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 5566363540918156792, guid: f17661a8f3c0a9646950ae0609a8fb30, type: 3}
       propertyPath: m_Radius
       value: 0.005
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: f17661a8f3c0a9646950ae0609a8fb30, type: 3}
 --- !u!4 &1618213939356284768 stripped
 Transform:

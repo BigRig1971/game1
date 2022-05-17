@@ -8,7 +8,7 @@ namespace EZInventory
 
 	public class LootableItem : MonoBehaviour
 	{
-		
+		public Rigidbody rb;
 		public bool isTree = false;
 		public bool addRigidBody = false;
 		public bool lootable = true;
@@ -16,8 +16,8 @@ namespace EZInventory
 		public AudioSource _treeFall;
 		public bool isDamagable = false;
 		public int health = 30;
-		CapsuleCollider collider;
-		Rigidbody rb;
+		
+	
 		[System.Serializable]
 		public class Item
 		{
@@ -34,36 +34,9 @@ namespace EZInventory
 			{
 				rb = GetComponent<Rigidbody>();
 			}
-			else if(addRigidBody)
-			{
-				rb = gameObject.AddComponent<Rigidbody>() as Rigidbody;
-				rb.isKinematic = false;
-				rb.useGravity = false;
-				rb.freezeRotation = true;	
-			}	
-			if(TryGetComponent<CapsuleCollider>(out collider))
-            {
-				collider = GetComponent<CapsuleCollider>();
-            }
-            else
-            {
-				collider = gameObject.AddComponent<CapsuleCollider>() as CapsuleCollider;
-				
-			}					
 		}
 #if UNITY_EDITOR
-		private void OnValidate()
-    {
-			if (TryGetComponent<CapsuleCollider>(out collider))
-			{
-				collider = GetComponent<CapsuleCollider>();
-			}
-			else
-			{
-				collider = gameObject.AddComponent<CapsuleCollider>() as CapsuleCollider;
-				
-			}
-		}
+		
 #endif
 		public void LootableItems()
 		{
@@ -100,7 +73,7 @@ namespace EZInventory
 				_treeFall?.Play();
 				rb.useGravity = true;
 				rb.isKinematic = false;
-				Invoke(nameof(DestroyItem), 3f);
+				Invoke(nameof(DestroyItem), 5f);
 			}
 		}
 		

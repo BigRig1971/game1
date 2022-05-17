@@ -17,7 +17,6 @@ public class LootStuff : MonoBehaviour
         {
             if (other.CompareTag("Lootable"))
             {
-                Debug.Log("lootstuff");
                 itemPickup = other.gameObject.GetComponent<LootableItem>();
                 droppedItemPickup = other.gameObject.GetComponent<ItemPickupable>();
                 StartCoroutine(LootItem());
@@ -25,12 +24,16 @@ public class LootStuff : MonoBehaviour
         }
 	private IEnumerator LootItem()
 	{
-		(gameObject.GetComponent(scriptToPause) as MonoBehaviour).enabled = false;
-		if (itemPickup != null) itemPickup.LootableItems();
-		if (droppedItemPickup != null) droppedItemPickup.LootableItems();
-		anim.SetBool("Pickup", true);
-		yield return new WaitForSeconds(.3f);
-		(gameObject.GetComponent(scriptToPause) as MonoBehaviour).enabled = true;
-		anim.SetBool("Pickup", false);		
+		
+		if (itemPickup != null && itemPickup.lootable)
+        {
+			(gameObject.GetComponent(scriptToPause) as MonoBehaviour).enabled = false;
+			itemPickup.LootableItems();
+			//droppedItemPickup.LootableItems();
+			anim.SetBool("Pickup", true);
+			yield return new WaitForSeconds(.3f);
+			(gameObject.GetComponent(scriptToPause) as MonoBehaviour).enabled = true;
+			anim.SetBool("Pickup", false);
+		}
 	}
 }
