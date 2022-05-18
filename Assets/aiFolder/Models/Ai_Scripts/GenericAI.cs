@@ -4,20 +4,20 @@ using UnityEngine;
 
 public class GenericAI : MonoBehaviour
 {
-    float blendSpeed = 1f;
-    Collider[] hitColliders;
-    [SerializeField] Rigidbody rb;
+    Collider[] hitColliders;   
+   [SerializeField] Rigidbody rb;
     bool _moveTowards = true;
     Vector3 wayPoint, homePosition;
     Quaternion targetRot;
     float posY;
     float previousSpeed, wayPointDistance, boundSize;
-    bool wayPointIsSet = false;
+    bool canChangeState = true;
+    bool  wayPointIsSet = false;
     Transform player;
     Animator animator;
     Vector3 sizeOfObject = Vector3.one;
     [Range(.1f, 50f)] public float scale = 1f;
-    public enum state { patrol, chase, attack, idle, die };
+    public enum state { patrol, chase, attack, idle };  
     [SerializeField] Vector3 obstacleCenter = Vector3.zero;
     [SerializeField, Range(0f, 10)] float obstacleRadius = 1f;
     [SerializeField] AudioSource[] randomSound;
@@ -26,7 +26,7 @@ public class GenericAI : MonoBehaviour
     [SerializeField] AudioSource footStep;
     [SerializeField] bool rootMotion = false;
     [SerializeField] bool canSwimOrFly = false, groundHugging = false;
-    [SerializeField] bool patrol = true, chaseOrFlee = true, attack = true, idle = true, die = true;
+    [SerializeField] bool patrol = true, chaseOrFlee = true, attack = true, idle = true;
     [SerializeField, Range(1, 10)] int _ChaseOrFlee = 5;
     [SerializeField] LayerMask groundLayer, playerLayer, obstacleLayer;
     [SerializeField, Range(0f, 10)] float turnSpeed = 3f, attackSpeed = 3f, animationSpeed = 3f, moveSpeed = 3f;
@@ -36,10 +36,9 @@ public class GenericAI : MonoBehaviour
     [SerializeField] state _state;
     [SerializeField] SkinnedMeshRenderer meshReference;
     [SerializeField] string[] obstacleTags;
-    bool resetBool = true;
-
+    
     void Start()
-    {
+    {     
         boundSize = (GetComponentInChildren<SkinnedMeshRenderer>().bounds.size.z);
         animator = GetComponent<Animator>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
@@ -48,7 +47,7 @@ public class GenericAI : MonoBehaviour
         animator.SetFloat("AnimationSpeed", animationSpeed);
         wayPointDistance = 10f;
         homePosition = transform.parent.position;
-        previousSpeed = moveSpeed;
+        previousSpeed = moveSpeed;      
         sightRange = attackRange + sightRange;
         sizeOfObject = new Vector3(scale, scale, scale) * Random.Range(.9f, 1.1f);
         transform.localScale = sizeOfObject;
@@ -70,7 +69,7 @@ public class GenericAI : MonoBehaviour
     {
         boundSize = (GetComponentInChildren<SkinnedMeshRenderer>().bounds.size.z);
         sizeOfObject = new Vector3(scale, scale, scale);
-        transform.localScale = sizeOfObject;
+        transform.localScale = sizeOfObject;    
     }
 #endif
     private void FixedUpdate()
@@ -108,21 +107,27 @@ public class GenericAI : MonoBehaviour
     {
         if (patrol && !Physics.CheckSphere(transform.position, sightRange, playerLayer) && !Physics.CheckSphere(transform.position, attackRange, playerLayer)) return true; else NextState(); return false;
     }
-
     void PatrolState()
     {
-
+       
         RandomWaypoint();
-        animator.SetFloat("Blend", blendSpeed);
-        float rnd = Random.Range(.5f, 1f);
-        moveSpeed = previousSpeed * rnd;
-
-        if (RandomBool(200)) blendSpeed = rnd;
-
-        if (idle && RandomBool(1500) && hitColliders.Length == 0)
+        if (canChangeState)
         {
-            _state = state.idle;
+            canChangeState = false;
+            moveSpeed = previousSpeed * .5f;
+            animator.SetFloat("Blend", .5f);
         }
+        if (RandomBool(200))
+        {
+            float rnd = Random.Range(.5f, 1f);
+            moveSpeed = previousSpeed * rnd;
+            animator.SetFloat("Blend", rnd);
+        }
+           if (idle && RandomBool(1500) && hitColliders.Length == 0)
+           {
+               canChangeState = true;
+               _state = state.idle;
+           }
         if (RandomBool(100))
         {
             RNDSound()?.Play();
@@ -132,10 +137,6 @@ public class GenericAI : MonoBehaviour
             wayPoint = homePosition;
             NextState();
         };
-    }
-    void RandomWalk()
-    {
-
     }
     bool WentTooFar()
     {
@@ -152,41 +153,56 @@ public class GenericAI : MonoBehaviour
     void ChaseState()
     {
         wayPoint = player.position;
-        ChaseOrFlee();
-        moveSpeed = previousSpeed;
-        animator.SetFloat("Blend", 1f);
-
+        moveSpeed = previousSpeed;    
+        if (canChangeState)
+        {
+            ChaseOrFlee();
+            animator.SetTrigger("Interrupt");
+            canChangeState = false;
+            animator.SetFloat("Blend", 1f);
+        }
         if (WentTooFar() && canSwimOrFly)
         {
             wayPoint = homePosition;
             NextState();
-        };
-    }
+        };       
+    } 
     void AttackState()
-    {
+    {      
         wayPoint = player.position;
-        _moveTowards = true;
-        moveSpeed = 0f;
-        animator.SetFloat("Blend", 0f);
+        if (canChangeState)
+        {
+            _moveTowards = true;
+            moveSpeed = 0f;
+            animator.SetFloat("Blend", 0f);
+            canChangeState = false;
+        }
         if (WentTooFar() && canSwimOrFly)
         {
             wayPoint = homePosition;
             NextState();
         };
         RandomAttackAnimations();
-    }
+    }   
     void IdleState()
-    {    
+    {
+        if(hitColliders.Length != 0) NextState();
         moveSpeed = 0f;
-        RandomIdleAnimations();
-        animator.SetFloat("Blend", 0f);     
-    }
+        if (canChangeState)
+        {         
+            RandomIdleAnimations();
+            animator.SetFloat("Blend", 0f);
+            canChangeState = false;
+            Invoke(nameof(NextState), Random.Range(3f, 5f));
+        }
+    }  
     void NextState()
     {
+        canChangeState = true;
         _state++;
         if ((int)_state >= 3)
         {
-            _state = 0;
+            _state = state.patrol;
         }
     }
     void SwimOrFly()
@@ -256,7 +272,7 @@ public class GenericAI : MonoBehaviour
         if (distance < 1f)
         {
             ResetWaypoint();
-        }
+        }   
     }
     void ResetWaypoint()
     {
@@ -273,22 +289,22 @@ public class GenericAI : MonoBehaviour
         else
         {
             return false;
-        }
+        }     
     }
     void OnHitObstacle()
-    {
+    {      
         hitColliders = Physics.OverlapSphere(transform.position + transform.up, obstacleRadius, obstacleLayer);
         foreach (Collider col in hitColliders)
-        {
+        {      
             if (canSwimOrFly)
             {
                 wayPoint = homePosition; return;
-            }
+            }                      
             Vector3 delta = (col.ClosestPoint(transform.position) - transform.position).normalized;
-
+            
             Vector3 cross = Vector3.Cross(delta, transform.forward);
-            if (cross.y > 0f && cross.y < .5f) wayPoint = transform.position + transform.forward * 3 + transform.right * 3f; //left
-            if (cross.y < 0f && cross.y > -.5f) wayPoint = transform.position + transform.forward * 3 - transform.right * 3f; //right
+            if (cross.y > 0f && cross.y < .5f) wayPoint = transform.position + transform.forward *3+ transform.right * 3f; //left
+            if (cross.y < 0f && cross.y > -.5f) wayPoint = transform.position + transform.forward *3- transform.right * 3f; //right
         }
     }
     private void OnDrawGizmos()
@@ -319,16 +335,18 @@ public class GenericAI : MonoBehaviour
     }
     public void AiFootStepsAudio()
     {
-      
+        if (footStep == null) return;
         if (RandomBool(3)) footStep.pitch = Random.Range(.9f, 1f);
         footStep?.Play();
     }
     void RandomIdleAnimations()
     {
+        if (animator == null) return;
         int rnd = Random.Range(0, 8);
+
         animator.SetInteger("IdleInt", rnd);
         animator.SetTrigger("IdleTrigger");
-        NextState();
+        Invoke(nameof(NextState), Random.Range(1f, 2f));
     }
     void RandomAttackAnimations()
     {
@@ -350,9 +368,4 @@ public class GenericAI : MonoBehaviour
     {
         _moveTowards = true;
     }
-    public void OnDie()
-    {
-
-    }
-    
 }

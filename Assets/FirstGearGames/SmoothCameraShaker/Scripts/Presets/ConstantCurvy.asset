@@ -3,9 +3,8 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -13,12 +12,10 @@ MonoBehaviour:
   m_Name: ConstantCurvy
   m_EditorClassIdentifier: 
   _scaledTime: 1
-  _shakeCameras: 1
   _shakeCanvases: 1
-  _shakeObjects: 1
-  _iterationPercent: 1
-  _unlimitedDuration: 0
-  _totalDuration: 3
+  _shakeRigidbodies: 1
+  _unlimitedDuration: 1
+  _totalDuration: 1
   _fadeInDuration: 1
   _fadeOutDuration: 1
   _magnitude: 0.5
@@ -26,51 +23,36 @@ MonoBehaviour:
   _magnitudeCurve:
     serializedVersion: 2
     m_Curve:
-    - serializedVersion: 3
+    - serializedVersion: 2
       time: 0
       value: 1
       inSlope: 0.014367644
       outSlope: 0.014367644
       tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
+    - serializedVersion: 2
       time: 0.5
       value: 0.25
       inSlope: 0
       outSlope: 0
       tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
+    - serializedVersion: 2
       time: 1
       value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
+    - serializedVersion: 2
       time: 1.5
       value: 0.25
       inSlope: 0.0036582947
       outSlope: 0.0036582947
       tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
+    - serializedVersion: 2
       time: 2
       value: 1.0036583
       inSlope: -0.00000054336607
       outSlope: -0.00000054336607
       tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
@@ -79,29 +61,22 @@ MonoBehaviour:
   _roughnessCurve:
     serializedVersion: 2
     m_Curve:
-    - serializedVersion: 3
+    - serializedVersion: 2
       time: 0
       value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
+    - serializedVersion: 2
       time: 2
       value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
   _positionalInfluence: {x: 1, y: 1, z: 0}
-  _positionalInverts: 0
   _rotationalInfluence: {x: 0, y: 0.5, z: 2}
-  _rotationalInverts: 0
   _randomSeed: 1
+  _seed: 0
