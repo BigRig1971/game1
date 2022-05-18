@@ -4,20 +4,21 @@ using UnityEngine;
 
 public class GenericAI : MonoBehaviour
 {
-    Collider[] hitColliders;   
-   [SerializeField] Rigidbody rb;
+    bool aiIsDead = false;
+    Collider[] hitColliders;
+    [SerializeField] Rigidbody rb;
     bool _moveTowards = true;
     Vector3 wayPoint, homePosition;
     Quaternion targetRot;
     float posY;
     float previousSpeed, wayPointDistance, boundSize;
-    bool canChangeState = true;
-    bool  wayPointIsSet = false;
+    //public bool canChangeState = true;
+    bool wayPointIsSet = false;
     Transform player;
     Animator animator;
     Vector3 sizeOfObject = Vector3.one;
     [Range(.1f, 50f)] public float scale = 1f;
-    public enum state { patrol, chase, attack, idle };  
+    public enum state { patrol, chase, attack, idle, die };
     [SerializeField] Vector3 obstacleCenter = Vector3.zero;
     [SerializeField, Range(0f, 10)] float obstacleRadius = 1f;
     [SerializeField] AudioSource[] randomSound;
@@ -26,28 +27,28 @@ public class GenericAI : MonoBehaviour
     [SerializeField] AudioSource footStep;
     [SerializeField] bool rootMotion = false;
     [SerializeField] bool canSwimOrFly = false, groundHugging = false;
-    [SerializeField] bool patrol = true, chaseOrFlee = true, attack = true, idle = true;
+    [SerializeField] bool canPatrol = true, canChaseOrFlee = true, canAttack = true, canIdle = true, canDie = true;
     [SerializeField, Range(1, 10)] int _ChaseOrFlee = 5;
     [SerializeField] LayerMask groundLayer, playerLayer, obstacleLayer;
     [SerializeField, Range(0f, 10)] float turnSpeed = 3f, attackSpeed = 3f, animationSpeed = 3f, moveSpeed = 3f;
     [SerializeField, Range(0f, 50)] float attackRange = 2f;
     [SerializeField, Range(0f, 100)] float sightRange = 5f;
     [SerializeField, Range(0f, 300)] float maxRange = 20f, maxAltitude = 200f, minAltitude = 0f;
-    [SerializeField] state _state;
+    public state _currentState;
     [SerializeField] SkinnedMeshRenderer meshReference;
-    [SerializeField] string[] obstacleTags;
-    
+    bool _resetBool = true;
+
     void Start()
-    {     
+    {
         boundSize = (GetComponentInChildren<SkinnedMeshRenderer>().bounds.size.z);
         animator = GetComponent<Animator>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         transform.rotation = Quaternion.Euler(new Vector3(0, Random.Range(0f, 360f), 0));
-        _state = state.patrol;
+        _currentState = state.patrol;
         animator.SetFloat("AnimationSpeed", animationSpeed);
         wayPointDistance = 10f;
         homePosition = transform.parent.position;
-        previousSpeed = moveSpeed;      
+        previousSpeed = moveSpeed;
         sightRange = attackRange + sightRange;
         sizeOfObject = new Vector3(scale, scale, scale) * Random.Range(.9f, 1.1f);
         transform.localScale = sizeOfObject;
@@ -69,7 +70,7 @@ public class GenericAI : MonoBehaviour
     {
         boundSize = (GetComponentInChildren<SkinnedMeshRenderer>().bounds.size.z);
         sizeOfObject = new Vector3(scale, scale, scale);
-        transform.localScale = sizeOfObject;    
+        transform.localScale = sizeOfObject;
     }
 #endif
     private void FixedUpdate()
@@ -79,7 +80,7 @@ public class GenericAI : MonoBehaviour
     }
     void Update()
     {
-        switch (_state)
+        switch (_currentState)
         {
             case state.patrol:
                 if (OnCanPatrol()) PatrolState();
@@ -93,41 +94,34 @@ public class GenericAI : MonoBehaviour
             case state.idle:
                 IdleState();
                 break;
+            case state.die:
+                DieState();
+                break;
+
         }
     }
     bool OnCanAttack()
     {
-        if (attack && Physics.CheckSphere(transform.position, attackRange, playerLayer) && attack && Physics.CheckSphere(transform.position, sightRange, playerLayer)) return true; else NextState(); return false;
+        if (canAttack && Physics.CheckSphere(transform.position, attackRange, playerLayer) && canAttack && Physics.CheckSphere(transform.position, sightRange, playerLayer)) return true; else NextState(); return false;
     }
     bool OnCanChase()
     {
-        if (chaseOrFlee && Physics.CheckSphere(transform.position, sightRange, playerLayer) && !Physics.CheckSphere(transform.position, attackRange, playerLayer)) return true; else NextState(); return false;
+        if (canChaseOrFlee && Physics.CheckSphere(transform.position, sightRange, playerLayer) && !Physics.CheckSphere(transform.position, attackRange, playerLayer)) return true; else NextState(); return false;
     }
     bool OnCanPatrol()
     {
-        if (patrol && !Physics.CheckSphere(transform.position, sightRange, playerLayer) && !Physics.CheckSphere(transform.position, attackRange, playerLayer)) return true; else NextState(); return false;
+        if (canPatrol && !Physics.CheckSphere(transform.position, sightRange, playerLayer) && !Physics.CheckSphere(transform.position, attackRange, playerLayer)) return true; else NextState(); return false;
     }
+
+
     void PatrolState()
     {
-       
         RandomWaypoint();
-        if (canChangeState)
+        RandomWalk();
+        if (RandomBool(1000) && hitColliders.Length == 0)
         {
-            canChangeState = false;
-            moveSpeed = previousSpeed * .5f;
-            animator.SetFloat("Blend", .5f);
+            _currentState = state.idle;
         }
-        if (RandomBool(200))
-        {
-            float rnd = Random.Range(.5f, 1f);
-            moveSpeed = previousSpeed * rnd;
-            animator.SetFloat("Blend", rnd);
-        }
-           if (idle && RandomBool(1500) && hitColliders.Length == 0)
-           {
-               canChangeState = true;
-               _state = state.idle;
-           }
         if (RandomBool(100))
         {
             RNDSound()?.Play();
@@ -137,6 +131,22 @@ public class GenericAI : MonoBehaviour
             wayPoint = homePosition;
             NextState();
         };
+    }
+    void RandomWalk()
+    {
+        
+
+        if (RandomBool(200))
+        {
+            float rnd = Random.Range(.5f, 1f);
+            moveSpeed = previousSpeed * rnd;
+            animator.SetFloat("Blend", rnd);
+        }
+        else
+        {
+            moveSpeed = previousSpeed * .5f;
+            animator.SetFloat("Blend", .5f);
+        }
     }
     bool WentTooFar()
     {
@@ -153,29 +163,29 @@ public class GenericAI : MonoBehaviour
     void ChaseState()
     {
         wayPoint = player.position;
-        moveSpeed = previousSpeed;    
-        if (canChangeState)
+        moveSpeed = previousSpeed;
+        //  if (canChangeState)
         {
             ChaseOrFlee();
-            animator.SetTrigger("Interrupt");
-            canChangeState = false;
+            //animator.SetTrigger("Interrupt");
+            // canChangeState = false;
             animator.SetFloat("Blend", 1f);
         }
         if (WentTooFar() && canSwimOrFly)
         {
             wayPoint = homePosition;
             NextState();
-        };       
-    } 
+        };
+    }
     void AttackState()
-    {      
+    {
         wayPoint = player.position;
-        if (canChangeState)
+        //   if (canChangeState)
         {
             _moveTowards = true;
             moveSpeed = 0f;
             animator.SetFloat("Blend", 0f);
-            canChangeState = false;
+            // canChangeState = false;
         }
         if (WentTooFar() && canSwimOrFly)
         {
@@ -183,26 +193,32 @@ public class GenericAI : MonoBehaviour
             NextState();
         };
         RandomAttackAnimations();
-    }   
+    }
     void IdleState()
     {
-        if(hitColliders.Length != 0) NextState();
-        moveSpeed = 0f;
-        if (canChangeState)
-        {         
-            RandomIdleAnimations();
+        RandomIdleAnimations();
+    }
+    void DieState()
+    {
+        //  if (canChangeState)
+        {
+            //   canChangeState = false;
+            if (animator == null) return;
+            int rnd = Random.Range(0, 3);
             animator.SetFloat("Blend", 0f);
-            canChangeState = false;
-            Invoke(nameof(NextState), Random.Range(3f, 5f));
+            animator.SetInteger("DeathInt", rnd);
+            animator.SetTrigger("DeathTrigger");
+            //  Invoke(nameof(NextState), Random.Range(.3f, .5f));
         }
-    }  
+
+    }
     void NextState()
     {
-        canChangeState = true;
-        _state++;
-        if ((int)_state >= 3)
+        // canChangeState = true;
+        _currentState++;
+        if ((int)_currentState >= 3)
         {
-            _state = state.patrol;
+            _currentState = 0;
         }
     }
     void SwimOrFly()
@@ -272,7 +288,7 @@ public class GenericAI : MonoBehaviour
         if (distance < 1f)
         {
             ResetWaypoint();
-        }   
+        }
     }
     void ResetWaypoint()
     {
@@ -289,22 +305,22 @@ public class GenericAI : MonoBehaviour
         else
         {
             return false;
-        }     
+        }
     }
     void OnHitObstacle()
-    {      
+    {
         hitColliders = Physics.OverlapSphere(transform.position + transform.up, obstacleRadius, obstacleLayer);
         foreach (Collider col in hitColliders)
-        {      
+        {
             if (canSwimOrFly)
             {
                 wayPoint = homePosition; return;
-            }                      
+            }
             Vector3 delta = (col.ClosestPoint(transform.position) - transform.position).normalized;
-            
+
             Vector3 cross = Vector3.Cross(delta, transform.forward);
-            if (cross.y > 0f && cross.y < .5f) wayPoint = transform.position + transform.forward *3+ transform.right * 3f; //left
-            if (cross.y < 0f && cross.y > -.5f) wayPoint = transform.position + transform.forward *3- transform.right * 3f; //right
+            if (cross.y > 0f && cross.y < .5f) wayPoint = transform.position + transform.forward * 3 + transform.right * 3f; //left
+            if (cross.y < 0f && cross.y > -.5f) wayPoint = transform.position + transform.forward * 3 - transform.right * 3f; //right
         }
     }
     private void OnDrawGizmos()
@@ -339,33 +355,49 @@ public class GenericAI : MonoBehaviour
         if (RandomBool(3)) footStep.pitch = Random.Range(.9f, 1f);
         footStep?.Play();
     }
+    void RandomPatrolAnimations()
+    {
+
+    }
     void RandomIdleAnimations()
     {
-        if (animator == null) return;
-        int rnd = Random.Range(0, 8);
 
+        if (!canIdle) return;
+        canIdle = false;
+        moveSpeed = 0f;
+        int rnd = Random.Range(0, 8);
+        animator.SetFloat("Blend", 0f);
         animator.SetInteger("IdleInt", rnd);
         animator.SetTrigger("IdleTrigger");
-        Invoke(nameof(NextState), Random.Range(1f, 2f));
+        canIdle = true;
+        Debug.Log("idle");
     }
     void RandomAttackAnimations()
     {
+        if (!canAttack) return;
+        canAttack = false;
         if (animator == null) return;
         int rnd = Random.Range(0, 3);
         animator.SetInteger("AttackInt", rnd);
         animator.SetTrigger("AttackTrigger");
-        Invoke(nameof(NextState), Random.Range(.3f, .5f));
+        canAttack = true;
     }
     void ChaseOrFlee()
     {
+        if (!canChaseOrFlee) return;
+        canChaseOrFlee = false;
         if (!_moveTowards) return;
         int a = Random.Range(1, Random.Range(1, _ChaseOrFlee));
         if (a == 1) _moveTowards = true;
         else if (a != 1 || _ChaseOrFlee == 10) _moveTowards = false;
-        Invoke(nameof(OnFleeReset), 3f);
+        canChaseOrFlee = true;
     }
     void OnFleeReset()
     {
         _moveTowards = true;
+    }
+    public void Death()
+    {
+        aiIsDead = true;
     }
 }
