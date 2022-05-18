@@ -17,8 +17,8 @@ public class AnimTriggerAndDamageDealer : MonoBehaviour
     public float delayImpact = .3f;
     [SerializeField] Animator _animator;
     bool canDamageStuff = false;
-    public ShakeData MyShake;
-
+    
+   
     private void Start()
     {
 
@@ -41,11 +41,9 @@ public class AnimTriggerAndDamageDealer : MonoBehaviour
     {
         if (other.CompareTag("Lootable"))///
 		{
-           
             if (!canDamageStuff) return;
             canDamageStuff = false;
             _animator.SetTrigger("Interrupt");
-            CameraShakerHandler.Shake(MyShake);
             other.gameObject.GetComponent<LootableItem>().TakeDamage(damagePower);
             other.gameObject.GetComponent<LootableItem>().LootableItems();
             _animator.SetFloat("ChopSpeed", 0f);
