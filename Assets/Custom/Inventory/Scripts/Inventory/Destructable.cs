@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using EZInventory;
 
-namespace EZInventory
+
+namespace StupidHumanGames
 {
     /// <summary>
     /// When this Object's health is reduced to 0, it drops items

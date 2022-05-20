@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using EZInventory;
 
-namespace EZInventory
+
+namespace StupidHumanGames
 {
-    [CreateAssetMenu(fileName = "New Item", menuName = "EZ Inventory/Item")]
+    [CreateAssetMenu(fileName = "New Item", menuName = "Inventory/Item")]
     public class ItemSO : ScriptableObject
     {
         [Tooltip("String that appears in tooltips.")]

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using EZInventory;
 
 
-namespace EZInventory
+
+namespace StupidHumanGames
 {
 	public class EquipSlot : InventorySlot
 	{

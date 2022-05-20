@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using EZInventory;
 
-namespace EZInventory
+
+namespace StupidHumanGames
 {
     /// <summary>
     /// Spawns Tooltip canvas when mouse hovers over items

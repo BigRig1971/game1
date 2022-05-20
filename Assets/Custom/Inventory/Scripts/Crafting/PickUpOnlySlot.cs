@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using EZInventory;
 
-namespace EZInventory
+namespace StupidHumanGames
 {
     public class PickUpOnlySlot : InventorySlot
     {

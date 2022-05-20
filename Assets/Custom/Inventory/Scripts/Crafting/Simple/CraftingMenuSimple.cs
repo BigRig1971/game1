@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using EZInventory;
 
-namespace EZInventory
+
+namespace StupidHumanGames
 {
     public class CraftingMenuSimple : MonoBehaviour
     {

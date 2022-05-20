@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using EZInventory;
 
-namespace EZInventory
+
+namespace StupidHumanGames
 {
 	/// <summary>
 	/// Adds items to inventory on collision with Player

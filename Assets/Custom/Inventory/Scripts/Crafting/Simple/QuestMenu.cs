@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using EZInventory;
 
-namespace EZInventory
+namespace StupidHumanGames
 {
     public class QuestMenu : MonoBehaviour
     {

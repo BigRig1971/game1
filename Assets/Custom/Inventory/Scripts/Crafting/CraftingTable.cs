@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using EZInventory;
 
-namespace EZInventory
+
+namespace StupidHumanGames
 {
     /// <summary>
     /// All this does is open the crafting menu if the inventory is open and the player is nearby

@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using EZInventory;
-
-namespace EZInventory
+namespace StupidHumanGames
 {
     public class InventoryManager : MonoBehaviour
     {

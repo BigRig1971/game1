@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using EZInventory;
 
-namespace EZInventory
+
+namespace StupidHumanGames
 {
-    [CreateAssetMenu(fileName = "New Recipe", menuName = "EZ Inventory/Recipe Simple")]
+    [CreateAssetMenu(fileName = "New Recipe", menuName = "Inventory/Recipe Simple")]
     public class RecipeSimple : ScriptableObject
     {
         public Ingredient[] ingredients;

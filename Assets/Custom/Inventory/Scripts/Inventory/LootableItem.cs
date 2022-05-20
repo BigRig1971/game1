@@ -1,12 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using EZInventory;
 using UnityEngine.Events;
 
-namespace EZInventory
-{
 
+namespace StupidHumanGames
+{
 	public class LootableItem : MonoBehaviour
 	{
 		public Rigidbody rb;
@@ -51,8 +48,10 @@ namespace EZInventory
 				else
 				{
 					if (!isDamagable)
-					{						
+					{
+					 if(transform.parent != null) Destroy(transform.parent.gameObject, .3f); 
 						Destroy(transform.gameObject, .3f);
+						
 					}
                     
 				}
@@ -68,9 +67,12 @@ namespace EZInventory
 			{
 				death.Invoke();
 				isDamagable = false;	
-				_treeFall?.Play();
-				rb.useGravity = true;
-				rb.isKinematic = false;
+				if(_treeFall != null) _treeFall?.Play();
+				if(rb!= null)
+                {
+					rb.useGravity = true;
+					rb.isKinematic = false;
+				}			
 				Invoke(nameof(DestroyItem), 5f);
 			}
 		}

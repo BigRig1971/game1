@@ -1,18 +1,8 @@
-﻿//
-//SpingManager.cs for unity-chan!
-//
-//Original Script is here:
-//ricopin / SpingManager.cs
-//Rocket Jump : http://rocketjump.skr.jp/unity3d/109/
-//https://twitter.com/ricopin416
-//
-//Revised by N.Kobayashi 2014/06/24
-//           Y.Ebata
-//
+﻿
 using UnityEngine;
 using System.Collections;
 
-namespace UnityChan
+namespace StupidHumanGames
 {
 	public class SpringManager : MonoBehaviour
 	{

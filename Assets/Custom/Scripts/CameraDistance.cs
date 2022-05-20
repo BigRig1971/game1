@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using UnityEngine.InputSystem;
-using EZInventory;
+using StupidHumanGames;
 
 
 public class CameraDistance : MonoBehaviour

@@ -1,17 +1,8 @@
-﻿//
-//SpringBone.cs for unity-chan!
-//
-//Original Script is here:
-//ricopin / SpringBone.cs
-//Rocket Jump : http://rocketjump.skr.jp/unity3d/109/
-//https://twitter.com/ricopin416
-//
-//Revised by N.Kobayashi 2014/06/20
-//
+﻿using UnityChan;
 using UnityEngine;
 using System.Collections;
 
-namespace UnityChan
+namespace StupidHumanGames
 {
 	public class SpringBone : MonoBehaviour
 	{

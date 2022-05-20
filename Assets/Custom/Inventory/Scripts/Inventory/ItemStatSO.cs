@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 
 
-[CreateAssetMenu(fileName = "New Stat", menuName = "EZ Inventory/Stat")]
+[CreateAssetMenu(fileName = "New Stat", menuName = "Inventory/Stat")]
 public class ItemStatSO : ScriptableObject
 {
 	//public Image image;

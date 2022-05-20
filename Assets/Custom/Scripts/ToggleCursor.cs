@@ -4,9 +4,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Cameras;
 using StarterAssets;
-using EZInventory;
 
-namespace StarterAssets
+
+namespace StupidHumanGames
 {
     public class ToggleCursor : MonoBehaviour
     {

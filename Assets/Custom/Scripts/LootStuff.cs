@@ -1,39 +1,40 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using EZInventory;
-public class LootStuff : MonoBehaviour
+namespace StupidHumanGames
 {
-	Animator anim;
-	LootableItem itemPickup;
-	ItemPickupable droppedItemPickup;
-	
-	public string scriptToPause;
-	private void Start()
+	public class LootStuff : MonoBehaviour
 	{
-		anim = GetComponent<Animator>();
-	}
-    	private void OnTriggerEnter(Collider other)
-        {
-            if (other.CompareTag("Lootable"))
-            {
-                itemPickup = other.gameObject.GetComponent<LootableItem>();
-                droppedItemPickup = other.gameObject.GetComponent<ItemPickupable>();
-                StartCoroutine(LootItem());
-            }
-        }
-	private IEnumerator LootItem()
-	{
-		
-		if (itemPickup != null && itemPickup.lootable)
-        {
-			(gameObject.GetComponent(scriptToPause) as MonoBehaviour).enabled = false;
-			itemPickup.LootableItems();
-			//droppedItemPickup.LootableItems();
-			anim.SetBool("Pickup", true);
-			yield return new WaitForSeconds(.3f);
-			(gameObject.GetComponent(scriptToPause) as MonoBehaviour).enabled = true;
-			anim.SetBool("Pickup", false);
+		Animator anim;
+		LootableItem itemPickup;
+		ItemPickupable droppedItemPickup;
+
+		public string scriptToPause;
+		private void Start()
+		{
+			anim = GetComponent<Animator>();
+		}
+		private void OnTriggerEnter(Collider other)
+		{
+			if (other.CompareTag("Lootable"))
+			{
+				itemPickup = other.gameObject.GetComponent<LootableItem>();
+				droppedItemPickup = other.gameObject.GetComponent<ItemPickupable>();
+				StartCoroutine(LootItem());
+			}
+		}
+		private IEnumerator LootItem()
+		{
+
+			if (itemPickup != null && itemPickup.lootable)
+			{
+				(gameObject.GetComponent(scriptToPause) as MonoBehaviour).enabled = false;
+				itemPickup.LootableItems();
+				//droppedItemPickup.LootableItems();
+				anim.SetBool("Pickup", true);
+				yield return new WaitForSeconds(.3f);
+				(gameObject.GetComponent(scriptToPause) as MonoBehaviour).enabled = true;
+				anim.SetBool("Pickup", false);
+			}
 		}
 	}
 }

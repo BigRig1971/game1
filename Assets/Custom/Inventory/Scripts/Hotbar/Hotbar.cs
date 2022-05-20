@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using EZInventory;
 
-namespace EZInventory
+namespace StupidHumanGames
 {
     public class Hotbar : MonoBehaviour
     {
