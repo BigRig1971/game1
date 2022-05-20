@@ -85,7 +85,10 @@ namespace StupidHumanGames
 
         private void OnValidate()
         {
+
+
             meshReference = GetComponentInChildren<SkinnedMeshRenderer>();
+
             sizeOfObject = new Vector3(scale, scale, scale);
             transform.localScale = sizeOfObject;
         }
@@ -114,6 +117,16 @@ namespace StupidHumanGames
             if (distanceToHome >= maxRange || transform.position.y > maxAltitude || transform.position.y < minAltitude) return true; else return false;
         }
 
+
+        void NextState()
+        {
+            var l = System.Enum.GetNames(typeof(state)).Length;
+            _currentState++;
+            if ((int)_currentState >= l)
+            {
+                _currentState = 0;
+            }
+        }
         void SwimOrFly()
         {
             DistanceToWaypoint();
@@ -272,8 +285,10 @@ namespace StupidHumanGames
         {
             while (true)
             {
+
                 yield return StartCoroutine(_currentState.ToString());
             }
+
         }
         IEnumerator Patrol()
         {
@@ -282,6 +297,7 @@ namespace StupidHumanGames
                 moveSpeed = previousSpeed * .5f;
                 animator.SetFloat("Blend", .5f);
             }
+
             while (_currentState == state.Patrol && OnCanPatrol())
             {
                 RandomWaypoint();
@@ -305,6 +321,7 @@ namespace StupidHumanGames
         }
         IEnumerator Chase()
         {
+
             if (OnCanChase())
             {
                 moveSpeed = previousSpeed;
@@ -328,7 +345,11 @@ namespace StupidHumanGames
             }
             while (_currentState == state.Attack && OnCanAttack())
             {
+
+
                 RandomAttackAnimations();
+
+
                 wayPoint = player.position;
                 yield return null;
             }
