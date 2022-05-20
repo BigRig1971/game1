@@ -30,14 +30,13 @@ Transform:
   m_Children:
   - {fileID: 8597224257116749827}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &8126112844907128808
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
     m_TransformParent: {fileID: 8126112846575446439}
     m_Modifications:
     - target: {fileID: -9062363583872100002, guid: ceb600f490ced814f9f02b2d89447b66, type: 3}
@@ -241,7 +240,6 @@ PrefabInstance:
       value: 14
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: ceb600f490ced814f9f02b2d89447b66, type: 3}
 --- !u!137 &4539525497308257797 stripped
 SkinnedMeshRenderer:
@@ -292,7 +290,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &2462340838425963679
+--- !u!114 &431494440708556100
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -301,23 +299,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 8936453678477384377}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2cf9d97e2f2bdf49bf617bf5e386cd7, type: 3}
+  m_Script: {fileID: 11500000, guid: af1f050af78b42c4ebc4641effb97678, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
   scale: 0.3
+  addRigidBody: 0
+  addCollider: 0
+  obstacleCenter: {x: 0, y: 0.35, z: 0}
+  obstacleRadius: 6.85
   randomSound: []
   attackSound: {fileID: 0}
   idleSound: {fileID: 0}
   footStep: {fileID: 0}
   rootMotion: 0
-  canSwimOrFly: 0
+  canSwimOrFly: 1
   groundHugging: 0
   patrol: 1
   chaseOrFlee: 1
   attack: 1
   idle: 0
-  die: 0
   _ChaseOrFlee: 1
   groundLayer:
     serializedVersion: 2
@@ -327,17 +327,16 @@ MonoBehaviour:
     m_Bits: 8192
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 1
-  turnSpeed: 3
+    m_Bits: 9216
+  turnSpeed: 5
   attackSpeed: 3
   animationSpeed: 3
   moveSpeed: 3
-  attackRange: 2
-  sightRange: 5
-  obstacleCenter: {x: 0, y: 0, z: 0}
-  obstacleRadius: 1
+  attackRange: 3.1
+  sightRange: 3
   maxRange: 20
-  maxAltitude: 200
+  maxAltitude: 87
   minAltitude: 0
-  _currentState: 0
+  _state: 0
   meshReference: {fileID: 4539525497308257797}
+  obstacleTags: []

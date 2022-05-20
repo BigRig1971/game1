@@ -199,14 +199,13 @@ Transform:
   m_Children:
   - {fileID: 8181756077974035174}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &8503313625609698573
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
     m_TransformParent: {fileID: 8503313627084961528}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 27b56e9e5563d994a8a26761334bd019, type: 3}
@@ -298,10 +297,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: d800bec895de2ee458cd14bf31b67606, type: 2}
     m_RemovedComponents: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 27b56e9e5563d994a8a26761334bd019, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1723115041892618141}
   m_SourcePrefab: {fileID: 100100000, guid: 27b56e9e5563d994a8a26761334bd019, type: 3}
 --- !u!4 &8181756077974035174 stripped
 Transform:
@@ -325,40 +320,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af1f050af78b42c4ebc4641effb97678, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
-  scale: 5
-  obstacleCenter: {x: 0, y: 0, z: 0}
-  obstacleRadius: 1
-  randomSound: []
-  attackSound: {fileID: 0}
-  idleSound: {fileID: 0}
-  footStep: {fileID: 0}
   rootMotion: 0
+  scale: 5
   canSwimOrFly: 1
   groundHugging: 0
   patrol: 1
-  chaseOrFlee: 1
+  chase: 1
   attack: 1
   idle: 0
-  _ChaseOrFlee: 5
-  groundLayer:
+  whatIsGround:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1024
   playerLayer:
     serializedVersion: 2
     m_Bits: 0
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 24375
+  sightRange: 5
+  attackRange: 0.97
+  boundSize: 0
+  maxRange: 10
+  maxAltitude: 150
+  minAltitude: 95
   turnSpeed: 3
   attackSpeed: 5
   animationSpeed: 2
   moveSpeed: 5
-  attackRange: 0.97
-  sightRange: 5
-  maxRange: 10
-  maxAltitude: 150
-  minAltitude: 95
   _state: 0
   meshReference: {fileID: 0}
-  obstacleTags: []
