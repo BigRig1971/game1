@@ -4,10 +4,10 @@ using UnityEngine;
 using EZInventory;
 using Photon.Pun;
 using FirstGearGames.SmoothCameraShaker;
+using UnityEngine.Events;
 public class AnimTriggerAndDamageDealer : MonoBehaviour
 {
     Rigidbody rb;
-    public LayerMask lootableLayer;
     public Vector3 colliderSize = Vector3.one;
     public Vector3 colliderCenter = Vector3.zero;
     public KeyCode _keyCode = KeyCode.Mouse0;
@@ -18,7 +18,7 @@ public class AnimTriggerAndDamageDealer : MonoBehaviour
     [SerializeField] Animator _animator;
     bool canDamageStuff = false;
     public ShakeData MyShake;
-
+   
     private void Start()
     {
 
@@ -41,35 +41,30 @@ public class AnimTriggerAndDamageDealer : MonoBehaviour
     {
         if (other.CompareTag("Lootable"))///
 		{
-           
+            
             if (!canDamageStuff) return;
             canDamageStuff = false;
             _animator.SetTrigger("Interrupt");
             CameraShakerHandler.Shake(MyShake);
             other.gameObject.GetComponent<LootableItem>().TakeDamage(damagePower);
             other.gameObject.GetComponent<LootableItem>().LootableItems();
-            _animator.SetFloat("ChopSpeed", 0f);
-            Invoke(nameof(PauseAnimation), .5f);
+           
         }
     }
-
+   
 
     void Update()
     {
 
         if (Input.GetKeyDown(_keyCode) && !InventoryManager.IsOpen())
         {
-            canDamageStuff = true;
             _animator.SetTrigger(_triggerName);
+            canDamageStuff = true;
+            
         }
     }
-    void PauseAnimation()
-    {
-
-        _animator.SetFloat("ChopSpeed", 1f);
-
-    }
-
+    
+   
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;

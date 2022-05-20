@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using EZInventory;
+using UnityEngine.Events;
 
 namespace EZInventory
 {
@@ -9,15 +10,13 @@ namespace EZInventory
 	public class LootableItem : MonoBehaviour
 	{
 		public Rigidbody rb;
-		public bool isTree = false;
-		public bool addRigidBody = false;
 		public bool lootable = true;
 		public AudioSource impactSound;
 		public AudioSource _treeFall;
 		public bool isDamagable = false;
 		public int health = 30;
-		
-	
+		public UnityEvent death;
+
 		[System.Serializable]
 		public class Item
 		{
@@ -28,12 +27,11 @@ namespace EZInventory
 
 
 
-        private void Start()
+		private void Start()
 		{
-			if (TryGetComponent<Rigidbody>(out rb))
-			{
-				rb = GetComponent<Rigidbody>();
-			}
+			if (death == null)
+				death = new UnityEvent();
+			
 		}
 #if UNITY_EDITOR
 		
@@ -68,7 +66,7 @@ namespace EZInventory
 			health -= amount;
 			if(health <= 0)
 			{
-				
+				death.Invoke();
 				isDamagable = false;	
 				_treeFall?.Play();
 				rb.useGravity = true;
@@ -85,10 +83,13 @@ namespace EZInventory
 		}
 		void DestroyItem()
         {
+			
 			lootable = true;
+			isDamagable = false;
 			LootableItems();
-			Destroy(transform.gameObject);
+			
 		}
+		
 	}
-
+	
 }

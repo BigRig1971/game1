@@ -286,7 +286,7 @@ Transform:
   m_Children:
   - {fileID: 8241939885164178941}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &8241939885164050301
 PrefabInstance:
@@ -1846,11 +1846,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400098, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.020233154
+      value: -0.020202637
       objectReference: {fileID: 0}
     - target: {fileID: 400098, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.0589066
+      value: 1.062355
       objectReference: {fileID: 0}
     - target: {fileID: 400098, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1894,30 +1894,21 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
   m_PrefabInstance: {fileID: 8241939885164050301}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7933680997236779174
-MonoBehaviour:
+--- !u!136 &6338297790895019933
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8241939885163950557}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6cc15dfc05bdc1742b2cc362979d493f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rb: {fileID: 0}
-  isTree: 0
-  addRigidBody: 0
-  lootable: 0
-  impactSound: {fileID: 7933680997473574767}
-  _treeFall: {fileID: 0}
-  isDamagable: 1
-  health: 30
-  _listOfItems:
-  - _item: {fileID: 11400000, guid: 1086e27366f3acd4d8514b605952723e, type: 2}
-    _itemAmount: 10
---- !u!114 &8241939884161140707
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.35
+  m_Height: 1.79
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.82, z: 0}
+--- !u!114 &1051854611
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1926,13 +1917,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8241939885163950557}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: af1f050af78b42c4ebc4641effb97678, type: 3}
+  m_Script: {fileID: 11500000, guid: a2cf9d97e2f2bdf49bf617bf5e386cd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
   scale: 1
-  obstacleCenter: {x: 0, y: 0.88, z: 0}
-  obstacleRadius: 1.26
   randomSound: []
   attackSound: {fileID: 0}
   idleSound: {fileID: 0}
@@ -1944,6 +1933,7 @@ MonoBehaviour:
   chaseOrFlee: 1
   attack: 1
   idle: 1
+  die: 0
   _ChaseOrFlee: 1
   groundLayer:
     serializedVersion: 2
@@ -1953,22 +1943,64 @@ MonoBehaviour:
     m_Bits: 8192
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 1
-  turnSpeed: 5
-  attackSpeed: 2
-  animationSpeed: 1
-  moveSpeed: 2
-  attackRange: 1.3
-  sightRange: 1
-  maxRange: 12
-  maxAltitude: 103.9
-  minAltitude: 95
-  _state: 0
-  meshReference: {fileID: 0}
-  obstacleTags:
-  - 
+    m_Bits: 4097
+  turnSpeed: 3
+  attackSpeed: 3
+  animationSpeed: 3
+  moveSpeed: 3
+  attackRange: 1.8
+  sightRange: 2.6
+  obstacleCenter: {x: 0, y: 0.92, z: 0}
+  obstacleRadius: 0.79
+  maxRange: 16
+  maxAltitude: 105
+  minAltitude: 0
+  _currentState: 0
+  meshReference: {fileID: 8241939885167131869}
+--- !u!114 &7933680997236779174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8241939885163950557}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cc15dfc05bdc1742b2cc362979d493f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 0}
+  isTree: 0
+  lootable: 0
+  impactSound: {fileID: 7933680997473574767}
+  _treeFall: {fileID: 0}
+  isDamagable: 1
+  health: 30
+  death:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1051854611}
+        m_TargetAssemblyTypeName: AiGeneric, Assembly-CSharp
+        m_MethodName: OnIsDead
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  _listOfItems:
+  - _item: {fileID: 11400000, guid: 1086e27366f3acd4d8514b605952723e, type: 2}
+    _itemAmount: 10
 --- !u!4 &8241939885164178941 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
+  m_PrefabInstance: {fileID: 8241939885164050301}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &8241939885167131869 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 13700000, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
   m_PrefabInstance: {fileID: 8241939885164050301}
   m_PrefabAsset: {fileID: 0}
