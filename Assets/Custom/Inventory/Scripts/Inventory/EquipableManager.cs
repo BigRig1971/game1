@@ -1,42 +1,59 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class EquipableManager : MonoBehaviour
+namespace StupidHumanGames
 {
-	
-	[SerializeField]
-	private GameObject equipableItemHolder;
-	
-	public List<GameObject> EquipableItems = new List<GameObject>();
-	private Transform[] equipableItems;
-	[SerializeField] private ScriptableObject[] itemSoList;
-	private void Awake()
+	public class EquipableManager : MonoBehaviour
 	{
-		itemSoList = Resources.LoadAll<ScriptableObject>("EquipableItems");
-		equipableItems = equipableItemHolder.GetComponentsInChildren<Transform>();
-		foreach (Transform child in equipableItems)
+		public UnityEvent weaponStartDamage;
+		public UnityEvent weaponStopDamage;
+		[SerializeField]
+		private GameObject equipableItemHolder;
+
+		public List<GameObject> EquipableItems = new List<GameObject>();
+		private Transform[] equipableItems;
+		[SerializeField] private ScriptableObject[] itemSoList;
+		private void Awake()
 		{
-			foreach (ScriptableObject iso in itemSoList)
+			itemSoList = Resources.LoadAll<ScriptableObject>("EquipableItems");
+			equipableItems = equipableItemHolder.GetComponentsInChildren<Transform>();
+			foreach (Transform child in equipableItems)
 			{
-				if (child.name == iso.name)
+				foreach (ScriptableObject iso in itemSoList)
 				{
-					if (!EquipableItems.Contains(child.gameObject))
-						EquipableItems.Add(child.gameObject);
+					if (child.name == iso.name)
+					{
+						if (!EquipableItems.Contains(child.gameObject))
+							EquipableItems.Add(child.gameObject);
+					}
 				}
 			}
 		}
-	}
-	private void Start()
-	{
-		DisableEquipped();
-	}
-	void DisableEquipped()
-	{
-		foreach (GameObject go in EquipableItems)
+		private void Start()
 		{
-			go.SetActive(false);
-		
+			if (weaponStartDamage == null)
+				weaponStartDamage = new UnityEvent();
+			if (weaponStopDamage == null)
+				weaponStopDamage = new UnityEvent();
+			DisableEquipped();
 		}
+		void DisableEquipped()
+		{
+			foreach (GameObject go in EquipableItems)
+			{
+				go.SetActive(false);
+
+			}
+		}
+		public void OnWeaponStartDamage()
+        {
+			weaponStartDamage?.Invoke();
+        }
+		public void OnWeaponStopDamage()
+        {
+			weaponStopDamage?.Invoke();
+        }
 	}
 }

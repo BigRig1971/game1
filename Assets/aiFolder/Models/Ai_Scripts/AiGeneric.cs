@@ -7,7 +7,6 @@ namespace StupidHumanGames
 {
     public class AiGeneric : MonoBehaviour
     {
-        bool isDead = false;
         Collider[] hitColliders;
         [SerializeField] Rigidbody rb;
         bool _moveTowards = true;
@@ -15,17 +14,17 @@ namespace StupidHumanGames
         Quaternion targetRot;
         float posY;
         float previousSpeed, wayPointDistance;
-
         bool wayPointIsSet = false;
         Transform player;
         Animator animator;
         Vector3 sizeOfObject = Vector3.one;
         [Range(.1f, 50f)] public float scale = 1f;
-        public enum state { Patrol, Chase, Attack, Lost, Die };
+        public enum state { Patrol, Chase, Attack, Lost };
         [SerializeField] AudioSource[] randomSound;
         [SerializeField] AudioSource attackSound;
         [SerializeField] AudioSource idleSound;
         [SerializeField] AudioSource footStep;
+        [SerializeField] AudioSource deathSound;
         [SerializeField] bool rootMotion = false;
         [SerializeField] bool canSwimOrFly = false, groundHugging = false;
         [SerializeField] bool patrol = true, chaseOrFlee = true, attack = true, idle = true, die = true;
@@ -39,20 +38,13 @@ namespace StupidHumanGames
         [SerializeField, Range(0f, 300)] float maxRange = 20f, maxAltitude = 200f, minAltitude = 0f;
         [SerializeField] state _currentState;
         [SerializeField] SkinnedMeshRenderer meshReference;
-
-
         private void Awake()
         {
             _currentState = state.Patrol;
-            if (TryGetComponent<SkinnedMeshRenderer>(out meshReference))
-            {
-                meshReference = transform.GetComponentInChildren<SkinnedMeshRenderer>();
-            }
+          
         }
         void Start()
         {
-
-            if (meshReference != null) obstacleRadius = obstacleRadius + meshReference.bounds.size.z;
             StartCoroutine(State());
 
             animator = GetComponent<Animator>();
@@ -78,55 +70,17 @@ namespace StupidHumanGames
             {
                 rb = GetComponent<Rigidbody>();
             }
-
-
         }
 #if UNITY_EDITOR
 
         private void OnValidate()
         {
-
-
-            meshReference = GetComponentInChildren<SkinnedMeshRenderer>();
-
             sizeOfObject = new Vector3(scale, scale, scale);
             transform.localScale = sizeOfObject;
         }
 #endif
-        private void FixedUpdate()
-        {
-            OnHitObstacle();
-            if (canSwimOrFly) SwimOrFly(); else MoveOnGround();
-        }
-
-        bool OnCanPatrol()
-        {
-            if (patrol && !OnLost() && !Physics.CheckSphere(transform.position, sightRange, playerLayer) && !Physics.CheckSphere(transform.position, attackRange, playerLayer)) return true; else return false;
-        }
-        bool OnCanChase()
-        {
-            if (chaseOrFlee && Physics.CheckSphere(transform.position, sightRange, playerLayer) && !Physics.CheckSphere(transform.position, attackRange, playerLayer)) return true; else return false;
-        }
-        bool OnCanAttack()
-        {
-            if (attack && Physics.CheckSphere(transform.position, attackRange, playerLayer) && attack && Physics.CheckSphere(transform.position, sightRange, playerLayer)) return true; else return false;
-        }
-        bool OnLost()
-        {
-            float distanceToHome = Vector3.Distance(homePosition, transform.position);
-            if (distanceToHome >= maxRange || transform.position.y > maxAltitude || transform.position.y < minAltitude) return true; else return false;
-        }
-
-
-        void NextState()
-        {
-            var l = System.Enum.GetNames(typeof(state)).Length;
-            _currentState++;
-            if ((int)_currentState >= l)
-            {
-                _currentState = 0;
-            }
-        }
+ 
+        #region Movement
         void SwimOrFly()
         {
             DistanceToWaypoint();
@@ -147,18 +101,10 @@ namespace StupidHumanGames
         void MoveOnGround()
         {
             float groundSpeed = moveSpeed;
-            Vector3 position = transform.position;
+
             DistanceToWaypoint();
-            RaycastHit hit;
-            if (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + transform.up.y, transform.position.z),
-                -transform.up, out hit, 20, groundLayer))
-            {
-                if (groundHugging) targetRot = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
-                transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime / 0.15f);
-                position.y = Terrain.activeTerrain.SampleHeight(transform.position) + .01f;
-                transform.position = position;
-            }
-            Vector3 newWay = new Vector3(wayPoint.x, position.y, wayPoint.z);
+
+            Vector3 newWay = new Vector3(wayPoint.x, transform.position.y, wayPoint.z);
             if (_moveTowards)
             {
                 var qto = Quaternion.LookRotation(newWay - transform.position).normalized;
@@ -171,21 +117,17 @@ namespace StupidHumanGames
             }
             if (!rootMotion) transform.position += transform.forward * Time.deltaTime * groundSpeed;
         }
-        void RandomWaypoint()
+        void GroundHugging()
         {
-            if (wayPointIsSet) { return; }
-            wayPointIsSet = true;
-            float randomX = Random.Range(-wayPointDistance, wayPointDistance);
-            Invoke(nameof(ResetWaypoint), 10f);
-            if (canSwimOrFly)
+            Vector3 position = transform.position;
+            RaycastHit hit;
+            if (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + transform.up.y, transform.position.z),
+                -transform.up, out hit, 20, groundLayer))
             {
-                posY = Random.Range(-wayPointDistance * .5f, wayPointDistance * .5f);
-                wayPoint = new Vector3(transform.position.x + randomX, transform.position.y + posY, transform.position.z) + transform.forward * wayPointDistance;
-            }
-            else
-            {
-                wayPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z) + transform.forward * wayPointDistance;
-                wayPoint.y = Terrain.activeTerrain.SampleHeight(wayPoint);
+                if (groundHugging) targetRot = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime / 0.15f);
+                position.y = Terrain.activeTerrain.SampleHeight(transform.position) + .01f;
+                transform.position = position;
             }
         }
         void DistanceToWaypoint()
@@ -199,12 +141,6 @@ namespace StupidHumanGames
         void ResetWaypoint()
         {
             wayPointIsSet = false;
-        }
-        bool RandomBool(int rn)
-        {
-            int rnd = Random.Range(0, rn);
-            int rnd2 = Random.Range(0, rn);
-            if (rnd == rnd2) return true; else return false;
         }
         void OnHitObstacle()
         {
@@ -222,24 +158,42 @@ namespace StupidHumanGames
                 if (cross.y < 0f && cross.y > -.5f) wayPoint = transform.position + transform.forward * 3 - transform.right * 3f; //right
             }
         }
-        private void OnDrawGizmos()
+        void ChaseOrFlee()
         {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(transform.position + obstacleCenter, obstacleRadius + meshReference.bounds.size.z);
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, attackRange);
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, (attackRange) + sightRange);
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(new Vector3(transform.parent.position.x, maxAltitude, transform.parent.position.z), new Vector3(maxRange * 2f, .01f, maxRange * 2f));
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(new Vector3(transform.parent.position.x, minAltitude, transform.parent.position.z), new Vector3(maxRange * 2f, .01f, maxRange * 2f));
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(new Vector3(transform.parent.position.x, (minAltitude + maxAltitude) / 2, transform.parent.position.z - maxRange), new Vector3(maxRange * 2f, maxAltitude - minAltitude, .01f));
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(new Vector3(transform.parent.position.x, (minAltitude + maxAltitude) / 2, transform.parent.position.z + maxRange), new Vector3(maxRange * 2f, maxAltitude - minAltitude, .01f));
-            Gizmos.DrawWireSphere(wayPoint, .5f);
-            Gizmos.color = Color.red;
+            if (!_moveTowards) return;
+            int a = Random.Range(1, Random.Range(1, _ChaseOrFlee));
+            if (a == 1) _moveTowards = true;
+            else if (a != 1 || _ChaseOrFlee == 10) _moveTowards = false;
+            Invoke(nameof(OnFleeReset), 3f);
+        }
+        void OnFleeReset()
+        {
+            _moveTowards = true;
+        }
+        #endregion
+        #region RNG
+        void RandomWaypoint()
+        {
+            if (wayPointIsSet) { return; }
+            wayPointIsSet = true;
+            float randomX = Random.Range(-wayPointDistance, wayPointDistance);
+            Invoke(nameof(ResetWaypoint), 10f);
+            if (canSwimOrFly)
+            {
+                posY = Random.Range(-wayPointDistance * .5f, wayPointDistance * .5f);
+                wayPoint = new Vector3(transform.position.x + randomX, transform.position.y + posY, transform.position.z) + transform.forward * wayPointDistance;
+            }
+            else
+            {
+                wayPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z) + transform.forward * wayPointDistance;
+                wayPoint.y = Terrain.activeTerrain.SampleHeight(wayPoint);
+            }
+        }
+        bool RandomBool(int rn)
+        {
+            int rnd = Random.Range(0, rn);
+            int rnd2 = Random.Range(0, rn);
+            if (rnd == rnd2) return true; else return false;
         }
         AudioSource RNDSound()
         {
@@ -247,12 +201,6 @@ namespace StupidHumanGames
             AudioSource rs;
             rs = randomSound[Random.Range(0, randomSound.Length)];
             return rs;
-        }
-        public void AiFootStepsAudio() //animation trigger
-        {
-            if (footStep == null) return;
-            if (RandomBool(3)) footStep.pitch = Random.Range(.9f, 1f);
-            footStep?.Play();
         }
         void RandomIdleAnimations()
         {
@@ -268,38 +216,47 @@ namespace StupidHumanGames
             animator.SetInteger("AttackInt", rnd);
             animator.SetTrigger("AttackTrigger");
         }
-        void ChaseOrFlee()
+        #endregion
+        #region Conditions
+        bool OnCanPatrol()
         {
-            if (!_moveTowards) return;
-            int a = Random.Range(1, Random.Range(1, _ChaseOrFlee));
-            if (a == 1) _moveTowards = true;
-            else if (a != 1 || _ChaseOrFlee == 10) _moveTowards = false;
-            Invoke(nameof(OnFleeReset), 3f);
+            if (patrol && !OnLost() && !Physics.CheckSphere(transform.position, sightRange, playerLayer) && !Physics.CheckSphere(transform.position, attackRange, playerLayer)) return true; else return false;
         }
-        void OnFleeReset()
+        bool OnCanChase()
         {
-            _moveTowards = true;
+            if (chaseOrFlee && Physics.CheckSphere(transform.position, sightRange, playerLayer) && !Physics.CheckSphere(transform.position, attackRange, playerLayer)) return true; else return false;
         }
-        #region COROUTINES
+        bool OnCanAttack()
+        {
+            if (attack && Physics.CheckSphere(transform.position, attackRange, playerLayer) && attack && Physics.CheckSphere(transform.position, sightRange, playerLayer)) return true; else return false;
+        }
+
+        bool OnLost()
+        {
+            float distanceToHome = Vector3.Distance(homePosition, transform.position);
+            if (distanceToHome >= maxRange || transform.position.y > maxAltitude || transform.position.y < minAltitude) return true; else return false;
+        }
+        #endregion
+        #region States
         IEnumerator State()
         {
             while (true)
             {
-
                 yield return StartCoroutine(_currentState.ToString());
             }
-
         }
         IEnumerator Patrol()
         {
-            if (OnCanPatrol())
-            {
-                moveSpeed = previousSpeed * .5f;
-                animator.SetFloat("Blend", .5f);
-            }
+            if (!OnCanPatrol()) _currentState = state.Chase;
 
-            while (_currentState == state.Patrol && OnCanPatrol())
+            moveSpeed = previousSpeed * .5f;
+            animator.SetFloat("Blend", .5f);
+
+            while (OnCanPatrol())
             {
+                OnHitObstacle();
+                if (canSwimOrFly) SwimOrFly(); else MoveOnGround();
+                GroundHugging();
                 RandomWaypoint();
                 if (RandomBool(200))
                 {
@@ -307,7 +264,7 @@ namespace StupidHumanGames
                     moveSpeed = previousSpeed * rnd;
                     animator.SetFloat("Blend", rnd);
                 }
-                if (idle && RandomBool(1000))
+                if (RandomBool(1000))
                 {
                     RandomIdleAnimations();
                 }
@@ -321,16 +278,16 @@ namespace StupidHumanGames
         }
         IEnumerator Chase()
         {
+            if (!OnCanChase()) _currentState = state.Attack;
 
-            if (OnCanChase())
+            moveSpeed = previousSpeed;
+            animator.SetFloat("Blend", 1f);
+            animator.SetTrigger("Interrupt");
+            while (OnCanChase())
             {
-                moveSpeed = previousSpeed;
-                animator.SetFloat("Blend", 1f);
-                animator.SetTrigger("Interrupt");
-            }
-
-            while (_currentState == state.Chase && OnCanChase())
-            {
+                OnHitObstacle();
+                if (canSwimOrFly) SwimOrFly(); else MoveOnGround();
+                GroundHugging();
                 wayPoint = player.position;
                 yield return null;
             }
@@ -338,63 +295,86 @@ namespace StupidHumanGames
         }
         IEnumerator Attack()
         {
-            if (OnCanAttack())
-            {
-                moveSpeed = 0f;
-                animator.SetFloat("Blend", 0f);
-            }
-            while (_currentState == state.Attack && OnCanAttack())
-            {
+            if (!OnCanAttack()) _currentState = state.Lost;
 
+            moveSpeed = 0f;
+            animator.SetFloat("Blend", 0f);
 
+            while (OnCanAttack())
+            {
+                if (canSwimOrFly) SwimOrFly(); else MoveOnGround();
                 RandomAttackAnimations();
-
-
                 wayPoint = player.position;
                 yield return null;
             }
             _currentState = state.Lost;
         }
+
         IEnumerator Lost()
         {
-            if (OnLost())
-            {
-                moveSpeed = previousSpeed * 1f;
-                animator.SetFloat("Blend", 1f);
-            }
+            if (!OnLost()) _currentState = state.Patrol;
 
-            while (_currentState == state.Lost && OnLost())
+            moveSpeed = previousSpeed * 1f;
+            animator.SetFloat("Blend", 1f);
+
+            while (OnLost())
             {
+                OnHitObstacle();
+                if (canSwimOrFly) SwimOrFly(); else MoveOnGround();
+                GroundHugging();
                 wayPoint = homePosition;
                 yield return null;
             }
-            _currentState = state.Die;
-        }
-        IEnumerator Die()
-        {
-            if (isDead)
-            {
-                StopCoroutine(State());
-                animator.SetFloat("Blend", 0f);
-                animator.SetInteger("DeathInt", 1);
-                animator.SetTrigger("DeathTrigger");
-                yield return null;
-            }
-            else
-            {
-                _currentState = state.Patrol;
-
-            }
-        }
-        public void OnIsDead()
-        {
-
-            _currentState = state.Die;
-            isDead = true;
+            _currentState = state.Patrol;
         }
 
         #endregion
-
+        #region Event Functions
+        public void AiFootStepsAudio() //animation trigger
+        {
+            if (footStep == null) return;
+            if (RandomBool(3)) footStep.pitch = Random.Range(.9f, 1f);
+            footStep?.Play();
+        }
+        public void OnIsDead()
+        {
+            if (!die) return;
+            StopAllCoroutines();
+            groundHugging = true;
+            animator.SetTrigger("Interrupt");
+            animator.SetFloat("Blend", 0f);
+            animator.SetInteger("DeathInt", 1);
+            animator.SetTrigger("DeathTrigger");
+            wayPoint = transform.position;
+            if(deathSound != null) deathSound?.Play();
+        }
+        public void OnTakeHit()
+        {
+            
+            animator.SetTrigger("Hit");
+        }
+        #endregion
+        #region Gizmos
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(transform.position + obstacleCenter, obstacleRadius);
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, attackRange);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, (attackRange) + sightRange);
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(new Vector3(transform.parent.position.x, maxAltitude, transform.parent.position.z), new Vector3(maxRange * 2f, .01f, maxRange * 2f));
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(new Vector3(transform.parent.position.x, minAltitude, transform.parent.position.z), new Vector3(maxRange * 2f, .01f, maxRange * 2f));
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(new Vector3(transform.parent.position.x, (minAltitude + maxAltitude) / 2, transform.parent.position.z - maxRange), new Vector3(maxRange * 2f, maxAltitude - minAltitude, .01f));
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(new Vector3(transform.parent.position.x, (minAltitude + maxAltitude) / 2, transform.parent.position.z + maxRange), new Vector3(maxRange * 2f, maxAltitude - minAltitude, .01f));
+            Gizmos.DrawWireSphere(wayPoint, .5f);
+            Gizmos.color = Color.red;
+        }
+        #endregion
     }
 }
 

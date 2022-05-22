@@ -39,19 +39,19 @@ namespace StupidHumanGames
             boxCollider.isTrigger = true;
         }
 
-        private void OnTriggerEnter(Collider other)
+        private void OnTriggerStay(Collider other)
         {
-            if (other.CompareTag("Lootable"))///
+            if (other.CompareTag("Lootable") && canDamageStuff)///
             {
                 var lootable = other.gameObject.GetComponent<LootableItem>();
-                if (!canDamageStuff) return;
-                canDamageStuff = false;
+                        
                 _animator.SetTrigger("Interrupt");
                 CameraShakerHandler.Shake(MyShake);
                 if(lootable != null)
                 {
                     lootable.TakeDamage(damagePower);
                     lootable.LootableItems();
+                    canDamageStuff = false;
                 }
             }
         }
@@ -61,7 +61,7 @@ namespace StupidHumanGames
             if (Input.GetKeyDown(_keyCode) && !InventoryManager.IsOpen())
             {
                 _animator.SetTrigger(_triggerName);
-                canDamageStuff = true;
+               
             }
         }
         void OnDrawGizmos()
@@ -69,6 +69,14 @@ namespace StupidHumanGames
             Gizmos.color = Color.red;
             Gizmos.matrix = transform.localToWorldMatrix;
             Gizmos.DrawWireCube(Vector3.zero + colliderCenter, colliderSize);
+        }
+        public void OnWeaponDamageStart()
+        {
+            canDamageStuff = true;
+        }
+        public void OnWeaponDamageStop()
+        {
+            canDamageStuff = false;
         }
     }
 }

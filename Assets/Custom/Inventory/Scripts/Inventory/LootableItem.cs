@@ -6,14 +6,15 @@ namespace StupidHumanGames
 {
 	public class LootableItem : MonoBehaviour
 	{
-		public Rigidbody rb;
+		[SerializeField] Rigidbody rb;
 		public bool lootable = true;
-		public AudioSource impactSound;
-		public AudioSource _treeFall;
-		public bool isDamagable = false;
-		public int health = 30;
+		[SerializeField] AudioSource impactSound;
+		[SerializeField] AudioSource _treeFall;
+		[SerializeField] bool isDamagable = false;
+		[SerializeField] int health = 30;
+		[SerializeField] float deathDelay = 5f;
 		public UnityEvent death;
-
+		public UnityEvent takeHit;
 		[System.Serializable]
 		public class Item
 		{
@@ -21,13 +22,12 @@ namespace StupidHumanGames
 			public int _itemAmount = 1;
 		}
 		public Item[] _listOfItems;
-
-
-
 		private void Start()
 		{
 			if (death == null)
 				death = new UnityEvent();
+			if(takeHit == null)
+				takeHit = new UnityEvent();	
 			
 		}
 #if UNITY_EDITOR
@@ -60,8 +60,10 @@ namespace StupidHumanGames
 		public void TakeDamage(int amount)
 		{
 			if (!isDamagable) return;
+			takeHit.Invoke();
 			lootable = false;
-			impactSound?.Play();
+		    if(impactSound != null) impactSound?.Play();
+			
 			health -= amount;
 			if(health <= 0)
 			{
@@ -73,7 +75,7 @@ namespace StupidHumanGames
 					rb.useGravity = true;
 					rb.isKinematic = false;
 				}			
-				Invoke(nameof(DestroyItem), 5f);
+				Invoke(nameof(LootItem), deathDelay);
 			}
 		}
 		
@@ -83,7 +85,7 @@ namespace StupidHumanGames
 			Gizmos.matrix = transform.localToWorldMatrix;
 			//Gizmos.(Vector3.zero + colliderCenter, colliderSize);
 		}
-		void DestroyItem()
+		void LootItem()
         {
 			
 			lootable = true;
