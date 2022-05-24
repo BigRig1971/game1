@@ -39,6 +39,8 @@ namespace StupidHumanGames
         [SerializeField, Range(0f, 300)] float maxRange = 20f, maxAltitude = 200f, minAltitude = 0f;
         [SerializeField] state _currentState;
         [SerializeField] SkinnedMeshRenderer meshReference;
+        [SerializeField, Range(0f, 10f)] int rndAttackCount = 3;
+        [SerializeField, Range(0f, 10f)] int rndIdleCount = 3;
         private void Awake()
         {
             animator = GetComponent<Animator>();
@@ -48,7 +50,7 @@ namespace StupidHumanGames
         private void FixedUpdate()
         {
             if (canSwimOrFly) SwimOrFly(); else MoveOnGround();
-          
+
 
         }
         void Start()
@@ -60,7 +62,7 @@ namespace StupidHumanGames
             animator.SetFloat("AnimationSpeed", animationSpeed);
             wayPointDistance = 10f;
             homePosition = transform.parent.position;
-            
+
             sightRange = attackRange + sightRange;
             sizeOfObject = new Vector3(scale, scale, scale) * Random.Range(.9f, 1.1f);
             transform.localScale = sizeOfObject;
@@ -211,14 +213,14 @@ namespace StupidHumanGames
         void RandomIdleAnimations()
         {
 
-            int rnd = Random.Range(0, 8);
+            int rnd = Random.Range(0, rndIdleCount);
             animator.SetInteger("IdleInt", rnd);
             animator.SetTrigger("IdleTrigger");
         }
         void RandomAttackAnimations()
         {
 
-            int rnd = Random.Range(0, 3);
+            int rnd = Random.Range(0, rndAttackCount);
             animator.SetInteger("AttackInt", rnd);
             animator.SetTrigger("AttackTrigger");
         }
@@ -253,15 +255,13 @@ namespace StupidHumanGames
         }
         IEnumerator Patrol()
         {
-            if (!OnCanPatrol()) _currentState = state.Chase;
 
             moveSpeed = previousSpeed * .5f;
             animator.SetFloat("Blend", .5f);
-
             while (OnCanPatrol())
             {
+                if (!OnCanPatrol()) yield break; else yield return null;
                 OnHitObstacle();
-
                 RandomWaypoint();
                 if (RandomBool(200))
                 {
@@ -277,56 +277,56 @@ namespace StupidHumanGames
                 {
                     RNDSound()?.Play();
                 }
-                yield return null;
+              
             }
             _currentState = state.Chase;
         }
         IEnumerator Chase()
         {
-            if (!OnCanChase()) _currentState = state.Attack;
-
             moveSpeed = previousSpeed;
             animator.SetFloat("Blend", 1f);
             animator.SetTrigger("Interrupt");
+
             while (OnCanChase())
             {
+                if (!OnCanChase()) yield break; else yield return null;
                 OnHitObstacle();
 
                 wayPoint = player.position;
-                yield return null;
+                
             }
             _currentState = state.Attack;
         }
         IEnumerator Attack()
         {
 
-            if (!OnCanAttack()) _currentState = state.Lost;
             _moveTowards = true;
             moveSpeed = 0f;
             animator.SetFloat("Blend", 0f);
 
             while (OnCanAttack())
             {
+                if (!OnCanAttack()) yield break; else yield return null;
                 wayPoint = player.position;
                 RandomAttackAnimations();
-                yield return null;
+                if (attackSound != null) attackSound.Play();
+                yield return new WaitForSeconds(.5f);
+                
             }
             _currentState = state.Lost;
         }
 
         IEnumerator Lost()
         {
-            if (!OnLost()) _currentState = state.Patrol;
 
             moveSpeed = previousSpeed * 1f;
             animator.SetFloat("Blend", 1f);
-
             while (OnLost())
             {
+                if (!OnLost()) yield break; else yield return null;
                 OnHitObstacle();
-
                 wayPoint = homePosition;
-                yield return null;
+                
             }
             _currentState = state.Patrol;
         }

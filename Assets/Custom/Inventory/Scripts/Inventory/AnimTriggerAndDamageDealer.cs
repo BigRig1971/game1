@@ -20,6 +20,8 @@ namespace StupidHumanGames
         [SerializeField] Animator _animator;
         bool canDamageStuff = false;
         public ShakeData MyShake;
+        public AudioSource weaponSwingSound;
+        [SerializeField, Range(0f,1f)] float swingVolume = 1;
 
         private void Start()
         {
@@ -63,7 +65,8 @@ namespace StupidHumanGames
             if (Input.GetKeyDown(_keyCode) && !InventoryManager.IsOpen())
             {
                 _animator.SetTrigger(_triggerName);
-               
+
+              
             }
         }
         void OnDrawGizmos()
@@ -75,11 +78,21 @@ namespace StupidHumanGames
         public void OnWeaponDamageStart()
         {
             canDamageStuff = true;
+            
         }
-        public void OnWeaponDamageStop()
+        public void OnWeaponSwing()
         {
-            canDamageStuff = false;
+            
+            if (weaponSwingSound != null)
+            {
+                weaponSwingSound.volume = swingVolume;
+                weaponSwingSound.pitch = (Random.Range(.9f, 1f));
+                weaponSwingSound?.Play();
+            }
+                
+                
+
         }
-        
+
     }
 }

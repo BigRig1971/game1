@@ -161,7 +161,7 @@ namespace StarterAssets
 			Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
 
 			// update animator if using character
-			if (_hasAnimator)
+			if (_hasAnimator && _customMovement.buttAboveWater)
 			{
 				_animator.SetBool(_animIDGrounded, Grounded);
 			}

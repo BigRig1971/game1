@@ -19,7 +19,7 @@ namespace StupidHumanGames
             {
                 lootableItem = other.gameObject.GetComponent<LootableItem>();
                 droppedItemPickup = other.gameObject.GetComponent<ItemPickupable>();
-                if (lootableItem != null) StartCoroutine(LootItem());
+                if (lootableItem != null && !lootableItem.isDamagable) StartCoroutine(LootItem());
                 if (droppedItemPickup != null) StartCoroutine(PickupItem());
             }
         }

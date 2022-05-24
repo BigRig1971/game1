@@ -20,7 +20,7 @@ namespace StarterAssets
 		private Camera _mainCamera;
 		private ThirdPersonController _tpc;
 		private bool headAboveWater = true;
-		private bool buttAboveWater = true;
+		public bool buttAboveWater = true;
 		public bool _verticalMovement = false;
 		//audio stuff
 		public AudioSource footStep;

@@ -8,7 +8,7 @@ namespace StupidHumanGames
 	public class EquipableManager : MonoBehaviour
 	{
 		public UnityEvent weaponStartDamage;
-		public UnityEvent weaponStopDamage;
+		public UnityEvent onWeaponSwing;
 		[SerializeField]
 		private GameObject equipableItemHolder;
 
@@ -35,8 +35,8 @@ namespace StupidHumanGames
 		{
 			if (weaponStartDamage == null)
 				weaponStartDamage = new UnityEvent();
-			if (weaponStopDamage == null)
-				weaponStopDamage = new UnityEvent();
+			if (onWeaponSwing == null)
+				onWeaponSwing = new UnityEvent();
 			DisableEquipped();
 		}
 		void DisableEquipped()
@@ -51,9 +51,9 @@ namespace StupidHumanGames
         {
 			weaponStartDamage?.Invoke();
         }
-		public void OnWeaponStopDamage()
+		public void ONWeaponSwing()
         {
-			weaponStopDamage?.Invoke();
+			onWeaponSwing?.Invoke();
         }
 	}
 }

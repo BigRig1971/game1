@@ -14,7 +14,7 @@ namespace StupidHumanGames
 		[SerializeField] AudioSource _treeFall;
 		
 		[SerializeField, Range(0f, 1f)] float volume;
-		[SerializeField] bool isDamagable = false;
+		public bool isDamagable = false;
 		[SerializeField] int health = 30;
 		[SerializeField] float deathDelay = 5f;
 		public UnityEvent death;
