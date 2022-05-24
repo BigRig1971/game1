@@ -97,6 +97,11 @@ namespace StupidHumanGames
 					currentItem = InventoryManager.currentItem;
 					InventoryManager.GrabItemFromSlot(this, -1);
 				}
+				if(currentItem.type == ItemSO.Type.HandRight)
+                {
+				Transform equipParent = GameObject.Find("WeaponSlot").transform;
+				
+				}
 
 
 			}

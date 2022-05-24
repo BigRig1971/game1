@@ -46,6 +46,8 @@ namespace StupidHumanGames
                 var lootable = other.gameObject.GetComponent<LootableItem>();
                         
                 _animator.SetTrigger("Interrupt");
+                _animator.StopPlayback();
+               
                 CameraShakerHandler.Shake(MyShake);
                 if(lootable != null)
                 {
@@ -78,5 +80,6 @@ namespace StupidHumanGames
         {
             canDamageStuff = false;
         }
+        
     }
 }

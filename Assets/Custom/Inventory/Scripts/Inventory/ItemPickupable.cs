@@ -42,10 +42,16 @@ namespace StupidHumanGames
 			{
 				itemAmount = remaining;
 			}
-			else
-			{
-				Destroy(gameObject, .5f);
-			}
+            else
+            {
+				StartCoroutine(DestroyItem());
+            }
+			
+		}
+		IEnumerator DestroyItem()
+        {
+			yield return new WaitForSeconds(.3f);
+			Destroy(gameObject);
 		}
 	}
 }

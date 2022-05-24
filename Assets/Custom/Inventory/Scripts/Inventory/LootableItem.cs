@@ -1,15 +1,19 @@
 using UnityEngine;
 using UnityEngine.Events;
+using System.Collections;
 
 
 namespace StupidHumanGames
 {
 	public class LootableItem : MonoBehaviour
 	{
+		private bool lootable;
 		[SerializeField] Rigidbody rb;
-		public bool lootable = true;
+		
 		[SerializeField] AudioSource impactSound;
 		[SerializeField] AudioSource _treeFall;
+		
+		[SerializeField, Range(0f, 1f)] float volume;
 		[SerializeField] bool isDamagable = false;
 		[SerializeField] int health = 30;
 		[SerializeField] float deathDelay = 5f;
@@ -22,18 +26,27 @@ namespace StupidHumanGames
 			public int _itemAmount = 1;
 		}
 		public Item[] _listOfItems;
+		private void Awake()
+		{
+			if (isDamagable) lootable = false; else lootable = true;
+		}
 		private void Start()
 		{
 			if (death == null)
 				death = new UnityEvent();
 			if(takeHit == null)
-				takeHit = new UnityEvent();	
+				takeHit = new UnityEvent();
 			
+
 		}
+       
+
+
 #if UNITY_EDITOR
-		
+
 #endif
-		public void LootableItems()
+
+        public void LootableItems()
 		{
 			if (!lootable) return;
             
@@ -57,7 +70,8 @@ namespace StupidHumanGames
 				}
 			}
 		}
-		public void TakeDamage(int amount)
+      
+        public void TakeDamage(int amount)
 		{
 			if (!isDamagable) return;
 			takeHit.Invoke();
@@ -78,6 +92,7 @@ namespace StupidHumanGames
 				Invoke(nameof(LootItem), deathDelay);
 			}
 		}
+		
 		
 		void OnDrawGizmos()
 		{

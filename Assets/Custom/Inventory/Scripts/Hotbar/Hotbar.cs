@@ -9,7 +9,7 @@ namespace StupidHumanGames
     {
         [SerializeField]
         private string equipParentName;
-
+       
         Transform equipParent;
         InventorySlot[] slots;
         Transform currentEquip;

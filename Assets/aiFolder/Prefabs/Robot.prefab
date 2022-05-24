@@ -2053,6 +2053,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
   scale: 1
+  animator: {fileID: 8241939885171360285}
   randomSound: []
   attackSound: {fileID: 0}
   idleSound: {fileID: 0}
@@ -2123,6 +2124,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  takeHit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1051854611}
+        m_TargetAssemblyTypeName: StupidHumanGames.AiGeneric, Assembly-CSharp
+        m_MethodName: OnTakeHit
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   _listOfItems:
   - _item: {fileID: 11400000, guid: 1086e27366f3acd4d8514b605952723e, type: 2}
     _itemAmount: 10
@@ -2134,5 +2150,10 @@ Transform:
 --- !u!137 &8241939885167131869 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 13700000, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
+  m_PrefabInstance: {fileID: 8241939885164050301}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &8241939885171360285 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9500000, guid: 320b1c2af77554f99a1658df4a6d3d5c, type: 3}
   m_PrefabInstance: {fileID: 8241939885164050301}
   m_PrefabAsset: {fileID: 0}
