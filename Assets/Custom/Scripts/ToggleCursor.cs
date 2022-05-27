@@ -13,10 +13,10 @@ namespace StupidHumanGames
     {
 		[SerializeField] string[] _elementsToDisable;
         bool state = false;
-		private ThirdPersonController _tpc;
+		private TPC _tpc;
 		private void Start()
 		{
-			_tpc = GetComponent<ThirdPersonController>();
+			_tpc = GetComponent<TPC>();
 		}
 		/*private void Update()
 		{
