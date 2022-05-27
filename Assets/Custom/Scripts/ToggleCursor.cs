@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Cameras;
-using StarterAssets;
+using StupidHumanGames;
 
 
 namespace StupidHumanGames

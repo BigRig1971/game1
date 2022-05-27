@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
-using StarterAssets;
+using StupidHumanGames;
 
 public class RootMotionController : MonoBehaviour
 {
@@ -40,7 +40,7 @@ public class RootMotionController : MonoBehaviour
     private const float _threshold = 0.01f;
 
     //starter input
-    public StarterAssetsInputs _input;
+    public StupidHumanInputs _input;
 
     // Start is called before the first frame update
     void Start()
@@ -48,7 +48,7 @@ public class RootMotionController : MonoBehaviour
         animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
         originalStepOffset = characterController.stepOffset;
-        _input = GetComponent<StarterAssetsInputs>();
+        _input = GetComponent<StupidHumanInputs>();
     }
 
     // Update is called once per frame

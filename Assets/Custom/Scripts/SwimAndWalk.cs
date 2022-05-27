@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using StarterAssets;
+using StupidHumanGames;
 
 namespace StupidHumanGames
 {
@@ -48,7 +48,7 @@ namespace StupidHumanGames
         [SerializeField] LayerMask groundLayer;
         public float runSpeed = 5f;
         public float walkSpeed = 2.5f;
-        public StarterAssetsInputs _input;
+        public StupidHumanInputs _input;
         private void Awake()
         {
             animator = GetComponent<Animator>();

@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 
-namespace StarterAssets
+namespace StupidHumanGames
 {
     public static class ScriptingDefineUtils
     {
