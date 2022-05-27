@@ -48,7 +48,7 @@ namespace StupidHumanGames
         [SerializeField] LayerMask groundLayer;
         public float runSpeed = 5f;
         public float walkSpeed = 2.5f;
-        public StarterAssetsInputs _input;
+        public StupidHumanInputs _input;
         private void Awake()
         {
             animator = GetComponent<Animator>();
