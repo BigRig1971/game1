@@ -6,7 +6,7 @@ namespace StupidHumanGames
     {
 
         [Header("Output")]
-        public StupidHumanInputs starterAssetsInputs;
+        public StarterAssetsInputs starterAssetsInputs;
 
         public void VirtualMoveInput(Vector2 virtualMoveDirection)
         {

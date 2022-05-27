@@ -40,7 +40,7 @@ public class RootMotionController : MonoBehaviour
     private const float _threshold = 0.01f;
 
     //starter input
-    public StupidHumanInputs _input;
+    public StarterAssetsInputs _input;
 
     // Start is called before the first frame update
     void Start()
@@ -48,7 +48,7 @@ public class RootMotionController : MonoBehaviour
         animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
         originalStepOffset = characterController.stepOffset;
-        _input = GetComponent<StupidHumanInputs>();
+        _input = GetComponent<StarterAssetsInputs>();
     }
 
     // Update is called once per frame

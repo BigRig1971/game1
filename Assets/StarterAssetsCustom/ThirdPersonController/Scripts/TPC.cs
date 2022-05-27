@@ -89,7 +89,7 @@ namespace StupidHumanGames
 
 		public Animator _animator;
 		private CharacterController _controller;
-		public StupidHumanInputs _input;
+		public StarterAssetsInputs _input;
 		private GameObject _mainCamera;
 
 		private const float _threshold = 0.01f;
@@ -112,7 +112,7 @@ namespace StupidHumanGames
 			_customMovement = GetComponent<CustomMovement>();
 			_hasAnimator = TryGetComponent(out _animator);
 			_controller = GetComponent<CharacterController>();
-			_input = GetComponent<StupidHumanInputs>();
+			_input = GetComponent<StarterAssetsInputs>();
 
 			AssignAnimationIDs();
 
