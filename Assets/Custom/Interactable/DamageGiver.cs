@@ -10,11 +10,11 @@ public class DamageGiver : MonoBehaviour
 	public float damage = 1;
 	public float rayRange = 10;
 	public string enemyTag;
-	ThirdPersonController _tpc;
+	TPC _tpc;
 	private void Start()
 	{
 		
-		_tpc = GetComponent<ThirdPersonController>();
+		_tpc = GetComponent<TPC>();
 	}
 	void Update()
 	{

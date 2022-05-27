@@ -18,7 +18,7 @@ namespace StupidHumanGames
 		
 		private CharacterController _controller;
 		private Camera _mainCamera;
-		private ThirdPersonController _tpc;
+		private TPC _tpc;
 		private bool headAboveWater = true;
 		public bool buttAboveWater = true;
 		public bool _verticalMovement = false;
@@ -33,7 +33,7 @@ namespace StupidHumanGames
 		private bool fp = false;
 		void Start()
 		{
-			_tpc = GetComponent<ThirdPersonController>();
+			_tpc = GetComponent<TPC>();
 			_controller = GetComponent<CharacterController>();
 			_animIDRoll = Animator.StringToHash("Roll");
 			_swim = Animator.StringToHash("Swim");
