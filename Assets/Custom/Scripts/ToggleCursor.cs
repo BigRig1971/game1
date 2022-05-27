@@ -17,7 +17,7 @@ namespace StupidHumanGames
 		{
 			_tpc = GetComponent<ThirdPersonController>();
 		}
-		private void Update()
+		/*private void Update()
 		{
 			if (_tpc._input.cursor)
 			{
@@ -56,6 +56,6 @@ namespace StupidHumanGames
 			//Cursor.visible = false;
 			//Cursor.lockState = CursorLockMode.Locked;
 			//_tpc._input.cursorInputForLook = true;
-		}
+		}*/
 	}
 }

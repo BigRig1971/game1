@@ -21,13 +21,16 @@ namespace Crest
 
         public UnderwaterMaskPassURP()
         {
-            renderPassEvent = RenderPassEvent.BeforeRenderingOpaques;
+            // Will always execute and matrices will be ready.
+            renderPassEvent = RenderPassEvent.BeforeRenderingPrepasses;
             _oceanMaskMaterial = new PropertyWrapperMaterial(k_ShaderPathOceanMask);
+            _oceanMaskMaterial.material.hideFlags = HideFlags.HideAndDontSave;
         }
 
-        ~UnderwaterMaskPassURP()
+        internal static void CleanUp()
         {
-            CoreUtils.Destroy(_oceanMaskMaterial.material);
+            CoreUtils.Destroy(s_instance._oceanMaskMaterial.material);
+            s_instance = null;
         }
 
         public static void Enable(UnderwaterRenderer underwaterRenderer)

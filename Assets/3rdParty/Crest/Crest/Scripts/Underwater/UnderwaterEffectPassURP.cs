@@ -32,11 +32,13 @@ namespace Crest
         {
             renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
             _underwaterEffectMaterial = new PropertyWrapperMaterial(SHADER_UNDERWATER_EFFECT);
+            _underwaterEffectMaterial.material.hideFlags = HideFlags.HideAndDontSave;
         }
 
-        ~UnderwaterEffectPassURP()
+        internal static void CleanUp()
         {
-            CoreUtils.Destroy(_underwaterEffectMaterial.material);
+            CoreUtils.Destroy(s_instance._underwaterEffectMaterial.material);
+            s_instance = null;
         }
 
         public static void Enable(UnderwaterRenderer underwaterRenderer)

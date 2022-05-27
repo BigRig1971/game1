@@ -340,6 +340,12 @@ namespace Crest
         bool _followSceneCamera = true;
 #pragma warning restore 414
 
+        [Tooltip("Whether height queries are enabled in edit mode."), SerializeField]
+#pragma warning disable 414
+        bool _heightQueries = true;
+#pragma warning restore 414
+
+
         [Header("Server Settings")]
         [Tooltip("Emulate batch mode which models running without a display (but with a GPU available). Equivalent to running standalone build with -batchmode argument."), SerializeField]
         bool _forceBatchMode = false;
@@ -664,6 +670,12 @@ namespace Crest
             _canSkipCulling = false;
 
             _generatedSettingsHash = CalculateSettingsHash();
+
+            // 2021.2 selects the the wrong default. UR might not be present so OR needs to handle it too.
+            if (FindObjectsOfType<UnderwaterRenderer>().Length == 0)
+            {
+                Shader.EnableKeyword("CREST_WATER_VOLUME_NONE");
+            }
         }
 
         internal void Rebuild()
@@ -1120,7 +1132,8 @@ namespace Crest
 #if UNITY_EDITOR
             // Issue #630 - seems to be a terrible memory leak coming from creating async gpu readbacks. We don't rely on queries in edit mode AFAIK
             // so knock this out.
-            if (EditorApplication.isPlaying)
+            // This was marked as resolved by Unity and confirmed fixed by forum posts.
+            if (_heightQueries || EditorApplication.isPlaying)
 #endif
             {
                 CollisionProvider?.UpdateQueries();

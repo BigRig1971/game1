@@ -261,6 +261,17 @@ namespace Crest
             Instance = null;
         }
 
+        void OnDestroy()
+        {
+            if (RenderPipelineHelper.IsUniversal)
+            {
+#if CREST_URP
+                UnderwaterEffectPassURP.CleanUp();
+                UnderwaterMaskPassURP.CleanUp();
+#endif
+            }
+        }
+
         void Enable()
         {
             SetupOceanMask();
@@ -582,6 +593,22 @@ namespace Crest
                                 // HDRP material will not update without viewing it...
                                 Selection.activeObject = material.targetObject;
                             }
+                        );
+                    }
+                }
+#endif
+
+#if CREST_URP
+                if (RenderPipelineHelper.IsUniversal)
+                {
+                    if (_mode != Mode.FullScreen && showMessage != ValidatedHelper.DebugLog)
+                    {
+                        showMessage
+                        (
+                            $"The <i>{_mode}</i> mode is incompatible with SSAO. " +
+                            "We cannot detect whether SSAO is enabled or not so this is general advice and can be ignored.",
+                            "",
+                            ValidatedHelper.MessageType.Info, this
                         );
                     }
                 }

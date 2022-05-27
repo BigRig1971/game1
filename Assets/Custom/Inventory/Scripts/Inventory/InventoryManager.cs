@@ -106,7 +106,7 @@ namespace StupidHumanGames
 
             if (instance.inventoryPause)
             {
-                Cursor.lockState = CursorLockMode.None;
+                Cursor.lockState = CursorLockMode.Confined;
                 Cursor.visible = true;
                 //Time.timeScale = 0;
             }

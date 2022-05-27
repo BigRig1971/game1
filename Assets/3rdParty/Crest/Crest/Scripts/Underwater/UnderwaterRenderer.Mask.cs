@@ -117,10 +117,14 @@ namespace Crest
 
         internal static void DisableOceanMaskKeywords()
         {
+            if (OceanRenderer.Instance == null || OceanRenderer.Instance.OceanMaterial == null) return;
             // Multiple keywords from same set can be enabled at the same time leading to undefined behaviour so we need
             // to disable all keywords from a set first.
             // https://docs.unity3d.com/Manual/shader-keywords-scripts.html
             // Global keywords are easier to manage. Otherwise we would have to track the material etc.
+            // 2021.2 SG: Toggling keywords through Shader API no longer worked in builds. Unity has a new keyword
+            // system so it is likely bugged.
+            Shader.EnableKeyword("CREST_WATER_VOLUME_NONE");
             Shader.DisableKeyword(k_KeywordVolume2D);
             Shader.DisableKeyword(k_KeywordVolumeHasBackFace);
         }
@@ -195,8 +199,15 @@ namespace Crest
 
         internal void SetUpVolume(Material maskMaterial)
         {
+            if (OceanRenderer.Instance == null || OceanRenderer.Instance.OceanMaterial == null) return;
+            // 2021.2 SG: Toggling keywords through Shader API no longer worked in builds. Unity has a new keyword
+            // system so it is likely bugged.
+            Helpers.SetGlobalKeyword("CREST_WATER_VOLUME_NONE", _mode == Mode.FullScreen);
             Helpers.SetGlobalKeyword(k_KeywordVolume2D, _mode == Mode.Portal);
             Helpers.SetGlobalKeyword(k_KeywordVolumeHasBackFace, _mode == Mode.Volume || _mode == Mode.VolumeFlyThrough);
+            OceanRenderer.Instance.OceanMaterial.SetKeyword("CREST_WATER_VOLUME_NONE", _mode == Mode.FullScreen);
+            OceanRenderer.Instance.OceanMaterial.SetKeyword(k_KeywordVolume2D, _mode == Mode.Portal);
+            OceanRenderer.Instance.OceanMaterial.SetKeyword(k_KeywordVolumeHasBackFace, _mode == Mode.Volume || _mode == Mode.VolumeFlyThrough);
             maskMaterial.SetKeyword(k_KeywordVolume, _mode != Mode.FullScreen);
             maskMaterial.SetInt("_StencilRef", UseStencilBufferOnMask ? k_StencilValueVolume : 0);
         }

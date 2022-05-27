@@ -2,10 +2,11 @@
 
 // Copyright 2020 Wave Harmonic Ltd
 
-Shader "Crest/Ocean"
+Shader "Hidden/Crest/Obsolete/Ocean"
 {
     Properties
     {
+        [HideInInspector] _ObsoleteMessage("It is generated from Ocean.shadergraph which for 2021.2 is now fully useable without a generation step and must be used instead.", Float) = 0
         [Header(Normals)]
         _NormalsStrengthOverall("Overall Normal Strength", Range(0, 1)) = 1
         [NoScaleOffset]_TextureNormals("Normal Map", 2D) = "bump" {}
@@ -39062,6 +39063,6 @@ Shader "Crest/Ocean"
     // }
     // DE: Set custom shader GUI to fix inspector for 2021. If running 2020 and want old inspector, swap these editors.
     // CustomEditor "Crest.OceanShaderGUI"
-    CustomEditor "Rendering.HighDefinition.LitShaderGraphGUI"
+    CustomEditor "Crest.ObsoleteShaderGUI"
     FallBack "Hidden/Shader Graph/FallbackError"
 }

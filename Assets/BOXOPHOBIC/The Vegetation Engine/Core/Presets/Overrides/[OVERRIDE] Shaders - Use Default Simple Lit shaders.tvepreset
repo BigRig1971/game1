@@ -1,0 +1,13 @@
+*******************************************************************
+*                            OVERRIDE                             *
+*******************************************************************
+
+InfoStatus The shaders will be chnaged to Simple Lit shaders if the shaders are found! The action will override the shader even if Keep Converted Materials is used!
+
+Utility USE_MATERIAL_POST_PROCESSING
+
+Shader SHADER_DEFAULT_PROP BOXOPHOBIC/The Vegetation Engine/Default/Prop Simple Lit
+Shader SHADER_DEFAULT_CROSS BOXOPHOBIC/The Vegetation Engine/Default/Cross Simple Lit
+Shader SHADER_DEFAULT_GRASS BOXOPHOBIC/The Vegetation Engine/Default/Grass Simple Lit
+Shader SHADER_DEFAULT_BARK BOXOPHOBIC/The Vegetation Engine/Default/Bark Simple Lit
+Shader SHADER_DEFAULT_LEAF BOXOPHOBIC/The Vegetation Engine/Default/Leaf Simple Lit

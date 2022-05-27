@@ -41,6 +41,7 @@ namespace StupidHumanGames
         [SerializeField] SkinnedMeshRenderer meshReference;
         [SerializeField, Range(0f, 10f)] int rndAttackCount = 3;
         [SerializeField, Range(0f, 10f)] int rndIdleCount = 3;
+        [SerializeField, Range(0f, 5f)] float reverseTime = 2f;
         private void Awake()
         {
             animator = GetComponent<Animator>();
@@ -50,8 +51,6 @@ namespace StupidHumanGames
         private void FixedUpdate()
         {
             if (canSwimOrFly) SwimOrFly(); else MoveOnGround();
-
-
         }
         void Start()
         {
@@ -87,14 +86,12 @@ namespace StupidHumanGames
             transform.localScale = sizeOfObject;
         }
 #endif
-
         #region Movement
         void SwimOrFly()
         {
             DistanceToWaypoint();
             if (_moveTowards)
             {
-
                 var qto = Quaternion.LookRotation(wayPoint - transform.position).normalized;
                 transform.rotation = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * turnSpeed);
             }
@@ -104,7 +101,6 @@ namespace StupidHumanGames
                 transform.rotation = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * turnSpeed);
             }
             transform.position += transform.forward * Time.deltaTime * moveSpeed;
-
         }
         void MoveOnGround()
         {
@@ -212,17 +208,17 @@ namespace StupidHumanGames
         }
         void RandomIdleAnimations()
         {
-
             int rnd = Random.Range(0, rndIdleCount);
             animator.SetInteger("IdleInt", rnd);
             animator.SetTrigger("IdleTrigger");
+            return;
         }
         void RandomAttackAnimations()
         {
-
             int rnd = Random.Range(0, rndAttackCount);
             animator.SetInteger("AttackInt", rnd);
             animator.SetTrigger("AttackTrigger");
+            return;
         }
         #endregion
         #region Conditions
@@ -255,7 +251,6 @@ namespace StupidHumanGames
         }
         IEnumerator Patrol()
         {
-
             moveSpeed = previousSpeed * .5f;
             animator.SetFloat("Blend", .5f);
             while (OnCanPatrol())
@@ -277,7 +272,6 @@ namespace StupidHumanGames
                 {
                     RNDSound()?.Play();
                 }
-              
             }
             _currentState = state.Chase;
         }
@@ -286,39 +280,37 @@ namespace StupidHumanGames
             moveSpeed = previousSpeed;
             animator.SetFloat("Blend", 1f);
             animator.SetTrigger("Interrupt");
-
             while (OnCanChase())
             {
                 if (!OnCanChase()) yield break; else yield return null;
                 OnHitObstacle();
 
                 wayPoint = player.position;
-                
             }
             _currentState = state.Attack;
         }
         IEnumerator Attack()
         {
-
             _moveTowards = true;
             moveSpeed = 0f;
             animator.SetFloat("Blend", 0f);
-
             while (OnCanAttack())
             {
                 if (!OnCanAttack()) yield break; else yield return null;
                 wayPoint = player.position;
                 RandomAttackAnimations();
                 if (attackSound != null) attackSound.Play();
-                yield return new WaitForSeconds(.5f);
-                
+                moveSpeed = -1f;
+                animator.SetFloat("AnimationSpeed", -1f);
+                animator.SetFloat("Blend", 1f);
+                yield return new WaitForSeconds(reverseTime * Random.Range(.5f, 1f));
+                animator.SetFloat("AnimationSpeed", animationSpeed);
+                moveSpeed = 1f;
             }
             _currentState = state.Lost;
         }
-
         IEnumerator Lost()
         {
-
             moveSpeed = previousSpeed * 1f;
             animator.SetFloat("Blend", 1f);
             while (OnLost())
@@ -326,11 +318,10 @@ namespace StupidHumanGames
                 if (!OnLost()) yield break; else yield return null;
                 OnHitObstacle();
                 wayPoint = homePosition;
-                
+
             }
             _currentState = state.Patrol;
         }
-
         #endregion
         #region Event Functions
         public void AiFootStepsAudio() //animation trigger
@@ -344,7 +335,6 @@ namespace StupidHumanGames
             if (!die) return;
             StopAllCoroutines();
             groundHugging = true;
-
             animator.SetFloat("Blend", 0f);
             animator.SetInteger("DeathInt", 1);
             animator.SetTrigger("DeathTrigger");
@@ -353,7 +343,6 @@ namespace StupidHumanGames
         }
         public void OnTakeHit()
         {
-
             animator.SetTrigger("Hit");
         }
         #endregion
@@ -383,15 +372,12 @@ namespace StupidHumanGames
             // Check if the gaze is looking at the front side of the object
             Vector3 forward = transform.forward;
             Vector3 toOther = (wayPoint - transform.position).normalized;
-
             if (Vector3.Dot(forward, toOther) < 0.7f)
             {
-                Debug.Log("Not facing the object");
-                return false;
+                return false; //not facing
             }
 
-            Debug.Log("Facing the object");
-            return true;
+            return true; //facomg
         }
     }
 }

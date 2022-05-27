@@ -20,7 +20,7 @@ namespace Crest.Internal
         // For example, if 4.9 was just released, so we change HELP_URL_VERSION from 4.9 to 4.10. If a user is using
         // master, then they will be redirected from crest.readthedocs.io/en/4.10 to crest.readthedocs.io/en/latest when
         // they land on the 404 page.
-        public const string HELP_URL_VERSION = "4.15";
+        public const string HELP_URL_VERSION = "4.15.2";
 #if CREST_HDRP
         public const string HELP_URL_RP = "?rp=hdrp";
 #elif CREST_URP

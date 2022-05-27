@@ -36,13 +36,16 @@ namespace Crest
             "CREST_UNDERWATER_BEFORE_TRANSPARENT",
             "CREST_FLOATING_ORIGIN",
 
-            // Defined by URP but considered UserDefined.
+            // XR keywords.
+            "STEREO_ENABLED_ON",
+            "STEREO_INSTANCING_ON",
+            "UNITY_SINGLE_PASS_STEREO",
+            "STEREO_MULTIVIEW_ON",
+
+            // URP keywords.
             "_MAIN_LIGHT_SHADOWS",
             "_MAIN_LIGHT_SHADOWS_CASCADE",
             "_SHADOWS_SOFT",
-
-            // Unity 2021.2 considers this UserDefined."
-            "STEREO_ENABLED_ON",
         };
 
         bool IsUnderwaterShader(string shaderName)
@@ -120,6 +123,12 @@ namespace Crest
             if (data.Count == 0)
             {
                 return;
+            }
+
+            // Since shader is in Resources folder, Unity will not strip it when not used so we have to.
+            if (_underwaterRenderers.Count == 0)
+            {
+                data.Clear();
             }
 
 #if CREST_DEBUG
