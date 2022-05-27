@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine;
 using UnityEngine.UI;
-using StarterAssets;
 
 
 
-namespace StupidHumanGames
+namespace StarterAssets
 {
 	public class CustomMovement : MonoBehaviour
 	{

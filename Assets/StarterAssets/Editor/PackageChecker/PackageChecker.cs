@@ -7,7 +7,7 @@ using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
-namespace StupidHumanGames
+namespace StarterAssets
 {
     public static class PackageChecker
     {
