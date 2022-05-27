@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace StarterAssets
+namespace StupidHumanGames
 {
     public class UICanvasControllerInput : MonoBehaviour
     {

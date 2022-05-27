@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 
 
-namespace StarterAssets
+namespace StupidHumanGames
 {
 	public class CustomMovement : MonoBehaviour
 	{

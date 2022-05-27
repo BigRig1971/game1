@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
-using StarterAssets;
+using StupidHumanGames;
 
 public class RootMotionController : MonoBehaviour
 {
