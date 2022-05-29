@@ -23,7 +23,7 @@ public class DamageGiver : MonoBehaviour
 
 	void Interact()
 	{
-		if (_tpc._input.interaction)
+	/*	if (_tpc._input.interaction)
 		{
 			RaycastHit hitInfo = new RaycastHit();
 			bool hit = Physics.Raycast(transform.position + transform.up * 1, transform.forward, out hitInfo, rayRange);
@@ -45,7 +45,7 @@ public class DamageGiver : MonoBehaviour
 				id.Damage(amount: damage);
 				Debug.Log(id.Health);
 			}
-		}
+		}*/
 		
 	}
 }

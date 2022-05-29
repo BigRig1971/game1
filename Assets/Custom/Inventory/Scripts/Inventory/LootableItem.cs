@@ -7,13 +7,13 @@ namespace StupidHumanGames
 {
 	public class LootableItem : MonoBehaviour
 	{
-		private bool lootable;
-		[SerializeField] Rigidbody rb;
+		[SerializeField] bool canFall = false;
+		private bool lootable;		
+		[SerializeField] AudioClip _impactSound;
+		[SerializeField, Range(0f, 1f)] float _impactVolume;
+		[SerializeField] AudioClip _deathSound;
+		[SerializeField, Range(0f, 1f)] float _deathVolume;
 		
-		[SerializeField] AudioSource impactSound;
-		[SerializeField] AudioSource _treeFall;
-		
-		[SerializeField, Range(0f, 1f)] float volume;
 		public bool isDamagable = false;
 		[SerializeField] int health = 30;
 		[SerializeField] float deathDelay = 5f;
@@ -36,16 +36,10 @@ namespace StupidHumanGames
 				death = new UnityEvent();
 			if(takeHit == null)
 				takeHit = new UnityEvent();
-			
-
 		}
-       
-
-
 #if UNITY_EDITOR
 
 #endif
-
         public void LootableItems()
 		{
 			if (!lootable) return;
@@ -76,23 +70,23 @@ namespace StupidHumanGames
 			if (!isDamagable) return;
 			takeHit.Invoke();
 			lootable = false;
-		    if(impactSound != null) impactSound?.Play();
-			
+		    if(_impactSound != null) AudioSource.PlayClipAtPoint(_impactSound, transform.position, _impactVolume);
+
 			health -= amount;
 			if(health <= 0)
 			{
 				death.Invoke();
 				isDamagable = false;	
-				if(_treeFall != null) _treeFall?.Play();
-				if(rb!= null)
+				if(_deathSound != null) AudioSource.PlayClipAtPoint(_deathSound, transform.position, _deathVolume);
+                if (canFall)
                 {
-					rb.useGravity = true;
-					rb.isKinematic = false;
-				}			
+					Rigidbody rBody = gameObject.AddComponent<Rigidbody>();
+					rBody.useGravity = true;
+					rBody.isKinematic = false;
+				}		
 				Invoke(nameof(LootItem), deathDelay);
 			}
 		}
-		
 		
 		void OnDrawGizmos()
 		{

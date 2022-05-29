@@ -11,7 +11,8 @@
                     "id": "6bc1aaf4-b110-4ff7-891e-5b9fe6f32c4d",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Look",
@@ -19,7 +20,8 @@
                     "id": "2690c379-f54d-45be-a724-414123833eb4",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Jump",
@@ -27,7 +29,8 @@
                     "id": "8c4abdf8-4099-493a-aa1a-129acec7c3df",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Sprint",
@@ -35,39 +38,53 @@
                     "id": "980e881e-182c-404c-8cbf-3d09fdb48fef",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "Cursor",
-                    "type": "Button",
-                    "id": "bd5bc89e-3a24-4e19-9fcd-134ca6f69878",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Roll",
                     "type": "Button",
-                    "id": "b1af0a0c-c466-47ec-9006-bebd7544d059",
+                    "id": "5ab43e4a-ae6c-4a3b-ae11-a417f00f8e7d",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
-                    "name": "Interaction",
+                    "name": "Inventory",
                     "type": "Button",
-                    "id": "6e61055b-34e2-4850-9b2a-ea9f94737841",
+                    "id": "071de8f5-ada0-420b-af38-6a4997a83bf5",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
-                    "name": "RightHand",
+                    "name": "Interact",
                     "type": "Button",
-                    "id": "4a1e9a97-3297-4ed5-8952-bb3db9b4e10a",
+                    "id": "3acc970d-0e65-44fd-93d5-4c7c37f0843b",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Attack",
+                    "type": "Button",
+                    "id": "12f56417-a4fc-4c06-93bc-7b2152af6613",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Pickup",
+                    "type": "Button",
+                    "id": "f282073d-172b-41b3-b1e9-4b10bd704607",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -186,7 +203,7 @@
                     "id": "ed66cbff-2900-4a62-8896-696503cfcd31",
                     "path": "<Pointer>/delta",
                     "interactions": "",
-                    "processors": "InvertVector2(invertX=false),ScaleVector2(x=15,y=15)",
+                    "processors": "InvertVector2(invertX=false),ScaleVector2(x=0.05,y=0.05)",
                     "groups": "KeyboardMouse",
                     "action": "Look",
                     "isComposite": false,
@@ -249,45 +266,84 @@
                 },
                 {
                     "name": "",
-                    "id": "85d335da-1d79-499a-8d66-fb2353e03785",
-                    "path": "<Keyboard>/ctrl",
-                    "interactions": "Press",
-                    "processors": "",
-                    "groups": "KeyboardMouse",
-                    "action": "Cursor",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "cf801d8a-592e-43ec-8efd-a154d50a5ac9",
+                    "id": "3ce1fab9-c32b-4f18-93f6-1a1942aaf7cd",
                     "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
-                    "groups": "KeyboardMouse",
+                    "groups": "",
                     "action": "Roll",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "f9335108-7eb4-4f57-b1d1-0a80c394b554",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "Press",
+                    "id": "c1048837-84d2-413e-afff-9840b92bf6ef",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
                     "processors": "",
-                    "groups": "KeyboardMouse",
-                    "action": "Interaction",
+                    "groups": "",
+                    "action": "Inventory",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "d66a0830-7900-4258-b0ef-836095a60c35",
+                    "id": "c919da26-fecb-48b9-8906-7c011e37138b",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "497f8846-4ee8-414b-a9e3-07d983c7d5d1",
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
-                    "groups": "KeyboardMouse",
-                    "action": "RightHand",
+                    "groups": "",
+                    "action": "Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "da33773b-fb1b-44a8-af38-958df76e7023",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pickup",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "UI",
+            "id": "8d4e1f58-0ac4-42fc-a308-1837646bf00a",
+            "actions": [
+                {
+                    "name": "Build",
+                    "type": "Button",
+                    "id": "a2f07bbd-8c80-4b8b-a760-c81eaae7e237",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "ba8c1db5-f71d-4d7b-84b7-ae267d71955f",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Build",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

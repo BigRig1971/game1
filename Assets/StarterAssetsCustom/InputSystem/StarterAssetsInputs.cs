@@ -3,39 +3,32 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
-namespace StupidHumanGames
+namespace StarterAssets
 {
 	public class StarterAssetsInputs : MonoBehaviour
 	{
 		[Header("Character Input Values")]
-		public Vector2 move;
-		public Vector2 look;
-		public bool jump;
-		public bool roll;
-		public bool swim;
-		public bool sprint;
-		public bool interaction;
-		public bool RightHand;
+		public Vector2 _move;
+		public Vector2 _look;
+		public bool _jump;
+		public bool _sprint;
+		public bool _roll;
+		public bool _interact;
+		public bool _inventory;
+		public bool _cursor;
+		public bool _attack;
+
 		[Header("Movement Settings")]
 		public bool analogMovement;
-	
-		
-		
 
-#if !UNITY_IOS || !UNITY_ANDROID
 		[Header("Mouse Cursor Settings")]
 		public bool cursorLocked = true;
 		public bool cursorInputForLook = true;
-		public bool cursor;
-
-#endif
 
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 		public void OnMove(InputValue value)
 		{
-			if (cursorInputForLook)
-				MoveInput(value.Get<Vector2>());
-			
+			MoveInput(value.Get<Vector2>());
 		}
 
 		public void OnLook(InputValue value)
@@ -50,85 +43,75 @@ namespace StupidHumanGames
 		{
 			JumpInput(value.isPressed);
 		}
-		public void OnRoll(InputValue value)
-		{
-			RollInput(value.isPressed);
-		}
 
 		public void OnSprint(InputValue value)
 		{
 			SprintInput(value.isPressed);
 		}
+		public void OnRoll(InputValue value)
+        {
+			RollInput(value.isPressed);
+        }
+		public void OnInteract(InputValue value)
+        {
+			Interact(value.isPressed);
+        }
+		public void OnInventory(InputValue value)
+        {
+			Inventory(value.isPressed);
+        }
 		public void OnCursor(InputValue value)
-		{
-			CursorInput(value.isPressed);
-		}
-		public void OnInteraction(InputValue value)
-		{
-			InteractionInput(value.isPressed);
-		}
-		public void OnRightHand(InputValue value)
-		{
-			RightHandInput(value.isPressed);
-		}
-
-#else
-	// old input sys if we do decide to have it (most likely wont)...
+        {
+			Kursor(value.isPressed);
+        }
 #endif
 
 
-		public void MoveInput(Vector2 newMoveDirection)
+		public void MoveInput(Vector2 value)
 		{
-			move = newMoveDirection;
+			_move = value;
+		} 
+
+		public void LookInput(Vector2 value)
+		{
+			_look = value;
 		}
 
-		public void LookInput(Vector2 newLookDirection)
+		public void JumpInput(bool value)
 		{
-			look = newLookDirection;
+			_jump = value;
 		}
 
-		public void JumpInput(bool newJumpState)
+		public void SprintInput(bool value)
 		{
-			jump = newJumpState;
+			_sprint = value;
 		}
-		public void RollInput(bool newRollState)
-		{
-			roll = newRollState;
-		}
-		public void InteractionInput(bool newRollState)
-		{
-			interaction = newRollState;
-		}
-		public void RightHandInput(bool newRightHandState)
-		{
-			RightHand = newRightHandState;
-		}
-
-		public void SprintInput(bool newSprintState)
-		{
-			sprint = newSprintState;
-		}
-		public void CursorInput(bool newCursorState)
-		{
-			cursor = newCursorState;
-		}
-		
-
-#if !UNITY_IOS || !UNITY_ANDROID
+		public void RollInput(bool value)
+        {
+			_roll = value;
+        }
+		public void Interact(bool value)
+        {
+			_interact = value;
+        }
+		public void Inventory(bool value)
+        {
+			_inventory = value;
+        }
+		public void Kursor(bool value)
+        {
+			_cursor = value;
+        }
 
 		private void OnApplicationFocus(bool hasFocus)
 		{
 			SetCursorState(cursorLocked);
-			Cursor.visible = false;
 		}
 
 		private void SetCursorState(bool newState)
 		{
 			Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
 		}
-
-#endif
-
 	}
 	
 }

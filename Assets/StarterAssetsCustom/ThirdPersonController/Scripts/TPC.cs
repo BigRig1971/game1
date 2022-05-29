@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using StarterAssets;
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 using UnityEngine.InputSystem;
 using System.Collections;
@@ -170,10 +171,10 @@ namespace StupidHumanGames
 		private void CameraRotation()
 		{
 			// if there is an input and camera position is not fixed
-			if (_input.look.sqrMagnitude >= _threshold && !LockCameraPosition)
+			if (_input._look.sqrMagnitude >= _threshold && !LockCameraPosition)
 			{
-				_cinemachineTargetYaw += _input.look.x * Time.deltaTime;
-				_cinemachineTargetPitch += _input.look.y * Time.deltaTime;
+				_cinemachineTargetYaw += _input._look.x * Time.deltaTime;
+				_cinemachineTargetPitch += _input._look.y * Time.deltaTime;
 			}
 
 			// clamp our rotations so our values are limited 360 degrees
@@ -188,20 +189,20 @@ namespace StupidHumanGames
 		{
 
 			// set target speed based on move speed, sprint speed and if sprint is pressed
-			float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+			float targetSpeed = _input._sprint ? SprintSpeed : MoveSpeed;
 
 			// a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
 			// note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
 			// if there is no input, set the target speed to 0
-			if (_input.move == Vector2.zero) targetSpeed = 0.0f;
+			if (_input._move == Vector2.zero) targetSpeed = 0.0f;
 
 			// a reference to the players current horizontal velocity
 			float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
 
 			float speedOffset = 0.1f;
 
-			float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
+			float inputMagnitude = _input.analogMovement ? _input._move.magnitude : 1f;
 
 			// accelerate or decelerate to target speed
 			if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
@@ -221,11 +222,11 @@ namespace StupidHumanGames
 			_animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
 
 			// normalise input direction
-			Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+			Vector3 inputDirection = new Vector3(_input._move.x, 0.0f, _input._move.y).normalized;
 
 			// note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
 			// if there is a move input rotate player when the player is moving
-			if (_input.move != Vector2.zero)
+			if (_input._move != Vector2.zero)
 			{
 				_targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + _mainCamera.transform.eulerAngles.y;
 				float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, RotationSmoothTime);
@@ -298,7 +299,7 @@ namespace StupidHumanGames
 				}
 
 				// Jump
-				if (_input.jump && _jumpTimeoutDelta <= 0.0f)
+				if (_input._jump && _jumpTimeoutDelta <= 0.0f)
 				{
 					_animator.applyRootMotion = false;
 					// the square root of H * -2 * G = how much velocity needed to reach desired height
@@ -341,7 +342,7 @@ namespace StupidHumanGames
 				}
 
 				// if we are not grounded, do not jump
-				_input.jump = false;
+				_input._jump = false;
 			}
 
 			// apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)

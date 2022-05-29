@@ -21,11 +21,14 @@ namespace StupidHumanGames
 
         public enum state { Patrol, Chase, Attack, Lost };
         [SerializeField] Animator animator;
-        [SerializeField] AudioSource[] randomSound;
-        [SerializeField] AudioSource attackSound;
-        [SerializeField] AudioSource idleSound;
-        [SerializeField] AudioSource footStep;
-        [SerializeField] AudioSource deathSound;
+        [SerializeField] AudioClip[] randomSound;
+        [SerializeField] float randomSoundvolume;
+        [SerializeField] AudioClip attackSound;
+        [SerializeField] float attackVolume;
+        [SerializeField] AudioClip idleSound;
+        [SerializeField] float idleVolume;
+        [SerializeField] AudioClip footStep;
+        [SerializeField] float footStepVolume;
         [SerializeField] bool rootMotion = false;
         [SerializeField] bool canSwimOrFly = false, groundHugging = false;
         [SerializeField] bool patrol = true, chaseOrFlee = true, attack = true, idle = true, die = true;
@@ -199,10 +202,10 @@ namespace StupidHumanGames
             int rnd2 = Random.Range(0, rn);
             if (rnd == rnd2) return true; else return false;
         }
-        AudioSource RNDSound()
+        AudioClip RNDSound()
         {
             if (randomSound.Length == 0f) return null;
-            AudioSource rs;
+            AudioClip rs;
             rs = randomSound[Random.Range(0, randomSound.Length)];
             return rs;
         }
@@ -270,7 +273,7 @@ namespace StupidHumanGames
                 }
                 if (RandomBool(100))
                 {
-                    RNDSound()?.Play();
+                    if (RNDSound() != null) AudioSource.PlayClipAtPoint(RNDSound(), transform.position, randomSoundvolume);
                 }
             }
             _currentState = state.Chase;
@@ -299,8 +302,16 @@ namespace StupidHumanGames
                 if (!OnCanAttack()) yield break; else yield return null;
                 wayPoint = player.position;
                 RandomAttackAnimations();
-                if (attackSound != null) attackSound.Play();
+                if (attackSound != null) AudioSource.PlayClipAtPoint(attackSound, transform.position, attackVolume);
                 moveSpeed = -1f;
+                if (RandomBool(5) && randomSound.Length > 0)
+                {
+                    if (randomSound.Length > 0)
+                    {
+                        var index = Random.Range(0, randomSound.Length);
+                        AudioSource.PlayClipAtPoint(randomSound[index], transform.position, attackVolume);
+                    }
+                }
                 animator.SetFloat("AnimationSpeed", -1f);
                 animator.SetFloat("Blend", 1f);
                 yield return new WaitForSeconds(reverseTime * Random.Range(.5f, 1f));
@@ -326,9 +337,8 @@ namespace StupidHumanGames
         #region Event Functions
         public void AiFootStepsAudio() //animation trigger
         {
-            if (footStep == null) return;
-            if (RandomBool(3)) footStep.pitch = Random.Range(.9f, 1f);
-            footStep?.Play();
+
+            if (footStep != null) AudioSource.PlayClipAtPoint(footStep, transform.position, randomSoundvolume);
         }
         public void OnIsDead()
         {
@@ -339,7 +349,7 @@ namespace StupidHumanGames
             animator.SetInteger("DeathInt", 1);
             animator.SetTrigger("DeathTrigger");
             wayPoint = transform.position;
-            if (deathSound != null) deathSound?.Play();
+
         }
         public void OnTakeHit()
         {
