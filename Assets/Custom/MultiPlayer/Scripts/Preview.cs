@@ -14,7 +14,7 @@ namespace StupidHumanGames
 
 		private MeshRenderer myRend;
 
-
+		public bool isGrounded = false;
 		private Transform spawnedTransform;
 		public Material goodMat;//green material
 		public Material badMat;//red material
@@ -30,19 +30,21 @@ namespace StupidHumanGames
 		}
 		public void Place()
 		{
+			//var spawnedObject = Instantiate(prefab, transform.position, Quaternion.identity);
 			var spawnedObject = SaveMaster.SpawnSavedPrefab(InstanceSource.Resources, prefab.name);
 			spawnedObject.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
 			spawnedObject.transform.rotation = this.transform.rotation;
-			PhotonNetwork.AddCallbackTarget(spawnedObject);
+			//PhotonNetwork.AddCallbackTarget(spawnedObject);
 			Destroy(gameObject);
 		}
 		private void ChangeColor()//changes between red and greed depending if this preview is/is not snapped to anything
 		{
-			Material[] mats = myRend.materials;
+			
 			if (isFoundation)
 			{
 				isSnapped = true;
 			}
+			
 			if (isSnapped)
 			{
 				myRend.material = goodMat;
@@ -54,6 +56,7 @@ namespace StupidHumanGames
 		}
 		private void OnTriggerEnter(Collider other)//this is what dertermins if you are snapped to a snap point
 		{
+			
 			for (int i = 0; i < tagsISnapTo.Count; i++)//loop through all the tags this preview can snap too
 			{
 				string currentTag = tagsISnapTo[i];//setting the current tag were looking at to a string...its easier to write currentTag then tagsISnapTo[i]
@@ -71,6 +74,7 @@ namespace StupidHumanGames
 		}
 		private void OnTriggerExit(Collider other)//this is what determins if you are no longer snapped to a snap point
 		{
+			
 			for (int i = 0; i < tagsISnapTo.Count; i++)//loop through all tags
 			{
 				string currentTag = tagsISnapTo[i];

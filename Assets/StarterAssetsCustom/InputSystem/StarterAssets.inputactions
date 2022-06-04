@@ -85,6 +85,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Build",
+                    "type": "Button",
+                    "id": "883adc3c-1fd2-4649-95e8-27afac105e71",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Aim",
+                    "type": "Button",
+                    "id": "97bcee24-c006-4e92-887c-4c83e6607422",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -311,11 +329,33 @@
                 {
                     "name": "",
                     "id": "da33773b-fb1b-44a8-af38-958df76e7023",
-                    "path": "<Mouse>/middleButton",
+                    "path": "<Keyboard>/period",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Pickup",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d9233c45-62cf-41b6-8715-66adb5908a83",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Build",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e20d8606-5a70-4e65-8dbf-ed8bdb59b892",
+                    "path": "<Pointer>/tip",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "KeyboardMouse",
+                    "action": "Aim",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -323,12 +363,12 @@
         },
         {
             "name": "UI",
-            "id": "8d4e1f58-0ac4-42fc-a308-1837646bf00a",
+            "id": "10fd108f-1a8a-48da-bbed-35ff42f0c243",
             "actions": [
                 {
-                    "name": "Build",
+                    "name": "New action",
                     "type": "Button",
-                    "id": "a2f07bbd-8c80-4b8b-a760-c81eaae7e237",
+                    "id": "104695f2-71c9-499e-aaeb-24b4cab55569",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -338,12 +378,12 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "ba8c1db5-f71d-4d7b-84b7-ae267d71955f",
-                    "path": "<Mouse>/middleButton",
+                    "id": "0438fd5e-54df-46e0-bfcb-76bad48d67be",
+                    "path": "",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Build",
+                    "action": "New action",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

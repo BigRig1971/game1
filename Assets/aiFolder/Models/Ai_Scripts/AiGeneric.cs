@@ -258,7 +258,6 @@ namespace StupidHumanGames
             animator.SetFloat("Blend", .5f);
             while (OnCanPatrol())
             {
-                if (!OnCanPatrol()) yield break; else yield return null;
                 OnHitObstacle();
                 RandomWaypoint();
                 if (RandomBool(200))
@@ -271,10 +270,8 @@ namespace StupidHumanGames
                 {
                     RandomIdleAnimations();
                 }
-                if (RandomBool(100))
-                {
-                    if (RNDSound() != null) AudioSource.PlayClipAtPoint(RNDSound(), transform.position, randomSoundvolume);
-                }
+               
+                yield return null;
             }
             _currentState = state.Chase;
         }
@@ -285,10 +282,10 @@ namespace StupidHumanGames
             animator.SetTrigger("Interrupt");
             while (OnCanChase())
             {
-                if (!OnCanChase()) yield break; else yield return null;
                 OnHitObstacle();
 
                 wayPoint = player.position;
+                yield return null;
             }
             _currentState = state.Attack;
         }
@@ -299,25 +296,21 @@ namespace StupidHumanGames
             animator.SetFloat("Blend", 0f);
             while (OnCanAttack())
             {
-                if (!OnCanAttack()) yield break; else yield return null;
                 wayPoint = player.position;
                 RandomAttackAnimations();
                 if (attackSound != null) AudioSource.PlayClipAtPoint(attackSound, transform.position, attackVolume);
                 moveSpeed = -1f;
-                if (RandomBool(5) && randomSound.Length > 0)
+                if (RandomBool(5))
                 {
-                    if (randomSound.Length > 0)
-                    {
-                        var index = Random.Range(0, randomSound.Length);
-                        AudioSource.PlayClipAtPoint(randomSound[index], transform.position, attackVolume);
-                    }
+                    if (RNDSound() != null) AudioSource.PlayClipAtPoint(RNDSound(), transform.position, randomSoundvolume);
                 }
                 animator.SetFloat("AnimationSpeed", -1f);
                 animator.SetFloat("Blend", 1f);
                 yield return new WaitForSeconds(reverseTime * Random.Range(.5f, 1f));
                 animator.SetFloat("AnimationSpeed", animationSpeed);
                 moveSpeed = 1f;
-            }
+                yield return null;
+            } 
             _currentState = state.Lost;
         }
         IEnumerator Lost()
@@ -325,11 +318,10 @@ namespace StupidHumanGames
             moveSpeed = previousSpeed * 1f;
             animator.SetFloat("Blend", 1f);
             while (OnLost())
-            {
-                if (!OnLost()) yield break; else yield return null;
+            {            
                 OnHitObstacle();
                 wayPoint = homePosition;
-
+                yield return null;
             }
             _currentState = state.Patrol;
         }
@@ -338,7 +330,7 @@ namespace StupidHumanGames
         public void AiFootStepsAudio() //animation trigger
         {
 
-            if (footStep != null) AudioSource.PlayClipAtPoint(footStep, transform.position, randomSoundvolume);
+            if (footStep != null) AudioSource.PlayClipAtPoint(footStep, transform.position, footStepVolume);
         }
         public void OnIsDead()
         {

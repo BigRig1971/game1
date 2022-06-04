@@ -4,11 +4,12 @@ namespace StupidHumanGames
 {
     public class LootStuff : MonoBehaviour
     {
+        public AudioClip lootSound;
+        public float lootSoundVolume;
         Animator anim;
         LootableItem lootableItem;
         ItemPickupable droppedItemPickup;
 
-        public string scriptToPause;
         private void Start()
         {
             anim = GetComponent<Animator>();
@@ -19,35 +20,18 @@ namespace StupidHumanGames
             {
                 lootableItem = other.gameObject.GetComponent<LootableItem>();
                 droppedItemPickup = other.gameObject.GetComponent<ItemPickupable>();
-                if (lootableItem != null && !lootableItem.isDamagable) StartCoroutine(LootItem());
-                if (droppedItemPickup != null) StartCoroutine(PickupItem());
+                if (lootableItem != null && !lootableItem.isDamagable) LootItem();
+                if (droppedItemPickup != null) PickupItem();
             }
         }
-        private IEnumerator LootItem()
+        void LootItem()
         {
-
-
-            (gameObject.GetComponent(scriptToPause) as MonoBehaviour).enabled = false;
             lootableItem.LootableItems();
-
-            anim.SetBool("Pickup", true);
-            yield return new WaitForSeconds(.3f);
-            (gameObject.GetComponent(scriptToPause) as MonoBehaviour).enabled = true;
-            anim.SetBool("Pickup", false);
-
+            if (lootSound != null) AudioSource.PlayClipAtPoint(lootSound, transform.position, lootSoundVolume);
         }
-        private IEnumerator PickupItem()
+        void PickupItem()
         {
-
-
-            (gameObject.GetComponent(scriptToPause) as MonoBehaviour).enabled = false;
-
             droppedItemPickup.LootableItems();
-            anim.SetBool("Pickup", true);
-            yield return new WaitForSeconds(.3f);
-            (gameObject.GetComponent(scriptToPause) as MonoBehaviour).enabled = true;
-            anim.SetBool("Pickup", false);
-
         }
     }
 }

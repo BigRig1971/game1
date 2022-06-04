@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using EZInventory;
+using UnityEngine.InputSystem;
 
 namespace StupidHumanGames
 {
 	public class BuildSystem : MonoBehaviour
 	{
-
-
-		public Camera cam;//camera used for raycast
+		public ThirdPersonController tpc;
+	    [SerializeField] Camera cam;//camera used for raycast
 		public LayerMask layer;//the layer that the raycast will hit on
 		public int buildDistance;
 		private GameObject previewGameObject = null;//referance to the preview gameobject
@@ -34,17 +34,19 @@ namespace StupidHumanGames
 		}
 		private void Update()
 		{
-			if (Input.GetMouseButtonDown(0))
+            if (InventoryManager.IsOpen() && tpc._input._pickup)
+            {				
+				removeItemFromField();
+				tpc._input._pickup = false;
+			}
+			
+			if (InventoryManager.IsOpen() && tpc._input._attack)
 			{
 				BuildTheFucker();
+				pauseBuilding = false;
+				tpc._input._attack = false;
 			}
-			if (InventoryManager.IsOpen() && Input.GetMouseButtonDown(2))
-
-			{
-				removeItemFromField();
-			}
-
-			if (Input.GetKeyDown(KeyCode.Y))//rotate
+	/*		if (Input.GetKeyDown(KeyCode.Y))//rotate
 			{
 				if (previewGameObject != null)
 					previewGameObject.transform.Rotate(0, 45f, 0);//rotate the preview 90 degrees. You can add in your own value here
@@ -68,7 +70,7 @@ namespace StupidHumanGames
 			{
 				if (previewGameObject != null)
 					previewGameObject.transform.localScale -= new Vector3(0, .1f, 0);
-			}
+			}*/
 
 			if (isBuilding)
 			{
@@ -111,11 +113,8 @@ namespace StupidHumanGames
 
 				foreach (ItemSO item in buildItems)
 				{
-					Debug.Log(item.name + " item name");
-					Debug.Log(hit.collider.name + " transform name");
 					if (hit.collider.name == item.name + "(Clone)")
 					{
-
 						InventoryManager.AddItemToInventory(item, 1);
 						Destroy(hit.transform.gameObject);
 					}
@@ -133,17 +132,19 @@ namespace StupidHumanGames
 
 		public void NewBuild(GameObject _go)
 		{
+			
+
 			isBuilt = false;
 			//float step = speed * Time.deltaTime;
 			//transform.position = Vector3.MoveTowards(transform.position.y, target.position, step);
 			CancelBuild();
 			//camPivot.transform.localPosition = new Vector3(camPivot.transform.localPosition.x + camPosX, camPivot.transform.localPosition.y + camPosY, camPivot.transform.localPosition.z + camPosZ);
 			previewGameObject = Instantiate(_go, Vector3.zero, Quaternion.identity);
-
 			previewScript = previewGameObject.GetComponent<Preview>();
+
 			isBuilding = true;
-			//Debug.Log(_go.name);
-			//itemToRemove.buildPrefab = _go;
+			
+			
 		}
 
 		public void CancelBuild()//you no longer want to build, this will get rid of the previewGameObject in the scene
@@ -153,8 +154,6 @@ namespace StupidHumanGames
 			previewGameObject = null;
 			previewScript = null;
 			isBuilding = false;
-
-
 
 		}
 
@@ -181,14 +180,13 @@ namespace StupidHumanGames
 										   //method whereever it snaps to a snap point
 		{
 			pauseBuilding = _value;
+			Debug.Log(_value);
 		}
 
 		private void DoBuildRay()//actually positions your previewGameobject in the world
 		{
-			Ray ray = cam.ScreenPointToRay(Input.mousePosition);//raycast stuff
+			Ray ray = cam.ScreenPointToRay(Mouse.current.position.ReadValue());//raycast stuff
 			RaycastHit hit;
-
-
 			if (Physics.Raycast(ray, out hit, buildDistance, layer))//notice the layer
 			{
 				/*Since I am using unity primitives in this example I have to postion the previewGameobject in a special way, 
@@ -203,11 +201,8 @@ namespace StupidHumanGames
 
 				//if your using something from blender and anchor points are setup correctly use this line
 				previewGameObject.transform.position = hit.point;
-
-
+				
 			}
-
 		}
-
 	}
 }

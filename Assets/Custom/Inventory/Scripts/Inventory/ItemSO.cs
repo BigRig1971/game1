@@ -20,7 +20,7 @@ namespace StupidHumanGames
         [SerializeField]
         public GameObject equipPrefab;
         public GameObject buildPrefab;
-        public GameObject questReward;
+        public GameObject spawnPrefab;
         public ItemStatSO[] stat;
 
         
@@ -36,8 +36,7 @@ namespace StupidHumanGames
             HandRight,
             HandLeft,
             Feet,
-            Buildable,
-            Quest
+            Buildable,       
         }
     }
 }

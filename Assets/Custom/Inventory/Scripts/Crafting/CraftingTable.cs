@@ -19,6 +19,13 @@ namespace StupidHumanGames
         {
             player = GameObject.FindGameObjectWithTag("Player").transform;
         }
+     /*   private void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("Player"))
+            {
+                craftingMenuCanvas.SetActive(InventoryManager.IsOpen() && Vector3.Distance(player.position, transform.position) < radius);
+            }
+        }*/
 
         // Update is called once per frame
         void Update()

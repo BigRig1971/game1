@@ -286,7 +286,7 @@ Transform:
   m_Children:
   - {fileID: 8597224257116749827}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &8126112844907128808
 PrefabInstance:
@@ -574,10 +574,13 @@ MonoBehaviour:
   scale: 0.3
   animator: {fileID: 8126112844798295721}
   randomSound: []
+  randomSoundvolume: 0
   attackSound: {fileID: 1536944611}
+  attackVolume: 0
   idleSound: {fileID: 0}
+  idleVolume: 0
   footStep: {fileID: 0}
-  deathSound: {fileID: 0}
+  footStepVolume: 0
   rootMotion: 0
   canSwimOrFly: 1
   groundHugging: 0
@@ -611,6 +614,7 @@ MonoBehaviour:
   meshReference: {fileID: 4539525497308257797}
   rndAttackCount: 1
   rndIdleCount: 1
+  reverseTime: 2
 --- !u!114 &1081428678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -623,10 +627,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cc15dfc05bdc1742b2cc362979d493f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 0}
-  impactSound: {fileID: 1961453475}
-  _treeFall: {fileID: 0}
-  volume: 0
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 1024
+  physicalObject: {fileID: 0}
+  canFall: 0
+  sitOnGround: 0
+  alignToGround: 0
+  _impactSound: {fileID: 0}
+  _impactVolume: 0
+  _deathSound: {fileID: 0}
+  _deathVolume: 0
   isDamagable: 1
   health: 20
   deathDelay: 2

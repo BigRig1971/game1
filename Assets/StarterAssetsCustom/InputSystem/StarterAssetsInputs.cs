@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
-namespace StarterAssets
+namespace StupidHumanGames
 {
 	public class StarterAssetsInputs : MonoBehaviour
 	{
@@ -17,6 +17,10 @@ namespace StarterAssets
 		public bool _inventory;
 		public bool _cursor;
 		public bool _attack;
+		public bool _build;
+		public bool _pickup;
+		
+
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -64,6 +68,19 @@ namespace StarterAssets
         {
 			Kursor(value.isPressed);
         }
+		public void OnBuild(InputValue value)
+		{
+			Build(value.isPressed);
+		}
+		public void OnAttack(InputValue value)
+		{
+			Attack(value.isPressed);
+		}
+		public void OnPickup(InputValue value)
+		{
+			Pickup(value.isPressed);
+		}
+		
 #endif
 
 
@@ -102,6 +119,20 @@ namespace StarterAssets
         {
 			_cursor = value;
         }
+		public void Build(bool value)
+		{
+			_build = value;
+		}
+		public void Attack(bool value)
+		{
+			_attack = value;
+		}
+		public void Pickup(bool value)
+		{
+			_pickup = value;
+		}
+		
+
 
 		private void OnApplicationFocus(bool hasFocus)
 		{

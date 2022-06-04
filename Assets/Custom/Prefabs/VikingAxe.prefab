@@ -29,6 +29,7 @@ Transform:
   m_LocalRotation: {x: -0.60985655, y: 0.7491515, z: -0.23021382, w: 0.11768013}
   m_LocalPosition: {x: -0.123162866, y: 0.4362709, z: 0.41437292}
   m_LocalScale: {x: 1.6482577, y: 1.1715, z: 1.5479394}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3137231645020918833}
   m_RootOrder: 0
@@ -45,13 +46,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cd4fd09d5d255c4bb713c2df1d7a408, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  colliderSize: {x: 1, y: 1, z: 1}
+  colliderCenter: {x: 0, y: 0, z: 0}
   _keyCode: 323
   damagePower: 5
-  _triggerName: Chop
-  _floatName: 
-  _boolName: 
+  _animTriggerName: 
+  _animIntName: 
+  _animIntValue: 0
   delayImpact: 0.3
   _animator: {fileID: 0}
+  MyShake: {fileID: 0}
+  weaponSwingSound: {fileID: 0}
+  swingVolume: 1
 --- !u!54 &6324178269776881751
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -107,8 +113,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2360588945834004107}
   m_LocalRotation: {x: -0.72972107, y: -0.5701904, z: -0.0716827, w: -0.37047505}
-  m_LocalPosition: {x: 0.016, y: 0.129, z: 0.047}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.99999994, y: 1, z: 0.99999994}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7841482898313653780}
   m_Father: {fileID: 0}

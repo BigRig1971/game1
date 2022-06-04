@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
-using StarterAssets;
+using System.Collections;
+using Photon.Pun;
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 using UnityEngine.InputSystem;
 using System.Collections;
 using Photon.Pun;
+
 #endif
 
 /* Note: animations are called via the controller for both the character and capsule using animator null checks

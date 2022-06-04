@@ -14,8 +14,9 @@ namespace StupidHumanGames
         public Vector3 colliderCenter = Vector3.zero;
         public KeyCode _keyCode = KeyCode.Mouse0;
         public int damagePower = 5;
-        public string _triggerName;
-        public string _animationName;
+        public string _animTriggerName;
+        public string _animIntName;
+        public int _animIntValue;
         public float delayImpact = .3f;
         [SerializeField] Animator _animator;
         bool canDamageStuff = false;
@@ -63,9 +64,9 @@ namespace StupidHumanGames
 
             if (Input.GetKeyDown(_keyCode) && !InventoryManager.IsOpen())
             {
-                _animator.SetTrigger(_triggerName);
-
-              
+                _animator.SetInteger(_animIntName, _animIntValue);
+                _animator.SetTrigger(_animTriggerName);
+             
             }
         }
         void OnDrawGizmos()

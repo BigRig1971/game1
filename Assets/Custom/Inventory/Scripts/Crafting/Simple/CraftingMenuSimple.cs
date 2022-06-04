@@ -8,6 +8,7 @@ namespace StupidHumanGames
 {
     public class CraftingMenuSimple : MonoBehaviour
     {
+        public string loadLocation;
         public RecipeSimple[] recipes;
         
         public Transform recipesParent;
@@ -24,7 +25,7 @@ namespace StupidHumanGames
         // Start is called before the first frame update
         void Awake()
         {
-            recipes = Resources.LoadAll<RecipeSimple>("Recipes");
+            recipes = Resources.LoadAll<RecipeSimple>(loadLocation);
             foreach (RecipeSimple recipe in recipes)
             {
                 InventorySlot slot = Instantiate(inventorySlotPrefab, recipesParent);

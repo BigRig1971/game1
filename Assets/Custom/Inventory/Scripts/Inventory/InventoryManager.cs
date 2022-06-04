@@ -5,9 +5,11 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 namespace StupidHumanGames
 {
+
     public class InventoryManager : MonoBehaviour
     {
-        
+       
+       
         [Tooltip("If true: hides cursor when inventory is closed, freezes time when open.")]
         public bool inventoryPause = true;
         [Tooltip("The main inventory parent, turns on/off with tab")]
@@ -19,9 +21,9 @@ namespace StupidHumanGames
 
         static InventoryManager instance;
 
+        
 
-        
-        
+
         private static List<InventorySlot> slots;
        // public InventorySlotsSO _slots;//**************************
         public static ItemSO currentItem { get; private set; }
@@ -208,6 +210,7 @@ namespace StupidHumanGames
         /// <param name="slot"></param>
         public static void SwapItemWithSlot(InventorySlot slot)
         {
+            
             //If items are different, do a complete swap
             if (slot.currentItem != currentItem)
             {
