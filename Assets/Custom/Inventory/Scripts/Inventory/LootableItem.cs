@@ -8,8 +8,6 @@ namespace StupidHumanGames
 {
     public class LootableItem : MonoBehaviour
     {
-
-
         Quaternion targetRot;
         
         [SerializeField] bool spawnLoot = false;
