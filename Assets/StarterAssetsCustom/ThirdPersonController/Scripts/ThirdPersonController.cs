@@ -18,7 +18,7 @@ namespace StupidHumanGames
 #endif
     public class ThirdPersonController : MonoBehaviour
     {
-
+        bool animEnable = false;
         bool cursorState = false;
         InventoryManager inventory;
         public enum State { MoveOnLand, Swimming, TreadingWater };
@@ -171,7 +171,12 @@ namespace StupidHumanGames
         {
             OnGravity();
             _hasAnimator = TryGetComponent(out _animator);
-
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                animEnable = !animEnable;
+               if(animEnable) _animator.SetBool("Dance", true); else _animator.SetBool("Dance", false);
+            }
+           
             if (_input._inventory)
             {
                 _input._inventory = false;
@@ -198,13 +203,11 @@ namespace StupidHumanGames
         {
 
         }
-
         private void LateUpdate()
         {
 
             if (!InventoryManager.IsOpen()) CameraRotation();
         }
-
         private void AssignAnimationIDs()
         {
             _animIDSpeed = Animator.StringToHash("Speed");
@@ -216,17 +219,12 @@ namespace StupidHumanGames
             _animIDSwim = Animator.StringToHash("Swim");
             _animIDRoll = Animator.StringToHash("Roll");
         }
-
         private void GroundedCheck()
         {
-            // set sphere position, with offset
             Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset,
                 transform.position.z);
-
             Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers,
                 QueryTriggerInteraction.Ignore);
-
-            // update animator if using character
             if (_hasAnimator)
             {
                 _animator.SetBool(_animIDGrounded, Grounded);
@@ -236,7 +234,7 @@ namespace StupidHumanGames
         {
             Vector3 spherePosition = new Vector3(head.position.x, head.position.y,
                head.position.z);
-            GroundedUnderWater = (Physics.CheckSphere(spherePosition, .3f, GroundLayers,
+            GroundedUnderWater = (Physics.CheckSphere(spherePosition, 1f, GroundLayers,
                  QueryTriggerInteraction.Ignore));
             if (GroundedUnderWater)
             {
@@ -249,19 +247,14 @@ namespace StupidHumanGames
         }
         private void CameraRotation()
         {
-            // if there is an input and camera position is not fixed
             if (_input._look.sqrMagnitude >= _threshold && !LockCameraPosition)
             {
-                //Don't multiply mouse input by Time.deltaTime;
                 float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1f : Time.deltaTime;
                 _cinemachineTargetYaw += _input._look.x * deltaTimeMultiplier;
                 _cinemachineTargetPitch += _input._look.y * deltaTimeMultiplier;
             }
-            // clamp our rotations so our values are limited 360 degrees
             _cinemachineTargetYaw = ClampAngle(_cinemachineTargetYaw, float.MinValue, float.MaxValue);
             _cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
-
-            // Cinemachine will follow this target
             CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride,
                 _cinemachineTargetYaw, 0.0f);
         }
@@ -274,7 +267,6 @@ namespace StupidHumanGames
             {
                 GroundedCheck();
                 JumpAndGravity();
-                //Roll
                 if (_input._roll)
                 {
                     if (_hasAnimator)
@@ -283,70 +275,39 @@ namespace StupidHumanGames
                         _input._roll = false;
                     }
                 }
-
-                // set target speed based on move speed, sprint speed and if sprint is pressed
                 float targetSpeed = _input._sprint ? SprintSpeed : MoveSpeed;
-
-                // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
-
-                // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-                // if there is no input, set the target speed to 0
                 if (_input._move == Vector2.zero) targetSpeed = 0.0f;
-
-                // a reference to the players current horizontal velocity
                 float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
-
                 float speedOffset = 0.1f;
                 float inputMagnitude = _input.analogMovement ? _input._move.magnitude : 1f;
-
-                // accelerate or decelerate to target speed
                 if (currentHorizontalSpeed < targetSpeed - speedOffset ||
                     currentHorizontalSpeed > targetSpeed + speedOffset)
                 {
-                    // creates curved result rather than a linear one giving a more organic speed change
-                    // note T in Lerp is clamped, so we don't need to clamp our speed
                     _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
                         Time.deltaTime * SpeedChangeRate);
-
-                    // round speed to 3 decimal places
                     _speed = Mathf.Round(_speed * 1000f) / 1000f;
                 }
                 else
                 {
                     _speed = targetSpeed;
                 }
-
                 _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
-                if (_animationBlend < 0.01f) _animationBlend = 0f;
-
-                // normalise input direction
+                if (_animationBlend < 0.01f) _animationBlend = 0f;              
                 Vector3 inputDirection = new Vector3(_input._move.x, 0.0f, _input._move.y).normalized;
-
-                // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-                // if there is a move input rotate player when the player is moving
                 if (_input._move != Vector2.zero)
                 {
                     _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
                                       _mainCamera.transform.eulerAngles.y;
                     float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                         RotationSmoothTime);
-
-                    // rotate to face input direction relative to camera position
                     transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
                 }
-
-
                 Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
-
-                // move the player
                 if (!_animator.applyRootMotion)
                 {
                     _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
                                  new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
                 }
-
-
-                // update animator if using character
                 if (_hasAnimator)
                 {
                     _animator.SetFloat(_animIDSpeed, _animationBlend);
@@ -360,18 +321,17 @@ namespace StupidHumanGames
         }
         IEnumerator TreadingWater()
         {
-
             if (_animator.applyRootMotion) _animator.applyRootMotion = false;
             _animator.SetBool(_animIDSwim, true);
             while (OnIsTreadingWater())
             {
-
-                
-                _controller.Move(new Vector3(0.0f, -.5f, 0.0f) * Time.deltaTime);
+                SwimGroundCheck();
+                OnSwim(-1);
+                float inputMagnitude = _input.analogMovement ? _input._move.magnitude : 1f;
                 if (_hasAnimator)
                 {
                     _animator.SetFloat(_animIDSwimSpeed, _animationBlend);
-
+                    _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
                 }
                 yield return null;
             }
@@ -379,57 +339,13 @@ namespace StupidHumanGames
         }
         IEnumerator Swimming()
         {
-
             if (_animator.applyRootMotion) _animator.applyRootMotion = false;
             _animator.SetBool(_animIDSwim, true);
             while (OnIsSwimming())
             {
                 SwimGroundCheck();
-                
-                float targetSpeed = _input._sprint ? SprintSpeed : MoveSpeed;
-                if (_input._move == Vector2.zero) targetSpeed = 0.0f;
-                float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
-                float speedOffset = 0.1f;
-                float inputMagnitude = _input.analogMovement ? _input._move.magnitude : 1f;                // accelerate or decelerate to target speed
-                if (currentHorizontalSpeed < targetSpeed - speedOffset ||
-                    currentHorizontalSpeed > targetSpeed + speedOffset)
-                {
-                    _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
-                        Time.deltaTime * SpeedChangeRate);
-                    _speed = Mathf.Round(_speed * 1000f) / 1000f;
-                }
-                else
-                {
-                    _speed = targetSpeed;
-                }
-                _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
-                if (_animationBlend < 0.01f) _animationBlend = 0f;
-                Vector3 inputDirection = new Vector3(_input._move.x, 0.0f, _input._move.y).normalized;
-                if (_input._move != Vector2.zero)
-                {
-                    _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
-                                      _mainCamera.transform.eulerAngles.y;
-                    float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
-                        RotationSmoothTime);
-                    var qto = Quaternion.LookRotation(transform.position - _mainCamera.transform.position);
-                    var rot = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * 5f);
-                    transform.rotation = Quaternion.Euler(rot.eulerAngles.x, rotation, 0.0f);
-                   // Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
-                    // if (Grounded)
-
-                  //  _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
-                                // new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-
-
-
-                    transform.position += transform.forward * Time.deltaTime * targetSpeed;
-
-                }
-                else
-                {
-                    transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
-                    _controller.Move(new Vector3(0.0f, 1f, 0.0f) * Time.deltaTime); //float up
-                }
+                OnSwim(1); 
+                float inputMagnitude = _input.analogMovement ? _input._move.magnitude : 1f;
                 if (_hasAnimator)
                 {
                     _animator.SetFloat(_animIDSwimSpeed, _animationBlend);
@@ -439,82 +355,94 @@ namespace StupidHumanGames
             }
             _currentState = State.MoveOnLand;
         }
+        void OnSwim(float gravity)
+        {
+            float targetSpeed = _input._sprint ? SprintSpeed : MoveSpeed;
+            if (_input._move == Vector2.zero) targetSpeed = 0.0f;
+            float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
+            float speedOffset = 0.1f;
+            if (currentHorizontalSpeed < targetSpeed - speedOffset ||
+                currentHorizontalSpeed > targetSpeed + speedOffset)
+            {
+                _speed = Mathf.Round(_speed * 1000f) / 1000f;
+            }
+            else
+            {
+                _speed = targetSpeed;
+            }
+            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
+            if (_animationBlend < 0.01f) _animationBlend = 0f;
+            Vector3 inputDirection = new Vector3(_input._move.x, 0.0f, _input._move.y).normalized;
+            if (_input._move != Vector2.zero)
+            {
+                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
+                                  _mainCamera.transform.eulerAngles.y;
+                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
+                    RotationSmoothTime);
+                var qto = Quaternion.LookRotation(transform.position - _mainCamera.transform.position);
+                var rot = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * 10f);
+                transform.rotation = Quaternion.Euler(rot.eulerAngles.x, rotation, 0.0f);
+                transform.position += transform.forward * Time.deltaTime * targetSpeed;
+            }
+            else
+            {
+                transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
+                _controller.Move(new Vector3(0.0f, gravity, 0.0f) * Time.deltaTime);
+            }
+        }
+           
         private void JumpAndGravity()
         {
             if (Grounded)
             {
-                // reset the fall timeout timer
-                _fallTimeoutDelta = FallTimeout;
-
-                // update animator if using character
+                _fallTimeoutDelta = FallTimeout;                // update animator if using character
                 if (_hasAnimator)
                 {
                     _animator.SetBool(_animIDSwim, false);
                     _animator.SetBool(_animIDJump, false);
                     _animator.SetBool(_animIDFreeFall, false);
                     if (!_animator.applyRootMotion) _animator.applyRootMotion = true;
-                }
-
-                // stop our velocity dropping infinitely when grounded
-                if (_verticalVelocity < 0.0f)
+                }               
+                if (_verticalVelocity < 0.0f)  // stop our velocity dropping infinitely when grounded
                 {
                     _verticalVelocity = -2f;
                 }
-
-                // Jump
-                if (_input._jump && _jumpTimeoutDelta <= 0.0f)
+                if (_input._jump && _jumpTimeoutDelta <= 0.0f) // Jump
                 {
                     _animator.applyRootMotion = false;
-                    // the square root of H * -2 * G = how much velocity needed to reach desired height
-                    StartCoroutine(JumpDelay());
-
-                    // update animator if using character
-                    if (_hasAnimator)
+                    StartCoroutine(JumpDelay());  // the square root of H * -2 * G = how much velocity needed to reach desired height
+                    if (_hasAnimator)  // update animator if using character
                     {
                         _animator.SetBool(_animIDJump, true);
                     }
                 }
-
-
-                // jump timeout
-                if (_jumpTimeoutDelta >= 0.0f)
+                if (_jumpTimeoutDelta >= 0.0f)  // jump timeout
                 {
                     _jumpTimeoutDelta -= Time.deltaTime;
                 }
             }
             else
             {
-                // reset the jump timeout timer
-                _jumpTimeoutDelta = JumpTimeout;
-
-                // fall timeout
-                if (_fallTimeoutDelta >= 0.0f)
+                _jumpTimeoutDelta = JumpTimeout;   // reset the jump timeout timer
+                if (_fallTimeoutDelta >= 0.0f)  // fall timeout
                 {
                     _fallTimeoutDelta -= Time.deltaTime;
                 }
                 else
                 {
-                    // update animator if using character
-                    if (_hasAnimator)
+                    if (_hasAnimator) // update animator if using character
                     {
                         _animator.SetBool(_animIDFreeFall, true);
 
                     }
                 }
-
-                // if we are not grounded, do not jump
-                _input._jump = false;
+                _input._jump = false;  // if we are not grounded, do not jump
             }
         }
-
         private IEnumerator JumpDelay()
         {
-
             yield return new WaitForSeconds(.3f);
-
             _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
-
-
         }
         void OnGravity()
         {
@@ -537,12 +465,9 @@ namespace StupidHumanGames
 
             if (Grounded) Gizmos.color = transparentGreen;
             else Gizmos.color = transparentRed;
-
-            // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
             Gizmos.DrawSphere(
                 new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z),
                 GroundedRadius);
-
             Gizmos.DrawSphere(
                 new Vector3(head.position.x, head.position.y, head.position.z),
                 .3f);
@@ -556,7 +481,6 @@ namespace StupidHumanGames
                 AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(_controller.center), FootstepAudioVolume);
             }
         }
-
         public void OnPlayerRoll()
         {
             AudioSource.PlayClipAtPoint(rollAudioClip, transform.TransformPoint(_controller.center), rollVolume);
@@ -591,7 +515,6 @@ namespace StupidHumanGames
         }
         bool OnIsTreadingWater()
         {
-
             if (headAboveWater && !buttAboveWater) return true; else return false;
         }
         bool OnIsOnLand()

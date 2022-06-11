@@ -10,11 +10,12 @@ public class ObjectSpawner : MonoBehaviour
     [Header("SPAWN ON GROUND ONLY PROPERTIES")]
     Quaternion targetRot;
     [SerializeField] bool spawnOnGround = true;
-    [SerializeField] bool alighWithGround = true;
+    [SerializeField] bool alignWithGround = true;
     [SerializeField, Range(0f, 200)] float minTerrainHeight = 0f;
     [SerializeField, Range(0f, 200)] float maxTerrainHeight = 200f;
     [SerializeField, Range(0f, 60)] float slopeLimit = 5f;
-    [Header("______________________________________________")]
+    [Header("")]
+    public float scale = 1f;
     public LayerMask avoidableObjects;
     public LayerMask ground;
     public GameObject[] prefab;
@@ -62,7 +63,7 @@ public class ObjectSpawner : MonoBehaviour
             Quaternion q = Quaternion.identity;
             foreach (GameObject _prefab in prefab)
             {
-                float scale = Random.Range(.8f, 1.2f);
+                float rndScale = Random.Range(.8f, 1.2f);
                 RaycastHit hit;
                 Vector3 _transform = transform.position + GetOffset();
                 if (Physics.Raycast(new Vector3(_transform.x, _transform.y + transform.up.y * 2, _transform.z),
@@ -70,13 +71,21 @@ public class ObjectSpawner : MonoBehaviour
                 {
                     slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
                 }
-                if(spawnOnGround) _transform = OnGround(_transform);
-                if (alighWithGround) q = AlignToGround(_transform,q);
-                if (slopeAngle >= slopeLimit) return;
-                if (hit.point.y <= minTerrainHeight || hit.point.y >= maxTerrainHeight) return;
+                if (spawnOnGround)
+                {
+                    _transform = OnGround(_transform);
+                    if (alignWithGround) q = AlignToGround(_transform, q);
+                    if (slopeAngle >= slopeLimit) return;
+                    if (hit.point.y <= minTerrainHeight || hit.point.y >= maxTerrainHeight) return;
+                }
+                else
+                {
+                    if (_transform.y <= OnGround(_transform).y + 3f) return;
+                }
+                                                         
                 if (Physics.CheckSphere(_transform, minSeparation, avoidableObjects)) return;
                 q = Quaternion.Euler(new Vector3(0, Random.Range(q.x, 360f), q.z));
-                _prefab.transform.localScale = new Vector3(scale, scale, scale);
+                _prefab.transform.localScale = new Vector3(scale*rndScale, scale*rndScale, scale*rndScale);
                 GameObject obj = Instantiate(_prefab, _transform, q) as GameObject;
                 
                 list.Add(obj);

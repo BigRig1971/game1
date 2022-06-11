@@ -409,12 +409,12 @@ Transform:
   m_GameObject: {fileID: 8052387118639454438}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 493.2268, y: 99.677, z: 556.55804}
-  m_LocalScale: {x: 0.80669504, y: 0.80669504, z: 0.80669504}
+  m_LocalScale: {x: 1.1824892, y: 1.1824892, z: 1.1824892}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7509024599024504244}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &8052387119105829471
 PrefabInstance:
@@ -1013,10 +1013,11 @@ MonoBehaviour:
   rb: {fileID: 0}
   scale: 1
   animator: {fileID: 0}
-  randomSound: []
-  randomSoundvolume: 0
-  attackSound: {fileID: 0}
-  attackVolume: 0
+  randomSound:
+  - {fileID: 8300000, guid: efbb68b8f8b976d4da69d9be9be08dfc, type: 3}
+  randomSoundvolume: 1
+  attackSound: {fileID: 8300000, guid: f8eee352d09a1de43b341d21b96adb36, type: 3}
+  attackVolume: 1
   idleSound: {fileID: 0}
   idleVolume: 0
   footStep: {fileID: 0}

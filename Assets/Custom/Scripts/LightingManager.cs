@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-[ExecuteAlways]
+//[ExecuteAlways]
 public class LightingManager : MonoBehaviour
 {
     public enum State { Day, Night };

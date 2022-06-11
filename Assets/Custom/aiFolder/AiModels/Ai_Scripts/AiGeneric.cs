@@ -258,6 +258,10 @@ namespace StupidHumanGames
             animator.SetFloat("Blend", .5f);
             while (OnCanPatrol())
             {
+                if (RandomBool(200))
+                {
+                    if (RNDSound() != null) AudioSource.PlayClipAtPoint(RNDSound(), transform.position, randomSoundvolume);
+                }
                 OnHitObstacle();
                 RandomWaypoint();
                 if (RandomBool(200))
@@ -300,10 +304,7 @@ namespace StupidHumanGames
                 RandomAttackAnimations();
                 if (attackSound != null) AudioSource.PlayClipAtPoint(attackSound, transform.position, attackVolume);
                 moveSpeed = -1f;
-                if (RandomBool(5))
-                {
-                    if (RNDSound() != null) AudioSource.PlayClipAtPoint(RNDSound(), transform.position, randomSoundvolume);
-                }
+               
                 animator.SetFloat("AnimationSpeed", -1f);
                 animator.SetFloat("Blend", 1f);
                 yield return new WaitForSeconds(reverseTime * Random.Range(.5f, 1f));
@@ -380,6 +381,10 @@ namespace StupidHumanGames
             }
 
             return true; //facomg
+        }
+        void OnRandomSound()
+        {
+
         }
     }
 }

@@ -18,6 +18,7 @@ namespace StupidHumanGames
         {
             if (other.CompareTag("Lootable"))
             {
+                anim.SetTrigger("PickupItem");
                 lootableItem = other.gameObject.GetComponent<LootableItem>();
                 droppedItemPickup = other.gameObject.GetComponent<ItemPickupable>();
                 if (lootableItem != null && !lootableItem.isDamagable) LootItem();
@@ -33,5 +34,6 @@ namespace StupidHumanGames
         {
             droppedItemPickup.LootableItems();
         }
+
     }
 }
