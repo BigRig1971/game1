@@ -25,12 +25,12 @@ Transform:
   m_GameObject: {fileID: 8503313627084961529}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.995283, y: 0.995283, z: 0.995283}
+  m_LocalScale: {x: 0.9666097, y: 0.9666097, z: 0.9666097}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8181756077974035174}
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &8503313625609698573
 PrefabInstance:
@@ -159,6 +159,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
+  wayPoint: {x: 0, y: 0, z: 0}
+  homePosition: {x: 0, y: 0, z: 0}
   scale: 5
   animator: {fileID: 0}
   randomSound:

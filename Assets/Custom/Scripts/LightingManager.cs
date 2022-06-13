@@ -166,7 +166,7 @@ public class LightingManager : MonoBehaviour
         {
             UnPauseNightSounds();           
         }       
-        while (!Daytime && canPlaySound)
+        while (!Daytime)
         {
             yield return null;
         }       
@@ -180,7 +180,7 @@ public class LightingManager : MonoBehaviour
         {
             UnPauseDaySounds();                     
         }
-        while (Daytime && canPlaySound)
+        while (Daytime)
         {
             yield return null;
         }             

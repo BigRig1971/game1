@@ -13,9 +13,9 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - TVE_ALPHA_CLIP
+  m_InvalidKeywords:
   - _DISABLE_DECALS
   - _DISABLE_SSR
-  m_InvalidKeywords: []
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -151,6 +151,7 @@ Material:
     - _RenderQueue: 0
     - _RenderQueueType: 1
     - _RenderSSR: 0
+    - _RenderSpecular: 1
     - _RenderZWrite: 1
     - _RenderingCat: 0
     - _RequireSplitLighting: 0
@@ -184,6 +185,12 @@ Material:
     - _SubsurfaceValue: 1
     - _SupportDecals: 1
     - _SurfaceType: 0
+    - _TransAmbient: 0.2
+    - _TransDirect: 1
+    - _TransNormalDistortion: 0
+    - _TransScattering: 8
+    - _TransShadow: 1
+    - _Translucency: 2
     - _TransparentBackfaceEnable: 0
     - _TransparentCullMode: 0
     - _TransparentSortPriority: 0
@@ -200,6 +207,8 @@ Material:
     - _ZTestGBuffer: 4
     - _ZTestTransparent: 4
     - _ZWrite: 1
+    - __dirty: 1
+    - _render_coverage: 0
     - _render_cull: 0
     - _render_dst: 0
     - _render_src: 1

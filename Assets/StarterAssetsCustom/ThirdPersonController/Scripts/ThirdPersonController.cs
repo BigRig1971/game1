@@ -18,6 +18,7 @@ namespace StupidHumanGames
 #endif
     public class ThirdPersonController : MonoBehaviour
     {
+        float lerpG = 0f;
         bool animEnable = false;
         bool cursorState = false;
         InventoryManager inventory;
@@ -174,9 +175,9 @@ namespace StupidHumanGames
             if (Input.GetKeyDown(KeyCode.H))
             {
                 animEnable = !animEnable;
-               if(animEnable) _animator.SetBool("Dance", true); else _animator.SetBool("Dance", false);
+                if (animEnable) _animator.SetBool("Dance", true); else _animator.SetBool("Dance", false);
             }
-           
+
             if (_input._inventory)
             {
                 _input._inventory = false;
@@ -292,7 +293,7 @@ namespace StupidHumanGames
                     _speed = targetSpeed;
                 }
                 _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
-                if (_animationBlend < 0.01f) _animationBlend = 0f;              
+                if (_animationBlend < 0.01f) _animationBlend = 0f;
                 Vector3 inputDirection = new Vector3(_input._move.x, 0.0f, _input._move.y).normalized;
                 if (_input._move != Vector2.zero)
                 {
@@ -326,13 +327,8 @@ namespace StupidHumanGames
             while (OnIsTreadingWater())
             {
                 SwimGroundCheck();
-                OnSwim(-1);
-                float inputMagnitude = _input.analogMovement ? _input._move.magnitude : 1f;
-                if (_hasAnimator)
-                {
-                    _animator.SetFloat(_animIDSwimSpeed, _animationBlend);
-                    _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
-                }
+                OnSwim(-2);
+
                 yield return null;
             }
             _currentState = State.Swimming;
@@ -344,13 +340,8 @@ namespace StupidHumanGames
             while (OnIsSwimming())
             {
                 SwimGroundCheck();
-                OnSwim(1); 
-                float inputMagnitude = _input.analogMovement ? _input._move.magnitude : 1f;
-                if (_hasAnimator)
-                {
-                    _animator.SetFloat(_animIDSwimSpeed, _animationBlend);
-                    _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
-                }
+                OnSwim(1);
+
                 yield return null;
             }
             _currentState = State.MoveOnLand;
@@ -375,22 +366,39 @@ namespace StupidHumanGames
             Vector3 inputDirection = new Vector3(_input._move.x, 0.0f, _input._move.y).normalized;
             if (_input._move != Vector2.zero)
             {
+
                 _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
                                   _mainCamera.transform.eulerAngles.y;
-                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
-                    RotationSmoothTime);
-                var qto = Quaternion.LookRotation(transform.position - _mainCamera.transform.position);
-                var rot = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * 10f);
-                transform.rotation = Quaternion.Euler(rot.eulerAngles.x, rotation, 0.0f);
+                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, .2f);
+                transform.rotation = Quaternion.Euler(_mainCamera.transform.rotation.eulerAngles.x, rotation, 0f);
                 transform.position += transform.forward * Time.deltaTime * targetSpeed;
             }
             else
             {
+
+
                 transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
-                _controller.Move(new Vector3(0.0f, gravity, 0.0f) * Time.deltaTime);
+                _controller.Move(new Vector3(0.0f, GravityLerp(gravity) * Time.deltaTime));
+
+            }
+
+
+            float inputMagnitude = _input.analogMovement ? _input._move.magnitude : 1f;
+            if (_hasAnimator)
+            {
+                _animator.SetFloat(_animIDSpeed, _animationBlend);
+                _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
             }
         }
-           
+        float GravityLerp(float goal)
+        {
+
+            float delta = goal - lerpG;
+            delta *= Time.deltaTime;
+            lerpG += delta;
+            Debug.Log(lerpG);
+            return lerpG;
+        }
         private void JumpAndGravity()
         {
             if (Grounded)
@@ -402,7 +410,7 @@ namespace StupidHumanGames
                     _animator.SetBool(_animIDJump, false);
                     _animator.SetBool(_animIDFreeFall, false);
                     if (!_animator.applyRootMotion) _animator.applyRootMotion = true;
-                }               
+                }
                 if (_verticalVelocity < 0.0f)  // stop our velocity dropping infinitely when grounded
                 {
                     _verticalVelocity = -2f;
@@ -450,6 +458,7 @@ namespace StupidHumanGames
             {
                 _verticalVelocity += Gravity * Time.deltaTime;
             }
+
         }
         private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
         {

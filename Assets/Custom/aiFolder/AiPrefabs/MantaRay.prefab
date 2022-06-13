@@ -25,12 +25,12 @@ Transform:
   m_GameObject: {fileID: 6518981239945531061}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 2563.4307, y: 201.796, z: 2485.2134}
-  m_LocalScale: {x: 0.9930989, y: 0.9930989, z: 0.9930989}
+  m_LocalScale: {x: 1.029648, y: 1.029648, z: 1.029648}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 318213778809023676}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &279289987499199319
 PrefabInstance:
@@ -547,6 +547,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
+  wayPoint: {x: 0, y: 0, z: 0}
+  homePosition: {x: 0, y: 0, z: 0}
   scale: 2
   animator: {fileID: 0}
   randomSound: []
@@ -577,14 +579,14 @@ MonoBehaviour:
     m_Bits: 1025
   turnSpeed: 3
   attackSpeed: 5
-  animationSpeed: 4.7
+  animationSpeed: 5
   moveSpeed: 3
   attackRange: 0.9
   sightRange: 1.8
   obstacleCenter: {x: 0, y: 0, z: -0.7}
   obstacleRadius: 1.91
-  maxRange: 50
-  maxAltitude: 88
+  maxRange: 30
+  maxAltitude: 90
   minAltitude: 0
   _currentState: 0
   meshReference: {fileID: 6306698922901831578}

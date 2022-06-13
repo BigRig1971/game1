@@ -16,9 +16,11 @@ namespace StupidHumanGames
         }
         private void OnTriggerEnter(Collider other)
         {
+            
             if (other.CompareTag("Lootable"))
             {
-                anim.SetTrigger("PickupItem");
+                
+               
                 lootableItem = other.gameObject.GetComponent<LootableItem>();
                 droppedItemPickup = other.gameObject.GetComponent<ItemPickupable>();
                 if (lootableItem != null && !lootableItem.isDamagable) LootItem();
@@ -29,6 +31,7 @@ namespace StupidHumanGames
         {
             lootableItem.LootableItems();
             if (lootSound != null) AudioSource.PlayClipAtPoint(lootSound, transform.position, lootSoundVolume);
+            anim.SetTrigger("PickupItem");
         }
         void PickupItem()
         {

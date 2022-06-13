@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 494031492655238138}
   - component: {fileID: 494031492656532442}
   - component: {fileID: 494031492657662234}
-  - component: {fileID: -6599793405795142651}
-  - component: {fileID: -4849202152333293341}
-  m_Layer: 14
+  - component: {fileID: 2776767615877921820}
+  - component: {fileID: 8922478790543886083}
+  m_Layer: 12
   m_Name: Stone_1
   m_TagString: Lootable
   m_Icon: {fileID: 0}
@@ -27,13 +27,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 494031492655470554}
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 473.0507, y: 99.978004, z: 578.725}
-  m_LocalScale: {x: 1.6411725, y: 1.6411725, z: 1.6411725}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.7191944, y: 1.7191944, z: 1.7191944}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &494031492656532442
 MeshFilter:
@@ -85,7 +85,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &-6599793405795142651
+--- !u!114 &2776767615877921820
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -97,7 +97,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cc15dfc05bdc1742b2cc362979d493f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scale: {x: 1, y: 1, z: 1}
+  playerPosition: {x: 0, y: 0, z: 0}
   spawnLoot: 0
+  spawnLootOffset: 2
   _impactSound: {fileID: 0}
   _impactVolume: 0
   _deathSound: {fileID: 0}
@@ -114,7 +117,7 @@ MonoBehaviour:
   _listOfItems:
   - _item: {fileID: 11400000, guid: 5798043884458524da5b651b1519cf74, type: 2}
     _itemAmount: 1
---- !u!135 &-4849202152333293341
+--- !u!135 &8922478790543886083
 SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

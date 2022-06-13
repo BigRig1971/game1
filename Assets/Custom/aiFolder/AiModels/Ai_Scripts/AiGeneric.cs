@@ -10,7 +10,7 @@ namespace StupidHumanGames
         Collider[] hitColliders;
         [SerializeField] Rigidbody rb;
         bool _moveTowards = true;
-        Vector3 wayPoint, homePosition;
+        public Vector3 wayPoint, homePosition;
         Quaternion targetRot;
         float posY;
         float previousSpeed, wayPointDistance;
@@ -63,7 +63,23 @@ namespace StupidHumanGames
 
             animator.SetFloat("AnimationSpeed", animationSpeed);
             wayPointDistance = 10f;
-            homePosition = transform.parent.position;
+            if (canSwimOrFly)
+            {
+                if (minAltitude > Terrain.activeTerrain.SampleHeight(transform.position))
+                {
+                    homePosition = new Vector3(transform.position.x, (maxAltitude + minAltitude) / 2, transform.position.z);
+                    
+                }
+                else
+                {
+                    homePosition = new Vector3(transform.position.x, (maxAltitude + Terrain.activeTerrain.SampleHeight(transform.position)) / 2f, transform.position.z);
+                }
+            }
+            else
+            {
+                homePosition = transform.parent.position;
+            }
+
 
             sightRange = attackRange + sightRange;
             sizeOfObject = new Vector3(scale, scale, scale) * Random.Range(.9f, 1.1f);
@@ -258,10 +274,7 @@ namespace StupidHumanGames
             animator.SetFloat("Blend", .5f);
             while (OnCanPatrol())
             {
-                if (RandomBool(200))
-                {
-                    if (RNDSound() != null) AudioSource.PlayClipAtPoint(RNDSound(), transform.position, randomSoundvolume);
-                }
+
                 OnHitObstacle();
                 RandomWaypoint();
                 if (RandomBool(200))
@@ -274,7 +287,7 @@ namespace StupidHumanGames
                 {
                     RandomIdleAnimations();
                 }
-               
+
                 yield return null;
             }
             _currentState = state.Chase;
@@ -283,11 +296,14 @@ namespace StupidHumanGames
         {
             moveSpeed = previousSpeed;
             animator.SetFloat("Blend", 1f);
-          
+
             while (OnCanChase())
             {
                 OnHitObstacle();
-
+                if (RandomBool(200))
+                {
+                    if (RNDSound() != null) AudioSource.PlayClipAtPoint(RNDSound(), transform.position, randomSoundvolume);
+                }
                 wayPoint = player.position;
                 yield return null;
             }
@@ -304,22 +320,22 @@ namespace StupidHumanGames
                 RandomAttackAnimations();
                 if (attackSound != null) AudioSource.PlayClipAtPoint(attackSound, transform.position, attackVolume);
                 moveSpeed = -1f;
-               
+
                 animator.SetFloat("AnimationSpeed", -1f);
                 animator.SetFloat("Blend", 1f);
                 yield return new WaitForSeconds(reverseTime * Random.Range(.5f, 1f));
                 animator.SetFloat("AnimationSpeed", animationSpeed);
                 moveSpeed = 1f;
                 yield return null;
-            } 
+            }
             _currentState = state.Lost;
         }
         IEnumerator Lost()
         {
-            moveSpeed = previousSpeed * 1f;
+            moveSpeed = previousSpeed * 2f;
             animator.SetFloat("Blend", 1f);
             while (OnLost())
-            {            
+            {
                 OnHitObstacle();
                 wayPoint = homePosition;
                 yield return null;

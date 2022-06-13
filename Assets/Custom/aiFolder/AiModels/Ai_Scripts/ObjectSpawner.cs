@@ -9,6 +9,7 @@ public class ObjectSpawner : MonoBehaviour
 
     [Header("SPAWN ON GROUND ONLY PROPERTIES")]
     Quaternion targetRot;
+    Quaternion q;
     [SerializeField] bool spawnOnGround = true;
     [SerializeField] bool alignWithGround = true;
     [SerializeField, Range(0f, 200)] float minTerrainHeight = 0f;
@@ -60,7 +61,8 @@ public class ObjectSpawner : MonoBehaviour
         m_internalTimer = Mathf.Max(m_internalTimer, 0f);
         if (m_internalTimer == 0f)
         {
-            Quaternion q = Quaternion.identity;
+           // Quaternion q = Quaternion.identity;
+            q = Quaternion.Euler(new Vector3(0, Random.Range(q.x, 360f), q.z));
             foreach (GameObject _prefab in prefab)
             {
                 float rndScale = Random.Range(.8f, 1.2f);
@@ -84,7 +86,7 @@ public class ObjectSpawner : MonoBehaviour
                 }
                                                          
                 if (Physics.CheckSphere(_transform, minSeparation, avoidableObjects)) return;
-                q = Quaternion.Euler(new Vector3(0, Random.Range(q.x, 360f), q.z));
+                
                 _prefab.transform.localScale = new Vector3(scale*rndScale, scale*rndScale, scale*rndScale);
                 GameObject obj = Instantiate(_prefab, _transform, q) as GameObject;
                 

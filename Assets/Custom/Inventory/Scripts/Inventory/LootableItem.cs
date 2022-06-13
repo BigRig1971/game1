@@ -9,8 +9,11 @@ namespace StupidHumanGames
     public class LootableItem : MonoBehaviour
     {
         Quaternion targetRot;
+        [SerializeField] Vector3 scale = Vector3.one;
+        [SerializeField] Vector3 playerPosition;
         
         [SerializeField] bool spawnLoot = false;
+        [SerializeField] float spawnLootOffset = 10f;
         private bool lootable;
         [SerializeField] AudioClip _impactSound;
         [SerializeField, Range(0f, 1f)] float _impactVolume;
@@ -36,6 +39,8 @@ namespace StupidHumanGames
         }
         private void Start()
         {
+            transform.localScale = scale;
+            playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position; 
             if (death == null)
                 death = new UnityEvent();
             if (takeHit == null)
@@ -112,15 +117,15 @@ namespace StupidHumanGames
             for (int i = 0; i < amount; i++)
             {
               
-               
-                Vector3 force = new Vector3(Random.Range(-2f, 2f), 2, Random.Range(-2f, 2f));
+              
+                Vector3 force = new Vector3(Random.Range(-3f, 3f), spawnLootOffset + Random.Range(0f, 5f), Random.Range(-3f, 3f));
                 var drop = (Instantiate(itemDrop.spawnPrefab, transform.position + (force / 4f), Quaternion.Euler(new Vector3(0, Random.Range(0f, 360f), 0))) as GameObject);
-                drop.AddComponent<BoxCollider>();
+
+                if (!drop.GetComponent<BoxCollider>()) drop.AddComponent<BoxCollider>();
                 drop.AddComponent<Rigidbody>();                
             }
        
-            if (transform.parent != null) Destroy(transform.parent.gameObject, .3f);
-            Destroy(transform.gameObject);
+            if (transform.parent != null) Destroy(transform.parent.gameObject, .3f); else Destroy(transform.gameObject, .3f);
         }
     }
 }
