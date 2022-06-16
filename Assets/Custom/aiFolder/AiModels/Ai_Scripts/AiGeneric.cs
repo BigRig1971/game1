@@ -247,7 +247,7 @@ namespace StupidHumanGames
         }
         bool OnCanChase()
         {
-            if (chaseOrFlee && Physics.CheckSphere(transform.position, sightRange, playerLayer) && !Physics.CheckSphere(transform.position, attackRange, playerLayer)) return true; else return false;
+            if (!OnLost() && chaseOrFlee && Physics.CheckSphere(transform.position, sightRange, playerLayer) && !Physics.CheckSphere(transform.position, attackRange, playerLayer)) return true; else return false;
         }
         bool OnCanAttack()
         {
@@ -283,7 +283,7 @@ namespace StupidHumanGames
                     moveSpeed = previousSpeed * rnd;
                     animator.SetFloat("Blend", rnd);
                 }
-                if (RandomBool(1000) && idle)
+                if (RandomBool(2000) && idle)
                 {
                     RandomIdleAnimations();
                 }
@@ -332,7 +332,7 @@ namespace StupidHumanGames
         }
         IEnumerator Lost()
         {
-            moveSpeed = previousSpeed * 2f;
+            moveSpeed = previousSpeed;
             animator.SetFloat("Blend", 1f);
             while (OnLost())
             {

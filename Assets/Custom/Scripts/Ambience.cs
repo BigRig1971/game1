@@ -9,6 +9,7 @@ namespace StupidHumanGames
 	{
 		public static event System.Action<bool> isUnderWater;
 		public AudioSource oceanSound;
+		public AudioSource forestSound;
 		public AudioSource underWater;
 		
 		private void OnEnable()
@@ -23,6 +24,7 @@ namespace StupidHumanGames
 			if (!oceanSound.isPlaying)
 			{
 				oceanSound?.Play();
+				forestSound?.Play();
 			}
 
 		}
@@ -33,6 +35,7 @@ namespace StupidHumanGames
 			if (oceanSound.isPlaying)
 			{
 				oceanSound?.Pause();
+				forestSound?.Pause();
 			}
 			if (!underWater.isPlaying)
 			{
@@ -46,7 +49,7 @@ namespace StupidHumanGames
 			if (!oceanSound.isPlaying)
 			{
 				oceanSound?.Play();
-
+				forestSound?.Play();
 
 			}
 			if (underWater.isPlaying)

@@ -13,6 +13,8 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - TVE_ALPHA_CLIP
+  - _DISABLE_DECALS
+  - _DISABLE_SSR
   m_InvalidKeywords: []
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
@@ -187,8 +189,8 @@ Material:
     - _MainMaskMaxValue: 1
     - _MainMaskMinValue: 0
     - _MainNormalValue: 1
-    - _MainOcclusionValue: 0.5
-    - _MainSmoothnessValue: 0.2
+    - _MainOcclusionValue: 1
+    - _MainSmoothnessValue: 0.41
     - _MaskMode: 0
     - _MessageGlobalsVariation: 0
     - _MessageMotionVariation: 0
@@ -276,10 +278,10 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _StencilRef: 0
-    - _StencilRefDepth: 8
+    - _StencilRefDepth: 0
     - _StencilRefDistortionVec: 4
-    - _StencilRefGBuffer: 10
-    - _StencilRefMV: 40
+    - _StencilRefGBuffer: 2
+    - _StencilRefMV: 32
     - _StencilWriteMask: 6
     - _StencilWriteMaskDepth: 8
     - _StencilWriteMaskDistortionVec: 4
@@ -297,7 +299,7 @@ Material:
     - _SubsurfaceMaxValue: 0
     - _SubsurfaceMinValue: 0
     - _SubsurfaceNormalValue: 0
-    - _SubsurfaceScatteringValue: 2
+    - _SubsurfaceScatteringValue: 3.3
     - _SubsurfaceShadowValue: 1
     - _SubsurfaceValue: 1
     - _SubsurfaceViewValue: 1
@@ -308,7 +310,7 @@ Material:
     - _TransNormalDistortion: 0
     - _TransScattering: 8
     - _TransShadow: 1
-    - _Translucency: 2
+    - _Translucency: 3.3
     - _TranslucencyAmbientValue: 0.2
     - _TranslucencyDirectValue: 1
     - _TranslucencyHDMessage: 0
@@ -359,7 +361,7 @@ Material:
     - _vertex_pivot_mode: 1
     m_Colors:
     - _AlphaMaskRemap: {r: 0, g: 0, b: 0, a: 0}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.29606536, g: 0.3490566, b: 0.20910466, a: 1}
     - _ColorsMaskRemap: {r: 0, g: 0, b: 0, a: 0}
     - _DetailBlendRemap: {r: 0, g: 0, b: 0, a: 0}
     - _DoubleSidedConstants: {r: -1, g: -1, b: -1, a: 0}
@@ -372,7 +374,7 @@ Material:
     - _GradientMaskRemap: {r: 0, g: 0, b: 0, a: 0}
     - _LeavesMaskRemap: {r: 0, g: 0, b: 0, a: 2}
     - _LocalColors: {r: 1, g: 1, b: 1, a: 1}
-    - _MainColor: {r: 1, g: 1, b: 1, a: 1}
+    - _MainColor: {r: 0.29606536, g: 0.3490566, b: 0.20910466, a: 1}
     - _MainUVs: {r: 1, g: 1, b: 0, a: 0}
     - _MaxBoundsInfo: {r: 5.75935, g: 1.7330613, b: 5.75935, a: 0}
     - _MotionHighlightColor: {r: 2, g: 2, b: 2, a: 1}
@@ -385,7 +387,7 @@ Material:
     - _SubsurfaceColor: {r: 0.33, g: 0.49, b: 0, a: 1}
     - _SubsurfaceDiffusion_Asset: {r: 2.2888926e+38, g: 1.2389358e-26, b: 7.69327e-37, a: 0.00018220427}
     - _SubsurfaceDiffusion_asset: {r: 2.2888926e+38, g: 1.2389358e-26, b: 7.69327e-37, a: 0.00018220427}
-    - _SubsurfaceMaskRemap: {r: 0, g: 0, b: 0, a: 0}
+    - _SubsurfaceMaskRemap: {r: 0, g: 1, b: 0, a: 0}
     - _VertexOcclusionColor: {r: 0, g: 0, b: 0, a: 0}
     - _VertexOcclusionRemap: {r: 0, g: 0, b: 0, a: 0}
     - _render_normals_options: {r: -1, g: -1, b: -1, a: 0}

@@ -9,6 +9,7 @@ namespace StupidHumanGames
 {
     public class AnimTriggerAndDamageDealer : MonoBehaviour
     {
+        [SerializeField] AudioSource _audioSource;
         Rigidbody rb;
         public Vector3 colliderSize = Vector3.one;
         public Vector3 colliderCenter = Vector3.zero;
@@ -45,17 +46,17 @@ namespace StupidHumanGames
         {
             if (other.CompareTag("Lootable") && canDamageStuff)///
             {
+                canDamageStuff = false;
                 var lootable = other.gameObject.GetComponent<LootableItem>();
-                        
-                _animator.SetTrigger("Interrupt");
-                _animator.StopPlayback();
                
-                CameraShakerHandler.Shake(MyShake);
                 if(lootable != null)
                 {
+                    _animator.SetTrigger("Interrupt");
+                    _animator.StopPlayback();
+                    CameraShakerHandler.Shake(MyShake);
+
                     lootable.TakeDamage(damagePower);
-                    lootable.LootableItems();
-                    canDamageStuff = false;
+                    Debug.Log("test");
                 }
             }
         }
@@ -78,14 +79,18 @@ namespace StupidHumanGames
         public void OnWeaponDamageStart()
         {
             canDamageStuff = true;
-            
+           Invoke(nameof(OnWeaponDamageEnd), .1f);
+        }
+        public void OnWeaponDamageEnd()
+        {
+            canDamageStuff = false;
         }
         public void OnWeaponSwing()
         {
             
             if (weaponSwingSound != null)
             {
-                AudioSource.PlayClipAtPoint(weaponSwingSound, transform.position, swingVolume);
+                _audioSource.PlayOneShot(weaponSwingSound, swingVolume);
             }
         }
     }

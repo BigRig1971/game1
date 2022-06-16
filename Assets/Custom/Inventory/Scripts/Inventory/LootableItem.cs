@@ -11,7 +11,7 @@ namespace StupidHumanGames
         Quaternion targetRot;
         [SerializeField] Vector3 scale = Vector3.one;
         [SerializeField] Vector3 playerPosition;
-        
+
         [SerializeField] bool spawnLoot = false;
         [SerializeField] float spawnLootOffset = 10f;
         private bool lootable;
@@ -32,7 +32,7 @@ namespace StupidHumanGames
             public int _itemAmount = 1;
         }
         public Item[] _listOfItems;
-        
+
         private void Awake()
         {
             if (isDamagable) lootable = false; else lootable = true;
@@ -40,13 +40,13 @@ namespace StupidHumanGames
         private void Start()
         {
             transform.localScale = scale;
-            playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position; 
+            playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
             if (death == null)
                 death = new UnityEvent();
             if (takeHit == null)
                 takeHit = new UnityEvent();
-           // SitOnGround();
-           // AlignToGround();
+            // SitOnGround();
+            // AlignToGround();
         }
 #if UNITY_EDITOR
 
@@ -55,7 +55,7 @@ namespace StupidHumanGames
 
         public void LootableItems()
         {
-            if (!lootable) return;
+            if (!lootable && isDamagable) return;
 
             foreach (Item loi in _listOfItems)
             {
@@ -88,7 +88,7 @@ namespace StupidHumanGames
             {
                 death.Invoke();
                 isDamagable = false;
-                if (_deathSound != null) AudioSource.PlayClipAtPoint(_deathSound, transform.position, _deathVolume);                
+                if (_deathSound != null) AudioSource.PlayClipAtPoint(_deathSound, transform.position, _deathVolume);
                 Invoke(nameof(LootItem), deathDelay);
             }
         }
@@ -103,29 +103,26 @@ namespace StupidHumanGames
 
             lootable = true;
             isDamagable = false;
-            if(spawnLoot) DropItems(); else LootableItems();
-
-
-
+            if (spawnLoot) StartCoroutine(OnDropItems());  else LootableItems();
         }
-      
-        void DropItems()
+
+        IEnumerator OnDropItems()
         {
-            int amount = _listOfItems[0]._itemAmount;
-            ItemSO itemDrop = _listOfItems[0]._item;
-
-            for (int i = 0; i < amount; i++)
+            GetComponent<MeshRenderer>().enabled = false;
+            GetComponent<Collider>().enabled = false;
+            foreach (Item i in _listOfItems)
             {
-              
-              
-                Vector3 force = new Vector3(Random.Range(-3f, 3f), spawnLootOffset + Random.Range(0f, 5f), Random.Range(-3f, 3f));
-                var drop = (Instantiate(itemDrop.spawnPrefab, transform.position + (force / 4f), Quaternion.Euler(new Vector3(0, Random.Range(0f, 360f), 0))) as GameObject);
-
-                if (!drop.GetComponent<BoxCollider>()) drop.AddComponent<BoxCollider>();
-                drop.AddComponent<Rigidbody>();                
+                for (int o = 0; o < i._itemAmount; o++)
+                {
+                    Vector3 force = new Vector3(Random.Range(-3f, 3f), spawnLootOffset, Random.Range(-3f, 3f));
+                    var drop = (Instantiate(i._item.spawnPrefab, transform.position + (force / 4f), Quaternion.Euler(new Vector3(90f, Random.Range(0f, 360f), 0))) as GameObject);
+                   
+                    if (!drop.GetComponent<BoxCollider>()) drop.AddComponent<BoxCollider>();
+                    drop.AddComponent<Rigidbody>();
+                    yield return new WaitForSeconds(.3f);
+                }
             }
-       
-            if (transform.parent != null) Destroy(transform.parent.gameObject, .3f); else Destroy(transform.gameObject, .3f);
+            if (transform.parent != null) Destroy(transform.parent.gameObject, .1f); else Destroy(transform.gameObject, .3f);
         }
     }
 }

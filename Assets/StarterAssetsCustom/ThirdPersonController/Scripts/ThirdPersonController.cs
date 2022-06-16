@@ -18,6 +18,7 @@ namespace StupidHumanGames
 #endif
     public class ThirdPersonController : MonoBehaviour
     {
+        public AudioSource _audioSource;
         float lerpG = 0f;
         bool animEnable = false;
         bool cursorState = false;
@@ -200,10 +201,8 @@ namespace StupidHumanGames
         {
             InventoryManager.CloseInventory();
         }
-        private void FixedUpdate()
-        {
+       
 
-        }
         private void LateUpdate()
         {
 
@@ -261,7 +260,7 @@ namespace StupidHumanGames
         }
         IEnumerator MoveOnLand()
         {
-            Gravity = -50f;
+         
             if (_animator && !_animator.applyRootMotion) _animator.applyRootMotion = true;
             _animator.SetBool(_animIDSwim, false);
             while (OnIsOnLand())
@@ -487,20 +486,20 @@ namespace StupidHumanGames
             if (FootstepAudioClips.Length > 0)
             {
                 var index = Random.Range(0, FootstepAudioClips.Length);
-                AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(_controller.center), FootstepAudioVolume);
+                _audioSource.PlayOneShot(FootstepAudioClips[index], FootstepAudioVolume);
             }
         }
         public void OnPlayerRoll()
         {
-            AudioSource.PlayClipAtPoint(rollAudioClip, transform.TransformPoint(_controller.center), rollVolume);
+            _audioSource.PlayOneShot(rollAudioClip, rollVolume);
         }
         public void OnPlayerLand()
         {
-            AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
+            _audioSource.PlayOneShot(LandingAudioClip, FootstepAudioVolume);
         }
         public void OnPlayerJump()
         {
-            AudioSource.PlayClipAtPoint(JumpingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
+            _audioSource.PlayOneShot(JumpingAudioClip, FootstepAudioVolume);
         }
         public void OnHeadAboveWater()
         {

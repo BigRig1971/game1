@@ -595,6 +595,52 @@ MonoBehaviour:
     m_Value:
     - {fileID: 11400000, guid: 26bdddf49760c61438938733f07fa2a2, type: 2}
     - {fileID: 11400000, guid: 78322c7f82657514ebe48203160e3f39, type: 2}
+--- !u!114 &-1440471180384975904
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcf384b154398e341b6b29969c078198, type: 3}
+  m_Name: MotionBlur
+  m_EditorClassIdentifier: 
+  active: 1
+  quality:
+    m_OverrideState: 0
+    m_Value: 1
+  intensity:
+    m_OverrideState: 0
+    m_Value: 0
+  maximumVelocity:
+    m_OverrideState: 0
+    m_Value: 200
+  minimumVelocity:
+    m_OverrideState: 0
+    m_Value: 2
+  cameraMotionBlur:
+    m_OverrideState: 0
+    m_Value: 1
+  specialCameraClampMode:
+    m_OverrideState: 0
+    m_Value: 0
+  cameraVelocityClamp:
+    m_OverrideState: 0
+    m_Value: 0.05
+  cameraTranslationVelocityClamp:
+    m_OverrideState: 0
+    m_Value: 0.05
+  cameraRotationVelocityClamp:
+    m_OverrideState: 0
+    m_Value: 0.03
+  depthComparisonExtent:
+    m_OverrideState: 0
+    m_Value: 1
+  m_SampleCount:
+    m_OverrideState: 0
+    m_Value: 8
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -617,6 +663,7 @@ MonoBehaviour:
   - {fileID: -6535504869059129589}
   - {fileID: -3323118340317683060}
   - {fileID: -1704332360436477241}
+  - {fileID: -1440471180384975904}
 --- !u!114 &177997624625229802
 MonoBehaviour:
   m_ObjectHideFlags: 3

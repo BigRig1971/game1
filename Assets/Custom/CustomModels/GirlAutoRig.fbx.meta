@@ -15,6 +15,9 @@ ModelImporter:
   - first:
       74: 7379930770205563154
     second: root|Pickup (1)
+  - first:
+      74: -3294804062281347465
+    second: root|TPose
   externalObjects: {}
   materials:
     materialImportMode: 0
@@ -30,11 +33,8 @@ ModelImporter:
     motionNodeName: 
     rigImportErrors: 
     rigImportWarnings: "Avatar Rig Configuration mis-match. Bone length in configuration
-      does not match position in animation file:\n\t'leg_stretch.l' : position error
-      = 26.686171 mm\n\t'foot.l' : position error = 24.169865 mm\n\t'toes_01.l' :
-      position error = 5.810260 mm\n\t'leg_stretch.r' : position error = 26.685904
-      mm\n\t'foot.r' : position error = 24.170202 mm\n\t'toes_01.r' : position error
-      = 5.810296 mm\n"
+      does not match position in animation file:\n\t'foot.l' : position error = 2.033274
+      mm\n\t'foot.r' : position error = 2.033614 mm\n"
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -54,21 +54,21 @@ ModelImporter:
       takeName: root|Pickup
       internalID: 0
       firstFrame: 0
-      lastFrame: 1
+      lastFrame: 9
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
-      hasAdditiveReferencePose: 0
-      loopTime: 1
-      loopBlend: 1
+      hasAdditiveReferencePose: 1
+      loopTime: 0
+      loopBlend: 0
       loopBlendOrientation: 1
       loopBlendPositionY: 1
-      loopBlendPositionXZ: 0
+      loopBlendPositionXZ: 1
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
+      keepOriginalPositionXZ: 1
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
@@ -79,8 +79,8 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: root|T-Pose
-      takeName: root|T-Pose
+      name: root|TPose
+      takeName: root|TPose
       internalID: 0
       firstFrame: 0
       lastFrame: 1
@@ -90,12 +90,12 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 1
-      loopBlend: 1
-      loopBlendOrientation: 1
-      loopBlendPositionY: 1
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
       loopBlendPositionXZ: 0
-      keepOriginalOrientation: 1
+      keepOriginalOrientation: 0
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0
       heightFromFeet: 0

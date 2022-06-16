@@ -18,9 +18,7 @@ namespace StupidHumanGames
         {
             
             if (other.CompareTag("Lootable"))
-            {
-                
-               
+            {              
                 lootableItem = other.gameObject.GetComponent<LootableItem>();
                 droppedItemPickup = other.gameObject.GetComponent<ItemPickupable>();
                 if (lootableItem != null && !lootableItem.isDamagable) LootItem();
