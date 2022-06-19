@@ -1,21 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using StupidHumanGames;
 
-public class StarterInventory : MonoBehaviour
+
+namespace StupidHumanGames
 {
-    [SerializeField] ItemSO starterItem;
-    [SerializeField] int amount;
 
-    void Awake()
+    public class StarterInventory : MonoBehaviour
     {
-        StupidHumanGames.InventoryManager.AddItemToInventory(starterItem, amount);
-    }
+        [System.Serializable]
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public class Item
+        {
+            public ItemSO _item;
+            public int _itemAmount = 1;
+        }
+        public Item[] _listOfItems;
+        void Start()
+        {
+            foreach(Item item in _listOfItems)
+            {
+                InventoryManager.AddItemToInventory(item._item, item._itemAmount);
+            } 
+        }
     }
 }

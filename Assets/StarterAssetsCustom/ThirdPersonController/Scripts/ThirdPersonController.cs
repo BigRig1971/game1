@@ -481,12 +481,13 @@ namespace StupidHumanGames
                 .3f);
         }
 
-        public void OnFootstep()
+        private void OnFootstep(AnimationEvent OnfootStep)
         {
             if (FootstepAudioClips.Length > 0)
             {
                 var index = Random.Range(0, FootstepAudioClips.Length);
-                _audioSource.PlayOneShot(FootstepAudioClips[index], FootstepAudioVolume);
+                if (OnfootStep.animatorClipInfo.weight >.8f)  _audioSource.PlayOneShot(FootstepAudioClips[index], FootstepAudioVolume);
+              
             }
         }
         public void OnPlayerRoll()

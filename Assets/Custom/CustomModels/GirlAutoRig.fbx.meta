@@ -5,7 +5,7 @@ ModelImporter:
   internalIDToNameTable:
   - first:
       74: -1905796296305973275
-    second: root|Pickup
+    second: Pickup (1)p
   - first:
       74: -1732875831255331005
     second: T-pose
@@ -18,6 +18,12 @@ ModelImporter:
   - first:
       74: -3294804062281347465
     second: root|TPose
+  - first:
+      74: 5085071530252092758
+    second: root|Rowing
+  - first:
+      74: 6932585776425292370
+    second: root|Row
   externalObjects: {}
   materials:
     materialImportMode: 0
@@ -33,10 +39,14 @@ ModelImporter:
     motionNodeName: 
     rigImportErrors: 
     rigImportWarnings: "Avatar Rig Configuration mis-match. Bone length in configuration
-      does not match position in animation file:\n\t'foot.l' : position error = 2.033274
-      mm\n\t'foot.r' : position error = 2.033614 mm\n"
+      does not match position in animation file:\n\t'thigh_stretch.l' : position
+      error = 7.432098 mm\n\t'foot.l' : position error = 2.033274 mm\n\t'thigh_stretch.r'
+      : position error = 7.432542 mm\n\t'foot.r' : position error = 2.033711 mm\n"
     animationImportErrors: 
-    animationImportWarnings: 
+    animationImportWarnings: "\nClip 'root|Row' has import animation warnings that
+      might lower retargeting quality:\nNote: Activate translation DOF on avatar
+      to improve retargeting quality.\n\t'c_ring1.l' has translation animation that
+      will be discarded.\n\t'c_ring1.r' has translation animation that will be discarded.\n"
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
@@ -50,11 +60,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: root|Pickup
-      takeName: root|Pickup
+      name: root|TPose
+      takeName: root|TPose
       internalID: 0
       firstFrame: 0
-      lastFrame: 9
+      lastFrame: 1
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -79,23 +89,52 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: root|TPose
-      takeName: root|TPose
+      name: root|Pickup (1)
+      takeName: root|Pickup
       internalID: 0
       firstFrame: 0
-      lastFrame: 1
+      lastFrame: 9
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
-      hasAdditiveReferencePose: 0
+      hasAdditiveReferencePose: 1
       loopTime: 0
       loopBlend: 0
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
       loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: root|Row
+      takeName: root|Row
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 59
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0.12
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0
       heightFromFeet: 0

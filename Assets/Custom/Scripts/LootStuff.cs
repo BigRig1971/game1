@@ -4,6 +4,7 @@ namespace StupidHumanGames
 {
     public class LootStuff : MonoBehaviour
     {
+        [SerializeField] AudioSource _audioSource;
         public AudioClip lootSound;
         public float lootSoundVolume;
         Animator anim;
@@ -28,7 +29,7 @@ namespace StupidHumanGames
         void LootItem()
         {
             lootableItem.LootableItems();
-            if (lootSound != null) AudioSource.PlayClipAtPoint(lootSound, transform.position, lootSoundVolume);
+            if (lootSound != null) _audioSource.PlayOneShot(lootSound, lootSoundVolume);
             anim.SetTrigger("PickupItem");
         }
         void PickupItem()

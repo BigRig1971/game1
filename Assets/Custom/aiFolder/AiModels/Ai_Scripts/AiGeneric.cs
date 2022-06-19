@@ -7,6 +7,7 @@ namespace StupidHumanGames
 {
     public class AiGeneric : MonoBehaviour
     {
+        [SerializeField] AudioSource _audioSource;
         Collider[] hitColliders;
         [SerializeField] Rigidbody rb;
         bool _moveTowards = true;
@@ -302,7 +303,7 @@ namespace StupidHumanGames
                 OnHitObstacle();
                 if (RandomBool(200))
                 {
-                    if (RNDSound() != null) AudioSource.PlayClipAtPoint(RNDSound(), transform.position, randomSoundvolume);
+                    if (RNDSound() != null) _audioSource.PlayOneShot(RNDSound(), randomSoundvolume);
                 }
                 wayPoint = player.position;
                 yield return null;
@@ -318,7 +319,7 @@ namespace StupidHumanGames
             {
                 wayPoint = player.position;
                 RandomAttackAnimations();
-                if (attackSound != null) AudioSource.PlayClipAtPoint(attackSound, transform.position, attackVolume);
+                if (attackSound != null) _audioSource.PlayOneShot(attackSound, attackVolume);
                 moveSpeed = -1f;
 
                 animator.SetFloat("AnimationSpeed", -1f);

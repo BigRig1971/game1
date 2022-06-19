@@ -8,6 +8,7 @@ namespace StupidHumanGames
 {
     public class LootableItem : MonoBehaviour
     {
+        [SerializeField] AudioSource _audioSource;
         Quaternion targetRot;
         [SerializeField] Vector3 scale = Vector3.one;
         [SerializeField] Vector3 playerPosition;
@@ -81,14 +82,14 @@ namespace StupidHumanGames
             if (!isDamagable) return;
             takeHit.Invoke();
             lootable = false;
-            if (_impactSound != null) AudioSource.PlayClipAtPoint(_impactSound, transform.position, _impactVolume);
-
+            if (_impactSound != null) _audioSource.PlayOneShot(_impactSound, _impactVolume);
+           if(spawnLoot) OnDropOnDamage();
             health -= amount;
             if (health <= 0)
             {
                 death.Invoke();
                 isDamagable = false;
-                if (_deathSound != null) AudioSource.PlayClipAtPoint(_deathSound, transform.position, _deathVolume);
+                if (_deathSound != null) _audioSource.PlayOneShot(_deathSound, _deathVolume);
                 Invoke(nameof(LootItem), deathDelay);
             }
         }
@@ -103,7 +104,7 @@ namespace StupidHumanGames
 
             lootable = true;
             isDamagable = false;
-            if (spawnLoot) StartCoroutine(OnDropItems());  else LootableItems();
+            if (spawnLoot) StartCoroutine(OnDropItems()); else LootableItems();
         }
 
         IEnumerator OnDropItems()
@@ -115,14 +116,25 @@ namespace StupidHumanGames
                 for (int o = 0; o < i._itemAmount; o++)
                 {
                     Vector3 force = new Vector3(Random.Range(-3f, 3f), spawnLootOffset, Random.Range(-3f, 3f));
-                    var drop = (Instantiate(i._item.spawnPrefab, transform.position + (force / 4f), Quaternion.Euler(new Vector3(90f, Random.Range(0f, 360f), 0))) as GameObject);
-                   
+                    var drop = (Instantiate(i._item.spawnPrefab, transform.position + (force / 4f), Quaternion.Euler(new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)))) as GameObject);
+
                     if (!drop.GetComponent<BoxCollider>()) drop.AddComponent<BoxCollider>();
                     drop.AddComponent<Rigidbody>();
-                    yield return new WaitForSeconds(.3f);
+                    yield return new WaitForSeconds(.1f);
                 }
             }
             if (transform.parent != null) Destroy(transform.parent.gameObject, .1f); else Destroy(transform.gameObject, .3f);
+        }
+        void OnDropOnDamage()
+        {
+            if(_listOfItems.Length > 0)
+            {
+                var index = Random.Range(0, _listOfItems.Length);
+                Vector3 force = new Vector3(Random.Range(-3f, 3f), spawnLootOffset, Random.Range(-3f, 3f));
+                var drop = (Instantiate(_listOfItems[index]._item.spawnPrefab, transform.position + (force / 4f), Quaternion.Euler(new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)))) as GameObject);
+                if (!drop.GetComponent<BoxCollider>()) drop.AddComponent<BoxCollider>();
+                drop.AddComponent<Rigidbody>();
+            }
         }
     }
 }
