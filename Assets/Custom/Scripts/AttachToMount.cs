@@ -12,7 +12,6 @@ namespace StupidHumanGames
         public UnityEvent controlMountDisable;
         Animator _animator;
         bool isMounted = false;
-        bool canRow = false;
         StarterAssetsInputs _input;
         Transform mount;
         Vector3 offset;
@@ -29,11 +28,19 @@ namespace StupidHumanGames
         {
             if (other.CompareTag("Mountable"))
             {
+                
+            
                 mount = other.GetComponent<Transform>();
+                Rigidbody rb= mount.GetComponent<Rigidbody>();
+                rb.maxLinearVelocity = 0f;
+                
                 isMounted = true;
                 
                 transform.SetParent(other.transform);
+                
                 transform.localPosition = new Vector3(0, 1f, 0);
+
+                rb.maxLinearVelocity = 10f;
             }
         }
         private void OnTriggerExit(Collider other)
@@ -51,13 +58,11 @@ namespace StupidHumanGames
             if (isMounted)
             {
 
-                if (Input.GetKeyDown(KeyCode.M))
+                if (_animator.GetBool("CanRide"))
                 {
-                    canRow = !canRow;
-                }
-                if (canRow)
-                {
-                    if(_input._move.y < 0f)
+                   
+                    controlMountEnable?.Invoke();
+                    if (_input._move.y < 0f)
                     {
                         _animator.SetFloat("SpeedMultiplier", -1f);
                     }
@@ -67,13 +72,15 @@ namespace StupidHumanGames
                     }
                     transform.localPosition = Vector3.zero;
                     transform.localRotation = Quaternion.identity;
-                    controlMountEnable?.Invoke();
-                    _animator.SetBool("Row", true);
+                   
+                    
                 }
                 else
                 {
+                    
+                  
                     controlMountDisable?.Invoke();
-                    _animator.SetBool("Row", false);
+                    
                    
                 }
                 if (_input._move == Vector2.zero)
@@ -84,6 +91,7 @@ namespace StupidHumanGames
                 {
                     offset = transform.localPosition;
                 }
+                
             }
         }
     }

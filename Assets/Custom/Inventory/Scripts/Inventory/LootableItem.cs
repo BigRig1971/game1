@@ -8,9 +8,12 @@ namespace StupidHumanGames
 {
     public class LootableItem : MonoBehaviour
     {
+        [SerializeField] bool randomSize = false;
         [SerializeField] AudioSource _audioSource;
         Quaternion targetRot;
         [SerializeField] Vector3 scale = Vector3.one;
+        [SerializeField] float droppedLootScale = 1f;
+        [SerializeField] float damageDropScale = 1f;    
         [SerializeField] Vector3 playerPosition;
 
         [SerializeField] bool spawnLoot = false;
@@ -33,6 +36,13 @@ namespace StupidHumanGames
             public int _itemAmount = 1;
         }
         public Item[] _listOfItems;
+        [System.Serializable]
+        public class DamageItem
+        {
+            public ItemSO _item;
+            public int _itemAmount = 1;
+        }
+        public DamageItem[] _listOfDamageItems;
 
         private void Awake()
         {
@@ -40,7 +50,8 @@ namespace StupidHumanGames
         }
         private void Start()
         {
-            transform.localScale = scale;
+
+            OnScaleObject();
             playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
             if (death == null)
                 death = new UnityEvent();
@@ -83,7 +94,7 @@ namespace StupidHumanGames
             takeHit.Invoke();
             lootable = false;
             if (_impactSound != null) _audioSource.PlayOneShot(_impactSound, _impactVolume);
-           if(spawnLoot) OnDropOnDamage();
+            if (spawnLoot) OnDropOnDamage();
             health -= amount;
             if (health <= 0)
             {
@@ -109,31 +120,50 @@ namespace StupidHumanGames
 
         IEnumerator OnDropItems()
         {
-            GetComponent<MeshRenderer>().enabled = false;
-            GetComponent<Collider>().enabled = false;
+
+            transform.localScale = Vector3.zero;
             foreach (Item i in _listOfItems)
             {
                 for (int o = 0; o < i._itemAmount; o++)
                 {
                     Vector3 force = new Vector3(Random.Range(-3f, 3f), spawnLootOffset, Random.Range(-3f, 3f));
                     var drop = (Instantiate(i._item.spawnPrefab, transform.position + (force / 4f), Quaternion.Euler(new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)))) as GameObject);
-
-                    if (!drop.GetComponent<BoxCollider>()) drop.AddComponent<BoxCollider>();
+                    drop.transform.localScale = new Vector3(drop.transform.localScale.x * droppedLootScale * Random.Range(1f, 1.5f), drop.transform.localScale.y * droppedLootScale * Random.Range(1f, 1.5f), drop.transform.localScale.z * droppedLootScale * Random.Range(1f, 1.5f));
+                    if (!drop.GetComponent<MeshCollider>()) drop.AddComponent<MeshCollider>();
+                    drop.GetComponent<MeshCollider>().convex = true;
                     drop.AddComponent<Rigidbody>();
-                    yield return new WaitForSeconds(.1f);
+                    drop.GetComponent<Rigidbody>().drag = 5f;
+                    Destroy(drop.gameObject, 60f);
+                    yield return new WaitForSeconds(.05f);
                 }
             }
-            if (transform.parent != null) Destroy(transform.parent.gameObject, .1f); else Destroy(transform.gameObject, .3f);
+            if (transform.parent != null) Destroy(transform.parent.gameObject); else Destroy(transform.gameObject);
         }
         void OnDropOnDamage()
         {
-            if(_listOfItems.Length > 0)
+            if (_listOfDamageItems.Length > 0)
             {
-                var index = Random.Range(0, _listOfItems.Length);
+                var index = Random.Range(0, _listOfDamageItems.Length);
                 Vector3 force = new Vector3(Random.Range(-3f, 3f), spawnLootOffset, Random.Range(-3f, 3f));
-                var drop = (Instantiate(_listOfItems[index]._item.spawnPrefab, transform.position + (force / 4f), Quaternion.Euler(new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)))) as GameObject);
-                if (!drop.GetComponent<BoxCollider>()) drop.AddComponent<BoxCollider>();
+                var drop = (Instantiate(_listOfDamageItems[index]._item.spawnPrefab, transform.position + (force / 4f), Quaternion.Euler(new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)))) as GameObject);
+                drop.transform.localScale = new Vector3(drop.transform.localScale.x * damageDropScale * Random.Range(1f, 1.5f), drop.transform.localScale.y * damageDropScale * Random.Range(1f, 1.5f), drop.transform.localScale.z * damageDropScale * Random.Range(1f, 1.5f));
+                
+                if (!drop.GetComponent<MeshCollider>()) drop.AddComponent<MeshCollider>();
+                drop.GetComponent<MeshCollider>().convex = true;
                 drop.AddComponent<Rigidbody>();
+                drop.GetComponent<Rigidbody>().drag = 5f;
+                Destroy(drop.gameObject, 120f);
+            }
+        }
+        void OnScaleObject()
+        {
+            if (randomSize)
+            {
+                transform.localScale = new Vector3(scale.x * Random.Range(1f, 2f), scale.y * Random.Range(1f, 2f), scale.z * Random.Range(1f, 2f));
+            }
+            else
+            {
+                transform.localScale = scale;
             }
         }
     }

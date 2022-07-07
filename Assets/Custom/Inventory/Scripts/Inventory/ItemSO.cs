@@ -19,7 +19,7 @@ namespace StupidHumanGames
         [Tooltip("If this is an equiipable item, this is what GameObject will spawn when held/equipped.")]
         [SerializeField]
         public GameObject equipPrefab;
-        public GameObject buildPrefab;
+        public GameObject buildPreview;
         public GameObject spawnPrefab;
         public ItemStatSO[] stat;
 

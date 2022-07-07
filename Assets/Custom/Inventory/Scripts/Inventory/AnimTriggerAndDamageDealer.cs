@@ -17,16 +17,26 @@ namespace StupidHumanGames
         public int damagePower = 5;
         public string _animTriggerName;
         public string _animIntName;
+        public string _animBoolName;
         public int _animIntValue;
         public float delayImpact = .3f;
         [SerializeField] Animator _animator;
-        bool canDamageStuff = false;
+        bool canDoStuff = false;
         public ShakeData MyShake;
         public AudioClip weaponSwingSound;
         [SerializeField, Range(0f,1f)] float swingVolume = 1;
 
+        private void OnEnable()
+        {
+            if (_animBoolName != null) _animator.SetBool(_animBoolName, true);
+        }
+        private void OnDisable()
+        {
+            if (_animBoolName != null) _animator.SetBool(_animBoolName, false);
+        }
         private void Start()
         { 
+           
             if (TryGetComponent<Rigidbody>(out rb))
             {
                 rb = GetComponent<Rigidbody>();
@@ -44,9 +54,9 @@ namespace StupidHumanGames
 
         private void OnTriggerStay(Collider other)
         {
-            if (other.CompareTag("Lootable") && canDamageStuff)///
+            if (other.CompareTag("Lootable") && canDoStuff)///
             {
-                canDamageStuff = false;
+                canDoStuff = false;
                 var lootable = other.gameObject.GetComponent<LootableItem>();
                
                 if(lootable != null)
@@ -56,7 +66,7 @@ namespace StupidHumanGames
                     CameraShakerHandler.Shake(MyShake);
 
                     lootable.TakeDamage(damagePower);
-                    Debug.Log("test");
+                   
                 }
             }
         }
@@ -65,8 +75,8 @@ namespace StupidHumanGames
 
             if (Input.GetKeyDown(_keyCode) && !InventoryManager.IsOpen())
             {
-                _animator.SetInteger(_animIntName, _animIntValue);
-                _animator.SetTrigger(_animTriggerName);
+               if(_animIntName != null) _animator.SetInteger(_animIntName, _animIntValue);
+               if(_animTriggerName != null) _animator.SetTrigger(_animTriggerName);
              
             }
         }
@@ -76,14 +86,14 @@ namespace StupidHumanGames
             Gizmos.matrix = transform.localToWorldMatrix;
             Gizmos.DrawWireCube(Vector3.zero + colliderCenter, colliderSize);
         }
-        public void OnWeaponDamageStart()
+        public void OnAnimStart()
         {
-            canDamageStuff = true;
-           Invoke(nameof(OnWeaponDamageEnd), .1f);
+            canDoStuff = true;
+           Invoke(nameof(OnAnimEnd), .1f);
         }
-        public void OnWeaponDamageEnd()
+        public void OnAnimEnd()
         {
-            canDamageStuff = false;
+            canDoStuff = false;
         }
         public void OnWeaponSwing()
         {

@@ -18,6 +18,8 @@ namespace StupidHumanGames
 #endif
     public class ThirdPersonController : MonoBehaviour
     {
+        Quaternion targetRot;
+        public bool isMounted = false;
         public AudioSource _audioSource;
         float lerpG = 0f;
         bool animEnable = false;
@@ -153,7 +155,6 @@ namespace StupidHumanGames
 
         private void Start()
         {
-            StartCoroutine(CurrentState());
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();
@@ -168,15 +169,16 @@ namespace StupidHumanGames
             // reset our timeouts on start
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
+            StartCoroutine(CurrentState());
         }
         private void Update()
         {
             OnGravity();
-            _hasAnimator = TryGetComponent(out _animator);
+            
             if (Input.GetKeyDown(KeyCode.H))
             {
                 animEnable = !animEnable;
-                if (animEnable) _animator.SetBool("Dance", true); else _animator.SetBool("Dance", false);
+                if (animEnable && _hasAnimator) _animator.SetBool("Dance", true); else _animator.SetBool("Dance", false);
             }
 
             if (_input._inventory)
@@ -201,7 +203,7 @@ namespace StupidHumanGames
         {
             InventoryManager.CloseInventory();
         }
-       
+
 
         private void LateUpdate()
         {
@@ -236,7 +238,7 @@ namespace StupidHumanGames
                head.position.z);
             GroundedUnderWater = (Physics.CheckSphere(spherePosition, 1f, GroundLayers,
                  QueryTriggerInteraction.Ignore));
-            if (GroundedUnderWater)
+            if (GroundedUnderWater && _hasAnimator)
             {
                 if (!_animator.applyRootMotion) _animator.applyRootMotion = true;
             }
@@ -260,9 +262,9 @@ namespace StupidHumanGames
         }
         IEnumerator MoveOnLand()
         {
-         
-            if (_animator && !_animator.applyRootMotion) _animator.applyRootMotion = true;
-            _animator.SetBool(_animIDSwim, false);
+
+            if (_hasAnimator && !_animator.applyRootMotion) _animator.applyRootMotion = true;
+           if(_hasAnimator) _animator.SetBool(_animIDSwim, false);
             while (OnIsOnLand())
             {
                 GroundedCheck();
@@ -300,7 +302,10 @@ namespace StupidHumanGames
                                       _mainCamera.transform.eulerAngles.y;
                     float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                         RotationSmoothTime);
-                    transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                    if (!isMounted)
+                    {
+                        transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                    }
                 }
                 Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
                 if (!_animator.applyRootMotion)
@@ -335,7 +340,7 @@ namespace StupidHumanGames
         IEnumerator Swimming()
         {
             if (_animator.applyRootMotion) _animator.applyRootMotion = false;
-            _animator.SetBool(_animIDSwim, true);
+           if(_hasAnimator) _animator.SetBool(_animIDSwim, true);
             while (OnIsSwimming())
             {
                 SwimGroundCheck();
@@ -369,14 +374,14 @@ namespace StupidHumanGames
                 _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
                                   _mainCamera.transform.eulerAngles.y;
                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, .2f);
-                transform.rotation = Quaternion.Euler(_mainCamera.transform.rotation.eulerAngles.x, rotation, 0f);
+               if(!isMounted) transform.rotation = Quaternion.Euler(_mainCamera.transform.rotation.eulerAngles.x, rotation, 0f);
                 transform.position += transform.forward * Time.deltaTime * targetSpeed;
             }
             else
             {
 
 
-                transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
+               if(!isMounted) transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
                 _controller.Move(new Vector3(0.0f, GravityLerp(gravity) * Time.deltaTime));
 
             }
@@ -395,7 +400,6 @@ namespace StupidHumanGames
             float delta = goal - lerpG;
             delta *= Time.deltaTime;
             lerpG += delta;
-            Debug.Log(lerpG);
             return lerpG;
         }
         private void JumpAndGravity()
@@ -416,10 +420,11 @@ namespace StupidHumanGames
                 }
                 if (_input._jump && _jumpTimeoutDelta <= 0.0f) // Jump
                 {
-                    _animator.applyRootMotion = false;
+                    
                     StartCoroutine(JumpDelay());  // the square root of H * -2 * G = how much velocity needed to reach desired height
                     if (_hasAnimator)  // update animator if using character
                     {
+                        _animator.applyRootMotion = false;
                         _animator.SetBool(_animIDJump, true);
                     }
                 }
@@ -486,8 +491,8 @@ namespace StupidHumanGames
             if (FootstepAudioClips.Length > 0)
             {
                 var index = Random.Range(0, FootstepAudioClips.Length);
-                if (OnfootStep.animatorClipInfo.weight >.8f)  _audioSource.PlayOneShot(FootstepAudioClips[index], FootstepAudioVolume);
-              
+                if (OnfootStep.animatorClipInfo.weight > .8f) _audioSource.PlayOneShot(FootstepAudioClips[index], FootstepAudioVolume);
+
             }
         }
         public void OnPlayerRoll()
@@ -536,6 +541,14 @@ namespace StupidHumanGames
             {
                 yield return StartCoroutine(_currentState.ToString());
             }
+        }
+        public void OnEnableMount()
+        {
+            isMounted = true;
+        }
+        public void OnDisableMount()
+        {
+            isMounted = false;
         }
 
     }

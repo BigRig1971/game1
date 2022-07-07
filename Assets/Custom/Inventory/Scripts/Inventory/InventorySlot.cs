@@ -212,7 +212,7 @@ namespace StupidHumanGames
         private IEnumerator BuildItem()
         {
             _buildSystem.tpc._input._build = false;
-            _buildSystem.NewBuild(currentItem.buildPrefab);
+            _buildSystem.NewBuild(currentItem.buildPreview);
             while (!_buildSystem.tpc._input._attack)
             {
                 if (_buildSystem.isBuilt)

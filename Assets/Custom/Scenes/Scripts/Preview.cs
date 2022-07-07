@@ -11,7 +11,7 @@ namespace StupidHumanGames
 	public class Preview : MonoBehaviour
 	{
 		public GameObject prefab;
-
+		public float spawnOffset = 0f;
 		private MeshRenderer myRend;
 
 		public bool isGrounded = false;
@@ -32,7 +32,7 @@ namespace StupidHumanGames
 		{
 			//var spawnedObject = Instantiate(prefab, transform.position, Quaternion.identity);
 			var spawnedObject = SaveMaster.SpawnSavedPrefab(InstanceSource.Resources, prefab.name);
-			spawnedObject.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+			spawnedObject.transform.position = new Vector3(transform.position.x, transform.position.y + spawnOffset, transform.position.z);
 			spawnedObject.transform.rotation = this.transform.rotation;
 			//PhotonNetwork.AddCallbackTarget(spawnedObject);
 			Destroy(gameObject);

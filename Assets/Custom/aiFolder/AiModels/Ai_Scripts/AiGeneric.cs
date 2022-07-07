@@ -7,10 +7,11 @@ namespace StupidHumanGames
 {
     public class AiGeneric : MonoBehaviour
     {
+        [SerializeField] bool canTame = false;
         [SerializeField] AudioSource _audioSource;
         Collider[] hitColliders;
         [SerializeField] Rigidbody rb;
-        bool _moveTowards = true;
+        [SerializeField] bool _aggressive = true;
         public Vector3 wayPoint, homePosition;
         Quaternion targetRot;
         float posY;
@@ -48,7 +49,6 @@ namespace StupidHumanGames
         [SerializeField, Range(0f, 5f)] float reverseTime = 2f;
         private void Awake()
         {
-            animator = GetComponent<Animator>();
             _currentState = state.Patrol;
             previousSpeed = moveSpeed;
         }
@@ -58,18 +58,19 @@ namespace StupidHumanGames
         }
         void Start()
         {
-            StartCoroutine(State());
+            animator = GetComponent<Animator>();
             player = GameObject.FindGameObjectWithTag("Player").transform;
             transform.rotation = Quaternion.Euler(new Vector3(0, Random.Range(0f, 360f), 0));
 
-            animator.SetFloat("AnimationSpeed", animationSpeed);
+
+            if (animator != null) animator.SetFloat("AnimationSpeed", animationSpeed);
             wayPointDistance = 10f;
             if (canSwimOrFly)
             {
                 if (minAltitude > Terrain.activeTerrain.SampleHeight(transform.position))
                 {
                     homePosition = new Vector3(transform.position.x, (maxAltitude + minAltitude) / 2, transform.position.z);
-                    
+
                 }
                 else
                 {
@@ -87,16 +88,17 @@ namespace StupidHumanGames
             transform.localScale = sizeOfObject;
             if (rootMotion)
             {
-                animator.applyRootMotion = true;
+                if (animator != null) animator.applyRootMotion = true;
             }
             else
             {
-                animator.applyRootMotion = false;
+                if (animator != null) animator.applyRootMotion = false;
             }
             if (TryGetComponent<Rigidbody>(out rb))
             {
                 rb = GetComponent<Rigidbody>();
             }
+            StartCoroutine(State());
         }
 #if UNITY_EDITOR
 
@@ -110,7 +112,7 @@ namespace StupidHumanGames
         void SwimOrFly()
         {
             DistanceToWaypoint();
-            if (_moveTowards)
+            if (_aggressive)
             {
                 var qto = Quaternion.LookRotation(wayPoint - transform.position).normalized;
                 transform.rotation = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * turnSpeed);
@@ -129,7 +131,7 @@ namespace StupidHumanGames
             DistanceToWaypoint();
 
             Vector3 newWay = new Vector3(wayPoint.x, transform.position.y, wayPoint.z);
-            if (_moveTowards)
+            if (_aggressive)
             {
                 var qto = Quaternion.LookRotation(newWay - transform.position).normalized;
                 transform.rotation = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * turnSpeed);
@@ -182,18 +184,7 @@ namespace StupidHumanGames
                 if (cross.y < 0f && cross.y > -.5f) wayPoint = transform.position + transform.forward * 3 - transform.right * 3f; //right
             }
         }
-        void ChaseOrFlee()
-        {
-            if (!_moveTowards) return;
-            int a = Random.Range(1, Random.Range(1, _ChaseOrFlee));
-            if (a == 1) _moveTowards = true;
-            else if (a != 1 || _ChaseOrFlee == 10) _moveTowards = false;
-            Invoke(nameof(OnFleeReset), 3f);
-        }
-        void OnFleeReset()
-        {
-            _moveTowards = true;
-        }
+      
         #endregion
         #region RNG
         void RandomWaypoint()
@@ -229,15 +220,15 @@ namespace StupidHumanGames
         void RandomIdleAnimations()
         {
             int rnd = Random.Range(0, rndIdleCount);
-            animator.SetInteger("IdleInt", rnd);
-            animator.SetTrigger("IdleTrigger");
+            if (animator != null) animator.SetInteger("IdleInt", rnd);
+            if (animator != null) animator.SetTrigger("IdleTrigger");
             return;
         }
         void RandomAttackAnimations()
         {
             int rnd = Random.Range(0, rndAttackCount);
-            animator.SetInteger("AttackInt", rnd);
-            animator.SetTrigger("AttackTrigger");
+            if (animator != null) animator.SetInteger("AttackInt", rnd);
+            if (animator != null) animator.SetTrigger("AttackTrigger");
             return;
         }
         #endregion
@@ -272,7 +263,7 @@ namespace StupidHumanGames
         IEnumerator Patrol()
         {
             moveSpeed = previousSpeed * .5f;
-            animator.SetFloat("Blend", .5f);
+            if (animator != null) animator.SetFloat("Blend", .5f);
             while (OnCanPatrol())
             {
 
@@ -282,7 +273,7 @@ namespace StupidHumanGames
                 {
                     float rnd = Random.Range(.5f, 1f);
                     moveSpeed = previousSpeed * rnd;
-                    animator.SetFloat("Blend", rnd);
+                    if (animator != null) animator.SetFloat("Blend", rnd);
                 }
                 if (RandomBool(2000) && idle)
                 {
@@ -296,7 +287,7 @@ namespace StupidHumanGames
         IEnumerator Chase()
         {
             moveSpeed = previousSpeed;
-            animator.SetFloat("Blend", 1f);
+            if (animator != null) animator.SetFloat("Blend", 1f);
 
             while (OnCanChase())
             {
@@ -312,9 +303,8 @@ namespace StupidHumanGames
         }
         IEnumerator Attack()
         {
-            _moveTowards = true;
             moveSpeed = 0f;
-            animator.SetFloat("Blend", 0f);
+            if (animator != null) animator.SetFloat("Blend", 0f);
             while (OnCanAttack())
             {
                 wayPoint = player.position;
@@ -322,10 +312,10 @@ namespace StupidHumanGames
                 if (attackSound != null) _audioSource.PlayOneShot(attackSound, attackVolume);
                 moveSpeed = -1f;
 
-                animator.SetFloat("AnimationSpeed", -1f);
-                animator.SetFloat("Blend", 1f);
+                if (animator != null) animator.SetFloat("AnimationSpeed", -1f);
+                if (animator != null) animator.SetFloat("Blend", 1f);
                 yield return new WaitForSeconds(reverseTime * Random.Range(.5f, 1f));
-                animator.SetFloat("AnimationSpeed", animationSpeed);
+                if (animator != null) animator.SetFloat("AnimationSpeed", animationSpeed);
                 moveSpeed = 1f;
                 yield return null;
             }
@@ -334,7 +324,7 @@ namespace StupidHumanGames
         IEnumerator Lost()
         {
             moveSpeed = previousSpeed;
-            animator.SetFloat("Blend", 1f);
+            if (animator != null) animator.SetFloat("Blend", 1f);
             while (OnLost())
             {
                 OnHitObstacle();
