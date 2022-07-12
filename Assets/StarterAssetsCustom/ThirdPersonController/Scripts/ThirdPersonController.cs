@@ -344,7 +344,7 @@ namespace StupidHumanGames
             while (OnIsSwimming())
             {
                 SwimGroundCheck();
-                OnSwim(1);
+                OnSwim(.5f);
 
                 yield return null;
             }
