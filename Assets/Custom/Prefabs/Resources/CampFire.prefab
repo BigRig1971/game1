@@ -1642,9 +1642,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3596187661416315477}
   - component: {fileID: 7417571817187288540}
-  - component: {fileID: 7292915517803103275}
-  - component: {fileID: 4829739827814761377}
-  - component: {fileID: 2662180243008893634}
   - component: {fileID: 3685654110381915278}
   - component: {fileID: 3685654110381915279}
   m_Layer: 12
@@ -1699,71 +1696,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.5, y: 0.1, z: 0.5}
   m_Center: {x: 0, y: 0.05, z: 0}
---- !u!114 &7292915517803103275
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3596187661416315478}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca6a0d75815a6ec449c648f0cf0fec23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  loadOnce: 0
-  manualSaveLoad: 0
-  externalListeners: []
-  saveWhenDisabled: 1
-  deactivateObjectWhenInitialized: 0
-  cachedSaveableComponents:
-  - identifier: 
-    hasUpdatedIdentifier: 1
-    identification:
-      UseConstant: 1
-      ConstantValue: SavePosition-7202c
-      Variable: {fileID: 0}
-    monoBehaviour: {fileID: 4829739827814761377}
-  - identifier: 
-    hasUpdatedIdentifier: 1
-    identification:
-      UseConstant: 1
-      ConstantValue: SaveRotation-ad09b
-      Variable: {fileID: 0}
-    monoBehaviour: {fileID: 2662180243008893634}
-  saveIdentifier:
-    UseConstant: 1
-    ConstantValue: 
-    Variable: {fileID: 0}
-  sceneName: 
-  saveIdentification: 
-  hasUpdatedIdentifier: 1
---- !u!114 &4829739827814761377
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3596187661416315478}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d2c7167844c4a445b275f02764b1d0f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  space: 0
---- !u!114 &2662180243008893634
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3596187661416315478}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16ee85bc9dc4d7942b110ac8bffc59bf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  space: 0
 --- !u!82 &3685654110381915278
 AudioSource:
   m_ObjectHideFlags: 0

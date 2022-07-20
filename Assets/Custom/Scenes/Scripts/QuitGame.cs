@@ -1,32 +1,49 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
+using UnityEditor;
+
 
 
 public class QuitGame : MonoBehaviour
 {
-    private TextMeshProUGUI Quit;
-	private void Start()
-	{
-        Quit = FindObjectOfType<TextMeshProUGUI>();
-        Quit.enabled = false;
+    [SerializeField] GameObject _quitGameUI;
+    
+    bool quit = false;
 
-	}
-	void Update()
+
+    private void Start()
     {
-        if (Input.GetKey(KeyCode.Y) && Quit.enabled)
+        _quitGameUI = Instantiate(_quitGameUI);
+        _quitGameUI.SetActive(false);
+       
+    }
+    void Update()
+    {
+#if UNITY_EDITOR
+   if(quit) EditorApplication.isPlaying = false;
+#else
+        if (quit) Application.Quit();
+#endif
+        if (Input.GetKey(KeyCode.Y))
         {
-            Application.Quit();         
+            quit = true;
+
         }
         if (Input.GetKey("escape"))
         {
-            Quit.enabled = true;     
+
+            if (!_quitGameUI.activeSelf)
+            {
+                _quitGameUI.SetActive(true);
+            }
+
+
         }
         else
                 if (Input.GetKey(KeyCode.N))
         {
-            Quit.enabled = false;
+            if (_quitGameUI.activeSelf) _quitGameUI.SetActive(false);          
         }
     }
 }

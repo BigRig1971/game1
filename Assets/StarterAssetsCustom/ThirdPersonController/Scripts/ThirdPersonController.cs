@@ -18,6 +18,8 @@ namespace StupidHumanGames
 #endif
     public class ThirdPersonController : MonoBehaviour
     {
+        Quaternion currentRotation;
+        bool groundHugging = false; 
         Quaternion targetRot;
         public bool isMounted = false;
         public AudioSource _audioSource;
@@ -175,11 +177,7 @@ namespace StupidHumanGames
         {
             OnGravity();
             
-            if (Input.GetKeyDown(KeyCode.H))
-            {
-                animEnable = !animEnable;
-                if (animEnable && _hasAnimator) _animator.SetBool("Dance", true); else _animator.SetBool("Dance", false);
-            }
+           
 
             if (_input._inventory)
             {
@@ -269,6 +267,7 @@ namespace StupidHumanGames
             {
                 GroundedCheck();
                 JumpAndGravity();
+
                 if (_input._roll)
                 {
                     if (_hasAnimator)
@@ -277,6 +276,23 @@ namespace StupidHumanGames
                         _input._roll = false;
                     }
                 }
+                if (Input.GetKeyDown(KeyCode.H))
+                {
+
+                    animEnable = !animEnable;
+                    if (animEnable && _hasAnimator)
+                    {
+                        _animator.SetBool("Crawl", true);
+                        groundHugging = true;
+                    }
+                    else
+                    {
+                        _animator.SetBool("Crawl", false);
+                        groundHugging = false;
+                        transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
+                    }
+                }
+                if(groundHugging) OnYPosition();
                 float targetSpeed = _input._sprint ? SprintSpeed : MoveSpeed;
                 if (_input._move == Vector2.zero) targetSpeed = 0.0f;
                 float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
@@ -304,7 +320,18 @@ namespace StupidHumanGames
                         RotationSmoothTime);
                     if (!isMounted)
                     {
-                        transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                        if (groundHugging)
+                        {
+                            OnYPosition();
+                            transform.rotation = Quaternion.Euler(currentRotation.eulerAngles.x, rotation, currentRotation.eulerAngles.z);
+                        }
+                        else
+                        {
+                            transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                        }
+                            
+
+                        
                     }
                 }
                 Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
@@ -549,6 +576,19 @@ namespace StupidHumanGames
         public void OnDisableMount()
         {
             isMounted = false;
+        }
+        void OnYPosition()
+        {
+            Vector3 position = transform.position;
+            RaycastHit hit;
+            if (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + transform.up.y, transform.position.z),
+                -transform.up, out hit, 20, GroundLayers))
+            {
+                targetRot = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
+                currentRotation = transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime / 0.15f);
+                position.y = Terrain.activeTerrain.SampleHeight(transform.position) + .01f;
+                transform.position = position;
+            }
         }
 
     }

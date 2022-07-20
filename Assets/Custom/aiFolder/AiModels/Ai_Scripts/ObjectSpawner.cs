@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 
 
@@ -29,7 +30,7 @@ public class ObjectSpawner : MonoBehaviour
     float slopeAngle;
 
 
-    List<GameObject> list = new List<GameObject>();
+  public List<GameObject> list = new List<GameObject>();
     private float m_internalTimer = 5f;
 
 #if UNITY_EDITOR
@@ -61,11 +62,10 @@ public class ObjectSpawner : MonoBehaviour
         m_internalTimer = Mathf.Max(m_internalTimer, 0f);
         if (m_internalTimer == 0f)
         {
-           // Quaternion q = Quaternion.identity;
-            q = Quaternion.Euler(new Vector3(0, Random.Range(q.x, 360f), q.z));
+            q = Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(q.x, 360f), q.z));
             foreach (GameObject _prefab in prefab)
             {
-                float rndScale = Random.Range(.8f, 1.2f);
+                float rndScale = UnityEngine.Random.Range(.8f, 1.2f);
                 RaycastHit hit;
                 Vector3 _transform = transform.position + GetOffset();
                 if (Physics.Raycast(new Vector3(_transform.x, _transform.y + transform.up.y * 2, _transform.z),
@@ -106,12 +106,12 @@ public class ObjectSpawner : MonoBehaviour
     }
     Vector3 GetOffset()
     {
-        Vector3 offset = new Vector3(Random.Range(-maxRange, maxRange), 0, Random.Range(-maxRange, maxRange));
+        Vector3 offset = new Vector3(UnityEngine.Random.Range(-maxRange, maxRange), 0, UnityEngine.Random.Range(-maxRange, maxRange));
         return offset;
     }
     Quaternion AlignToGround(Vector3 position, Quaternion rotation)
     {
-        transform.rotation = Quaternion.Euler(new Vector3(0, Random.Range(0f, 360f), 0));
+        transform.rotation = Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(0f, 360f), 0));
 
         RaycastHit hit;
         if (Physics.Raycast(new Vector3(position.x, position.y + transform.up.y, position.z),
@@ -128,5 +128,5 @@ public class ObjectSpawner : MonoBehaviour
         return _pos;
     }
 
-
+   
 }

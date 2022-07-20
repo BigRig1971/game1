@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Photon.Pun;
-using Lowscope.Saving;
+
 
 
 namespace StupidHumanGames
@@ -30,10 +30,10 @@ namespace StupidHumanGames
 		}
 		public void Place()
 		{
-			//var spawnedObject = Instantiate(prefab, transform.position, Quaternion.identity);
-			var spawnedObject = SaveMaster.SpawnSavedPrefab(InstanceSource.Resources, prefab.name);
-			spawnedObject.transform.position = new Vector3(transform.position.x, transform.position.y + spawnOffset, transform.position.z);
-			spawnedObject.transform.rotation = this.transform.rotation;
+			var spawnedObject = Instantiate(prefab, transform.position, Quaternion.identity);
+			//var spawnedObject = SaveMaster.SpawnSavedPrefab(InstanceSource.Resources, prefab.name);
+			//spawnedObject.transform.position = new Vector3(transform.position.x, transform.position.y + spawnOffset, transform.position.z);
+			//spawnedObject.transform.rotation = this.transform.rotation;
 			//PhotonNetwork.AddCallbackTarget(spawnedObject);
 			Destroy(gameObject);
 		}
