@@ -1969,7 +1969,7 @@ Transform:
   - {fileID: 4811726338812890204}
   - {fileID: 604333711}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4811726339079997503
 MonoBehaviour:
@@ -1983,6 +1983,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5eb322b395582646afc3101b3e47671, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  showSettings: 0
+  isOn: 1
+  groupID: 0
+  autoSync: 1
+  _zuid: 
+  _gozuid: 
   _randomAttackSound: []
   _randomAttackSoundVolume: 1
   _randomSound: []
@@ -2003,6 +2009,7 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 1024
+  _mountTransform: {fileID: 0}
 --- !u!95 &4811726339079997490
 Animator:
   serializedVersion: 4

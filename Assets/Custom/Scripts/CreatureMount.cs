@@ -5,9 +5,10 @@ using UnityEngine.InputSystem;
 using UnityEngine.Events;
 using TMPro;
 using System;
+using ZSerializer;
 namespace StupidHumanGames
 {
-    public class CreatureMount : MonoBehaviour
+    public class CreatureMount : PersistentMonoBehaviour
     {
         AudioSource _audioSource;
         [SerializeField] AudioClip[] _randomAttackSound;
@@ -43,10 +44,12 @@ namespace StupidHumanGames
         Transform _player;
         ThirdPersonController _tpc;      
         [SerializeField] LayerMask groundLayer;
+        public Transform _mountTransform;
 
         private void Start()
         {
-            
+            transform.position = _mountTransform.position;
+            transform.rotation = _mountTransform.rotation;  
             _audioSource = GetComponent<AudioSource>();
             rb = GetComponent<Rigidbody>();
 
@@ -60,6 +63,7 @@ namespace StupidHumanGames
 
             _thisAnimator = GetComponent<Animator>();
             OnYPosition();
+            _ = ZSerialize.LoadScene();
         }
         private void OnTriggerEnter(Collider other)
         {
@@ -225,12 +229,17 @@ namespace StupidHumanGames
             int rnd2 = UnityEngine.Random.Range(0, rn);
             if (rnd == rnd2) return true; else return false;
         }
-
       
+        private void OnApplicationQuit()
+        {
+            _mountTransform = transform;
+            _ = ZSerialize.SaveScene();
+        }
 
-      
 
- 
+
+
+
     }
 }
 
