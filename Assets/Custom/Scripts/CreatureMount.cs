@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.Events;
 using TMPro;
 using System;
+
 namespace StupidHumanGames
 {
     public class CreatureMount : MonoBehaviour
@@ -225,12 +226,16 @@ namespace StupidHumanGames
             int rnd2 = UnityEngine.Random.Range(0, rn);
             if (rnd == rnd2) return true; else return false;
         }
+        private void OnApplicationQuit()
+        {
+            
+        }
 
-      
 
-      
 
- 
+
+
+
     }
 }
 

@@ -383,7 +383,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Blend Tree
-  m_Speed: 1
+  m_Speed: 0.5
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -7825012904365907917}
@@ -399,10 +399,10 @@ AnimatorState:
   m_TimeParameterActive: 0
   m_Motion: {fileID: 4823601306688042712}
   m_Tag: 
-  m_SpeedParameter: AnimationSpeed
+  m_SpeedParameter: BlendMultiplier
   m_MirrorParameter: Reverse
   m_CycleOffsetParameter: Blend
-  m_TimeParameter: AnimationSpeed
+  m_TimeParameter: BlendMultiplier
 --- !u!1101 &-1982371247329308592
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -533,7 +533,7 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
-  - m_Name: AnimationSpeed
+  - m_Name: BlendMultiplier
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -857,7 +857,7 @@ BlendTree:
     m_Motion: {fileID: 7400000, guid: eaa398d60a599b545984d0674198ad2e, type: 2}
     m_Threshold: 0
     m_Position: {x: 0, y: 0}
-    m_TimeScale: 0.01
+    m_TimeScale: 0.5
     m_CycleOffset: 0
     m_DirectBlendParameter: Blend
     m_Mirror: 0
@@ -873,7 +873,7 @@ BlendTree:
     m_Motion: {fileID: 4015240799290289283, guid: 13ff9b98158a0934ba70928b94670b7f, type: 3}
     m_Threshold: 1
     m_Position: {x: 0, y: 0}
-    m_TimeScale: 1
+    m_TimeScale: 2
     m_CycleOffset: 0
     m_DirectBlendParameter: Blend
     m_Mirror: 0
