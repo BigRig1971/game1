@@ -10,6 +10,7 @@ public class QuitGame : MonoBehaviour
     [SerializeField] GameObject _quitGameUI;
     
     bool quit = false;
+   public bool aboutToQuit = false;
 
 
     private void Start()
@@ -27,7 +28,8 @@ public class QuitGame : MonoBehaviour
 #endif
         if (Input.GetKey(KeyCode.Y))
         {
-            quit = true;
+            
+            StartCoroutine(OnQuit());
 
         }
         if (Input.GetKey("escape"))
@@ -45,5 +47,11 @@ public class QuitGame : MonoBehaviour
         {
             if (_quitGameUI.activeSelf) _quitGameUI.SetActive(false);          
         }
+    }
+    IEnumerator OnQuit()
+    {
+        aboutToQuit = true;
+        yield return new WaitForSeconds(.3f);
+        quit = true;
     }
 }

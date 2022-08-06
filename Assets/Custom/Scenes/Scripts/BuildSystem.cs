@@ -30,7 +30,7 @@ namespace StupidHumanGames
 		private void Start()
 		{
 
-
+			cam = Camera.main;
 		}
 		private void Update()
 		{
@@ -113,7 +113,7 @@ namespace StupidHumanGames
 
 				foreach (ItemSO item in buildItems)
 				{
-					if (hit.collider.name == item.name + "(Clone)")
+					if (hit.collider.name == item.name)
 					{
 						InventoryManager.AddItemToInventory(item, 1);
 						Destroy(hit.transform.gameObject);
@@ -180,7 +180,7 @@ namespace StupidHumanGames
 										   //method whereever it snaps to a snap point
 		{
 			pauseBuilding = _value;
-			Debug.Log(_value);
+			//Debug.Log(_value);
 		}
 
 		private void DoBuildRay()//actually positions your previewGameobject in the world

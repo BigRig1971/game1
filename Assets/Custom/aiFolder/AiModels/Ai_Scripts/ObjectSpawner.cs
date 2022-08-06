@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.IO;
 
 
 
@@ -25,34 +26,46 @@ public class ObjectSpawner : MonoBehaviour
     public int maximum = 15;
     public float maxRange = 3f;
     public float minSeparation = 3f;
-    GameObject go;
+    GameObject _object;
+
+
+
+    private static readonly string SAVE_FOLDER = Application.dataPath + "/Saves/";
+
+    string json;
 
     float slopeAngle;
 
 
-  public List<GameObject> list = new List<GameObject>();
+    public List<GameObject> list = new List<GameObject>();
     private float m_internalTimer = 5f;
 
 #if UNITY_EDITOR
 
 #endif
-   
+    private void Awake()
+    {
+       
+
+    }
     void Start()
     {
+       
+
         m_internalTimer = delay;
     }
     public void OnRemoveObject()
     {
-        list.Remove(go);
+        list.Remove(_object);
     }
     void Update()
     {
-       
+
         spawnObjects();
     }
-   public void spawnObjects()
+    public void spawnObjects()
     {
-        
+
         if (list.Count >= maximum)
         {
             return;
@@ -67,37 +80,38 @@ public class ObjectSpawner : MonoBehaviour
             {
                 float rndScale = UnityEngine.Random.Range(.8f, 1.2f);
                 RaycastHit hit;
-                Vector3 _transform = transform.position + GetOffset();
-                if (Physics.Raycast(new Vector3(_transform.x, _transform.y + transform.up.y * 2, _transform.z),
+                Vector3 _position = transform.position + GetOffset();
+                if (Physics.Raycast(new Vector3(_position.x, _position.y + transform.up.y * 2, _position.z),
             -transform.up, out hit, 50, ground))
                 {
                     slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
                 }
                 if (spawnOnGround)
                 {
-                    _transform = OnGround(_transform);
-                    if (alignWithGround) q = AlignToGround(_transform, q);
+                    _position = OnGround(_position);
+                    if (alignWithGround) q = AlignToGround(_position, q);
                     if (slopeAngle >= slopeLimit) return;
                     if (hit.point.y <= minTerrainHeight || hit.point.y >= maxTerrainHeight) return;
                 }
                 else
                 {
-                    if (_transform.y <= OnGround(_transform).y + 3f) return;
+                    if (_position.y <= OnGround(_position).y + 3f) return;
                 }
-                                                         
-                if (Physics.CheckSphere(_transform, minSeparation, avoidableObjects)) return;
-                
-                _prefab.transform.localScale = new Vector3(scale*rndScale, scale*rndScale, scale*rndScale);
-                GameObject obj = Instantiate(_prefab, _transform, q) as GameObject;
-                
+
+                if (Physics.CheckSphere(_position, minSeparation, avoidableObjects)) return;
+
+                _prefab.transform.localScale = new Vector3(scale * rndScale, scale * rndScale, scale * rndScale);
+                GameObject obj = Instantiate(_prefab, _position, q) as GameObject;
+
                 list.Add(obj);
-                go = obj;
+
+
                 m_internalTimer = delay;
 
             }
         }
     }
-  
+
 
     void LateUpdate()
     {
@@ -117,7 +131,7 @@ public class ObjectSpawner : MonoBehaviour
         if (Physics.Raycast(new Vector3(position.x, position.y + transform.up.y, position.z),
             -transform.up, out hit, 20, ground))
         {
-            targetRot = Quaternion.FromToRotation(transform.up, hit.normal) * rotation;          
+            targetRot = Quaternion.FromToRotation(transform.up, hit.normal) * rotation;
         }
         return targetRot;
     }
@@ -128,5 +142,9 @@ public class ObjectSpawner : MonoBehaviour
         return _pos;
     }
 
-   
+    private void OnApplicationQuit()
+    {
+       
+    }
+
 }

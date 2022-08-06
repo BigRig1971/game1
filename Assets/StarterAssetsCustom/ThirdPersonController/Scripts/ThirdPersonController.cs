@@ -18,6 +18,7 @@ namespace StupidHumanGames
 #endif
     public class ThirdPersonController : MonoBehaviour
     {
+        public float _surfaceDist = 0f;
         Quaternion currentRotation;
         bool groundHugging = false; 
         Quaternion targetRot;
@@ -410,6 +411,7 @@ namespace StupidHumanGames
 
                if(!isMounted) transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
                 _controller.Move(new Vector3(0.0f, GravityLerp(gravity) * Time.deltaTime));
+                
 
             }
 
@@ -590,6 +592,8 @@ namespace StupidHumanGames
                 transform.position = position;
             }
         }
+
+       
 
     }
 }

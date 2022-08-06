@@ -13,7 +13,7 @@ namespace StupidHumanGames
 		public GameObject prefab;
 		public float spawnOffset = 0f;
 		private MeshRenderer myRend;
-
+		private SaveGame saveGame;
 		public bool isGrounded = false;
 		private Transform spawnedTransform;
 		public Material goodMat;//green material
@@ -24,13 +24,17 @@ namespace StupidHumanGames
 		public List<string> tagsISnapTo = new List<string>();//list of all of the SnapPoint tags this particular preview can snap too
 		private void Start()
 		{
+			saveGame = GameObject.FindObjectOfType<SaveGame>();
 			buildSystem = GameObject.FindObjectOfType<BuildSystem>();
 			myRend = GetComponent<MeshRenderer>();
 			ChangeColor();
 		}
 		public void Place()
 		{
-			var spawnedObject = Instantiate(prefab, transform.position, Quaternion.identity);
+			//var spawnedObject = Instantiate(prefab, transform.position, Quaternion.identity);
+			
+			saveGame.SpawnPrefab(prefab, transform.position, transform.rotation);
+
 			//var spawnedObject = SaveMaster.SpawnSavedPrefab(InstanceSource.Resources, prefab.name);
 			//spawnedObject.transform.position = new Vector3(transform.position.x, transform.position.y + spawnOffset, transform.position.z);
 			//spawnedObject.transform.rotation = this.transform.rotation;

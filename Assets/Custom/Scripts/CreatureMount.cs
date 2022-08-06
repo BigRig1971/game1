@@ -14,7 +14,6 @@ namespace StupidHumanGames
         [SerializeField] AudioClip[] _randomAttackSound;
         [SerializeField] float _randomAttackSoundVolume = 1f;
         [SerializeField] AudioClip[] _randomSound;
-
         [SerializeField] float _randomSoundVolume = 1f;
         [SerializeField] AudioClip[] FootstepAudioClips;
         [SerializeField] float FootstepAudioVolume = 1f;
@@ -44,13 +43,10 @@ namespace StupidHumanGames
         Transform _player;
         ThirdPersonController _tpc;      
         [SerializeField] LayerMask groundLayer;
-
         private void Start()
         {
-            
             _audioSource = GetComponent<AudioSource>();
             rb = GetComponent<Rigidbody>();
-
             _prevCamRoot = _camRootPlayer.localPosition;
             _mountUI = Instantiate(_mountUI);
             _mountUI.SetActive(false);
@@ -58,7 +54,6 @@ namespace StupidHumanGames
             {
                 _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             }
-
             _thisAnimator = GetComponent<Animator>();
             OnYPosition();
         }
@@ -80,7 +75,6 @@ namespace StupidHumanGames
                         _mountUI.SetActive(true);
                     }
                 }
-
             }
         }
         private void OnTriggerExit(Collider other)
@@ -92,9 +86,7 @@ namespace StupidHumanGames
                 {
                     _mountUI.SetActive(false);
                 }
-               // _player.SetParent(null);
             }
-
         }
         private void Update()
         {
@@ -119,7 +111,6 @@ namespace StupidHumanGames
                     _player.transform.localPosition = _saddlePoint.localPosition;
                     _player.transform.localRotation = _saddlePoint.localRotation;
                     _tpc.OnEnableMount();
-
                 }
                 else
                 {
@@ -136,7 +127,6 @@ namespace StupidHumanGames
                 }
             }
             if (_isMounted) OnMove();
-
         }
         private void OnMove()
         {
@@ -149,7 +139,6 @@ namespace StupidHumanGames
             {
                 speed = walkSpeed;
             }
-
             if (_player != null)
             {
                 _player.transform.localPosition = _saddlePoint.localPosition;
@@ -159,7 +148,6 @@ namespace StupidHumanGames
 
                     _thisAnimator.SetTrigger("Attack");
                 }
-
                 Vector3 inputDirection = new Vector3(_input._move.x, 0.0f, _input._move.y).normalized;
                 if (_input._move != Vector2.zero)
                 {
@@ -169,14 +157,10 @@ namespace StupidHumanGames
                         RotationSmoothTime);
                     transform.rotation = Quaternion.Euler(currentRotation.eulerAngles.x, rotation, currentRotation.eulerAngles.z);
                 }
-
                 if (_input != null && _input._move != Vector2.zero) _thisAnimator.SetFloat("Blend", speed); else _thisAnimator.SetFloat("Blend", 0f);
-
                 OnYPosition();
-
             }
         }
-
         void OnYPosition()
         {
             Vector3 position = transform.position;
@@ -199,7 +183,6 @@ namespace StupidHumanGames
             {
                 var index = UnityEngine.Random.Range(0, FootstepAudioClips.Length);
                 if (OnfootStep.animatorClipInfo.weight > .8f) _audioSource.PlayOneShot(FootstepAudioClips[index], FootstepAudioVolume);
-
             }
         }
         private void OnRandomSound()
@@ -208,7 +191,6 @@ namespace StupidHumanGames
             {
                 var index = UnityEngine.Random.Range(0, _randomSound.Length);
                 _audioSource.PlayOneShot(_randomSound[index], _randomSoundVolume);
-
             }
         }
         private void OnRandomAttackSound(AnimationEvent OnAttack)
@@ -217,7 +199,6 @@ namespace StupidHumanGames
             {
                 var index = UnityEngine.Random.Range(0, _randomAttackSound.Length);
                 if (OnAttack.animatorClipInfo.weight > .2f) _audioSource.PlayOneShot(_randomAttackSound[index], _randomAttackSoundVolume);
-
             }
         }
         bool RandomBool(int rn)
@@ -226,15 +207,8 @@ namespace StupidHumanGames
             int rnd2 = UnityEngine.Random.Range(0, rn);
             if (rnd == rnd2) return true; else return false;
         }
-        private void OnApplicationQuit()
-        {
-            
-        }
 
-
-
-
-
+       
 
     }
 }
