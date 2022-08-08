@@ -13,10 +13,11 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _DETAIL_MAP
-  - _DISABLE_DECALS
   - _DISABLE_SSR_TRANSPARENT
+  - _ENABLE_GEOMETRIC_SPECULAR_AA
   - _MATERIAL_FEATURE_CLEAR_COAT
   - _MATERIAL_FEATURE_SUBSURFACE_SCATTERING
+  - _MATERIAL_FEATURE_TRANSMISSION
   - _NORMALMAP
   - _NORMALMAP_TANGENT_SPACE
   m_InvalidKeywords:
@@ -30,7 +31,7 @@ Material:
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2000
+  m_CustomRenderQueue: 2225
   stringTagMap:
     MotionVector: User
   disabledShaderPasses:
@@ -579,7 +580,7 @@ Material:
     - _CarPaint2_FlakeNumThetaI: 0
     - _CarPaint2_FlakeNumThetaIF: 0
     - _CarPaint2_LobeCount: 0
-    - _CoatMask: 0.328
+    - _CoatMask: 0.379
     - _ConservativeDepthOffsetEnable: 0
     - _CullMode: 2
     - _CullModeForward: 2
@@ -591,7 +592,7 @@ Material:
     - _DetailAlbedoScale2: 1
     - _DetailAlbedoScale3: 1
     - _DetailNormalMapScale: 1
-    - _DetailNormalScale: 0.73
+    - _DetailNormalScale: 0.653
     - _DetailNormalScale0: 1
     - _DetailNormalScale1: 1
     - _DetailNormalScale2: 1
@@ -639,7 +640,7 @@ Material:
     - _EmissiveIntensityUnit: 0
     - _EnableBlendModePreserveSpecularLighting: 1
     - _EnableFogOnTransparent: 1
-    - _EnableGeometricSpecularAA: 0
+    - _EnableGeometricSpecularAA: 1
     - _EnergyConservingSpecularColor: 1
     - _Flags: 0
     - _FlagsB: 8388608
@@ -742,7 +743,7 @@ Material:
     - _NormalMapSpace1: 0
     - _NormalMapSpace2: 0
     - _NormalMapSpace3: 0
-    - _NormalScale: 0
+    - _NormalScale: 2.69
     - _NormalScale0: 1
     - _NormalScale1: 1
     - _NormalScale2: 1
@@ -784,7 +785,7 @@ Material:
     - _SVBRDF_HeightMapMaxMM: 0
     - _SVBRDF_SpecularLobeMapScale: 1
     - _SensorId: 1
-    - _Smoothness: 0.36
+    - _Smoothness: 0.357
     - _Smoothness0: 0.5
     - _Smoothness1: 0.5
     - _Smoothness2: 0.5
@@ -816,13 +817,13 @@ Material:
     - _StencilWriteMaskDistortionVec: 4
     - _StencilWriteMaskGBuffer: 14
     - _StencilWriteMaskMV: 40
-    - _SubsurfaceMask: 1
+    - _SubsurfaceMask: 0.255
     - _SubsurfaceMask0: 1
     - _SubsurfaceMask1: 1
     - _SubsurfaceMask2: 1
     - _SubsurfaceMask3: 1
     - _SubsurfaceScale: 1
-    - _SupportDecals: 0
+    - _SupportDecals: 1
     - _SurfaceType: 0
     - _TessellationBackFaceCullEpsilon: -0.25
     - _TessellationFactor: 4
@@ -838,12 +839,12 @@ Material:
     - _TexWorldScale3: 1
     - _TexWorldScaleBlendMask: 1
     - _TexWorldScaleEmissive: 1
-    - _Thickness: 0.234
+    - _Thickness: 0.105
     - _Thickness0: 1
     - _Thickness1: 1
     - _Thickness2: 1
     - _Thickness3: 1
-    - _TransmissionEnable: 0
+    - _TransmissionEnable: 1
     - _TransparentBackfaceEnable: 0
     - _TransparentCullMode: 2
     - _TransparentDepthPostpassEnable: 0
@@ -892,7 +893,7 @@ Material:
     - WaterColorA: {r: 0.08490565, g: 0.04261914, b: 0.03484337, a: 0}
     - WaterColorB: {r: 0.001201498, g: 0.009433985, b: 0.009433985, a: 0}
     - _BASE_COLOR: {r: 1, g: 1, b: 1, a: 0}
-    - _BaseColor: {r: 0.8490566, g: 0.7781239, b: 0.6928622, a: 1}
+    - _BaseColor: {r: 0.6037736, g: 0.6037736, b: 0.6037736, a: 1}
     - _BaseColor0: {r: 1, g: 1, b: 1, a: 1}
     - _BaseColor1: {r: 1, g: 1, b: 1, a: 1}
     - _BaseColor2: {r: 1, g: 1, b: 1, a: 1}
@@ -906,7 +907,7 @@ Material:
     - _CarPaint2_CTF0s: {r: 1, g: 1, b: 1, a: 1}
     - _CarPaint2_CTSpreads: {r: 1, g: 1, b: 1, a: 1}
     - _ClearcoatNormalMap_SO: {r: 1, g: 1, b: 0, a: 0}
-    - _Color: {r: 0.8490566, g: 0.7781239, b: 0.6928622, a: 1}
+    - _Color: {r: 0.6037736, g: 0.6037736, b: 0.6037736, a: 1}
     - _DiffusionProfileAsset: {r: -1.405437e+32, g: 2.0030989e-26, b: 0.00000006313206, a: -4.4045647e-18}
     - _DiffusionProfileAsset0: {r: 0, g: 0, b: 0, a: 0}
     - _DiffusionProfileAsset1: {r: 0, g: 0, b: 0, a: 0}

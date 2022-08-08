@@ -22,12 +22,7 @@ public class SaveableObject : MonoBehaviour
     {
         saveGame = GameObject.FindObjectOfType<SaveGame>();
     }
-    private void OnDestroy()
-    {
-        saveGame.RemoveId(goid.ToString());
-    }
-
-
+  
     private void GenerateID()
     {
         //id = Guid.NewGuid().ToString();

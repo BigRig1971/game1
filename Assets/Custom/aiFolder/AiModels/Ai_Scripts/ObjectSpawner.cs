@@ -12,6 +12,7 @@ public class ObjectSpawner : MonoBehaviour
     [Header("SPAWN ON GROUND ONLY PROPERTIES")]
     Quaternion targetRot;
     Quaternion q;
+    [SerializeField] GameObject _prefab;
     [SerializeField] bool spawnOnGround = true;
     [SerializeField] bool alignWithGround = true;
     [SerializeField, Range(0f, 200)] float minTerrainHeight = 0f;
@@ -21,94 +22,162 @@ public class ObjectSpawner : MonoBehaviour
     public float scale = 1f;
     public LayerMask avoidableObjects;
     public LayerMask ground;
-    public GameObject[] prefab;
+
     public float delay = .1f;
     public int maximum = 15;
     public float maxRange = 3f;
     public float minSeparation = 3f;
     GameObject _object;
-
-
-
-    private static readonly string SAVE_FOLDER = Application.dataPath + "/Saves/";
-
-    string json;
-
+    [SerializeField] SaveGame saveGame;
+    bool canSpawn = false;
     float slopeAngle;
+    GameObject delete;
 
 
-    public List<GameObject> list = new List<GameObject>();
+    [SerializeField] List<GameObject> list = new List<GameObject>();
+    [SerializeField] List<GameObject> deleteThese = new List<GameObject>();
+
     private float m_internalTimer = 5f;
 
-#if UNITY_EDITOR
 
-#endif
     private void Awake()
     {
-       
+
 
     }
     void Start()
     {
-       
+
+
+        StartCoroutine(GetAlreadySpawned());
+
 
         m_internalTimer = delay;
+
     }
     public void OnRemoveObject()
     {
         list.Remove(_object);
     }
-    void Update()
+    public IEnumerator GetAlreadySpawned()
+    {
+        // SaveableObject[] myItems = FindObjectsOfType(typeof(SaveableObject)) as SaveableObject[];
+        // Debug.Log("Found " + myItems.Length + " instances with this script attached");
+
+
+
+
+
+
+        yield return new WaitForSeconds(1f);
+
+        SaveableObject[] myItems = FindObjectsOfType(typeof(SaveableObject)) as SaveableObject[];
+        foreach (SaveableObject obj in myItems)
+        {
+            GameObject go = obj.gameObject;
+            Debug.Log(go.name + " " + _prefab.name);
+            if(go.name == _prefab.name)
+            {
+                list.Add(go);
+            }
+
+            canSpawn = true;
+
+            //list.RemoveAll(o => (o == null || o.Equals(null)));
+
+        }
+        
+       /* yield return new WaitForSeconds(.1f);
+        foreach(GameObject obj in deleteThese)
+        {
+            list.Remove(obj); 
+        }*/
+
+    }
+    public void Remove(GameObject go)
     {
 
-        spawnObjects();
+        //foreach (GameObject target in spawnedTargets)
+        for (int t = list.Count - 1; t >= 0; t--)
+        {
+
+            if (go.name != list[t].name)
+            {
+                list.RemoveAt(t);
+            }
+        }
+        
+    }
+    private void FixedUpdate()
+    {
+
+    }
+    void Update()
+    {
+        if (canSpawn)
+        {
+            spawnObjects();
+        }
+        else
+        {
+            // list.RemoveAll(o => (o != _prefab || !o.Equals(_prefab)));
+        }
+
+
     }
     public void spawnObjects()
     {
-
-        if (list.Count >= maximum)
-        {
-            return;
-        }
-
+        if (list.Count >= maximum) return;
         m_internalTimer -= Time.deltaTime;
         m_internalTimer = Mathf.Max(m_internalTimer, 0f);
         if (m_internalTimer == 0f)
         {
             q = Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(q.x, 360f), q.z));
-            foreach (GameObject _prefab in prefab)
+            // foreach (GameObject _prefab in prefab)
+
+            float rndScale = UnityEngine.Random.Range(.8f, 1.2f);
+            RaycastHit hit;
+            Vector3 _position = transform.position + GetOffset();
+            if (Physics.Raycast(new Vector3(_position.x, _position.y + transform.up.y * 2, _position.z),
+        -transform.up, out hit, 50, ground))
             {
-                float rndScale = UnityEngine.Random.Range(.8f, 1.2f);
-                RaycastHit hit;
-                Vector3 _position = transform.position + GetOffset();
-                if (Physics.Raycast(new Vector3(_position.x, _position.y + transform.up.y * 2, _position.z),
-            -transform.up, out hit, 50, ground))
-                {
-                    slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
-                }
-                if (spawnOnGround)
-                {
-                    _position = OnGround(_position);
-                    if (alignWithGround) q = AlignToGround(_position, q);
-                    if (slopeAngle >= slopeLimit) return;
-                    if (hit.point.y <= minTerrainHeight || hit.point.y >= maxTerrainHeight) return;
-                }
-                else
-                {
-                    if (_position.y <= OnGround(_position).y + 3f) return;
-                }
+                slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
+            }
+            if (spawnOnGround)
+            {
+                _position = OnGround(_position);
+                if (alignWithGround) q = AlignToGround(_position, q);
+                if (slopeAngle >= slopeLimit) return;
+                if (hit.point.y <= minTerrainHeight || hit.point.y >= maxTerrainHeight) return;
+            }
+            else
+            {
+                if (_position.y <= OnGround(_position).y + 3f) return;
+            }
 
-                if (Physics.CheckSphere(_position, minSeparation, avoidableObjects)) return;
+            if (Physics.CheckSphere(_position, minSeparation, avoidableObjects)) return;
 
-                _prefab.transform.localScale = new Vector3(scale * rndScale, scale * rndScale, scale * rndScale);
-                GameObject obj = Instantiate(_prefab, _position, q) as GameObject;
+            _prefab.transform.localScale = new Vector3(scale * rndScale, scale * rndScale, scale * rndScale);
+
+            if (saveGame != null)
+            {
+                if (!canSpawn) return;
+
+                GameObject obj = _prefab.gameObject;
+                //GameObject obj = Instantiate(_prefab, _position, q) as GameObject;
+                saveGame.SpawnPrefab(obj, _position, q);
 
                 list.Add(obj);
-
-
-                m_internalTimer = delay;
+            }
+            else
+            {
+                GameObject obj = Instantiate(_prefab, _position, q) as GameObject;
+                list.Add(obj);
 
             }
+            m_internalTimer = delay;
+
+
         }
     }
 
@@ -117,6 +186,7 @@ public class ObjectSpawner : MonoBehaviour
     {
         //remove all destroyed objects
         list.RemoveAll(o => (o == null || o.Equals(null)));
+
     }
     Vector3 GetOffset()
     {
@@ -140,11 +210,6 @@ public class ObjectSpawner : MonoBehaviour
         Vector3 _pos = position;
         _pos.y = Terrain.activeTerrain.SampleHeight(_pos);
         return _pos;
-    }
-
-    private void OnApplicationQuit()
-    {
-       
     }
 
 }

@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 1063685555775678326}
   - component: {fileID: 867740816601150840}
   - component: {fileID: 5737826633824268361}
-  m_Layer: 3
+  - component: {fileID: 8547058542299140764}
+  m_Layer: 14
   m_Name: Fern
-  m_TagString: Untagged
+  m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -27,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 1067475167801613174}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 475.2235, y: 99.994255, z: 631.506}
-  m_LocalScale: {x: 0.8608474, y: 0.8608474, z: 0.8608474}
+  m_LocalScale: {x: 0.8961354, y: 0.8961354, z: 0.8961354}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1070990229691921554}
@@ -79,6 +80,20 @@ MonoBehaviour:
   storedPrefabBackupGUID: 15f4ffe4e57e4da19d66679b550735a8
   storedPreset: Vegetation Assets/The Vegetation Engine/Demo Fern
   storedOverrides: []
+--- !u!114 &8547058542299140764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1067475167801613174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c722b79df248e254b86fab64ca4c1ce3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goid: 0
+  saveGame: {fileID: 0}
 --- !u!1 &1069080511620410544
 GameObject:
   m_ObjectHideFlags: 0
@@ -90,7 +105,7 @@ GameObject:
   - component: {fileID: 1071230609065457336}
   - component: {fileID: 1055130539806239770}
   - component: {fileID: 1045325109379713424}
-  m_Layer: 3
+  m_Layer: 14
   m_Name: Fern_Var3_LOD2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -173,7 +188,7 @@ GameObject:
   - component: {fileID: 1070990229691921554}
   - component: {fileID: 1055531658165806222}
   - component: {fileID: 1045063903205048922}
-  m_Layer: 3
+  m_Layer: 14
   m_Name: Fern_Var3_LOD0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -256,7 +271,7 @@ GameObject:
   - component: {fileID: 1063856890926895068}
   - component: {fileID: 1055763163760846198}
   - component: {fileID: 1046880492412471184}
-  m_Layer: 3
+  m_Layer: 14
   m_Name: Fern_Var3_LOD1
   m_TagString: Untagged
   m_Icon: {fileID: 0}

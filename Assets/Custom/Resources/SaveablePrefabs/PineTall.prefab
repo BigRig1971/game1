@@ -1930,6 +1930,7 @@ GameObject:
   - component: {fileID: 5216203916248268762}
   - component: {fileID: 5216203916227931002}
   - component: {fileID: 5443340617682455114}
+  - component: {fileID: -1147411108517900675}
   m_Layer: 14
   m_Name: PineTall
   m_TagString: Lootable
@@ -1946,7 +1947,7 @@ Transform:
   m_GameObject: {fileID: 5216203916248425466}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 477.69226, y: 100.06916, z: 628.86755}
-  m_LocalScale: {x: 1.5027845, y: 1.5027845, z: 1.5027845}
+  m_LocalScale: {x: 1.61589, y: 1.61589, z: 1.61589}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5216203916248268760}
@@ -1994,6 +1995,20 @@ MonoBehaviour:
   storedPrefabBackupGUID: 094a6915ae3f48a6a891a7fccb1f37b5
   storedPreset: Vegetation Assets/The Vegetation Engine/Demo Pine Big
   storedOverrides: []
+--- !u!114 &-1147411108517900675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5216203916248425466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c722b79df248e254b86fab64ca4c1ce3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goid: 0
+  saveGame: {fileID: 0}
 --- !u!1 &5216203916248425470
 GameObject:
   m_ObjectHideFlags: 0

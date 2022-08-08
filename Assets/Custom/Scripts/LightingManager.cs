@@ -34,7 +34,8 @@ public class LightingManager : MonoBehaviour
     bool Daytime = true;
     private void Awake()
     {
-       // _currentState = State.Day;
+        // _currentState = State.Day;
+       
     }
     private void Start()
     {
@@ -43,6 +44,8 @@ public class LightingManager : MonoBehaviour
         PauseDaySounds();
         PauseNightSounds();
         StartCoroutine(CurrentState());
+        TimeOfDay = DirectionalLight.transform.rotation.eulerAngles.magnitude; 
+        Debug.Log(TimeOfDay);
     }
     private void Update()
     {

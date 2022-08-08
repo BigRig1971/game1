@@ -52,9 +52,11 @@ MonoBehaviour:
   cloudMap:
     m_OverrideState: 1
     m_Value: {fileID: 0}
+    dimension: 2
   cloudLut:
     m_OverrideState: 1
     m_Value: {fileID: 0}
+    dimension: 2
   cloudControl:
     m_OverrideState: 1
     m_Value: 0
@@ -64,24 +66,28 @@ MonoBehaviour:
   cumulusMap:
     m_OverrideState: 1
     m_Value: {fileID: 0}
+    dimension: 2
   cumulusMapMultiplier:
     m_OverrideState: 1
     m_Value: 1
   altoStratusMap:
     m_OverrideState: 1
     m_Value: {fileID: 0}
+    dimension: 2
   altoStratusMapMultiplier:
     m_OverrideState: 1
     m_Value: 1
   cumulonimbusMap:
     m_OverrideState: 1
     m_Value: {fileID: 0}
+    dimension: 2
   cumulonimbusMapMultiplier:
     m_OverrideState: 1
     m_Value: 1
   rainMap:
     m_OverrideState: 1
     m_Value: {fileID: 0}
+    dimension: 2
   cloudMapResolution:
     m_OverrideState: 1
     m_Value: 64
@@ -294,6 +300,9 @@ MonoBehaviour:
   ghostingReduction:
     m_OverrideState: 1
     m_Value: 0
+  perceptualBlending:
+    m_OverrideState: 0
+    m_Value: 1
   shadows:
     m_OverrideState: 1
     m_Value: 0
@@ -659,7 +668,7 @@ MonoBehaviour:
   active: 1
   mode:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0
   meteringMode:
     m_OverrideState: 0
     m_Value: 2
@@ -667,8 +676,8 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 1
   fixedExposure:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 14.750303
   compensation:
     m_OverrideState: 0
     m_Value: 0

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6714496616346440484}
   - component: {fileID: 1318385350296791475}
   - component: {fileID: 6289608672768380363}
+  - component: {fileID: 4678371224276987799}
   - component: {fileID: 4257156120379383459}
   m_Layer: 14
   m_Name: Object
@@ -99,19 +100,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   randomSize: 1
-  _audioSource: {fileID: 0}
-  scale: {x: 0.3, y: 0.3, z: 0.3}
-  droppedLootScale: 1
-  damageDropScale: 1
+  _audioSource: {fileID: 4678371224276987799}
+  scale: {x: 1, y: 1, z: 1}
+  droppedLootScale: 0.5
+  damageDropScale: 0.5
   playerPosition: {x: 0, y: 0, z: 0}
-  spawnLoot: 0
+  spawnLoot: 1
   spawnLootOffset: 1
-  _impactSound: {fileID: 0}
-  _impactVolume: 0
-  _deathSound: {fileID: 0}
-  _deathVolume: 0
-  isDamagable: 0
-  health: 0
+  _impactSound: {fileID: 8300000, guid: 4c991488ad132924092130a25c056bb7, type: 3}
+  _impactVolume: 1
+  _deathSound: {fileID: 8300000, guid: ce7d868d12bef064f9996eef55b4d90d, type: 3}
+  _deathVolume: 1
+  isDamagable: 1
+  health: 30
   deathDelay: 0
   death:
     m_PersistentCalls:
@@ -121,8 +122,10 @@ MonoBehaviour:
       m_Calls: []
   _listOfItems:
   - _item: {fileID: 11400000, guid: 5798043884458524da5b651b1519cf74, type: 2}
+    _itemAmount: 10
+  _listOfDamageItems:
+  - _item: {fileID: 11400000, guid: 5798043884458524da5b651b1519cf74, type: 2}
     _itemAmount: 1
-  _listOfDamageItems: []
 --- !u!64 &6289608672768380363
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -137,6 +140,102 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 3475293078157405746, guid: 46e48b607229b834fac93dd219f26006, type: 3}
+--- !u!82 &4678371224276987799
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5057071141085770481}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 24300001, guid: cc0bf72c5763743468b1ee3d764d3d04, type: 2}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 100
+  Pan2D: 0
+  rolloffMode: 2
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.0057040714
+      value: 0.9945259
+      inSlope: -2.7541273
+      outSlope: -2.7541273
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.08938561
+    - serializedVersion: 3
+      time: 0.97776794
+      value: 0
+      inSlope: -0.26270157
+      outSlope: -0.26270157
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.1714464
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!135 &4257156120379383459
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -159,8 +258,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 611219191401898355}
+  - component: {fileID: -6851526613249562091}
   m_Layer: 14
-  m_Name: BoulderPiece2
+  m_Name: BoulderPiece1
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -175,10 +275,24 @@ Transform:
   m_GameObject: {fileID: 5145991746880739064}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 476.75433, y: 99.29969, z: 639.3982}
-  m_LocalScale: {x: 0.9971192, y: 0.9971192, z: 0.9971192}
+  m_LocalScale: {x: 0.8642892, y: 0.8642892, z: 0.8642892}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5577008592797280331}
   m_Father: {fileID: 0}
   m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-6851526613249562091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5145991746880739064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c722b79df248e254b86fab64ca4c1ce3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goid: 0
+  saveGame: {fileID: 0}

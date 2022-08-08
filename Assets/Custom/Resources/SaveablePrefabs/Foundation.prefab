@@ -100,7 +100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6514835523492375823}
   - component: {fileID: 24305615543124360}
-  - component: {fileID: 2300177457338649662}
+  - component: {fileID: -1425221514754937204}
   m_Layer: 12
   m_Name: Foundation
   m_TagString: Buildable
@@ -145,7 +145,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 4, y: 0.55, z: 4}
   m_Center: {x: 0, y: 0.225, z: 0}
---- !u!114 &2300177457338649662
+--- !u!114 &-1425221514754937204
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -158,6 +158,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   goid: 0
+  saveGame: {fileID: 0}
 --- !u!1 &2810372047715799055
 GameObject:
   m_ObjectHideFlags: 0

@@ -1692,6 +1692,7 @@ GameObject:
   - component: {fileID: -6168218015175888055}
   - component: {fileID: 3361174208360155842}
   - component: {fileID: 7027092438936165128}
+  - component: {fileID: -3433005996186413097}
   m_Layer: 3
   m_Name: Grass
   m_TagString: Lootable
@@ -1708,7 +1709,7 @@ Transform:
   m_GameObject: {fileID: 8431606884316112175}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 478.0845, y: 99.72398, z: 635.6801}
-  m_LocalScale: {x: 2.1419373, y: 2.1419373, z: 2.1419373}
+  m_LocalScale: {x: 2.1272228, y: 2.1272228, z: 2.1272228}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4558011422375507784}
@@ -1868,3 +1869,17 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-3433005996186413097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8431606884316112175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c722b79df248e254b86fab64ca4c1ce3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goid: 0
+  saveGame: {fileID: 0}

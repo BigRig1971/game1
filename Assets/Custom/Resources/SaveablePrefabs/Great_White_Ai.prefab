@@ -911,6 +911,7 @@ GameObject:
   - component: {fileID: 1871553602470365072}
   - component: {fileID: 4498870682796428703}
   - component: {fileID: 5489243114963825017}
+  - component: {fileID: -7783862932340831166}
   m_Layer: 16
   m_Name: Great_White_Ai
   m_TagString: Untagged
@@ -1161,6 +1162,20 @@ MonoBehaviour:
   - _item: {fileID: 11400000, guid: fb2636d27ecb9b34b8f27f34b39040f4, type: 2}
     _itemAmount: 10
   _listOfDamageItems: []
+--- !u!114 &-7783862932340831166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8126112846575446432}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c722b79df248e254b86fab64ca4c1ce3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goid: 0
+  saveGame: {fileID: 0}
 --- !u!1 &8163201677267358095
 GameObject:
   m_ObjectHideFlags: 0

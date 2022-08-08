@@ -3,22 +3,38 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
-using System;
-using System.Linq;
+
+
 
 public class SaveGame : MonoBehaviour
 {
     [Header("Variables")]
     public List<GameObject> targets = new List<GameObject>();
     public List<GameObject> spawnedTargets = new List<GameObject>();
+    public List<GameObject> loadedTargets = new List<GameObject>();
+   
 
-
+    Dictionary<string, List<string>> listMaster;
+    public string saveObject;
+    private void Awake()
+    {
+        listMaster = new Dictionary<string, List<string>>();
+    }
 
     private void Start()
     {
 
         LoadGameFile();
         LoadSpawnedGameFile();
+    }
+    private void LateUpdate()
+    {
+        
+    }
+    void Cleanup()
+    {
+        spawnedTargets.RemoveAll(o => (o == null || o.Equals(null)));
+        targets.RemoveAll(o => (o == null || o.Equals(null)));
     }
     public void RemoveId(string id)
     {
@@ -32,7 +48,7 @@ public class SaveGame : MonoBehaviour
                 if (id == GetIdsFromList(spawnedTargets)[i])
                 {
                     spawnedTargets.RemoveAt(i);
-                   
+
                 }
             }
         }
@@ -50,11 +66,29 @@ public class SaveGame : MonoBehaviour
     }
     public void SpawnPrefab(GameObject go, Vector3 pos, Quaternion rot)
     {
+        //saveObject = saveObj;
+       // List<string> list = new List<string>();
+       // list.Add(saveObj);
         GameObject obj = Instantiate(go);
         obj.name = go.name;
         obj.transform.position = pos;
         obj.transform.rotation = rot;
         spawnedTargets.Add(obj);
+        //CreateList(saveObj);
+    }
+    public void CreateList(string listName)
+    {
+        #region List Check
+
+        var IO = listMaster.ContainsKey(listName);
+        if (IO) { return; }
+        else 
+        { 
+            listMaster.Add(listName, new List<string>()); 
+            Debug.Log("list added: " + listName);
+        }
+
+        #endregion
     }
     public void SaveGameFile()
     {
@@ -68,7 +102,7 @@ public class SaveGame : MonoBehaviour
     }
     public void SaveSpawnedGameFile()
     {
-
+        Cleanup();
 
         var save = CreateSpawnedSaveGameObject();
 
@@ -180,6 +214,7 @@ public class SaveGame : MonoBehaviour
                 targets[i].transform.localPosition = vector3;
                 targets[i].transform.localRotation = quaternion;
             }
+          
         }
         else
         {
@@ -221,9 +256,12 @@ public class SaveGame : MonoBehaviour
                 };
 
                 // Debug.Log("loaded: " + targetNames.name);
-                GameObject go = Resources.Load("Prefabs/" + targetName.name) as GameObject;
+                GameObject go = Resources.Load("SaveablePrefabs/" + targetName.name) as GameObject;
                 SpawnPrefab(go, vector3, quaternion);
+                loadedTargets.Add(go);
             }
+          
+            
         }
         else
         {
@@ -236,24 +274,11 @@ public class SaveGame : MonoBehaviour
 
         return id;
     }
-  /*  List<string> GetIdsFromScene()
-    {
-        List<string> ids = new List<string>();
-        SaveableObject[] ObjectsInScene = FindObjectsOfType(typeof(SaveableObject)) as SaveableObject[];
-        Debug.Log("Found " + ObjectsInScene.Length + " instances with this script attached");
-        foreach (SaveableObject item in ObjectsInScene)
-        {
-            string id = item.goid.ToString();
-            ids.Add(id);
-
-        }
-        return ids;
-
-    }*/
-
+   
     private void OnApplicationQuit()
     {
         SaveGameFile();
         SaveSpawnedGameFile();
     }
+
 }

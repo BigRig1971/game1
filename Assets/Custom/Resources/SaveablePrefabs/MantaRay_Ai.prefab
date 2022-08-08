@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3634373536421230527}
   - component: {fileID: 5616161971596861165}
   - component: {fileID: 5414713441048343817}
+  - component: {fileID: 1684253768430766198}
   m_Layer: 16
   m_Name: MantaRay_Ai
   m_TagString: Untagged
@@ -227,6 +228,20 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &1684253768430766198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6518981239945531061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c722b79df248e254b86fab64ca4c1ce3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goid: 0
+  saveGame: {fileID: 0}
 --- !u!1001 &279289987499199319
 PrefabInstance:
   m_ObjectHideFlags: 0

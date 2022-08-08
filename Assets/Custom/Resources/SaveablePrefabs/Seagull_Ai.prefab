@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5106347526583491683}
   - component: {fileID: 2710802426999360038}
   - component: {fileID: 8257459880331942254}
+  - component: {fileID: 7127822342387288942}
   m_Layer: 16
   m_Name: Seagull_Ai
   m_TagString: Untagged
@@ -215,6 +216,20 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &7127822342387288942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8503313627084961529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c722b79df248e254b86fab64ca4c1ce3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goid: 0
+  saveGame: {fileID: 0}
 --- !u!1001 &8503313625609698573
 PrefabInstance:
   m_ObjectHideFlags: 0

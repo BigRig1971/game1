@@ -396,6 +396,7 @@ GameObject:
   - component: {fileID: 2034494482742037403}
   - component: {fileID: 2403401424209747555}
   - component: {fileID: 5091515690027297058}
+  - component: {fileID: -8845822349833927468}
   m_Layer: 16
   m_Name: Louse_RM_Ai
   m_TagString: Untagged
@@ -598,6 +599,20 @@ MonoBehaviour:
   rndAttackCount: 3
   rndIdleCount: 3
   reverseTime: 2
+--- !u!114 &-8845822349833927468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8052387118639454438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c722b79df248e254b86fab64ca4c1ce3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goid: 0
+  saveGame: {fileID: 0}
 --- !u!1001 &8052387119105829471
 PrefabInstance:
   m_ObjectHideFlags: 0

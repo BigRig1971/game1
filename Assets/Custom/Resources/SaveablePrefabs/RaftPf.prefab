@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3425630473488255540}
   - component: {fileID: 155672309}
   - component: {fileID: 7130284289660796751}
-  - component: {fileID: -4713635236796591429}
+  - component: {fileID: -3310746417018347995}
   m_Layer: 12
   m_Name: RaftPf
   m_TagString: Mountable
@@ -124,7 +124,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animationTrigger: CanRow
---- !u!114 &-4713635236796591429
+--- !u!114 &-3310746417018347995
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -137,6 +137,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   goid: 0
+  saveGame: {fileID: 0}
 --- !u!1001 &3425630473980944914
 PrefabInstance:
   m_ObjectHideFlags: 0

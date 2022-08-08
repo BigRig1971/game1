@@ -1220,7 +1220,7 @@ GameObject:
   - component: {fileID: 2432799443676163174}
   - component: {fileID: 2432799443676163177}
   - component: {fileID: 2432799443676163179}
-  - component: {fileID: -4347657469132393583}
+  - component: {fileID: 7706132509570158260}
   m_Layer: 13
   m_Name: Character
   m_TagString: Player
@@ -2199,7 +2199,7 @@ MonoBehaviour:
   idleTargetHorizAngle: 10
   crossEyeCorrection: 1
   limitHeadAngle: 0
---- !u!114 &-4347657469132393583
+--- !u!114 &7706132509570158260
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2212,6 +2212,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   goid: 0
+  saveGame: {fileID: 0}
 --- !u!1001 &6181965369171114931
 PrefabInstance:
   m_ObjectHideFlags: 0

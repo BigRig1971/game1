@@ -22,6 +22,7 @@ namespace StupidHumanGames
 		private bool isSnapped = false;//only this script should change this value
 		public bool isFoundation = false;//this is a special rule for foundations. 
 		public List<string> tagsISnapTo = new List<string>();//list of all of the SnapPoint tags this particular preview can snap too
+		public List<GameObject> prefabs = new List<GameObject>();
 		private void Start()
 		{
 			saveGame = GameObject.FindObjectOfType<SaveGame>();
@@ -34,6 +35,7 @@ namespace StupidHumanGames
 			//var spawnedObject = Instantiate(prefab, transform.position, Quaternion.identity);
 			
 			saveGame.SpawnPrefab(prefab, transform.position, transform.rotation);
+			prefabs.Add(prefab);
 
 			//var spawnedObject = SaveMaster.SpawnSavedPrefab(InstanceSource.Resources, prefab.name);
 			//spawnedObject.transform.position = new Vector3(transform.position.x, transform.position.y + spawnOffset, transform.position.z);

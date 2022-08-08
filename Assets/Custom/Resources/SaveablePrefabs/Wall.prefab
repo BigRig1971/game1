@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5606185181749980146}
   - component: {fileID: 1725487822844004213}
-  - component: {fileID: -2336547877756029451}
+  - component: {fileID: 2101253797183904774}
   m_Layer: 12
-  m_Name: Window
+  m_Name: Wall
   m_TagString: Buildable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3546104704373886435}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 474.04245, y: 100.00001, z: 633.3332}
+  m_LocalPosition: {x: 517.88837, y: 100.557274, z: 514.1802}
   m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -48,7 +48,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 4, y: 4, z: 0.3}
   m_Center: {x: 0, y: 2, z: 0}
---- !u!114 &-2336547877756029451
+--- !u!114 &2101253797183904774
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -60,7 +60,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c722b79df248e254b86fab64ca4c1ce3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: d9c1bc3c-eab6-4403-bdfb-c479a20180f3
+  goid: 0
+  saveGame: {fileID: 0}
 --- !u!1001 &271722481434121134
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -200,7 +201,7 @@ PrefabInstance:
     - target: {fileID: -5754084199372789682, guid: 1bd4c9155e17dd04d9e68c0d353a2a8e, type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 1049928748687988745, guid: 1263cc715cbaf3e4294d7e8c198f900e, type: 3}
+      objectReference: {fileID: 8733429697405204941, guid: 6c9c52e33415c4b47b64b7640e7386b8, type: 3}
     - target: {fileID: 919132149155446097, guid: 1bd4c9155e17dd04d9e68c0d353a2a8e, type: 3}
       propertyPath: m_Name
       value: Object

@@ -245,6 +245,7 @@ GameObject:
   - component: {fileID: 1060656245024213140}
   - component: {fileID: 5383601168974871405}
   - component: {fileID: 2642623868656506072}
+  - component: {fileID: 1044886910298580940}
   m_Layer: 16
   m_Name: Robot_Ai
   m_TagString: Lootable
@@ -417,6 +418,7 @@ MonoBehaviour:
   homePosition: {x: 465.3514, y: 100.16382, z: 607.76025}
   player: {fileID: 0}
   scale: 1
+  _rigidBody: 1
   _animator: {fileID: 0}
   randomSound:
   - {fileID: 8300000, guid: 1bb4684cdf243ae4db9ffb27da49899d, type: 3}
@@ -427,11 +429,10 @@ MonoBehaviour:
   _randomIdleDelay: 1000
   idleSound: {fileID: 0}
   idleVolume: 0
-  footStep: {fileID: 8300000, guid: 37e044cebda3d264ba7c752980797bfb, type: 3}
-  footStepVolume: 1
+  FootstepAudioClips: []
+  FootstepAudioVolume: 0
   rootMotion: 1
   canSwimOrFly: 0
-  _feetOnGround: 1
   groundHugging: 0
   _groundHuggingTweak: 0.01
   patrol: 1
@@ -524,6 +525,20 @@ MonoBehaviour:
   - _item: {fileID: 11400000, guid: 6ef10b5b350e062408c03d2d94d8958b, type: 2}
     _itemAmount: 10
   _listOfDamageItems: []
+--- !u!114 &1044886910298580940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4095782058947759523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c722b79df248e254b86fab64ca4c1ce3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goid: 0
+  saveGame: {fileID: 0}
 --- !u!1 &4095782058947759525
 GameObject:
   m_ObjectHideFlags: 0
