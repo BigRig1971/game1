@@ -7,8 +7,6 @@ public class Save
     public List<Vector3Serializable> targetPositions = new List<Vector3Serializable>();
     public List<QuaternionSerializable> targetRotation = new List<QuaternionSerializable>();
     public List<Strings> names = new List<Strings>();
-    public List<string> inventoryItems = new List<string>();
-    public List<int> itemCounts = new List<int>();
 }
 [System.Serializable]
 public struct Vector3Serializable
@@ -29,9 +27,4 @@ public struct QuaternionSerializable
 public struct Strings
 {
     public string name;
-    public string inventoryItem;
-}
-public struct Ints
-{
-    public int itemCount;
 }
