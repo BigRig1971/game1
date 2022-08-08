@@ -3,29 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 //using System;
 
-
-public class SaveableObject : MonoBehaviour
+namespace StupidHumanGames
 {
-  
-    public float goid;
-    public SaveGame saveGame;
 
-    private void Awake()
+    public class SaveableObject : MonoBehaviour
     {
 
-        if(goid == 0)
+        public float goid;
+        public SaveGame saveGame;
+
+        private void Awake()
         {
-            GenerateID();
+
+            if (goid == 0)
+            {
+                GenerateID();
+            }
         }
-    }
-    private void Start()
-    {
-        saveGame = GameObject.FindObjectOfType<SaveGame>();
-    }
-  
-    private void GenerateID()
-    {
-        //id = Guid.NewGuid().ToString();
-        goid = Random.Range(1, 999999999);
+        private void Start()
+        {
+            saveGame = GameObject.FindObjectOfType<SaveGame>();
+        }
+
+        private void GenerateID()
+        {
+            //id = Guid.NewGuid().ToString();
+            goid = Random.Range(1, 999999999);
+        }
     }
 }
