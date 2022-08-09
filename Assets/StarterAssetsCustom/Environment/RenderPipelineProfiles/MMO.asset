@@ -1,5 +1,54 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8138666602204007401
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56b145d2b9ee1ac4f846968484e7485a, type: 3}
+  m_Name: ContactShadows
+  m_EditorClassIdentifier: 
+  active: 1
+  quality:
+    m_OverrideState: 1
+    m_Value: 3
+  enable:
+    m_OverrideState: 1
+    m_Value: 1
+  length:
+    m_OverrideState: 0
+    m_Value: 0.15
+  opacity:
+    m_OverrideState: 0
+    m_Value: 1
+  distanceScaleFactor:
+    m_OverrideState: 0
+    m_Value: 0.5
+  maxDistance:
+    m_OverrideState: 0
+    m_Value: 50
+  minDistance:
+    m_OverrideState: 0
+    m_Value: 0
+  fadeDistance:
+    m_OverrideState: 0
+    m_Value: 5
+  fadeInDistance:
+    m_OverrideState: 0
+    m_Value: 0
+  rayBias:
+    m_OverrideState: 0
+    m_Value: 0.2
+  thicknessScale:
+    m_OverrideState: 0
+    m_Value: 0.15
+  m_SampleCount:
+    m_OverrideState: 0
+    m_Value: 12
 --- !u!114 &-6570732037428521991
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -434,7 +483,7 @@ MonoBehaviour:
     m_Value: 13.604264
   compensation:
     m_OverrideState: 1
-    m_Value: 2.88
+    m_Value: 3
   limitMin:
     m_OverrideState: 0
     m_Value: -1
@@ -558,6 +607,28 @@ MonoBehaviour:
   proceduralSoftness:
     m_OverrideState: 0
     m_Value: 0.5
+--- !u!114 &-5133107730783135407
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da5ab44aadfb1804db5fd470983ac1b8, type: 3}
+  m_Name: LiftGammaGain
+  m_EditorClassIdentifier: 
+  active: 1
+  lift:
+    m_OverrideState: 0
+    m_Value: {x: 1, y: 1, z: 1, w: 0}
+  gamma:
+    m_OverrideState: 1
+    m_Value: {x: 1, y: 1, z: 1, w: -0.15706807}
+  gain:
+    m_OverrideState: 1
+    m_Value: {x: 1, y: 1, z: 1, w: 0.20942385}
 --- !u!114 &-4581520730190887658
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -578,8 +649,8 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 0
   exposure:
-    m_OverrideState: 1
-    m_Value: 0
+    m_OverrideState: 0
+    m_Value: 2.29
   multiplier:
     m_OverrideState: 1
     m_Value: 1
@@ -600,10 +671,10 @@ MonoBehaviour:
     m_Value: 0
   includeSunInBaking:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
   type:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
   sphericalMode:
     m_OverrideState: 1
     m_Value: 1
@@ -638,22 +709,22 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: {r: 0.9, g: 0.9, b: 0.9, a: 1}
   aerosolMaximumAltitude:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 8289.296
   aerosolAnisotropy:
     m_OverrideState: 1
     m_Value: 0
   numberOfBounces:
     m_OverrideState: 1
-    m_Value: 3
+    m_Value: 5
   groundTint:
-    m_OverrideState: 1
-    m_Value: {r: 0.4, g: 0.25, b: 0.15, a: 1}
+    m_OverrideState: 0
+    m_Value: {r: 0.7264151, g: 0.5575536, b: 0.44201672, a: 1}
   groundColorTexture:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: {fileID: 0}
   groundEmissionTexture:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: {fileID: 0}
   groundEmissionMultiplier:
     m_OverrideState: 1
@@ -663,10 +734,10 @@ MonoBehaviour:
     m_Value: {x: 0, y: 0, z: 0}
   spaceEmissionTexture:
     m_OverrideState: 1
-    m_Value: {fileID: 0}
+    m_Value: {fileID: 8900000, guid: eb5cb4184adf9d848afb8006bb164c6a, type: 3}
   spaceEmissionMultiplier:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 1000
   spaceRotation:
     m_OverrideState: 1
     m_Value: {x: 0, y: 0, z: 0}
@@ -707,7 +778,7 @@ MonoBehaviour:
   active: 1
   indirectDiffuseLightingMultiplier:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 1
   indirectDiffuseLightingLayers:
     m_OverrideState: 0
     m_Value: 255
@@ -762,7 +833,8 @@ MonoBehaviour:
   - {fileID: -1704332360436477241}
   - {fileID: -4581520730190887658}
   - {fileID: 8434638653436175181}
-  - {fileID: 8497536882929954364}
+  - {fileID: -8138666602204007401}
+  - {fileID: -5133107730783135407}
 --- !u!114 &177997624625229802
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -781,7 +853,7 @@ MonoBehaviour:
     m_Value: 1
   opacity:
     m_OverrideState: 1
-    m_Value: 0.909
+    m_Value: 1
 --- !u!114 &821166259789530765
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -794,7 +866,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 953beb541740ddc499d005ee80c9ff29, type: 3}
   m_Name: Fog
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   quality:
     m_OverrideState: 0
     m_Value: 2
@@ -809,7 +881,7 @@ MonoBehaviour:
     m_Value: {r: 0.8773585, g: 0.8069347, b: 0.40281233, a: 1}
   tint:
     m_OverrideState: 0
-    m_Value: {r: 1.8544642, g: 1.8544642, b: 1.8544642, a: 1}
+    m_Value: {r: 1.1444993, g: 0.1133702, b: 0.1133702, a: 1}
   maxFogDistance:
     m_OverrideState: 1
     m_Value: 513.98
@@ -827,10 +899,10 @@ MonoBehaviour:
     m_Value: 100
   maximumHeight:
     m_OverrideState: 1
-    m_Value: 120
+    m_Value: 200
   meanFreePath:
     m_OverrideState: 1
-    m_Value: 1000
+    m_Value: 2000
   enableVolumetricFog:
     m_OverrideState: 1
     m_Value: 1
@@ -838,7 +910,7 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: {r: 0.5566038, g: 0.5566038, b: 0.5566038, a: 1}
   globalLightProbeDimmer:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 0.516
   depthExtent:
     m_OverrideState: 0
@@ -913,7 +985,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24f077503be6ae942a1e1245dbd53ea9, type: 3}
   m_Name: Bloom
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   quality:
     m_OverrideState: 1
     m_Value: 1
@@ -922,13 +994,13 @@ MonoBehaviour:
     m_Value: 0
   intensity:
     m_OverrideState: 1
-    m_Value: 0.184
+    m_Value: 0.341
   scatter:
     m_OverrideState: 1
-    m_Value: 0.742
+    m_Value: 0.489
   tint:
-    m_OverrideState: 0
-    m_Value: {r: 0.9433962, g: 0.77558774, b: 0.6541474, a: 1}
+    m_OverrideState: 1
+    m_Value: {r: 0.8867924, g: 0.7419708, b: 0.6316305, a: 1}
   dirtTexture:
     m_OverrideState: 0
     m_Value: {fileID: 0}
@@ -968,10 +1040,10 @@ MonoBehaviour:
     m_Value: 0
   intensity:
     m_OverrideState: 1
-    m_Value: 1.92
+    m_Value: 0.99
   directLightingStrength:
     m_OverrideState: 1
-    m_Value: 0.497
+    m_Value: 0.45
   radius:
     m_OverrideState: 0
     m_Value: 2
@@ -979,7 +1051,7 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 0.15
   temporalAccumulation:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   ghostingReduction:
     m_OverrideState: 0
@@ -1025,43 +1097,3 @@ MonoBehaviour:
   m_DenoiserRadius:
     m_OverrideState: 1
     m_Value: 0.65
---- !u!114 &8497536882929954364
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c1be1b6c95cd2e41b27903b9270817f, type: 3}
-  m_Name: Vignette
-  m_EditorClassIdentifier: 
-  active: 1
-  mode:
-    m_OverrideState: 1
-    m_Value: 0
-  color:
-    m_OverrideState: 1
-    m_Value: {r: 0, g: 0, b: 0, a: 1}
-  center:
-    m_OverrideState: 1
-    m_Value: {x: 0.5, y: 0.5}
-  intensity:
-    m_OverrideState: 1
-    m_Value: 0.34
-  smoothness:
-    m_OverrideState: 1
-    m_Value: 0.2
-  roundness:
-    m_OverrideState: 1
-    m_Value: 1
-  rounded:
-    m_OverrideState: 1
-    m_Value: 0
-  mask:
-    m_OverrideState: 1
-    m_Value: {fileID: 0}
-  opacity:
-    m_OverrideState: 1
-    m_Value: 1

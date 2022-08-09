@@ -132,7 +132,7 @@ namespace StupidHumanGames
                     if (!drop.GetComponent<MeshCollider>()) drop.AddComponent<MeshCollider>();
                     drop.GetComponent<MeshCollider>().convex = true;
                     drop.AddComponent<Rigidbody>();
-                    drop.GetComponent<Rigidbody>().drag = 5f;
+                    drop.GetComponent<Rigidbody>().drag = 1f;
                     Destroy(drop.gameObject, 60f);
                     yield return new WaitForSeconds(.05f);
                 }
@@ -151,7 +151,7 @@ namespace StupidHumanGames
                 if (!drop.GetComponent<MeshCollider>()) drop.AddComponent<MeshCollider>();
                 drop.GetComponent<MeshCollider>().convex = true;
                 drop.AddComponent<Rigidbody>();
-                drop.GetComponent<Rigidbody>().drag = 5f;
+                drop.GetComponent<Rigidbody>().drag = 1f;
                 Destroy(drop.gameObject, 120f);
             }
         }

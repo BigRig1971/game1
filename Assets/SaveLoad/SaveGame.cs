@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using StupidHumanGames;
 
 
 
@@ -12,7 +13,9 @@ public class SaveGame : MonoBehaviour
     public List<GameObject> targets = new List<GameObject>();
     public List<GameObject> spawnedTargets = new List<GameObject>();
     public List<GameObject> loadedTargets = new List<GameObject>();
-   
+    public List<ItemSO> inventoryItemList = new List<ItemSO>();
+    public ItemSO[] loadedInventory;
+
 
     Dictionary<string, List<string>> listMaster;
     public string saveObject;
@@ -23,9 +26,10 @@ public class SaveGame : MonoBehaviour
 
     private void Start()
     {
-
+        loadedInventory = Resources.LoadAll<ItemSO>("ItemsAll");
         LoadGameFile();
         LoadSpawnedGameFile();
+        LoadInventoryGameFile();    
     }
     private void LateUpdate()
     {
@@ -76,6 +80,33 @@ public class SaveGame : MonoBehaviour
         spawnedTargets.Add(obj);
         //CreateList(saveObj);
     }
+    public void SaveInventory(ItemSO item, int amount)
+    {
+        for(int i = 0; i < amount; i++)
+        {
+            inventoryItemList.Add(item);
+        }
+    }
+    public void LoadInventory(string item)
+    {
+        foreach(var inv in loadedInventory)
+        {
+            if(inv.name == item)
+            {
+                InventoryManager.AddItemToInventory(inv, 1);
+            }
+        }
+        
+
+        
+    }
+    public void RemoveInventory(ItemSO item, int amount)
+    {
+        for (int i = 0; i < amount; i++)
+        {
+            inventoryItemList.Remove(item);
+        }
+    }
     public void CreateList(string listName)
     {
         #region List Check
@@ -111,6 +142,16 @@ public class SaveGame : MonoBehaviour
         bf.Serialize(file, save);
         file.Close();
     }
+    public void SaveInventoryGameFile()
+    {
+
+        var save = CreateInventorySaveObject();
+
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream file = File.Create(Application.persistentDataPath + "/gamesave.inventorySave");
+        bf.Serialize(file, save);
+        file.Close();
+    }
     private Save CreateSaveGameObject()
     {
         var save = new Save();
@@ -119,7 +160,8 @@ public class SaveGame : MonoBehaviour
 
             var position = targets[i].transform.position;
             var rotation = targets[i].transform.rotation;
-            var targetName = targets[i].name;
+          
+            
 
             Vector3Serializable serializableVector3 = new Vector3Serializable
             {
@@ -134,15 +176,11 @@ public class SaveGame : MonoBehaviour
                 z = rotation.z,
                 w = rotation.w
             };
-            Strings strings = new Strings
-            {
-                name = targetName
-            };
-
+           
             save.targetPositions.Add(serializableVector3);
             save.targetRotation.Add(serializableQuaternion);
-            save.names.Add(strings);
-            //Debug.Log("saved: " + targets[i].name);
+            
+         
         }
         return save;
     }
@@ -172,15 +210,31 @@ public class SaveGame : MonoBehaviour
             };
             Strings strings = new Strings
             {
-                name = targetName
+                _string = targetName
             };
 
             save.targetPositions.Add(serializableVector3);
             save.targetRotation.Add(serializableQuaternion);
-            save.names.Add(strings);
+            save._strings.Add(strings);
+            
             //Debug.Log("saved: " + targets[i].name);
         }
         return save;
+    }
+    private Save CreateInventorySaveObject()
+    {
+        var save = new Save();
+        for (int i = 0; i < inventoryItemList.Count; i++)
+        {
+            var inventoryItem = inventoryItemList[i].name;
+            InventoryItems invItems = new InventoryItems
+            {
+                _item = inventoryItem
+            };
+            save._inventoryItems.Add(invItems);
+            //Debug.Log("saved: " + invItems._item);
+        }
+            return save;
     }
     public void LoadGameFile()
     {
@@ -207,12 +261,13 @@ public class SaveGame : MonoBehaviour
                     z = save.targetRotation[i].z,
                     w = save.targetRotation[i].w
                 };
-                Strings targetNames = new Strings()
-                {
-                    name = save.names[i].name
-                };
+               
                 targets[i].transform.localPosition = vector3;
                 targets[i].transform.localRotation = quaternion;
+
+               // LoadInventory(targetNames._inventoryItem.ToString());
+              
+
             }
           
         }
@@ -221,6 +276,7 @@ public class SaveGame : MonoBehaviour
             Debug.Log("No game saved!");
         }
     }
+
 
     public void LoadSpawnedGameFile()
     {
@@ -252,16 +308,39 @@ public class SaveGame : MonoBehaviour
                 };
                 Strings targetName = new Strings()
                 {
-                    name = save.names[i].name
+                    _string = save._strings[i]._string
                 };
 
                 // Debug.Log("loaded: " + targetNames.name);
-                GameObject go = Resources.Load("SaveablePrefabs/" + targetName.name) as GameObject;
+                GameObject go = Resources.Load("SaveablePrefabs/" + targetName._string) as GameObject;
                 SpawnPrefab(go, vector3, quaternion);
                 loadedTargets.Add(go);
             }
           
             
+        }
+        else
+        {
+            Debug.Log("No game saved!");
+        }
+    }
+    public void LoadInventoryGameFile()
+    {
+        if (File.Exists(Application.persistentDataPath + "/gamesave.inventorySave"))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(Application.persistentDataPath + "/gamesave.inventorySave", FileMode.Open);
+            Save save = (Save)bf.Deserialize(file);
+            file.Close();
+            for (var i = 0; i < save._inventoryItems.Count; i++)
+            {
+                InventoryItems inventoryItems = new InventoryItems()
+                {
+                    _item = save._inventoryItems[i]._item
+                };
+                // Debug.Log("loaded: " + inventoryItems._item);
+                LoadInventory(inventoryItems._item);
+            }
         }
         else
         {
@@ -279,6 +358,7 @@ public class SaveGame : MonoBehaviour
     {
         SaveGameFile();
         SaveSpawnedGameFile();
+        SaveInventoryGameFile();    
     }
 
 }

@@ -6,7 +6,9 @@ public class Save
 {
     public List<Vector3Serializable> targetPositions = new List<Vector3Serializable>();
     public List<QuaternionSerializable> targetRotation = new List<QuaternionSerializable>();
-    public List<Strings> names = new List<Strings>();
+    public List<Strings> _strings = new List<Strings>();
+    public List<InventoryItems> _inventoryItems = new List<InventoryItems>();
+    
 }
 [System.Serializable]
 public struct Vector3Serializable
@@ -23,8 +25,17 @@ public struct QuaternionSerializable
     public float z;
     public float w;
 }
-[System.Serializable] 
+[System.Serializable]
 public struct Strings
 {
-    public string name;
+    public string _string;
+   
 }
+[System.Serializable]
+public struct InventoryItems
+{
+    public string _item;
+
+}
+
+

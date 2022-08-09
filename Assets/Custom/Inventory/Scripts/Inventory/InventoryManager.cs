@@ -20,7 +20,7 @@ namespace StupidHumanGames
         public Text currentItemStackDisplay;
 
         static InventoryManager instance;
-
+        static SaveGame saveGame;
         
 
 
@@ -37,6 +37,7 @@ namespace StupidHumanGames
 		// Start is called before the first frame update
 		void Start()
         {
+            saveGame = GameObject.FindObjectOfType<SaveGame>(); 
             if (instance == null)
                 instance = this;
 
@@ -138,6 +139,7 @@ namespace StupidHumanGames
         /// <returns></returns>
         public static int AddItemToInventory(ItemSO item, int amount)
         {
+            saveGame.SaveInventory(item, amount);
             int remaining = amount;
             if (slots == null) return 0;
             //check slots that contain same item
@@ -172,6 +174,7 @@ namespace StupidHumanGames
             }
 
             return remaining;
+            
         }
 
         /// <summary>
@@ -303,6 +306,7 @@ namespace StupidHumanGames
         /// <param name="amount"></param>
         public static void RemoveItemFromInventory(ItemSO item, int amount)
         {
+            saveGame.RemoveInventory(item, amount);
             int remaining = amount;
 
             foreach (InventorySlot slot in slots)

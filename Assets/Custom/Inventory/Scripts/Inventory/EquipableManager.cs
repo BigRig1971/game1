@@ -18,7 +18,7 @@ namespace StupidHumanGames
         [SerializeField] private ScriptableObject[] itemSoList;
         private void Awake()
         {
-            itemSoList = Resources.LoadAll<ScriptableObject>("EquipableItems");
+            itemSoList = Resources.LoadAll<ScriptableObject>("ItemsAll/EquipableItems");
             equipableItems = equipableItemHolder.GetComponentsInChildren<Transform>();
             foreach (Transform child in equipableItems)
             {
