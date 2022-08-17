@@ -45,6 +45,18 @@ namespace StupidHumanGames
             StartCoroutine(GetAlreadySpawned());
             currentDelay = .1f;
         }
+        void Update()
+        {
+            if (canSpawn)
+            {
+                spawnObjects();
+            }
+        }
+        void LateUpdate()
+        {
+            //remove all destroyed objects
+            list.RemoveAll(o => (o == null || o.Equals(null)));
+        }
         void StartDelay()
         {
             if (!delayStarted)
@@ -81,13 +93,6 @@ namespace StupidHumanGames
                 {
                     list.RemoveAt(t);
                 }
-            }
-        }
-        void Update()
-        {
-            if (canSpawn)
-            {
-                spawnObjects();
             }
         }
         public void spawnObjects()
@@ -144,11 +149,6 @@ namespace StupidHumanGames
 
                 m_internalTimer = currentDelay;
             }
-        }
-        void LateUpdate()
-        {
-            //remove all destroyed objects
-            list.RemoveAll(o => (o == null || o.Equals(null)));
         }
         Vector3 GetOffset()
         {

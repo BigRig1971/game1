@@ -57,6 +57,11 @@ namespace StupidHumanGames
             _thisAnimator = GetComponent<Animator>();
             OnYPosition();
         }
+        private void Update()
+        {
+            OnMount();
+            if (RandomBool(100)) OnRandomSound();
+        }
         private void OnTriggerEnter(Collider other)
         {
             if (other.CompareTag("Player"))
@@ -89,11 +94,6 @@ namespace StupidHumanGames
                     _player.transform.SetParent(null);
                 }
             }
-        }
-        private void Update()
-        {
-            OnMount();
-            if (RandomBool(100)) OnRandomSound();
         }
         void OnMount()
         {

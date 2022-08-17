@@ -139,7 +139,6 @@ namespace StupidHumanGames
         /// <returns></returns>
         public static int AddItemToInventory(ItemSO item, int amount)
         {
-            Debug.Log(item.name + " " + amount);
             saveGame.SaveInventory(item, amount);
             int remaining = amount;
             if (slots == null) return 0;

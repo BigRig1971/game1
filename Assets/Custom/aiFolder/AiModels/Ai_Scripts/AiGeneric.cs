@@ -54,18 +54,7 @@ namespace StupidHumanGames
             _currentState = state.Patrol;
 
         }
-        private void Update()
-        {
-
-        }
-        private void FixedUpdate()
-        {
-            if (canSwimOrFly) SwimOrFly(); else MoveOnGround();
-
-            OnHitObstacle();
-            OutOfBounds();
-
-        }
+       
         void Start()
         {
             homePosition = GetComponent<Transform>().position;
@@ -103,6 +92,14 @@ namespace StupidHumanGames
         }
 #endif
         #region Movement
+        private void FixedUpdate()
+        {
+            if (canSwimOrFly) SwimOrFly(); else MoveOnGround();
+
+            OnHitObstacle();
+            OutOfBounds();
+
+        }
         void SwimOrFly()
         {
             var step = _moveSpeed * Time.deltaTime;

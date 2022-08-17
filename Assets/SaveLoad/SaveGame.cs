@@ -24,10 +24,6 @@ public class SaveGame : MonoBehaviour
         LoadSpawnedGameFile();
         LoadInventoryGameFile();    
     }
-    private void LateUpdate()
-    {
-        
-    }
     void Cleanup()
     {
         spawnedTargets.RemoveAll(o => (o == null || o.Equals(null)));
@@ -86,7 +82,6 @@ public class SaveGame : MonoBehaviour
         {
             if(inv.name == item)
             {
-                Debug.Log("Loaded: " +inv.name);
                 InventoryManager.AddItemToInventory(inv, 1);
             }
         }
