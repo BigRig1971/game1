@@ -150,12 +150,12 @@ AnimatorStateMachine:
   - {fileID: -3170846889234168980}
   m_EntryTransitions: []
   m_StateMachineTransitions:
-  - first: {fileID: 1080286843909954419}
-    second:
-    - {fileID: 1141794941440567737}
   - first: {fileID: -139356603793972646}
     second:
     - {fileID: 1004877069199586771}
+  - first: {fileID: 1080286843909954419}
+    second:
+    - {fileID: 1141794941440567737}
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: -40, y: 310, z: 0}
   m_EntryPosition: {x: -310, y: 90, z: 0}
@@ -549,7 +549,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Blend Tree
-  m_Speed: 1.5
+  m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -7825012904365907917}

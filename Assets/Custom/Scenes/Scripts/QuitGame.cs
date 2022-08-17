@@ -26,26 +26,30 @@ public class QuitGame : MonoBehaviour
 #else
         if (quit) Application.Quit();
 #endif
-        if (Input.GetKey(KeyCode.Y))
-        {
-            
-            StartCoroutine(OnQuit());
-
-        }
-        if (Input.GetKey("escape"))
+       
+        if (Input.GetKeyDown("escape"))
         {
 
             if (!_quitGameUI.activeSelf)
             {
                 _quitGameUI.SetActive(true);
             }
-
+            else
+            {
+                _quitGameUI.SetActive(false);
+            }
 
         }
-        else
-                if (Input.GetKey(KeyCode.N))
+        if (Input.GetKeyDown(KeyCode.Y) && _quitGameUI.activeSelf)
         {
-            if (_quitGameUI.activeSelf) _quitGameUI.SetActive(false);          
+
+            StartCoroutine(OnQuit());
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.N) && _quitGameUI.activeSelf)
+        {
+             _quitGameUI.SetActive(false);          
         }
     }
     IEnumerator OnQuit()

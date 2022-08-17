@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.AI;
 using UnityEngine;
 
-public class SimpleAI : MonoBehaviour, IDamagable
+public class SimpleAI : MonoBehaviour, IDamage
 
 
 {

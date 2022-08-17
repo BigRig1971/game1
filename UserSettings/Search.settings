@@ -1,6 +1,6 @@
 trackSelection = true
 fetchPreview = true
-wantsMore = false
+defaultFlags = 0
 keepOpen = false
 queryFolder = "Assets"
 onBoardingDoNotAskAgain = true
@@ -25,6 +25,12 @@ scopes = {
 	"last_search.2D5C1488" = "system"
 	"OpenInspectorPreview.2D5C1488" = "0"
 	"currentGroup.2D5C1488" = "_group_provider_Files"
+	"last_search.7788661B" = ""
+	"OpenInspectorPreview.7788661B" = "0"
+	"currentGroup.7788661B" = "asset"
+	"last_search.3619CCAF" = ""
+	"OpenInspectorPreview.3619CCAF" = "0"
+	"currentGroup.3619CCAF" = "all"
 }
 providers = {
 	asset = {
@@ -72,6 +78,8 @@ providers = {
 		priority = 100
 		defaultAction = null
 	}
+}
+objectSelectors = {
 }
 recentSearches = [
 	"finger"

@@ -22,7 +22,7 @@ namespace Crest
         public UnderwaterMaskPassURP()
         {
             // Will always execute and matrices will be ready.
-            renderPassEvent = RenderPassEvent.BeforeRenderingPrepasses;
+            renderPassEvent = RenderPassEvent.BeforeRenderingPrePasses;
             _oceanMaskMaterial = new PropertyWrapperMaterial(k_ShaderPathOceanMask);
             _oceanMaskMaterial.material.hideFlags = HideFlags.HideAndDontSave;
         }

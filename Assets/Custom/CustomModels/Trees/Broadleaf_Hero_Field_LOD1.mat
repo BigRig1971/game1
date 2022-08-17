@@ -22,12 +22,14 @@ Material:
   m_DoubleSidedGI: 1
   m_CustomRenderQueue: 2475
   stringTagMap:
+    MotionVector: User
     RenderType: TransparentCutout
   disabledShaderPasses:
   - TransparentDepthPrepass
   - TransparentDepthPostpass
   - TransparentBackface
   - RayTracingPrepass
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -83,7 +85,7 @@ Material:
     - _DstBlend: 0
     - _EnableBlendModePreserveSpecularLighting: 1
     - _EnableFogOnTransparent: 1
-    - _Glossiness: 0.356
+    - _Glossiness: 0.2
     - _HueVariationKwToggle: 1
     - _NormalMapKwToggle: 1
     - _OpaqueCullMode: 2
@@ -123,7 +125,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - Diffusion_Profile_Asset: {r: 2.2888926e+38, g: 1.2389358e-26, b: 7.69327e-37, a: 0.00018220427}
-    - _Color: {r: 0.39752606, g: 0.46226418, b: 0.34669814, a: 1}
+    - _Color: {r: 0.397526, g: 0.46226412, b: 0.3466981, a: 1}
     - _DoubleSidedConstants: {r: -1, g: -1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _HueVariationColor: {r: 1, g: 0.5, b: 0, a: 0.1}

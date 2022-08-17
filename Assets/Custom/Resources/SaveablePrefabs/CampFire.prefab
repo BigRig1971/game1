@@ -16,7 +16,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &134676199
 Transform:
@@ -233,7 +233,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &659485427
 Transform:
@@ -450,7 +450,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &803517541
 Transform:
@@ -667,7 +667,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &1103097690
 Transform:
@@ -884,7 +884,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &1445936629
 Transform:
@@ -1101,7 +1101,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &1607433329
 Transform:
@@ -1318,7 +1318,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &3596187661048649781
 Transform:
@@ -1535,7 +1535,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &3596187661400330133
 Transform:
@@ -1641,16 +1641,16 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3596187661416315477}
-  - component: {fileID: 7417571817187288540}
   - component: {fileID: 3685654110381915278}
   - component: {fileID: 3685654110381915279}
   - component: {fileID: 4011532674994283476}
+  - component: {fileID: 5543363946520988817}
   m_Layer: 12
   m_Name: CampFire
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &3596187661416315477
 Transform:
@@ -1684,19 +1684,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &7417571817187288540
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3596187661416315478}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.5, y: 0.1, z: 0.5}
-  m_Center: {x: 0, y: 0.05, z: 0}
 --- !u!82 &3685654110381915278
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1820,6 +1807,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   goid: 0
   saveGame: {fileID: 0}
+--- !u!135 &5543363946520988817
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3596187661416315478}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.46
+  m_Center: {x: -0.013419062, y: -0.11, z: 0.0054566115}
 --- !u!1 &3977556540547096081
 GameObject:
   m_ObjectHideFlags: 0
@@ -1836,7 +1836,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &3977556540546662961
 Transform:
@@ -1919,7 +1919,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &3977556540936450663
 Transform:
@@ -2002,7 +2002,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &3977556541031831822
 Transform:
@@ -2085,7 +2085,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &3977556541784462635
 Transform:
@@ -2168,7 +2168,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &3977556542350352907
 Transform:
@@ -2253,7 +2253,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &3918836336074176679
 Transform:
@@ -2332,6 +2332,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cc15dfc05bdc1742b2cc362979d493f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  randomItems: []
   randomSize: 0
   _audioSource: {fileID: 3685654110381915278}
   scale: {x: 1, y: 1, z: 1}
@@ -2368,10 +2369,10 @@ SphereCollider:
   m_GameObject: {fileID: 4407142006735266333}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
-  m_Radius: 1
-  m_Center: {x: -0.013419062, y: 0.15712488, z: 0.0054566115}
+  m_Radius: 0.46
+  m_Center: {x: -0.013419062, y: -0.11, z: 0.0054566115}
 --- !u!1 &6254326218548695553
 GameObject:
   m_ObjectHideFlags: 0
@@ -2388,7 +2389,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &6254326218548989473
 Transform:
@@ -2471,7 +2472,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &6254326220155984654
 Transform:
@@ -2554,7 +2555,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &6827981124411935655
 Transform:

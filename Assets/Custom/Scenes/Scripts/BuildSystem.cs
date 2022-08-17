@@ -21,11 +21,12 @@ namespace StupidHumanGames
 		public ItemSO[] buildItems;             //attempt to spawn inventory items from database  ***********
 		public ItemSO currentBuildItem;
 		public bool isBuilt = false;
+		bool canCancel = false;
 
 
 		private void Awake()
 		{
-			buildItems = Resources.LoadAll<ItemSO>("BuildItems");
+			buildItems = Resources.LoadAll<ItemSO>("ItemsAll/BuildItems");
 		}
 		private void Start()
 		{
@@ -34,22 +35,37 @@ namespace StupidHumanGames
 		}
 		private void Update()
 		{
+            if (InventoryManager.IsOpen())
+            {
+				canCancel = true;
+			}
             if (InventoryManager.IsOpen() && tpc._input._pickup)
-            {				
+            {
+				
 				removeItemFromField();
 				tpc._input._pickup = false;
 			}
 			
 			if (InventoryManager.IsOpen() && tpc._input._attack)
 			{
+				
 				BuildTheFucker();
 				pauseBuilding = false;
 				tpc._input._attack = false;
 			}
-	/*		if (Input.GetKeyDown(KeyCode.Y))//rotate
+            if (!InventoryManager.IsOpen())
+            {
+                if (canCancel)
+                {
+					canCancel = false;
+					CancelBuild();
+
+                }
+            }
+			if (Input.GetKeyDown(KeyCode.Y))
 			{
 				if (previewGameObject != null)
-					previewGameObject.transform.Rotate(0, 45f, 0);//rotate the preview 90 degrees. You can add in your own value here
+					previewGameObject.transform.Rotate(0, 45f, 0);
 			}
 			if (Input.GetKeyDown(KeyCode.X))//rotate
 			{
@@ -61,17 +77,7 @@ namespace StupidHumanGames
 				if (previewGameObject != null)
 					previewGameObject.transform.Rotate(0, 0, 45f);//rotate the preview 90 degrees. You can add in your own value here
 			}
-			if (Input.GetKeyDown(KeyCode.PageUp))
-			{
-				if (previewGameObject != null)
-					previewGameObject.transform.localScale += new Vector3(0, .1f, 0);
-			}
-			if (Input.GetKeyDown(KeyCode.PageDown))
-			{
-				if (previewGameObject != null)
-					previewGameObject.transform.localScale -= new Vector3(0, .1f, 0);
-			}*/
-
+			
 			if (isBuilding)
 			{
 
@@ -106,11 +112,6 @@ namespace StupidHumanGames
 			RaycastHit hit;
 			if (Physics.Raycast(ray, out hit, 10000))
 			{
-
-				Debug.DrawLine(ray.origin, hit.point);
-				//Debug.Log("Clicked on " + hit.transform.gameObject.name);
-
-
 				foreach (ItemSO item in buildItems)
 				{
 					if (hit.collider.name == item.name)

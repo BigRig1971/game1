@@ -81,21 +81,23 @@ namespace StupidHumanGames
         {
             if (other.CompareTag("Player"))
             {
-                _canMount = false;
+                
                 if (_mountUI.activeSelf)
                 {
+                    _canMount = false;
                     _mountUI.SetActive(false);
+                    _player.transform.SetParent(null);
                 }
             }
         }
         private void Update()
         {
             OnMount();
-
+            if (RandomBool(100)) OnRandomSound();
         }
         void OnMount()
         {
-            if (RandomBool(100)) OnRandomSound();
+           
             if (Input.GetKeyDown(KeyCode.M) && _canMount)
             {
                 _isMounted = !_isMounted;
@@ -115,11 +117,8 @@ namespace StupidHumanGames
                 else
                 {
                     if (!_mountUI.activeSelf) _mountUI.SetActive(true);
-
-                    _player.transform.SetParent(null);
                     _camRootPlayer.SetParent(_player);
                     _camRootPlayer.localPosition = _prevCamRoot;
-
                     if (_animator != null) _animator.SetBool(_animation, false);
                     _player.transform.position = _dismountPoint.position;
                     _tpc.OnDisableMount();

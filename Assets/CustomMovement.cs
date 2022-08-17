@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine;
 using UnityEngine.UI;
+using StupidHumanGames;
 
 
 
@@ -18,7 +19,7 @@ namespace StupidHumanGames
 		
 		private CharacterController _controller;
 		private Camera _mainCamera;
-		private TPC _tpc;
+		private ThirdPersonController _tpc;
 		private bool headAboveWater = true;
 		public bool buttAboveWater = true;
 		public bool _verticalMovement = false;
@@ -33,7 +34,7 @@ namespace StupidHumanGames
 		private bool fp = false;
 		void Start()
 		{
-			_tpc = GetComponent<TPC>();
+			_tpc = GetComponent<ThirdPersonController>();
 			_controller = GetComponent<CharacterController>();
 			_animIDRoll = Animator.StringToHash("Roll");
 			_swim = Animator.StringToHash("Swim");

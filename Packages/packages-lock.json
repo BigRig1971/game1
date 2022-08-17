@@ -75,6 +75,15 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.ide.rider": {
+      "version": "3.0.7",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.ext.nunit": "1.0.6"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.ide.visualstudio": {
       "version": "2.0.16",
       "depth": 0,
@@ -158,6 +167,17 @@
       "source": "builtin",
       "dependencies": {
         "com.unity.render-pipelines.core": "13.1.8"
+      }
+    },
+    "com.unity.render-pipelines.universal": {
+      "version": "13.1.8",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.mathematics": "1.2.1",
+        "com.unity.burst": "1.5.0",
+        "com.unity.render-pipelines.core": "13.1.8",
+        "com.unity.shadergraph": "13.1.8"
       }
     },
     "com.unity.scriptablebuildpipeline": {

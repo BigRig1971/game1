@@ -15,15 +15,8 @@ public class SaveGame : MonoBehaviour
     public List<GameObject> loadedTargets = new List<GameObject>();
     public List<ItemSO> inventoryItemList = new List<ItemSO>();
     public ItemSO[] loadedInventory;
-
-
-    Dictionary<string, List<string>> listMaster;
     public string saveObject;
-    private void Awake()
-    {
-        listMaster = new Dictionary<string, List<string>>();
-    }
-
+  
     private void Start()
     {
         loadedInventory = Resources.LoadAll<ItemSO>("ItemsAll");
@@ -93,6 +86,7 @@ public class SaveGame : MonoBehaviour
         {
             if(inv.name == item)
             {
+                Debug.Log("Loaded: " +inv.name);
                 InventoryManager.AddItemToInventory(inv, 1);
             }
         }
@@ -107,20 +101,7 @@ public class SaveGame : MonoBehaviour
             inventoryItemList.Remove(item);
         }
     }
-    public void CreateList(string listName)
-    {
-        #region List Check
-
-        var IO = listMaster.ContainsKey(listName);
-        if (IO) { return; }
-        else 
-        { 
-            listMaster.Add(listName, new List<string>()); 
-            Debug.Log("list added: " + listName);
-        }
-
-        #endregion
-    }
+ 
     public void SaveGameFile()
     {
 

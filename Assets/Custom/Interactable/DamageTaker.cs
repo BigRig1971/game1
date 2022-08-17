@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DamageTaker : MonoBehaviour, IGenericInteractable, IDamagable
+public class DamageTaker : MonoBehaviour, IGenericInteractable, IDamage
 {
 	[SerializeField] private float health = 100;
 	[SerializeField] private float armor = 5f;

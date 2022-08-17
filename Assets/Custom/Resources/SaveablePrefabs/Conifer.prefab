@@ -17,7 +17,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &7564354510659557059
 Transform:
@@ -105,14 +105,13 @@ GameObject:
   m_Component:
   - component: {fileID: 4619944839324576837}
   - component: {fileID: 452410499546061620}
-  - component: {fileID: 2290506133541655415}
   - component: {fileID: 2453777522180458400}
   m_Layer: 14
   m_Name: Conifer
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &4619944839324576837
 Transform:
@@ -123,7 +122,7 @@ Transform:
   m_GameObject: {fileID: 5428675891731855103}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 488.8495, y: 99.708694, z: 619.86914}
-  m_LocalScale: {x: 0.9346787, y: 0.9346787, z: 0.9346787}
+  m_LocalScale: {x: 0.92550576, y: 0.92550576, z: 0.92550576}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2792771647965147239}
@@ -131,7 +130,7 @@ Transform:
   - {fileID: 7564354510659557059}
   - {fileID: 7219832246027509757}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!205 &452410499546061620
 LODGroup:
@@ -147,11 +146,11 @@ LODGroup:
   m_AnimateCrossFading: 1
   m_LastLODIsBillboard: 0
   m_LODs:
-  - screenRelativeHeight: 0.5
+  - screenRelativeHeight: 0.30046314
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 8463437545125822941}
-  - screenRelativeHeight: 0.25
+  - screenRelativeHeight: 0.09552182
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 4503396914658246783}
@@ -160,22 +159,6 @@ LODGroup:
     renderers:
     - renderer: {fileID: 2452689973400803030}
   m_Enabled: 1
---- !u!54 &2290506133541655415
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5428675891731855103}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!114 &2453777522180458400
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,7 +190,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &2792771647965147239
 Transform:
@@ -250,6 +233,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cc15dfc05bdc1742b2cc362979d493f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  randomItems: []
   randomSize: 1
   _audioSource: {fileID: 4092055081127426504}
   scale: {x: 1, y: 1, z: 1}
@@ -388,7 +372,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &4564695821618027484
 Transform:
@@ -483,7 +467,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &7219832246027509757
 Transform:

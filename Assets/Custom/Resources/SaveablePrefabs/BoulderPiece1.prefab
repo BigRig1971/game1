@@ -20,7 +20,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &5577008592797280331
 Transform:
@@ -99,6 +99,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cc15dfc05bdc1742b2cc362979d493f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  randomItems: []
   randomSize: 1
   _audioSource: {fileID: 4678371224276987799}
   scale: {x: 1, y: 1, z: 1}
@@ -259,12 +260,13 @@ GameObject:
   m_Component:
   - component: {fileID: 611219191401898355}
   - component: {fileID: -6851526613249562091}
+  - component: {fileID: 3727447448209104558}
   m_Layer: 14
   m_Name: BoulderPiece1
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &611219191401898355
 Transform:
@@ -275,12 +277,12 @@ Transform:
   m_GameObject: {fileID: 5145991746880739064}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 476.75433, y: 99.29969, z: 639.3982}
-  m_LocalScale: {x: 0.8642892, y: 0.8642892, z: 0.8642892}
+  m_LocalScale: {x: 0.84202963, y: 0.84202963, z: 0.84202963}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5577008592797280331}
   m_Father: {fileID: 0}
-  m_RootOrder: 16
+  m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &-6851526613249562091
 MonoBehaviour:
@@ -296,3 +298,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   goid: 0
   saveGame: {fileID: 0}
+--- !u!205 &3727447448209104558
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5145991746880739064}
+  serializedVersion: 2
+  m_LocalReferencePoint: {x: -0.021744967, y: 0.025080979, z: -0.016544282}
+  m_Size: 1.593904
+  m_FadeMode: 1
+  m_AnimateCrossFading: 1
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.023344854
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 6714496616346440484}
+  - screenRelativeHeight: 0.023344854
+    fadeTransitionWidth: 0
+    renderers: []
+  - screenRelativeHeight: 0.023344854
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 6714496616346440484}
+  m_Enabled: 1

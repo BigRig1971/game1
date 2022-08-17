@@ -8,6 +8,10 @@ namespace StupidHumanGames
 {
     public class LootableItem : MonoBehaviour
     {
+       
+      
+
+        [SerializeField] List<Item> randomItems = new List<Item>();
         [SerializeField] bool randomSize = false;
         [SerializeField] AudioSource _audioSource;
         Quaternion targetRot;
@@ -35,7 +39,8 @@ namespace StupidHumanGames
             public ItemSO _item;
             public int _itemAmount = 1;
         }
-        public Item[] _listOfItems;
+        //public Item[] _listOfItems;
+        public List<Item> _listOfItems = new List<Item>();  
         [System.Serializable]
         public class DamageItem
         {
@@ -50,7 +55,8 @@ namespace StupidHumanGames
         }
         private void Start()
         {
-
+         
+            RandomLootableItems();
             OnScaleObject();
             playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
             if (death == null)
@@ -64,10 +70,11 @@ namespace StupidHumanGames
 
 
 #endif
-
+        
         public void LootableItems()
         {
             if (!lootable && isDamagable) return;
+            
 
             foreach (Item loi in _listOfItems)
             {
@@ -85,6 +92,15 @@ namespace StupidHumanGames
                         Destroy(transform.gameObject, .3f);
                     }
                 }
+            }
+        }
+        public void RandomLootableItems()
+        {
+
+            if (randomItems.Count > 0)
+            {
+                var index = Random.Range(0, randomItems.Count);
+                _listOfItems.Add(randomItems[index]);
             }
         }
 
@@ -166,5 +182,6 @@ namespace StupidHumanGames
                 transform.localScale = scale;
             }
         }
+     
     }
 }

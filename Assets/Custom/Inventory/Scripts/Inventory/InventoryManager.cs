@@ -37,7 +37,7 @@ namespace StupidHumanGames
 		// Start is called before the first frame update
 		void Start()
         {
-            saveGame = GameObject.FindObjectOfType<SaveGame>(); 
+            saveGame = FindObjectOfType<SaveGame>();
             if (instance == null)
                 instance = this;
 
@@ -139,6 +139,7 @@ namespace StupidHumanGames
         /// <returns></returns>
         public static int AddItemToInventory(ItemSO item, int amount)
         {
+            Debug.Log(item.name + " " + amount);
             saveGame.SaveInventory(item, amount);
             int remaining = amount;
             if (slots == null) return 0;

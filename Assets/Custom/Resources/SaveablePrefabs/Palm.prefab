@@ -10,14 +10,13 @@ GameObject:
   m_Component:
   - component: {fileID: 405037844027693233}
   - component: {fileID: 4883279051538755520}
-  - component: {fileID: 6506065036691236739}
   - component: {fileID: 6311266908345720967}
   m_Layer: 14
   m_Name: Palm
-  m_TagString: Untagged
+  m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &405037844027693233
 Transform:
@@ -31,13 +30,12 @@ Transform:
   m_LocalScale: {x: 1.3418258, y: 1.3418258, z: 1.3418258}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3063794075674076138}
   - {fileID: 7395265656423177607}
   - {fileID: 7001921170578538912}
   - {fileID: 8261629866746376025}
   - {fileID: 3713522243455231419}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!205 &4883279051538755520
 LODGroup:
@@ -53,11 +51,11 @@ LODGroup:
   m_AnimateCrossFading: 1
   m_LastLODIsBillboard: 0
   m_LODs:
-  - screenRelativeHeight: 0.5
+  - screenRelativeHeight: 0.30046314
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 5412349694203967741}
-  - screenRelativeHeight: 0.25
+  - screenRelativeHeight: 0.054535124
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 8785546541807328555}
@@ -66,22 +64,6 @@ LODGroup:
     renderers:
     - renderer: {fileID: 6535549675470044592}
   m_Enabled: 1
---- !u!54 &6506065036691236739
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1068808218545488395}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!114 &6311266908345720967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -96,52 +78,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   goid: 0
   saveGame: {fileID: 0}
---- !u!1 &1259417964898059658
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3063794075674076138}
-  - component: {fileID: 1148982838420729745}
-  m_Layer: 14
-  m_Name: CollisionObject1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3063794075674076138
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1259417964898059658}
-  m_LocalRotation: {x: -0, y: 0.19683042, z: 0.6781982, w: 0.708029}
-  m_LocalPosition: {x: 0.034402218, y: 3.8294291, z: -0.49457178}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 405037844027693233}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &1148982838420729745
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1259417964898059658}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.21945661
-  m_Height: 2.9535108
-  m_Direction: 0
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3220828547917619514
 GameObject:
   m_ObjectHideFlags: 0
@@ -159,7 +95,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &7395265656423177607
 Transform:
@@ -202,6 +138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cc15dfc05bdc1742b2cc362979d493f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  randomItems: []
   randomSize: 0
   _audioSource: {fileID: 0}
   scale: {x: 1, y: 1, z: 1}
@@ -340,7 +277,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &3713522243455231419
 Transform:
@@ -434,7 +371,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &8261629866746376025
 Transform:
@@ -528,7 +465,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &7001921170578538912
 Transform:

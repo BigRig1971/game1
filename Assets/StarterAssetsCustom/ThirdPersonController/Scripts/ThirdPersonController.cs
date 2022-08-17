@@ -18,6 +18,7 @@ namespace StupidHumanGames
 #endif
     public class ThirdPersonController : MonoBehaviour
     {
+       
         public float _surfaceDist = 0f;
         Quaternion currentRotation;
         bool groundHugging = false; 
@@ -126,7 +127,7 @@ namespace StupidHumanGames
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
         private PlayerInput _playerInput;
 #endif
-        private Animator _animator;
+        public Animator _animator;
         private CharacterController _controller;
         public StarterAssetsInputs _input;
         private GameObject _mainCamera;
@@ -158,6 +159,7 @@ namespace StupidHumanGames
 
         private void Start()
         {
+           
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();

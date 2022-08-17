@@ -14,12 +14,13 @@ GameObject:
   - component: {fileID: 7667643243335390169}
   - component: {fileID: 2110895135298308840}
   - component: {fileID: 7403020430546038282}
+  - component: {fileID: 6833900456508179381}
   m_Layer: 14
   m_Name: StickPf
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 20
   m_IsActive: 1
 --- !u!4 &7917972023084776732
 Transform:
@@ -30,11 +31,11 @@ Transform:
   m_GameObject: {fileID: 7397612320337340326}
   m_LocalRotation: {x: 0.35537896, y: -0.04640036, z: -0.017666237, w: 0.9334028}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.1464691, y: 1.1464691, z: 1.1464691}
+  m_LocalScale: {x: 4.192515, y: 4.192515, z: 4.192515}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6507017633357755065
 MeshFilter:
@@ -98,9 +99,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cc15dfc05bdc1742b2cc362979d493f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  randomSize: 0
+  randomItems: []
+  randomSize: 1
   _audioSource: {fileID: 0}
-  scale: {x: 0.5, y: 0.5, z: 0.5}
+  scale: {x: 1, y: 1, z: 1}
   droppedLootScale: 1
   damageDropScale: 1
   playerPosition: {x: 0, y: 0, z: 0}
@@ -150,3 +152,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   goid: 0
   saveGame: {fileID: 0}
+--- !u!205 &6833900456508179381
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7397612320337340326}
+  serializedVersion: 2
+  m_LocalReferencePoint: {x: 0, y: 0, z: 0}
+  m_Size: 1
+  m_FadeMode: 1
+  m_AnimateCrossFading: 1
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.999
+    fadeTransitionWidth: 0
+    renderers: []
+  - screenRelativeHeight: 0.999
+    fadeTransitionWidth: 0
+    renderers: []
+  - screenRelativeHeight: 0.023344854
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 9054879878157764211}
+  m_Enabled: 1

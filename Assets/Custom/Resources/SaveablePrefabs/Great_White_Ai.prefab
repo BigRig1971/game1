@@ -912,9 +912,10 @@ GameObject:
   - component: {fileID: 4498870682796428703}
   - component: {fileID: 5489243114963825017}
   - component: {fileID: -7783862932340831166}
+  - component: {fileID: -7422796524765440052}
   m_Layer: 16
   m_Name: Great_White_Ai
-  m_TagString: Untagged
+  m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -933,7 +934,7 @@ Transform:
   m_Children:
   - {fileID: 8597224257116749827}
   m_Father: {fileID: 0}
-  m_RootOrder: 22
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &6708947247149174795
 AudioSource:
@@ -1042,7 +1043,7 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: ceb600f490ced814f9f02b2d89447b66, type: 3}
   m_Controller: {fileID: 9100000, guid: 80b56c1dfcf814c4e8974327f336220a, type: 2}
-  m_CullingMode: 0
+  m_CullingMode: 2
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
@@ -1064,16 +1065,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canTame: 0
-  rb: {fileID: 0}
   wayPoint: {x: 0, y: 0, z: 0}
   homePosition: {x: 499.09482, y: 120, z: 573.6}
   player: {fileID: 0}
   scale: 0.5
-  _rigidBody: 1
   _animator: {fileID: 0}
   randomSound: []
   randomSoundvolume: 0
-  attackSound: {fileID: 8300000, guid: ef75b19c901bc82439f9467862f32d1d, type: 3}
+  attackSound: {fileID: 8300000, guid: f8eee352d09a1de43b341d21b96adb36, type: 3}
   attackVolume: 1
   _randomIdleDelay: 1000
   idleSound: {fileID: 0}
@@ -1097,22 +1096,22 @@ MonoBehaviour:
     m_Bits: 8192
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 5120
+    m_Bits: 17408
   _turnSpeed: 3
   _moveSpeed: 3
-  obstacleRadius: 4.84
+  obstacleRadius: 4.35
   attackCenter: {x: 0, y: 0, z: 0}
-  _delayAfterAttack: 2
-  attackRange: 2
-  sightRange: 6
+  _attackDelay: 0.3
+  _afterAttackDelay: 1
+  attackRange: 2.7
+  sightRange: 16.4
   maxRange: 50
-  maxAltitude: 93
+  maxAltitude: 85
   minAltitude: 0
   _currentState: 0
   meshReference: {fileID: 4539525497308257797}
   rndAttackCount: 1
   rndIdleCount: 1
-  reverseTime: 1
 --- !u!114 &5489243114963825017
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1125,6 +1124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cc15dfc05bdc1742b2cc362979d493f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  randomItems: []
   randomSize: 0
   _audioSource: {fileID: 0}
   scale: {x: 0.3, y: 0.3, z: 0.3}
@@ -1176,6 +1176,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   goid: 0
   saveGame: {fileID: 0}
+--- !u!205 &-7422796524765440052
+LODGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8126112846575446432}
+  serializedVersion: 2
+  m_LocalReferencePoint: {x: 0, y: 0, z: 0}
+  m_Size: 1
+  m_FadeMode: 1
+  m_AnimateCrossFading: 1
+  m_LastLODIsBillboard: 0
+  m_LODs:
+  - screenRelativeHeight: 0.999
+    fadeTransitionWidth: 0
+    renderers: []
+  - screenRelativeHeight: 0.999
+    fadeTransitionWidth: 0
+    renderers: []
+  - screenRelativeHeight: 0.023344854
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 4539525497308257797}
+  m_Enabled: 1
 --- !u!1 &8163201677267358095
 GameObject:
   m_ObjectHideFlags: 0
@@ -1426,7 +1451,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8597224257116749827}
-  - component: {fileID: 6888052073301542269}
   m_Layer: 16
   m_Name: GWShark
   m_TagString: Lootable
@@ -1442,7 +1466,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8936453678477384377}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.62, z: -2.56}
+  m_LocalPosition: {x: 0, y: -1.64, z: -2.48}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -1451,17 +1475,3 @@ Transform:
   m_Father: {fileID: 8126112846575446439}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &6888052073301542269
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8936453678477384377}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 1.03
-  m_Height: 6.98
-  m_Direction: 2
-  m_Center: {x: 0, y: 1.57, z: 2.25}

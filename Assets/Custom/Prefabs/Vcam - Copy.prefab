@@ -170,7 +170,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 46c42b43a66103e47a22e30d853c13c7, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 021494bb7eb76664d847be3cfc7f2d51, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -335,7 +335,7 @@ MonoBehaviour:
   ShoulderOffset: {x: 0, y: 0, z: 0}
   VerticalArmLength: 0
   CameraSide: 0.183
-  CameraDistance: 0.5
+  CameraDistance: 1
   CameraCollisionFilter:
     serializedVersion: 2
     m_Bits: 1024
@@ -402,8 +402,8 @@ MonoBehaviour:
   m_Lens:
     FieldOfView: 60
     OrthographicSize: 10
-    NearClipPlane: 0.02
-    FarClipPlane: 500
+    NearClipPlane: 0.1
+    FarClipPlane: 1000
     Dutch: 0
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
@@ -458,7 +458,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82b5928127bcee8478ac05b73ca39034, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxDistance: 20
+  maxDistance: 50
 --- !u!1 &8463273388551327913
 GameObject:
   m_ObjectHideFlags: 0
@@ -476,6 +476,7 @@ GameObject:
   - component: {fileID: 1001227110}
   - component: {fileID: 1001227118}
   - component: {fileID: 1001227119}
+  - component: {fileID: 1483617401}
   m_Layer: 0
   m_Name: PlayerCamera
   m_TagString: MainCamera
@@ -523,8 +524,8 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.02
-  far clip plane: 500
+  near clip plane: 0.1
+  far clip plane: 1000
   field of view: 60.000004
   orthographic: 0
   orthographic size: 10
@@ -843,3 +844,20 @@ MonoBehaviour:
   _distanceFromOceanSurface:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1483617401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8463273388551327913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ab8353b5ebd32545867da143199a814, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _shakeTechnique: 0
+  _makeDefaultOnEnable: 1
+  _limitMagnitude: 0
+  _positionalMagnitudeLimit: 10
+  _rotationalMagnitudeLimit: 3
