@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 8900000, guid: 619e305f5165a9946b7f72464e44ca4a, type: 3}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 3995.1523, g: 3298.4492, b: 3966.2344, a: 1}
+  m_IndirectSpecularColor: {r: 3684.2705, g: 2874.912, b: 2967.7734, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1367,6 +1367,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cheat Menu
       objectReference: {fileID: 0}
+    - target: {fileID: 2412816610735298411, guid: 501dc7df8dc084644a5ce8f733bb2fb9, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2412816610735298415, guid: 501dc7df8dc084644a5ce8f733bb2fb9, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -1914,7 +1918,6 @@ MonoBehaviour:
   - {fileID: 6932115265227224079}
   spawnedTargets: []
   loadedTargets: []
-  inventoryItemList: []
   loadedInventory: []
   saveObject: 
 --- !u!224 &537433646 stripped
@@ -3838,43 +3841,6 @@ PrefabInstance:
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 110682f3b2e634b43927cbc761b62c16, type: 3}
---- !u!84 &1239590600
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: GerstnerCascades
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 5
-  m_Width: 64
-  m_Height: 64
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 0
-  m_ColorFormat: 48
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 0
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 5
-  m_VolumeDepth: 16
-  m_ShadowSamplingMode: 2
 --- !u!1 &1319065227
 GameObject:
   m_ObjectHideFlags: 0
@@ -4626,12 +4592,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.size
-      value: 11
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
+      propertyPath: _listOfDamageItems.Array.size
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.data[0]._item
       value: 
-      objectReference: {fileID: 11400000, guid: 49ca32b875d459b439263025574a91b3, type: 2}
+      objectReference: {fileID: 11400000, guid: e92644d93aa5a2e489ef17b59bea3360, type: 2}
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.data[1]._item
       value: 
@@ -4639,42 +4609,42 @@ PrefabInstance:
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.data[2]._item
       value: 
-      objectReference: {fileID: 11400000, guid: 7fb642c04ac817b49b58b80815239e45, type: 2}
+      objectReference: {fileID: 11400000, guid: 83ea64d8bb9bdf94bb2b3e4d682e086a, type: 2}
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.data[3]._item
       value: 
-      objectReference: {fileID: 11400000, guid: b6ccda354ce3a2b479560af08b1dd188, type: 2}
+      objectReference: {fileID: 11400000, guid: 6ecb248fd25252243b82281f92ee9d64, type: 2}
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.data[4]._item
       value: 
-      objectReference: {fileID: 11400000, guid: 05e0c7d2b90a08f4d81b35590c77b38d, type: 2}
+      objectReference: {fileID: 11400000, guid: 7a05efd311bcf9240a4e60f0027c972d, type: 2}
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.data[5]._item
       value: 
-      objectReference: {fileID: 11400000, guid: 6ecb248fd25252243b82281f92ee9d64, type: 2}
+      objectReference: {fileID: 11400000, guid: 3ae720c01a3cd9d48908d04020a8e8eb, type: 2}
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.data[6]._item
       value: 
-      objectReference: {fileID: 11400000, guid: 7a05efd311bcf9240a4e60f0027c972d, type: 2}
+      objectReference: {fileID: 11400000, guid: b6ccda354ce3a2b479560af08b1dd188, type: 2}
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.data[7]._item
       value: 
-      objectReference: {fileID: 11400000, guid: 83ea64d8bb9bdf94bb2b3e4d682e086a, type: 2}
+      objectReference: {fileID: 11400000, guid: 49ca32b875d459b439263025574a91b3, type: 2}
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.data[8]._item
       value: 
-      objectReference: {fileID: 11400000, guid: b0392e1b3edbb5249b19b0690e414344, type: 2}
+      objectReference: {fileID: 11400000, guid: b6ccda354ce3a2b479560af08b1dd188, type: 2}
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.data[9]._item
       value: 
-      objectReference: {fileID: 11400000, guid: 6e4f9e2f510f0c4408c402b8be236be3, type: 2}
+      objectReference: {fileID: 11400000, guid: 3ae720c01a3cd9d48908d04020a8e8eb, type: 2}
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.data[10]._item
       value: 
       objectReference: {fileID: 11400000, guid: 3ae720c01a3cd9d48908d04020a8e8eb, type: 2}
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.data[0]._itemAmount
-      value: 99
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.data[1]._itemAmount
@@ -4710,7 +4680,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.data[9]._itemAmount
-      value: 10
+      value: 99
       objectReference: {fileID: 0}
     - target: {fileID: 214394069, guid: fa73c91e841eaa14196cb8e9e2ecf1e5, type: 3}
       propertyPath: _listOfItems.Array.data[10]._itemAmount
@@ -6302,7 +6272,7 @@ MonoBehaviour:
   _radius: 20
   _subdivisions: 1
   _featherWaveStart: 0.1
-  _waveBuffers: {fileID: 1239590600}
+  _waveBuffers: {fileID: 2074460519}
 --- !u!224 &2033499921 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4108157927623740475, guid: a908b416d38138b48a29072adff123e9, type: 3}
@@ -6318,6 +6288,43 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4140670084722468269, guid: 110682f3b2e634b43927cbc761b62c16, type: 3}
   m_PrefabInstance: {fileID: 494633556}
   m_PrefabAsset: {fileID: 0}
+--- !u!84 &2074460519
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: GerstnerCascades
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 5
+  m_Width: 64
+  m_Height: 64
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 0
+  m_ColorFormat: 48
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 0
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 5
+  m_VolumeDepth: 16
+  m_ShadowSamplingMode: 2
 --- !u!1 &2109530064
 GameObject:
   m_ObjectHideFlags: 0

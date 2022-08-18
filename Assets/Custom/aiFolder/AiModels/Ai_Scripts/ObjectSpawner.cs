@@ -45,18 +45,6 @@ namespace StupidHumanGames
             StartCoroutine(GetAlreadySpawned());
             currentDelay = .1f;
         }
-        void Update()
-        {
-            if (canSpawn)
-            {
-                spawnObjects();
-            }
-        }
-        void LateUpdate()
-        {
-            //remove all destroyed objects
-            list.RemoveAll(o => (o == null || o.Equals(null)));
-        }
         void StartDelay()
         {
             if (!delayStarted)
@@ -95,6 +83,13 @@ namespace StupidHumanGames
                 }
             }
         }
+        void Update()
+        {
+            if (canSpawn)
+            {
+                spawnObjects();
+            }
+        }
         public void spawnObjects()
         {
             if (list.Count >= maximum)
@@ -127,7 +122,7 @@ namespace StupidHumanGames
                     if (maxTerrainHeight - hit.point.y < minYSpace) return;
                     if (hit.point.y <= minTerrainHeight || hit.point.y >= maxTerrainHeight) return;
                     _position.y = (hit.point.y + maxTerrainHeight) / 2;
-                    Debug.Log(hit.point.y);
+                   // Debug.Log(hit.point.y);
                 }
 
                 if (Physics.CheckSphere(_position, minSeparation, avoidableObjects)) return;
@@ -149,6 +144,11 @@ namespace StupidHumanGames
 
                 m_internalTimer = currentDelay;
             }
+        }
+        void LateUpdate()
+        {
+            //remove all destroyed objects
+            list.RemoveAll(o => (o == null || o.Equals(null)));
         }
         Vector3 GetOffset()
         {

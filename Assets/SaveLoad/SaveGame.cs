@@ -13,17 +13,28 @@ public class SaveGame : MonoBehaviour
     public List<GameObject> targets = new List<GameObject>();
     public List<GameObject> spawnedTargets = new List<GameObject>();
     public List<GameObject> loadedTargets = new List<GameObject>();
-    public List<ItemSO> inventoryItemList = new List<ItemSO>();
-    public ItemSO[] loadedInventory;
+    public static List<ItemSO> inventoryItemList = new List<ItemSO>();
+    public  ItemSO[] loadedInventory;
     public string saveObject;
-  
+    static SaveGame instance;
+    private void Awake()
+    {
+        loadedInventory = Resources.LoadAll<ItemSO>("");
+    }
     private void Start()
     {
-        loadedInventory = Resources.LoadAll<ItemSO>("ItemsAll");
+        if (instance == null)
+            instance = this;
+        StartCoroutine(LoadAll());
+    }
+    IEnumerator LoadAll()
+    {
+        yield return new WaitForSeconds(.3f);
         LoadGameFile();
         LoadSpawnedGameFile();
-        LoadInventoryGameFile();    
+        LoadInventoryGameFile();
     }
+   
     void Cleanup()
     {
         spawnedTargets.RemoveAll(o => (o == null || o.Equals(null)));
@@ -45,7 +56,6 @@ public class SaveGame : MonoBehaviour
                 }
             }
         }
-
     }
     List<string> GetIdsFromList(List<GameObject> list)
     {
@@ -69,11 +79,12 @@ public class SaveGame : MonoBehaviour
         spawnedTargets.Add(obj);
         //CreateList(saveObj);
     }
-    public void SaveInventory(ItemSO item, int amount)
+    public static void SaveInventory(ItemSO item, int amount)
     {
         for(int i = 0; i < amount; i++)
         {
             inventoryItemList.Add(item);
+           // Debug.Log("item: " + item.name);
         }
     }
     public void LoadInventory(string item)
@@ -82,6 +93,7 @@ public class SaveGame : MonoBehaviour
         {
             if(inv.name == item)
             {
+               // Debug.Log("Loaded: " +inv.name);
                 InventoryManager.AddItemToInventory(inv, 1);
             }
         }
@@ -89,7 +101,7 @@ public class SaveGame : MonoBehaviour
 
         
     }
-    public void RemoveInventory(ItemSO item, int amount)
+    public static void RemoveInventory(ItemSO item, int amount)
     {
         for (int i = 0; i < amount; i++)
         {

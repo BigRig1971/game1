@@ -23,11 +23,14 @@ namespace StupidHumanGames
 		public bool isFoundation = false;//this is a special rule for foundations. 
 		public List<string> tagsISnapTo = new List<string>();//list of all of the SnapPoint tags this particular preview can snap too
 		public List<GameObject> prefabs = new List<GameObject>();
+
+		public Material[] materials;
 		private void Start()
 		{
 			saveGame = GameObject.FindObjectOfType<SaveGame>();
 			buildSystem = GameObject.FindObjectOfType<BuildSystem>();
-			myRend = GetComponent<MeshRenderer>();
+			myRend = GetComponentInChildren<MeshRenderer>();
+			materials = myRend.materials;
 			ChangeColor();
 		}
 		public void Place()
@@ -45,24 +48,45 @@ namespace StupidHumanGames
 		}
 		private void ChangeColor()//changes between red and greed depending if this preview is/is not snapped to anything
 		{
-			
-			if (isFoundation)
+
+
+			if (isFoundation && isGrounded)
 			{
 				isSnapped = true;
 			}
 			
 			if (isSnapped)
 			{
-				myRend.material = goodMat;
+			
+				var materials = myRend.sharedMaterials;
+				for (int i = 0; i < materials.Length; i++)
+				{
+
+					materials[i] = goodMat;
+				}
+				myRend.sharedMaterials = materials;
 			}
 			else
 			{
-				myRend.material = badMat;
-			}
+				var materials = myRend.sharedMaterials;
+				for (int i = 0; i < materials.Length; i++)
+				{
+
+					materials[i] = badMat;
+				}
+				myRend.sharedMaterials = materials;
+
+			}		
 		}
 		private void OnTriggerEnter(Collider other)//this is what dertermins if you are snapped to a snap point
 		{
-			
+			if (other.CompareTag("Ground"))
+			{
+				isGrounded = true;
+				ChangeColor();
+			}
+
+
 			for (int i = 0; i < tagsISnapTo.Count; i++)//loop through all the tags this preview can snap too
 			{
 				string currentTag = tagsISnapTo[i];//setting the current tag were looking at to a string...its easier to write currentTag then tagsISnapTo[i]
@@ -80,12 +104,17 @@ namespace StupidHumanGames
 		}
 		private void OnTriggerExit(Collider other)//this is what determins if you are no longer snapped to a snap point
 		{
+            if (other.CompareTag("Ground"))
+            {
+				isGrounded = false;
+				ChangeColor();
+            }
 			
 			for (int i = 0; i < tagsISnapTo.Count; i++)//loop through all tags
 			{
 				string currentTag = tagsISnapTo[i];
 
-				if (other.tag == currentTag)//if we OnTriggerExit something that we can snap too
+				if (other.CompareTag(currentTag))//if we OnTriggerExit something that we can snap too
 				{
 					isSnapped = false;//were no longer snapped
 					ChangeColor();//change color
