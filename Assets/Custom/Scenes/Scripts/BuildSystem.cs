@@ -11,6 +11,7 @@ namespace StupidHumanGames
 		public ThirdPersonController tpc;
 	    [SerializeField] Camera cam;//camera used for raycast
 		public LayerMask layer;//the layer that the raycast will hit on
+		public LayerMask removeLayer;
 		public int buildDistance;
 		private GameObject previewGameObject = null;//referance to the preview gameobject
 		private Preview previewScript = null;//the Preview.cs script sitting on the previewGameObject
@@ -65,7 +66,7 @@ namespace StupidHumanGames
 			if (Input.GetKeyDown(KeyCode.Y))
 			{
 				if (previewGameObject != null)
-					previewGameObject.transform.Rotate(0, 45f, 0);
+					previewGameObject.transform.Rotate(0, 15f, 0);
 			}
 			if (Input.GetKeyDown(KeyCode.X))//rotate
 			{
@@ -110,7 +111,7 @@ namespace StupidHumanGames
 
 			Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 			RaycastHit hit;
-			if (Physics.Raycast(ray, out hit, 10000))
+			if (Physics.Raycast(ray, out hit, 100, removeLayer))
 			{
 				foreach (ItemSO item in buildItems)
 				{

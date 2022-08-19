@@ -11,7 +11,7 @@ public class SaveGame : MonoBehaviour
 {
     [Header("Variables")]
     public List<GameObject> targets = new List<GameObject>();
-    public List<GameObject> spawnedTargets = new List<GameObject>();
+    public static List<GameObject> spawnedTargets = new List<GameObject>();
     public List<GameObject> loadedTargets = new List<GameObject>();
     public static List<ItemSO> inventoryItemList = new List<ItemSO>();
     public  ItemSO[] loadedInventory;
@@ -67,7 +67,7 @@ public class SaveGame : MonoBehaviour
         }
         return l;
     }
-    public void SpawnPrefab(GameObject go, Vector3 pos, Quaternion rot)
+    public static void SpawnPrefab(GameObject go, Vector3 pos, Quaternion rot)
     {
         //saveObject = saveObj;
        // List<string> list = new List<string>();

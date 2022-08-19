@@ -12,12 +12,12 @@ GameObject:
   - component: {fileID: 1725487822844004213}
   - component: {fileID: 6478689033048657295}
   - component: {fileID: 7877817656558206362}
-  m_Layer: 12
+  m_Layer: 17
   m_Name: Doorway
   m_TagString: Buildable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 4
   m_IsActive: 1
 --- !u!4 &5606185181749980146
 Transform:
@@ -34,7 +34,7 @@ Transform:
   - {fileID: 7721987241213264172}
   - {fileID: 628840466639908857}
   m_Father: {fileID: 0}
-  m_RootOrder: 17
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1725487822844004213
 BoxCollider:
@@ -138,7 +138,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2036489951703125026, guid: f17661a8f3c0a9646950ae0609a8fb30, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 2147483647
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5566363540918156792, guid: f17661a8f3c0a9646950ae0609a8fb30, type: 3}
       propertyPath: m_Radius
@@ -230,7 +230,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 1bd4c9155e17dd04d9e68c0d353a2a8e, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 2147483647
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []

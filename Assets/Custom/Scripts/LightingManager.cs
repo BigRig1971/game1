@@ -6,10 +6,10 @@ namespace StupidHumanGames
 {
     public class LightingManager : MonoBehaviour
     {
-        SaveGame saveGame;
+        
         public enum State { Day, Night };
         [SerializeField] State _currentState;
-        //Scene References
+      
         [SerializeField] private Light DirectionalLight;
         [SerializeField] private LightingPreset Preset;
         //Variables

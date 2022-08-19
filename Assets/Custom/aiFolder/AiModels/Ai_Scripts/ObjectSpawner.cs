@@ -13,6 +13,7 @@ namespace StupidHumanGames
         [Header("SPAWN ON GROUND ONLY PROPERTIES")]
         Quaternion targetRot;
         Quaternion q;
+        bool save = true;
         [SerializeField] GameObject _prefab;
         [SerializeField] bool spawnOnGround = true;
         [SerializeField] bool alignWithGround = true;
@@ -29,7 +30,7 @@ namespace StupidHumanGames
         public float maxRange = 3f;
         public float minSeparation = 3f;
         GameObject _object;
-        [SerializeField] SaveGame saveGame;
+        //[SerializeField] SaveGame saveGame;
         bool canSpawn = false;
         float slopeAngle;
         GameObject delete;
@@ -129,11 +130,11 @@ namespace StupidHumanGames
 
                 _prefab.transform.localScale = new Vector3(scale * rndScale, scale * rndScale, scale * rndScale);
 
-                if (saveGame != null)
+               if(save)
                 {
                     if (!canSpawn) return;
                     GameObject obj = _prefab.gameObject;
-                    saveGame.SpawnPrefab(obj, _position, q);
+                    SaveGame.SpawnPrefab(obj, _position, q);
                     list.Add(obj);
                 }
                 else
