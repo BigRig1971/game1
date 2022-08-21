@@ -1645,6 +1645,7 @@ GameObject:
   - component: {fileID: 3685654110381915279}
   - component: {fileID: 4011532674994283476}
   - component: {fileID: 5543363946520988817}
+  - component: {fileID: -3294267138842296299}
   m_Layer: 12
   m_Name: CampFire
   m_TagString: Lootable
@@ -1682,7 +1683,7 @@ Transform:
   - {fileID: 803517541}
   - {fileID: 1607433329}
   m_Father: {fileID: 0}
-  m_RootOrder: 17
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &3685654110381915278
 AudioSource:
@@ -1820,6 +1821,22 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.46
   m_Center: {x: -0.013419062, y: -0.11, z: 0.0054566115}
+--- !u!114 &-3294267138842296299
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3596187661416315478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 848d223c75571264d83c3c53f677023d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent:
+    serializedVersion: 2
+    m_Bits: 4096
+  hitColliders: []
 --- !u!1 &3977556540547096081
 GameObject:
   m_ObjectHideFlags: 0

@@ -47,6 +47,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e364704e38ac6ca4d9643b7934fc2899, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  layer:
+    serializedVersion: 2
+    m_Bits: 131072
   prefab: {fileID: 3546104704373886435, guid: ba730ce5aa6dfb145af6fdbf36c1cafb, type: 3}
   spawnOffset: 0
   isGrounded: 0
@@ -55,7 +58,7 @@ MonoBehaviour:
   isFoundation: 0
   tagsISnapTo:
   - SnapPointWall
-  prefabs: []
+  hitColliders: []
   materials: []
 --- !u!135 &520517092527905833
 SphereCollider:
@@ -69,7 +72,7 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Center: {x: 8.470329e-24, y: 0, z: -0.125}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &2169820069306480909
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -12,7 +12,7 @@ public class SaveGame : MonoBehaviour
     [Header("Variables")]
     public List<GameObject> targets = new List<GameObject>();
     public static List<GameObject> spawnedTargets = new List<GameObject>();
-    public List<GameObject> loadedTargets = new List<GameObject>();
+    public static List<GameObject> loadedTargets = new List<GameObject>();
     public static List<ItemSO> inventoryItemList = new List<ItemSO>();
     public  ItemSO[] loadedInventory;
     public string saveObject;

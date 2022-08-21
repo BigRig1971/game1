@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5606185181749980146}
   - component: {fileID: 2101253797183904774}
   - component: {fileID: 4459381881173074208}
+  - component: {fileID: -3816790490691510140}
   m_Layer: 17
   m_Name: WallHalf
   m_TagString: Buildable
@@ -62,6 +63,22 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 4.000002, y: 2, z: 0.2}
   m_Center: {x: 0, y: 1, z: 0.1}
+--- !u!114 &-3816790490691510140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3546104704373886435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 848d223c75571264d83c3c53f677023d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent:
+    serializedVersion: 2
+    m_Bits: 4096
+  hitColliders: []
 --- !u!1001 &271722481434121134
 PrefabInstance:
   m_ObjectHideFlags: 0

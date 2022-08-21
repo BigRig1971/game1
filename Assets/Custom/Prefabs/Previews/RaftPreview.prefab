@@ -46,6 +46,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e364704e38ac6ca4d9643b7934fc2899, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  layer:
+    serializedVersion: 2
+    m_Bits: 131072
   prefab: {fileID: 888041386150712503, guid: 73dcde35d6269ea4db8e9b31381d9299, type: 3}
   spawnOffset: 2
   isGrounded: 0
@@ -53,7 +56,7 @@ MonoBehaviour:
   badMat: {fileID: 0}
   isFoundation: 1
   tagsISnapTo: []
-  prefabs: []
+  hitColliders: []
   materials: []
 --- !u!54 &1918876817250068541
 Rigidbody:

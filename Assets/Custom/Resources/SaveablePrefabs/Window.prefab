@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5606185181749980146}
   - component: {fileID: 1725487822844004213}
   - component: {fileID: -7475900389979325628}
+  - component: {fileID: -8694228343797866459}
   m_Layer: 17
   m_Name: Window
   m_TagString: Buildable
@@ -33,7 +34,7 @@ Transform:
   - {fileID: 7721987241213264172}
   - {fileID: 628840466639908857}
   m_Father: {fileID: 0}
-  m_RootOrder: 17
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1725487822844004213
 BoxCollider:
@@ -46,8 +47,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 4, y: 4, z: 0.3}
-  m_Center: {x: 0, y: 2, z: 0}
+  m_Size: {x: 4, y: 4, z: 0.2}
+  m_Center: {x: 0, y: 2, z: 0.1}
 --- !u!114 &-7475900389979325628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62,6 +63,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   goid: 0
   saveGame: {fileID: 0}
+--- !u!114 &-8694228343797866459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3546104704373886435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 848d223c75571264d83c3c53f677023d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent:
+    serializedVersion: 2
+    m_Bits: 4096
 --- !u!1001 &271722481434121134
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1105,7 +1105,7 @@ MonoBehaviour:
   _afterAttackDelay: 1
   attackRange: 2.7
   sightRange: 16.4
-  maxRange: 50
+  maxRange: 100
   maxAltitude: 85
   minAltitude: 0
   _currentState: 0
@@ -1184,22 +1184,23 @@ LODGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8126112846575446432}
   serializedVersion: 2
-  m_LocalReferencePoint: {x: 0, y: 0, z: 0}
-  m_Size: 1
+  m_LocalReferencePoint: {x: -0.055807114, y: 0.73996425, z: -3.217035}
+  m_Size: 17.089447
   m_FadeMode: 1
   m_AnimateCrossFading: 1
   m_LastLODIsBillboard: 0
   m_LODs:
-  - screenRelativeHeight: 0.999
-    fadeTransitionWidth: 0
-    renderers: []
-  - screenRelativeHeight: 0.999
-    fadeTransitionWidth: 0
-    renderers: []
-  - screenRelativeHeight: 0.023344854
+  - screenRelativeHeight: 0.14788686
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 4539525497308257797}
+  - screenRelativeHeight: 0.14788686
+    fadeTransitionWidth: 0
+    renderers: []
+  - screenRelativeHeight: 0.14788686
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 0}
   m_Enabled: 1
 --- !u!1 &8163201677267358095
 GameObject:

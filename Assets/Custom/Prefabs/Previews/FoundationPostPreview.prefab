@@ -64,6 +64,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e364704e38ac6ca4d9643b7934fc2899, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  layer:
+    serializedVersion: 2
+    m_Bits: 131072
   prefab: {fileID: 2779346234581961502, guid: 73b76c878fdd0094aa0018f8560edff0, type: 3}
   spawnOffset: 0
   isGrounded: 0
@@ -72,7 +75,8 @@ MonoBehaviour:
   isFoundation: 1
   tagsISnapTo:
   - SnapPointFoundation
-  prefabs: []
+  - SnapPointSubFoundation
+  hitColliders: []
   materials: []
 --- !u!135 &6537753090992730759
 SphereCollider:

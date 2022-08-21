@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6803671870972185397}
   m_Layer: 12
   m_Name: SnapPointFoundation (3)_1
-  m_TagString: SnapPointFoundation
+  m_TagString: SnapPointSubFoundation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -57,7 +57,7 @@ GameObject:
   - component: {fileID: 2592393061999208248}
   m_Layer: 12
   m_Name: SnapPointFoundation (2)_1
-  m_TagString: SnapPointFoundation
+  m_TagString: SnapPointSubFoundation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -147,6 +147,7 @@ GameObject:
   - component: {fileID: -1425221514754937204}
   - component: {fileID: 1862006222020382164}
   - component: {fileID: -959808193609178722}
+  - component: {fileID: 7929938023828060740}
   m_Layer: 17
   m_Name: FoundationPost
   m_TagString: Buildable
@@ -177,6 +178,7 @@ Transform:
   - {fileID: 2964192909131469449}
   - {fileID: 6453854568673041562}
   - {fileID: 5074627300249162360}
+  - {fileID: 6001192698505949370}
   m_Father: {fileID: 0}
   m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -224,10 +226,27 @@ MonoBehaviour:
   - {fileID: 1862006222020382164}
   - {fileID: 6683802087812001308}
   - {fileID: 9135838811712355009}
+  - {fileID: 8445829096019265872}
   allColliders: []
   ground:
     serializedVersion: 2
     m_Bits: 1024
+--- !u!114 &7929938023828060740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2779346234581961502}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 848d223c75571264d83c3c53f677023d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent:
+    serializedVersion: 2
+    m_Bits: 4096
+  hitColliders: []
 --- !u!1 &2810372047715799055
 GameObject:
   m_ObjectHideFlags: 0
@@ -240,7 +259,7 @@ GameObject:
   - component: {fileID: 4990518851457975900}
   m_Layer: 12
   m_Name: SnapPointFoundation (1)
-  m_TagString: SnapPointFoundation
+  m_TagString: SnapPointSubFoundation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -273,6 +292,51 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &3039397045792324995
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6001192698505949370}
+  - component: {fileID: 8445829096019265872}
+  m_Layer: 12
+  m_Name: SnapPointMain_1
+  m_TagString: SnapPointFoundation
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6001192698505949370
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3039397045792324995}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -2, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6514835523492375823}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &8445829096019265872
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3039397045792324995}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6481420660057274041
 GameObject:
   m_ObjectHideFlags: 0
@@ -285,7 +349,7 @@ GameObject:
   - component: {fileID: 4630434499945617301}
   m_Layer: 12
   m_Name: SnapPointFoundation
-  m_TagString: SnapPointFoundation
+  m_TagString: SnapPointSubFoundation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -330,7 +394,7 @@ GameObject:
   - component: {fileID: 5792934076300476160}
   m_Layer: 12
   m_Name: SnapPointFoundation (3)
-  m_TagString: SnapPointFoundation
+  m_TagString: SnapPointSubFoundation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -420,7 +484,7 @@ GameObject:
   - component: {fileID: 7939994759686493659}
   m_Layer: 12
   m_Name: SnapPointFoundation_2
-  m_TagString: SnapPointFoundation
+  m_TagString: SnapPointSubFoundation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -465,7 +529,7 @@ GameObject:
   - component: {fileID: 7610135651923129877}
   m_Layer: 12
   m_Name: SnapPointFoundation (2)
-  m_TagString: SnapPointFoundation
+  m_TagString: SnapPointSubFoundation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -510,7 +574,7 @@ GameObject:
   - component: {fileID: 4511276821703379462}
   m_Layer: 12
   m_Name: SnapPointFoundation (1)_1
-  m_TagString: SnapPointFoundation
+  m_TagString: SnapPointSubFoundation
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
