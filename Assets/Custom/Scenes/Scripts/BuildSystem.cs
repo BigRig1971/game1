@@ -42,8 +42,8 @@ namespace StupidHumanGames
             }
             if (InventoryManager.IsOpen() && tpc._input._pickup)
             {
-
-                removeItemFromField();
+                removeFromField();
+                //RemoveItemFromField();
                 tpc._input._pickup = false;
             }
 
@@ -106,32 +106,30 @@ namespace StupidHumanGames
             }
 
         }
-        public void removeItemFromField()
+      
+        public void removeFromField()
         {
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, 100, removeLayer))
             {
-                List<ItemSO> gos = new List<ItemSO>();
-                foreach (ItemSO item in buildItems)
+                List<Transform> children = new List<Transform>(hit.transform.GetComponentsInChildren<Transform>());
+                foreach (Transform child in children)
                 {
-                    Transform[] allChildren = hit.collider.GetComponentsInChildren<Transform>();
-                    foreach (Transform child in allChildren)
+                    foreach(ItemSO i in buildItems)
                     {
-                        if (child.gameObject.name == item.name)
+                        if(i.name == child.name)
                         {
-                            child.gameObject.transform.SetParent(null);
                             Rigidbody rb = child.gameObject.AddComponent<Rigidbody>();
+                            child.gameObject.transform.SetParent(null);
                             rb.AddForce(cam.transform.forward * 5, ForceMode.Impulse);
-                            
-                            InventoryManager.AddItemToInventory(item,1);
+                            InventoryManager.AddItemToInventory(i, 1);
                             Destroy(child.gameObject, 5);
                         }
-                    }
+                    }                   
                 }
             }
         }
-
         public void NewBuild(GameObject _go)
         {
             isBuilt = false;
@@ -141,7 +139,6 @@ namespace StupidHumanGames
             //camPivot.transform.localPosition = new Vector3(camPivot.transform.localPosition.x + camPosX, camPivot.transform.localPosition.y + camPosY, camPivot.transform.localPosition.z + camPosZ);
             previewGameObject = Instantiate(_go, Vector3.zero, Quaternion.identity);
             previewScript = previewGameObject.GetComponent<Preview>();
-
             isBuilding = true;
         }
 

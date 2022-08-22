@@ -86,7 +86,7 @@ namespace StupidHumanGames
                 {
                     _canMount = false;
                     _mountUI.SetActive(false);
-                    _player.transform.SetParent(null);
+                    //_player.transform.SetParent(null);
                 }
             }
         }
@@ -123,6 +123,7 @@ namespace StupidHumanGames
                     _player.transform.position = _dismountPoint.position;
                     _tpc.OnDisableMount();
                     _player.transform.rotation = Quaternion.Euler(0f, _player.rotation.eulerAngles.y, 0f);
+                    _player.transform.SetParent(null);
                 }
             }
             if (_isMounted) OnMove();
