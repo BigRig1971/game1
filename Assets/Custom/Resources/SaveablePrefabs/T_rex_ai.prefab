@@ -38,7 +38,7 @@ Transform:
   - {fileID: 8628325387236954835}
   - {fileID: 1519641524647566667}
   m_Father: {fileID: 0}
-  m_RootOrder: 17
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &7658770512043103392
 Animator:
@@ -278,9 +278,9 @@ MonoBehaviour:
   _moveSpeed: 3
   obstacleRadius: 1.12
   attackCenter: {x: 0, y: 0, z: 0}
-  _attackDelay: 1
-  _afterAttackDelay: 1
-  attackRange: 1
+  _attackDelay: 0.9
+  _afterAttackDelay: 0
+  attackRange: 0.73
   sightRange: 4.7
   maxRange: 16
   maxAltitude: 112

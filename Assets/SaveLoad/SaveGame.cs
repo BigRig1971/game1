@@ -252,6 +252,7 @@ public class SaveGame : MonoBehaviour
                
                 targets[i].transform.localPosition = vector3;
                 targets[i].transform.localRotation = quaternion;
+               
 
                // LoadInventory(targetNames._inventoryItem.ToString());
               

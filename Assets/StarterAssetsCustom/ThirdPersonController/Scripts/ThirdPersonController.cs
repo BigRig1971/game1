@@ -159,7 +159,7 @@ namespace StupidHumanGames
 
         private void Start()
         {
-           
+           transform.localRotation = Quaternion.identity;
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();
@@ -279,22 +279,8 @@ namespace StupidHumanGames
                         _input._roll = false;
                     }
                 }
-                if (Input.GetKeyDown(KeyCode.H))
-                {
-
-                    animEnable = !animEnable;
-                    if (animEnable && _hasAnimator)
-                    {
-                        _animator.SetBool("Crawl", true);
-                        groundHugging = true;
-                    }
-                    else
-                    {
-                        _animator.SetBool("Crawl", false);
-                        groundHugging = false;
-                        transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
-                    }
-                }
+                if (Input.GetKeyDown(KeyCode.J)) _animator.SetTrigger("RandomIdle");
+              
                 if(groundHugging) OnYPosition();
                 float targetSpeed = _input._sprint ? SprintSpeed : MoveSpeed;
                 if (_input._move == Vector2.zero) targetSpeed = 0.0f;
@@ -374,7 +360,7 @@ namespace StupidHumanGames
             while (OnIsSwimming())
             {
                 SwimGroundCheck();
-                OnSwim(.5f);
+                OnSwim(.1f);
 
                 yield return null;
             }
@@ -581,7 +567,7 @@ namespace StupidHumanGames
         {
             isMounted = false;
         }
-        void OnYPosition()
+        public void OnYPosition()
         {
             Vector3 position = transform.position;
             RaycastHit hit;

@@ -314,7 +314,6 @@ namespace StupidHumanGames
             if (OnCanChase()) SetAnimation(1, 1, 2);
             while (OnCanChase() && !OutOfBounds() && !OnHitObstacle())
             {
-
                 wayPoint = player.position;
                 if (RandomBool(200))
                 {
@@ -329,35 +328,46 @@ namespace StupidHumanGames
         {
             if (OnCanAttack() && !OutOfBounds() && !OnHitObstacle())
             {
-                SetAnimation(1, 1, 2);
-                RandomAttackAnimations();
-                _audioSource.PlayOneShot(attackSound, attackVolume);
-                yield return new WaitForSeconds(_attackDelay);
+                float distance = Vector3.Distance(wayPoint, transform.position);
 
-                if (RandomBool(2))
+                if (distance < attackRange)
                 {
-                    wayPoint = transform.position - transform.right * 100f;
-                    yield return new WaitForSeconds(_afterAttackDelay);
-                    wayPoint = transform.position - transform.right * 100f;
-                    yield return new WaitForSeconds(_afterAttackDelay / 2);
-                    wayPoint = transform.position - transform.right * 100f;
-                    yield return new WaitForSeconds(_afterAttackDelay / 2);
+
+                    var restrictedMaxRange = wayPoint + (transform.position - wayPoint).normalized * attackRange;
+                    transform.position = new Vector3(restrictedMaxRange.x, transform.position.y, restrictedMaxRange.z);
+                }
+                if (canSwimOrFly)
+                {
+                    SetAnimation(1, 1, 2);
+                    RandomAttackAnimations();
+                    _audioSource.PlayOneShot(attackSound, attackVolume);
+                    yield return new WaitForSeconds(_attackDelay);
+
+                    if (RandomBool(2))
+                    {
+                        wayPoint = transform.position - transform.right * 100f;
+                        yield return new WaitForSeconds(_afterAttackDelay);
+                    }
+                    else
+                    {
+                        wayPoint = transform.position + transform.right * 100f;
+                        yield return new WaitForSeconds(_afterAttackDelay);
+                    }
                 }
                 else
                 {
-                    wayPoint = transform.position + transform.right * 100f;
+                   
+                    SetAnimation(0, 0, 5);
+                    RandomAttackAnimations();
+                    _audioSource.PlayOneShot(attackSound, attackVolume);
+                    yield return new WaitForSeconds(_attackDelay);
+                   
                     yield return new WaitForSeconds(_afterAttackDelay);
-                    wayPoint = transform.position + transform.right * 100f;
-                    yield return new WaitForSeconds(_afterAttackDelay / 2);
-                    wayPoint = transform.position + transform.right * 100f;
-                    yield return new WaitForSeconds(_afterAttackDelay / 2);
                 }
-
 
                 SetAnimation(1, 1, 1);
                 yield break;
             }
-
             while (OnCanAttack())
             {
 
@@ -420,7 +430,6 @@ namespace StupidHumanGames
                 if (OnfootStep.animatorClipInfo.weight > .8f) _audioSource.PlayOneShot(FootstepAudioClips[index], FootstepAudioVolume);
             }
         }
-
         private bool IsFacingObject()
         {
             Vector3 forward = transform.TransformDirection(Vector3.forward);
@@ -433,10 +442,7 @@ namespace StupidHumanGames
             {
                 return true; //in front
             }
-
         }
-
-
     }
 }
 
