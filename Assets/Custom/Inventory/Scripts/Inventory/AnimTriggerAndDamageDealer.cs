@@ -10,7 +10,6 @@ namespace StupidHumanGames
     public class AnimTriggerAndDamageDealer : MonoBehaviour
     {
         [SerializeField] bool groundHugging = false;
-        [SerializeField] Transform lookTransform;
         [SerializeField] Transform cameraRoot;
         [SerializeField] float cameraRootOffset;
         [SerializeField] AudioSource _audioSource;
@@ -49,11 +48,14 @@ namespace StupidHumanGames
             {
                 rb = gameObject.AddComponent<Rigidbody>() as Rigidbody;
                 rb.isKinematic = true;
+                BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
+                boxCollider.size = colliderSize;
+                boxCollider.center = (Vector3.zero + colliderCenter);
+                boxCollider.isTrigger = true;
             }
-            BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
-            boxCollider.size = colliderSize;
-            boxCollider.center = (Vector3.zero + colliderCenter);
-            boxCollider.isTrigger = true;
+
+           
+            
         }
 
         private void OnTriggerStay(Collider other)
@@ -92,6 +94,7 @@ namespace StupidHumanGames
                 {
                     hugTheGround = true;
                     cameraRoot.position =  new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset, cameraRoot.position.z);
+                    _tpc.isMounted = true;
 
                 }
                 else
@@ -99,6 +102,7 @@ namespace StupidHumanGames
                     hugTheGround= false;
                     cameraRoot.position = new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset * -1, cameraRoot.position.z);
                      _tpc.transform.rotation = Quaternion.Euler(0f, _tpc.transform.rotation.eulerAngles.y, 0f);
+                    _tpc.isMounted = false;
                 }
 
                 foreach(GameObject go in _itemsToDisable)

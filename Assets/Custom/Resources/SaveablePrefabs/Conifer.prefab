@@ -106,6 +106,7 @@ GameObject:
   - component: {fileID: 4619944839324576837}
   - component: {fileID: 452410499546061620}
   - component: {fileID: 2453777522180458400}
+  - component: {fileID: -6714449688435351906}
   m_Layer: 14
   m_Name: Conifer
   m_TagString: Lootable
@@ -122,7 +123,7 @@ Transform:
   m_GameObject: {fileID: 5428675891731855103}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 488.8495, y: 99.708694, z: 619.86914}
-  m_LocalScale: {x: 1.0865123, y: 1.0865123, z: 1.0865123}
+  m_LocalScale: {x: 1.0703819, y: 1.0703819, z: 1.0703819}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2792771647965147239}
@@ -130,7 +131,7 @@ Transform:
   - {fileID: 7564354510659557059}
   - {fileID: 7219832246027509757}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!205 &452410499546061620
 LODGroup:
@@ -173,6 +174,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   goid: 0
   saveGame: {fileID: 0}
+--- !u!54 &-6714449688435351906
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5428675891731855103}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
 --- !u!1 &6304367193709181087
 GameObject:
   m_ObjectHideFlags: 0

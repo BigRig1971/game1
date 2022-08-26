@@ -1,35 +1,26 @@
 fileFormatVersion: 2
-guid: cd23c4e676716524db261224ac16ff8b
+guid: 75f79c86359020f4a8187b4b897ed94a
 ModelImporter:
   serializedVersion: 22103
-  internalIDToNameTable:
+  internalIDToNameTable: []
+  externalObjects:
   - first:
-      74: 7478958893544636339
-    second: Banana|BananaAction
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Tree_0Mat
+    second: {fileID: 2100000, guid: 4af62974717628548bc6e4cb1244ebfc, type: 2}
   - first:
-      74: -6198444922888198692
-    second: Banana|BananaFuck
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Tree_1Mat
+    second: {fileID: 2100000, guid: c02da26397e6aca45ad304ebac12dd87, type: 2}
   - first:
-      74: 7004670450179686901
-    second: Banana|BodyAction
-  - first:
-      74: 8929285722220695598
-    second: Banana|BodyAction.001
-  - first:
-      74: -8611898891390018456
-    second: Banana|BodyAction.002
-  - first:
-      74: 7328379780508671503
-    second: Banana|BodyAction.005
-  - first:
-      74: 3855383605252018646
-    second: Banana|Cube.001Action
-  - first:
-      74: 7627906298000570894
-    second: Banana|Cube.001Action.001
-  externalObjects: {}
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Tree_2Mat
+    second: {fileID: 2100000, guid: 7394636d30ae8a0448fc34fbb64523ba, type: 2}
   materials:
-    materialImportMode: 2
+    materialImportMode: 0
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -56,7 +47,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages: []
     globalScale: 1
@@ -90,7 +81,7 @@ ModelImporter:
     secondaryUVMinLightmapResolution: 40
     secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
-    useFileScale: 1
+    useFileScale: 0
     strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60
