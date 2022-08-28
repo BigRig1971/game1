@@ -48,13 +48,11 @@ namespace StupidHumanGames
             {
                 rb = gameObject.AddComponent<Rigidbody>() as Rigidbody;
                 rb.isKinematic = true;
-                BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
-                boxCollider.size = colliderSize;
-                boxCollider.center = (Vector3.zero + colliderCenter);
-                boxCollider.isTrigger = true;
             }
-
-           
+            BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
+            boxCollider.size = colliderSize;
+            boxCollider.center = (Vector3.zero + colliderCenter);
+            boxCollider.isTrigger = true;
             
         }
 
@@ -79,7 +77,7 @@ namespace StupidHumanGames
         void Update()
         {
            
-            if (hugTheGround) _tpc.OnYPosition();
+            if (hugTheGround && toggle) _tpc.OnYPosition();
 
             if (Input.GetKeyDown(_keyCode) && !InventoryManager.IsOpen())
             {
@@ -93,16 +91,18 @@ namespace StupidHumanGames
                 if (toggle)
                 {
                     hugTheGround = true;
-                    cameraRoot.position =  new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset, cameraRoot.position.z);
                     _tpc.isMounted = true;
+                    cameraRoot.position =  new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset, cameraRoot.position.z);
+                  
 
                 }
                 else
                 {
                     hugTheGround= false;
+                    _tpc.isMounted = false;
                     cameraRoot.position = new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset * -1, cameraRoot.position.z);
                      _tpc.transform.rotation = Quaternion.Euler(0f, _tpc.transform.rotation.eulerAngles.y, 0f);
-                    _tpc.isMounted = false;
+                   
                 }
 
                 foreach(GameObject go in _itemsToDisable)

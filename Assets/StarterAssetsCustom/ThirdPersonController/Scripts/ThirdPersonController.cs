@@ -360,7 +360,7 @@ namespace StupidHumanGames
             while (OnIsSwimming())
             {
                 SwimGroundCheck();
-                OnSwim(.1f);
+                OnSwim(.5f);
 
                 yield return null;
             }
@@ -576,8 +576,8 @@ namespace StupidHumanGames
             {
                 targetRot = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
                 currentRotation = transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime / 0.15f);
-                position.y = Terrain.activeTerrain.SampleHeight(transform.position) + .01f;
-                transform.position = position;
+               // position.y = Terrain.activeTerrain.SampleHeight(transform.position) + .01f;
+                //transform.position = position;
             }
         }
 

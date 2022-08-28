@@ -212,6 +212,9 @@ namespace StupidHumanGames
             int rnd = Random.Range(0, rndAttackCount);
             if (_animator != null) _animator.SetInteger("AttackInt", rnd);
             if (_animator != null) _animator.SetTrigger("AttackTrigger");
+            // _attackDelay = _animator.GetCurrentAnimatorStateInfo(rnd).length;
+            _attackDelay = _animator.GetCurrentAnimatorClipInfo(rnd).Length *2;
+
             return;
         }
         #endregion
@@ -356,13 +359,14 @@ namespace StupidHumanGames
                 }
                 else
                 {
-                   
+                  
+                    
                     SetAnimation(0, 0, 5);
                     RandomAttackAnimations();
                     _audioSource.PlayOneShot(attackSound, attackVolume);
+                     
                     yield return new WaitForSeconds(_attackDelay);
-                   
-                    yield return new WaitForSeconds(_afterAttackDelay);
+      
                 }
 
                 SetAnimation(1, 1, 1);
