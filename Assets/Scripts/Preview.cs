@@ -10,11 +10,14 @@ namespace StupidHumanGames
 {
     public class Preview : MonoBehaviour
     {
-        public LayerMask layer;
+        public float _groundHuggingTweak = .01f;
+        Quaternion targetRot;
+        public bool groundHugging = false;
+        public LayerMask layer, groundLayer;
         public GameObject prefab;
         public float spawnOffset = 0f;
         private MeshRenderer myRend;
-        public bool isGrounded = false;
+        bool isGrounded = false;
         private Transform spawnedTransform;
         public Material goodMat;//green material
         public Material badMat;//red material
@@ -24,7 +27,7 @@ namespace StupidHumanGames
         public bool isFoundation = false;//this is a special rule for foundations. 
         public List<string> tagsISnapTo = new List<string>();//list of all of the SnapPoint tags this particular preview can snap too
         public Collider[] hitColliders;
-        
+
 
 
         public Material[] materials;
@@ -37,19 +40,23 @@ namespace StupidHumanGames
         }
         public void Place()
         {
-           // if (OnHitObstacle()) buildSystem.removeItemFromField();
-           StartCoroutine(OnPlace());
-            
+            // if (OnHitObstacle()) buildSystem.removeItemFromField();
+            StartCoroutine(OnPlace());
+
         }
         IEnumerator OnPlace()
         {
             yield return new WaitForSeconds(.1f);
-           
+
             SaveGame.SpawnPrefab(prefab, transform.position, transform.rotation);
-           
+
             // prefab.transform.SetParent(adoptiveParent);
             //Debug.Log(adoptiveParent.name);
             Destroy(gameObject);
+        }
+        private void Update()
+        {
+            if(groundHugging) OnYPosition();
         }
 
         private void ChangeColor()//changes between red and greed depending if this preview is/is not snapped to anything
@@ -85,21 +92,21 @@ namespace StupidHumanGames
         }
         private void OnTriggerEnter(Collider other)//this is what dertermins if you are snapped to a snap point
         {
-            
+
 
             if (other.CompareTag("Ground"))
             {
                 isGrounded = true;
                 ChangeColor();
             }
-          
+
             for (int i = 0; i < tagsISnapTo.Count; i++)//loop through all the tags this preview can snap too
             {
                 string currentTag = tagsISnapTo[i];//setting the current tag were looking at to a string...its easier to write currentTag then tagsISnapTo[i]
 
                 if (other.CompareTag(currentTag))
                 {
-                   
+
                     buildSystem.PauseBuild(true);//this, and the line below are how you snap
                     transform.position = other.transform.position;//set position of preview so that it "snaps" into position
                     transform.rotation = other.transform.rotation;
@@ -110,7 +117,7 @@ namespace StupidHumanGames
         }
         private void OnTriggerExit(Collider other)//this is what determins if you are no longer snapped to a snap point
         {
-           
+
             if (other.CompareTag("Ground"))
             {
                 isGrounded = false;
@@ -149,6 +156,22 @@ namespace StupidHumanGames
         {
             Gizmos.color = Color.blue;
             Gizmos.DrawSphere(transform.position, 3f);
+        }
+        void OnYPosition()
+        {
+            Vector3 position = transform.position;
+            RaycastHit hit;
+            if (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + transform.up.y, transform.position.z),
+                -transform.up, out hit, 20, groundLayer))
+            {
+
+
+                targetRot = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime / _groundHuggingTweak);
+
+                position.y = Terrain.activeTerrain.SampleHeight(transform.position) + .01f;
+                transform.position = position;
+            }
         }
     }
 }

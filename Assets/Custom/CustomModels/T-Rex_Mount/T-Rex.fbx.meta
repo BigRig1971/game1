@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: 7b318ae62990b9c499ead613845f98dd
 ModelImporter:
-  serializedVersion: 22102
+  serializedVersion: 22103
   internalIDToNameTable:
   - first:
       74: -2083199217339642700
@@ -18,6 +18,9 @@ ModelImporter:
   - first:
       74: -1046623218494002802
     second: T_Rex_Sprint
+  - first:
+      74: 2901369280826477002
+    second: T_Rex_Swim
   externalObjects: {}
   materials:
     materialImportMode: 0
@@ -144,6 +147,35 @@ ModelImporter:
       orientationOffsetY: 0
       level: 0
       cycleOffset: 360
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 362
+    - serializedVersion: 16
+      name: T_Rex_Swim
+      takeName: root|T_Rex_Animations
+      internalID: 0
+      firstFrame: 400
+      lastFrame: 439
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 1
@@ -652,6 +684,7 @@ ModelImporter:
   avatarSetup: 1
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
   importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 1
   additionalBone: 0
   userData: 
   assetBundleName: 

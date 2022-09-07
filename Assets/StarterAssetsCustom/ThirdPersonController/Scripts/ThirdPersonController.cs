@@ -18,10 +18,10 @@ namespace StupidHumanGames
 #endif
     public class ThirdPersonController : MonoBehaviour
     {
-       
+        public bool _canMove = true;
         public float _surfaceDist = 0f;
         Quaternion currentRotation;
-        bool groundHugging = false; 
+       public bool groundHugging = false; 
         Quaternion targetRot;
         public bool isMounted = false;
         public AudioSource _audioSource;
@@ -250,7 +250,7 @@ namespace StupidHumanGames
         }
         private void CameraRotation()
         {
-            if (_input._look.sqrMagnitude >= _threshold && !LockCameraPosition)
+            if (_input._look.sqrMagnitude >= _threshold && !LockCameraPosition && !InventoryManager.IsOpen())
             {
                 float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1f : Time.deltaTime;
                 _cinemachineTargetYaw += _input._look.x * deltaTimeMultiplier;
@@ -271,7 +271,7 @@ namespace StupidHumanGames
                 GroundedCheck();
                 JumpAndGravity();
 
-                if (_input._roll)
+                if (_input._roll && !InventoryManager.IsOpen() && _canMove)
                 {
                     if (_hasAnimator)
                     {
@@ -301,7 +301,7 @@ namespace StupidHumanGames
                 _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
                 if (_animationBlend < 0.01f) _animationBlend = 0f;
                 Vector3 inputDirection = new Vector3(_input._move.x, 0.0f, _input._move.y).normalized;
-                if (_input._move != Vector2.zero)
+                if (_input._move != Vector2.zero && !InventoryManager.IsOpen() && _canMove)
                 {
                     _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
                                       _mainCamera.transform.eulerAngles.y;
@@ -318,8 +318,6 @@ namespace StupidHumanGames
                         {
                             transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
                         }
-                            
-
                         
                     }
                 }
@@ -384,7 +382,7 @@ namespace StupidHumanGames
             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
             if (_animationBlend < 0.01f) _animationBlend = 0f;
             Vector3 inputDirection = new Vector3(_input._move.x, 0.0f, _input._move.y).normalized;
-            if (_input._move != Vector2.zero)
+            if (_input._move != Vector2.zero && _canMove && !InventoryManager.IsOpen())
             {
 
                 _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
@@ -516,9 +514,9 @@ namespace StupidHumanGames
         {
             _audioSource.PlayOneShot(rollAudioClip, rollVolume);
         }
-        public void OnPlayerLand()
+        public void OnPlayerLand(AnimationEvent OnPlayerLand)
         {
-            _audioSource.PlayOneShot(LandingAudioClip, FootstepAudioVolume);
+            if (OnPlayerLand.animatorClipInfo.weight > .5f) _audioSource.PlayOneShot(LandingAudioClip, FootstepAudioVolume);
         }
         public void OnPlayerJump()
         {

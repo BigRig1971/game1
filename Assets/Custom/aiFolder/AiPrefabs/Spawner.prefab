@@ -44,12 +44,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 630ec91876cff9a418ae8268d08a55c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mask:
+  _prefab: {fileID: 9222980981543852366, guid: 37f26925a87ba3a4ca2a8fcacf2bb7c7, type: 3}
+  spawnOnGround: 1
+  alignWithGround: 1
+  minYSpace: 10
+  minTerrainHeight: 0
+  maxTerrainHeight: 200
+  slopeLimit: 5
+  scale: 1
+  avoidableObjects:
     serializedVersion: 2
-    m_Bits: 16384
-  prefab:
-  - {fileID: 2597498106890124194, guid: dbd82b3594fb67544ae2fda4799b92b7, type: 3}
-  delay: 0.5
-  maximum: 20
-  offSet: 50
+    m_Bits: 0
+  ground:
+    serializedVersion: 2
+    m_Bits: 1024
+  delay: 100000
+  currentDelay: 0.1
+  maximum: 1
+  maxRange: 3
   minSeparation: 5
+  list: []
+  deleteThese: []

@@ -213,7 +213,7 @@ namespace StupidHumanGames
             if (_animator != null) _animator.SetInteger("AttackInt", rnd);
             if (_animator != null) _animator.SetTrigger("AttackTrigger");
             // _attackDelay = _animator.GetCurrentAnimatorStateInfo(rnd).length;
-            _attackDelay = _animator.GetCurrentAnimatorClipInfo(rnd).Length *2;
+           // _attackDelay = _animator.GetCurrentAnimatorClipInfo(rnd).Length *2;
 
             return;
         }
@@ -342,34 +342,58 @@ namespace StupidHumanGames
                 if (canSwimOrFly)
                 {
                     SetAnimation(1, 1, 2);
-                    RandomAttackAnimations();
-                    _audioSource.PlayOneShot(attackSound, attackVolume);
-                    yield return new WaitForSeconds(_attackDelay);
+                    if (OnIsFacing())
+                    {
 
-                    if (RandomBool(2))
-                    {
-                        wayPoint = transform.position - transform.right * 100f;
-                        yield return new WaitForSeconds(_afterAttackDelay);
+                        RandomAttackAnimations();
+                        _audioSource.PlayOneShot(attackSound, attackVolume);
+                        yield return new WaitForSeconds(_attackDelay);
+                        SetAnimation(1, 1, 1);
+                        if (RandomBool(2))
+                        {
+                            wayPoint = transform.position - transform.right * 100f;
+                            yield return new WaitForSeconds(_afterAttackDelay);
+                        }
+                        else
+                        {
+                            wayPoint = transform.position + transform.right * 100f;
+                            yield return new WaitForSeconds(_afterAttackDelay);
+                        }
                     }
-                    else
-                    {
-                        wayPoint = transform.position + transform.right * 100f;
-                        yield return new WaitForSeconds(_afterAttackDelay);
-                    }
+                    SetAnimation(1, 1, 1);
                 }
                 else
                 {
-                  
-                    
-                    SetAnimation(0, 0, 5);
-                    RandomAttackAnimations();
-                    _audioSource.PlayOneShot(attackSound, attackVolume);
-                     
-                    yield return new WaitForSeconds(_attackDelay);
-      
+
+
+                    SetAnimation(0, 0, 3);
+                    if (OnIsFacing())
+                    {
+                        
+                        RandomAttackAnimations();
+
+
+                        _audioSource.PlayOneShot(attackSound, attackVolume);
+
+                        yield return new WaitForSeconds(_attackDelay);
+                        SetAnimation(1, 2, 1);
+
+                        if (RandomBool(2))
+                        {
+                            wayPoint = transform.position - transform.right * 100f;
+                            yield return new WaitForSeconds(_afterAttackDelay);
+                        }
+                        else
+                        {
+                            wayPoint = transform.position + transform.right * 100f;
+                            yield return new WaitForSeconds(_afterAttackDelay);
+                        }
+                    }
+                    SetAnimation(1, 1, 1);
+
                 }
 
-                SetAnimation(1, 1, 1);
+                
                 yield break;
             }
             while (OnCanAttack())
@@ -446,6 +470,17 @@ namespace StupidHumanGames
             {
                 return true; //in front
             }
+        }
+        private bool OnIsFacing()
+        {
+            RaycastHit hit;
+            bool canAttack = false;
+            if (Physics.Raycast(transform.position + transform.up * 1f, transform.TransformDirection(Vector3.forward), out hit, 10, playerLayer))
+            {
+                canAttack = true;
+                Debug.DrawRay(transform.position + transform.up * 1f, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
+            }
+            return canAttack;
         }
     }
 }

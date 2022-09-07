@@ -11,6 +11,7 @@ namespace StupidHumanGames
     public class CreatureMount : MonoBehaviour
     {
         AudioSource _audioSource;
+        [SerializeField] float minAltitude = 0f, maxAltitude = 200;    
         [SerializeField] AudioClip[] _randomAttackSound;
         [SerializeField] float _randomAttackSoundVolume = 1f;
         [SerializeField] AudioClip[] _randomSound;
@@ -43,8 +44,10 @@ namespace StupidHumanGames
         Transform _player;
         ThirdPersonController _tpc;      
         [SerializeField] LayerMask groundLayer;
+        Vector3 homePosition;
         private void Start()
         {
+            homePosition = transform.position;
             _audioSource = GetComponent<AudioSource>();
             rb = GetComponent<Rigidbody>();
             _prevCamRoot = _camRootPlayer.localPosition;
@@ -130,6 +133,8 @@ namespace StupidHumanGames
         }
         private void OnMove()
         {
+
+           
             float speed;
             if (Input.GetKey(KeyCode.LeftShift))
             {
@@ -141,6 +146,8 @@ namespace StupidHumanGames
             }
             if (_player != null)
             {
+                
+               
                 _player.transform.localPosition = _saddlePoint.localPosition;
                 _player.transform.localRotation = _saddlePoint.localRotation;
                 if (Input.GetKeyDown(KeyCode.Mouse0))
@@ -174,8 +181,32 @@ namespace StupidHumanGames
                     currentRotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime / 0.15f);
                     position.y = Terrain.activeTerrain.SampleHeight(transform.position) + .01f;
                     transform.position = position;
+                    if (Swimming())
+                    {
+                        _thisAnimator.SetBool("Swim", true);
+                        transform.position = new Vector3(transform.position.x, minAltitude, transform.position.z);
+                        currentRotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
+                    }
+                    else
+                    {
+                        _thisAnimator.SetBool("Swim", false);
+                    }
+                    
                 }
             }
+        }
+        bool Swimming()
+        {
+            bool outOfBounds = false;
+            if (transform.position.y > maxAltitude)
+            {
+                outOfBounds = true;
+            }
+            if (transform.position.y < minAltitude)
+            {
+                outOfBounds = true;
+            }
+            return outOfBounds; 
         }
         private void OnFootstep(AnimationEvent OnfootStep)
         {

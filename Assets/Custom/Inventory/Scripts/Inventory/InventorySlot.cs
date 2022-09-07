@@ -8,7 +8,7 @@ namespace StupidHumanGames
 {
     public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        
+
         private ThirdPersonController _tpc;
         private BuildSystem _buildSystem;
         public ItemSO currentItem { get; protected set; }
@@ -18,7 +18,7 @@ namespace StupidHumanGames
         [Tooltip("What types of items this slot can hold")]
         public ItemSO.Type type;
         public bool interactable = true;
-       
+
         [SerializeField]
         protected Image itemImage;
         [SerializeField]
@@ -27,15 +27,16 @@ namespace StupidHumanGames
         protected Image stackImage;
         [SerializeField]
         protected Text stackText;
-
+        
 
         protected bool mouseOver;
         protected static GameObject tooltipPrefab;
         protected GameObject tooltipInstance;
-
+        EquipSlot[] _equipSlots;
         // Start is called before the first frame update
         void Start()
         {
+           
             _tpc = GameObject.FindObjectOfType<ThirdPersonController>();
             _buildSystem = GameObject.FindObjectOfType<BuildSystem>();
             if (!tooltipPrefab)
@@ -45,7 +46,7 @@ namespace StupidHumanGames
         // Update is called once per frame
         void Update()
         {
-
+            _equipSlots = FindObjectsOfType<EquipSlot>();
             if (currentItemAmount <= 0)
             {
                 currentItem = null;
@@ -72,19 +73,20 @@ namespace StupidHumanGames
         {
             if (!interactable) return;
 
-            if (Input.GetMouseButtonDown(2))
-
+            if (Input.GetMouseButtonDown(1))
+            {
                 if (currentItem && currentItem.type == ItemSO.Type.Buildable)
                 {
                     StartCoroutine(BuildItem());
+                } 
+            }
 
-                }
             if (Input.GetMouseButtonDown(0))
             {
                 InventoryManager.SwapItemWithSlot(this);
-                
+
             }
-            if (Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.Comma))
             {
 
                 //Grab item from slot if slot contains an item
@@ -101,11 +103,12 @@ namespace StupidHumanGames
                     currentItem = InventoryManager.currentItem;
                     InventoryManager.GrabItemFromSlot(this, -1);
                 }
-                if (currentItem.type == ItemSO.Type.HandRight)
+              /*  if (currentItem.type == ItemSO.Type.HandRight)
                 {
                     Transform equipParent = GameObject.Find("WeaponSlot").transform;
 
-                }
+                }*/
+
 
 
             }

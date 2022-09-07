@@ -32,13 +32,13 @@ namespace StupidHumanGames
         [SerializeField, Range(0f, 1f)] float swingVolume = 1;
         bool toggle = false;
         float previousCamOffset;
-       bool hugTheGround = false;
+        bool hugTheGround = false;
 
 
         private void Start()
         {
             _tpc = GameObject.FindObjectOfType<ThirdPersonController>();
-           
+
             previousCamOffset = cameraRoot.transform.position.y;
             if (TryGetComponent<Rigidbody>(out rb))
             {
@@ -53,7 +53,7 @@ namespace StupidHumanGames
             boxCollider.size = colliderSize;
             boxCollider.center = (Vector3.zero + colliderCenter);
             boxCollider.isTrigger = true;
-            
+
         }
 
         private void OnTriggerStay(Collider other)
@@ -76,8 +76,13 @@ namespace StupidHumanGames
         }
         void Update()
         {
-           
-            if (hugTheGround && toggle) _tpc.OnYPosition();
+            if (groundHugging && hugTheGround)
+            {
+                
+                _tpc.OnYPosition();
+            }
+
+
 
             if (Input.GetKeyDown(_keyCode) && !InventoryManager.IsOpen())
             {
@@ -86,26 +91,26 @@ namespace StupidHumanGames
                 if (_animTriggerName != null) _animator.SetTrigger(_animTriggerName);
 
 
-
+                
                 if (_animBoolName != null) _animator.SetBool(_animBoolName, toggle);
-                if (toggle)
+                if (toggle && groundHugging)
                 {
+                    
                     hugTheGround = true;
-                    _tpc.isMounted = true;
-                    cameraRoot.position =  new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset, cameraRoot.position.z);
-                  
+                    cameraRoot.position = new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset, cameraRoot.position.z);
+                    _tpc._canMove = false;
 
                 }
                 else
                 {
-                    hugTheGround= false;
-                    _tpc.isMounted = false;
-                    cameraRoot.position = new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset * -1, cameraRoot.position.z);
-                     _tpc.transform.rotation = Quaternion.Euler(0f, _tpc.transform.rotation.eulerAngles.y, 0f);
                    
+                    hugTheGround = false;
+                    cameraRoot.position = new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset * -1, cameraRoot.position.z);
+                    _tpc.transform.rotation = Quaternion.Euler(0f, _tpc.transform.rotation.eulerAngles.y, 0f);
+                    _tpc._canMove = true;
                 }
 
-                foreach(GameObject go in _itemsToDisable)
+                foreach (GameObject go in _itemsToDisable)
                 {
                     go.SetActive(!toggle);
                 }
@@ -136,6 +141,6 @@ namespace StupidHumanGames
                 _audioSource.PlayOneShot(weaponSwingSound, swingVolume);
             }
         }
-       
+
     }
 }
