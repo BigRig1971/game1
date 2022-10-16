@@ -18,6 +18,7 @@ namespace StupidHumanGames
         public Vector3 colliderSize = Vector3.one;
         public Vector3 colliderCenter = Vector3.zero;
         public KeyCode _keyCode = KeyCode.Mouse0;
+        public KeyCode[] _keyCodes;
         public int damagePower = 5;
         public string _animTriggerName;
         public string _animIntName;
@@ -83,39 +84,44 @@ namespace StupidHumanGames
             }
 
 
-
-            if (Input.GetKeyDown(_keyCode) && !InventoryManager.IsOpen())
+            if (Input.GetKey(_keyCode))
             {
-                toggle = !toggle;
-                if (_animIntName != null) _animator.SetInteger(_animIntName, _animIntValue);
-                if (_animTriggerName != null) _animator.SetTrigger(_animTriggerName);
 
 
-                
-                if (_animBoolName != null) _animator.SetBool(_animBoolName, toggle);
-                if (toggle && groundHugging)
+
+                if (Input.GetKeyDown(KeyCode.Mouse0) && !InventoryManager.IsOpen())
                 {
-                    
-                    hugTheGround = true;
-                    cameraRoot.position = new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset, cameraRoot.position.z);
-                    _tpc._canMove = false;
+                    toggle = !toggle;
+                    if (_animIntName != null) _animator.SetInteger(_animIntName, _animIntValue);
+                    if (_animTriggerName != null) _animator.SetTrigger(_animTriggerName);
+
+
+
+                    if (_animBoolName != null) _animator.SetBool(_animBoolName, toggle);
+                    if (toggle && groundHugging)
+                    {
+
+                        hugTheGround = true;
+                        cameraRoot.position = new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset, cameraRoot.position.z);
+                        _tpc._canMove = false;
+
+                    }
+                    else
+                    {
+
+                        hugTheGround = false;
+                        cameraRoot.position = new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset * -1, cameraRoot.position.z);
+                        _tpc.transform.rotation = Quaternion.Euler(0f, _tpc.transform.rotation.eulerAngles.y, 0f);
+                        _tpc._canMove = true;
+                    }
+
+                    foreach (GameObject go in _itemsToDisable)
+                    {
+                        go.SetActive(!toggle);
+                    }
+
 
                 }
-                else
-                {
-                   
-                    hugTheGround = false;
-                    cameraRoot.position = new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset * -1, cameraRoot.position.z);
-                    _tpc.transform.rotation = Quaternion.Euler(0f, _tpc.transform.rotation.eulerAngles.y, 0f);
-                    _tpc._canMove = true;
-                }
-
-                foreach (GameObject go in _itemsToDisable)
-                {
-                    go.SetActive(!toggle);
-                }
-
-
             }
         }
         void OnDrawGizmos()

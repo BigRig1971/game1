@@ -11,6 +11,7 @@ namespace StupidHumanGames
     public class CreatureMount : MonoBehaviour
     {
         AudioSource _audioSource;
+        [SerializeField] float _attackDelay = 1f;
         [SerializeField] float minAltitude = 0f, maxAltitude = 200;    
         [SerializeField] AudioClip[] _randomAttackSound;
         [SerializeField] float _randomAttackSoundVolume = 1f;
@@ -40,6 +41,7 @@ namespace StupidHumanGames
         Animator _thisAnimator;
         bool _isMounted = false;
         bool _canMount = false;
+        bool _canAttack = false;
         StarterAssetsInputs _input;
         Transform _player;
         ThirdPersonController _tpc;      
@@ -96,7 +98,7 @@ namespace StupidHumanGames
         private void Update()
         {
             OnMount();
-            if (RandomBool(100)) OnRandomSound();
+            if (RandomBool(300)) OnRandomSound();
         }
         void OnMount()
         {
@@ -133,8 +135,6 @@ namespace StupidHumanGames
         }
         private void OnMove()
         {
-
-           
             float speed;
             if (Input.GetKey(KeyCode.LeftShift))
             {
@@ -146,14 +146,12 @@ namespace StupidHumanGames
             }
             if (_player != null)
             {
-                
-               
                 _player.transform.localPosition = _saddlePoint.localPosition;
                 _player.transform.localRotation = _saddlePoint.localRotation;
-                if (Input.GetKeyDown(KeyCode.Mouse0))
+                if (Input.GetKeyDown(KeyCode.Mouse0) && !_canAttack)
                 {
-
-                    _thisAnimator.SetTrigger("Attack");
+                    StartCoroutine(OnAttack());
+                  
                 }
                 Vector3 inputDirection = new Vector3(_input._move.x, 0.0f, _input._move.y).normalized;
                 if (_input._move != Vector2.zero)
@@ -224,13 +222,21 @@ namespace StupidHumanGames
                 _audioSource.PlayOneShot(_randomSound[index], _randomSoundVolume);
             }
         }
-        private void OnRandomAttackSound(AnimationEvent OnAttack)
+        private void OnRandomAttackSound()
         {
             if (_randomSound.Length > 0)
             {
                 var index = UnityEngine.Random.Range(0, _randomAttackSound.Length);
-                if (OnAttack.animatorClipInfo.weight > .2f) _audioSource.PlayOneShot(_randomAttackSound[index], _randomAttackSoundVolume);
+                _audioSource.PlayOneShot(_randomAttackSound[index], _randomAttackSoundVolume);
             }
+        }
+        IEnumerator OnAttack()
+        {
+            _canAttack = true;
+            OnRandomAttackSound();
+            _thisAnimator.SetTrigger("Attack");
+            yield return new WaitForSeconds(_attackDelay);
+            _canAttack = false;
         }
         bool RandomBool(int rn)
         {
@@ -238,9 +244,6 @@ namespace StupidHumanGames
             int rnd2 = UnityEngine.Random.Range(0, rn);
             if (rnd == rnd2) return true; else return false;
         }
-
-       
-
     }
 }
 

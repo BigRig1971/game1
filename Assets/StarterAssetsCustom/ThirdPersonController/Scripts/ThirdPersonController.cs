@@ -159,7 +159,7 @@ namespace StupidHumanGames
 
         private void Start()
         {
-           transform.localRotation = Quaternion.identity;
+           
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();
@@ -552,6 +552,8 @@ namespace StupidHumanGames
         }
         IEnumerator CurrentState()
         {
+            yield return new WaitForSeconds(.1f);
+            transform.localRotation = Quaternion.identity;
             while (true)
             {
                 yield return StartCoroutine(_currentState.ToString());
