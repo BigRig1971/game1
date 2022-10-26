@@ -18,9 +18,8 @@ namespace StupidHumanGames
 		[SerializeField] Transform player;
 		Vector3 sizeOfObject = Vector3.one;
 		[Range(.1f, 50f)] public float scale = 1f;
-		bool isIdling = false;
 
-		public enum state { Patrol, Chase, Attack, Lost };
+		public enum state { Patrol, Chase, Attack, Lost, Idle };
 
 		[SerializeField] Animator _animator;
 		[SerializeField] AudioClip[] randomSound;
@@ -55,18 +54,7 @@ namespace StupidHumanGames
 			_currentState = state.Patrol;
 
 		}
-		private void Update()
-		{
-
-		}
-		private void FixedUpdate()
-		{
-			if (canSwimOrFly) SwimOrFly(); else MoveOnGround();
-
-			OnHitObstacle();
-			OutOfBounds();
-
-		}
+		
 		void Start()
 		{
 			homePosition = GetComponent<Transform>().position;
@@ -93,6 +81,13 @@ namespace StupidHumanGames
 			}
 
 			StartCoroutine(State());
+		}
+		private void Update()
+		{
+			if (canSwimOrFly) SwimOrFly(); else MoveOnGround();
+
+			OnHitObstacle();
+			OutOfBounds();
 		}
 #if UNITY_EDITOR
 
@@ -310,8 +305,9 @@ namespace StupidHumanGames
 				}
 				if (RandomBool(_randomIdleDelay) && idle)
 				{
-					
 					RandomIdleAnimations();
+					_currentState = state.Idle;
+					
 				}
 				yield return null;
 			}
@@ -419,6 +415,15 @@ namespace StupidHumanGames
 			}
 			yield return new WaitForSeconds(2f);
 			_currentState = state.Patrol;
+		}
+		IEnumerator Idle()
+		{
+			//SetAnimation(0,1,0);
+			
+			yield return new WaitForSeconds(5);
+
+			_currentState = state.Patrol;
+			
 		}
 		void SetAnimation(float blend, float moveSpeedMultiplier, float turnSpeedMultiplier)
 		{
