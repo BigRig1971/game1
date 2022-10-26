@@ -14,7 +14,8 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
+  stringTagMap:
+    ElementType: ColorsElement
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
@@ -61,13 +62,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _AdvancedCat: 1
-    - _AdvancedCat1: 1
     - _Autumn: 1
     - _AutumnValue: 0
     - _Banner: 0
-    - _Banner1: 0
     - _BumpScale: 1
-    - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _ElementCat: 1
@@ -122,6 +120,10 @@ Material:
     - _NoiseScaleValue: 50
     - _OcclusionStrength: 1
     - _Parallax: 0.02
+    - _RaycastDistanceEndValue: 2
+    - _RaycastFadeValue: 1
+    - _RaycastLayerMask: 1
+    - _RaycastMessage: 0
     - _RenderCat: 1
     - _SeasonMode: 0
     - _SeasonMode_Seasons: 0

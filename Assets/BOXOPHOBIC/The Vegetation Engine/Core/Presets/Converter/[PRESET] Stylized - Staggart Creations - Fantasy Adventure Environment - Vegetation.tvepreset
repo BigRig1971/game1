@@ -13,14 +13,14 @@ InfoOnline https://assetstore.unity.com/packages/3d/environments/fantasy/fantasy
 
 Mesh SetVariation GET_MASK_PROCEDURAL 3
 Mesh SetOcclusion GET_MASK_FROM_CHANNEL 0
-Mesh SetDetailMask NONE
-Mesh SetMultiMask NONE
+Mesh SetDetailMask GET_MASK_PROCEDURAL 8
+Mesh SetDetailCoord GET_COORD_FROM_CHANNEL 0
 
-Mesh SetDetailCoord NONE
-
-Mesh SetMotion1 GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_FROM_CHANNEL 0
+Mesh SetHeight GET_MASK_PROCEDURAL 4
+Mesh SetMotion2 GET_MASK_PROCEDURAL 16
 Mesh SetMotion3 GET_MASK_FROM_CHANNEL 0
+
+Mesh SetPivots NONE
 
 *******************************************************************
 
@@ -47,8 +47,6 @@ if SHADER_NAME_CONTAINS Trunk
 	Material SET_SHADER SHADER_DEFAULT_BARK
 	Material SET_FLOAT _RenderCull 2
 	Material SET_FLOAT _RenderClip 0
-	
-	Material SET_FLOAT _MotionValue_20 0
 }
 
 *******************************************************************
@@ -64,31 +62,3 @@ if SHADER_NAME_CONTAINS Billboard
 	Material SET_FLOAT _RenderCull 2
 	Material SET_FLOAT _MainSmoothnessValue 0
 }
-
-*******************************************************************
-
-Material SET_FLOAT _MotionAmplitude_10 0.05
-Material SET_FLOAT _MotionSpeed_10 2
-Material SET_FLOAT _MotionScale_10 0
-Material SET_FLOAT _MotionVariation_10 0
-
-Material SET_FLOAT _MotionAmplitude_20 0.1
-Material SET_FLOAT _MotionSpeed_20 6
-Material SET_FLOAT _MotionScale_20 0.5
-Material SET_FLOAT _MotionVariation_20 0
-
-Material SET_FLOAT _MotionAmplitude_32 0.2
-Material SET_FLOAT _MotionSpeed_32 20
-Material SET_FLOAT _MotionScale_32 19
-Material SET_FLOAT _MotionVariation_32 0
-
-Material SET_FLOAT _InteractionAmplitude 1
-Material SET_FLOAT _InteractionVariation 0
-
-if PREFAB_PATH_CONTAINS Ivy
-{
-	Material SET_FLOAT _MotionAmplitude_10 0
-	Material SET_FLOAT _MotionAmplitude_20 0
-}
-
-

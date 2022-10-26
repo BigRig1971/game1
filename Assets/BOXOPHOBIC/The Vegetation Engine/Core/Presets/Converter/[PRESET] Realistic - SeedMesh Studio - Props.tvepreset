@@ -53,6 +53,7 @@ if SHADER_NAME_CONTAINS Moss
 	// Enable Blending
 	Material SET_FLOAT _DetailMode 1
 	Material SET_FLOAT _DetailBlendMode 1
+	Material SET_FLOAT _DetailCoordMode 1
 	Material SET_FLOAT _DetailMaskMode 0
 
 	Material SET_FLOAT _DetailMeshValue 0

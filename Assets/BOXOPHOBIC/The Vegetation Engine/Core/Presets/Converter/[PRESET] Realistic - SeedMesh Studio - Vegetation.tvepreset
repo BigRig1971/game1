@@ -13,14 +13,14 @@ InfoOnline https://assetstore.unity.com/publishers/49875
 
 Mesh SetVariation GET_MASK_PROCEDURAL 3
 Mesh SetOcclusion GET_MASK_FROM_CHANNEL 0
-Mesh SetDetailMask NONE
-Mesh SetMultiMask NONE
+Mesh SetDetailMask GET_MASK_PROCEDURAL 8
+Mesh SetDetailCoord GET_COORD_FROM_CHANNEL 0
 
-Mesh SetDetailCoord NONE
-
-Mesh SetMotion1 GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_FROM_CHANNEL 0 ACTION_MULTIPLY_BY_HEIGHT
+Mesh SetHeight GET_MASK_PROCEDURAL 4
+Mesh SetMotion2 GET_MASK_PROCEDURAL 16
 Mesh SetMotion3 GET_MASK_FROM_CHANNEL 0
+
+Mesh SetPivots NONE
 
 *******************************************************************
 
@@ -31,7 +31,7 @@ if SHADER_NAME_CONTAINS Vegetation
 	Material COPY_FLOAT _DoubleSidedNormalMode _RenderNormals
 	Material SET_FLOAT _FadeGlancingValue 0
 
-	Material COPY_FLOAT _cutoff _AlphaCutoffValue
+	Material COPY_FLOAT _cutoff _AlphaClipValue
 
 	// Copy Main props
 	Material COPY_VECTOR _Color _MainColor
@@ -126,8 +126,6 @@ if SHADER_NAME_CONTAINS Moss
 		Material SET_SHADER SHADER_DEFAULT_PROP
 	}
 	
-	Material SET_FLOAT _MotionValue_20 0
-	
 	// Copy Bark Pros
 	Material COPY_COLOR Color_DC4D13CB _MainColor
 	Material COPY_TEX base_color_moss _MainAlbedoTex
@@ -149,6 +147,7 @@ if SHADER_NAME_CONTAINS Moss
 	// Enable Blending
 	Material SET_FLOAT _DetailMode 1
 	Material SET_FLOAT _DetailBlendMode 1
+	Material SET_FLOAT _DetailCoordMode 1
 	Material SET_FLOAT _DetailMaskMode 0
 
 	Material SET_FLOAT _DetailMeshValue 0
@@ -166,75 +165,12 @@ if SHADER_NAME_CONTAINS Moss
 
 *******************************************************************
 
-// Default
-Material SET_FLOAT _MotionAmplitude_10 0.05
-Material SET_FLOAT _MotionSpeed_10 2
-Material SET_FLOAT _MotionScale_10 0
-Material SET_FLOAT _MotionVariation_10 0
-
-Material SET_FLOAT _MotionAmplitude_20 0.05
-Material SET_FLOAT _MotionSpeed_20 6
-Material SET_FLOAT _MotionScale_20 1
-Material SET_FLOAT _MotionVariation_20 0
-
-Material SET_FLOAT _MotionAmplitude_32 0.1
-Material SET_FLOAT _MotionSpeed_32 30
-Material SET_FLOAT _MotionScale_32 19
-Material SET_FLOAT _MotionVariation_32 0
-
-Material SET_FLOAT _InteractionAmplitude 1
-Material SET_FLOAT _InteractionVariation 0
-
 if PREFAB_PATH_CONTAINS Agave
 {
-	Material SET_FLOAT _MotionAmplitude_10 0.01
-	Material SET_FLOAT _MotionSpeed_10 2
-	Material SET_FLOAT _MotionScale_10 0
-	Material SET_FLOAT _MotionVariation_10 0
-
-	Material SET_FLOAT _MotionAmplitude_20 0.01
-	Material SET_FLOAT _MotionSpeed_20 6
-	Material SET_FLOAT _MotionScale_20 0
-	Material SET_FLOAT _MotionVariation_20 10
-
-	Material SET_FLOAT _MotionAmplitude_32 0
-	Material SET_FLOAT _MotionSpeed_32 30
-	Material SET_FLOAT _MotionScale_32 19
-	Material SET_FLOAT _MotionVariation_32 0
+	Material SET_FLOAT _MotionValue_30 0
 }
 
 if PREFAB_PATH_CONTAINS Succulents
 {
-	Material SET_FLOAT _MotionAmplitude_10 0.01
-	Material SET_FLOAT _MotionSpeed_10 2
-	Material SET_FLOAT _MotionScale_10 0
-	Material SET_FLOAT _MotionVariation_10 0
-
-	Material SET_FLOAT _MotionAmplitude_20 0.01
-	Material SET_FLOAT _MotionSpeed_20 6
-	Material SET_FLOAT _MotionScale_20 0
-	Material SET_FLOAT _MotionVariation_20 10
-
-	Material SET_FLOAT _MotionAmplitude_32 0
-	Material SET_FLOAT _MotionSpeed_32 30
-	Material SET_FLOAT _MotionScale_32 19
-	Material SET_FLOAT _MotionVariation_32 0
-}
-
-if PREFAB_PATH_CONTAINS Bush
-{
-	Material SET_FLOAT _MotionAmplitude_10 0.1
-	Material SET_FLOAT _MotionSpeed_10 2
-	Material SET_FLOAT _MotionScale_10 0
-	Material SET_FLOAT _MotionVariation_10 0
-
-	Material SET_FLOAT _MotionAmplitude_20 0.1
-	Material SET_FLOAT _MotionSpeed_20 6
-	Material SET_FLOAT _MotionScale_20 1
-	Material SET_FLOAT _MotionVariation_20 10
-
-	Material SET_FLOAT _MotionAmplitude_32 0.2
-	Material SET_FLOAT _MotionSpeed_32 30
-	Material SET_FLOAT _MotionScale_32 19
-	Material SET_FLOAT _MotionVariation_32 0
+	Material SET_FLOAT _MotionValue_30 0
 }

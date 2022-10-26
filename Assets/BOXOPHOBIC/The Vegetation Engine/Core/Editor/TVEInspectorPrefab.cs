@@ -2,7 +2,6 @@
 
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 
 namespace TheVegetationEngine
 {
@@ -67,9 +66,9 @@ namespace TheVegetationEngine
                 window.Show();
             }
 
-            if (GUILayout.Button("Open Material Settings"/*, GUILayout.Width(160)*/))
+            if (GUILayout.Button("Open Material Manager"/*, GUILayout.Width(160)*/))
             {
-                TVEMaterialSettings window = EditorWindow.GetWindow<TVEMaterialSettings>(false, "Material Settings", true);
+                TVEMaterialManager window = EditorWindow.GetWindow<TVEMaterialManager>(false, "Material Manager", true);
                 window.minSize = new Vector2(389, 200);
                 window.Show();
             }

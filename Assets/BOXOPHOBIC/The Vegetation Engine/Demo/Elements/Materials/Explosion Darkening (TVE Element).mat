@@ -14,7 +14,8 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
+  stringTagMap:
+    ElementType: ColorsElement
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
@@ -89,6 +90,7 @@ Material:
     - _ElementRaycastEndValue: 1
     - _ElementRaycastMask: 1
     - _ElementRaycastMode: 0
+    - _ElementVertexColorMode: 1
     - _ElementVolumeFadeMode: 0
     - _FadeCat: 1
     - _GlossMapScale: 1
@@ -108,7 +110,7 @@ Material:
     - _IsStandardPipeline: 0
     - _IsTVEElement: 1
     - _IsTVEShader: 1
-    - _IsVersion: 600
+    - _IsVersion: 700
     - _MainTexMaxValue: 1
     - _MainTexMinValue: 0
     - _MainTexSpace: 0
@@ -122,6 +124,10 @@ Material:
     - _NoiseScaleValue: 13.6
     - _OcclusionStrength: 1
     - _Parallax: 0.02
+    - _RaycastDistanceEndValue: 2
+    - _RaycastFadeValue: 1
+    - _RaycastLayerMask: 1
+    - _RaycastMessage: 0
     - _RenderCat: 1
     - _SeasonMode: 0
     - _SeasonMode_Seasons: 0
@@ -160,3 +166,4 @@ Material:
     - _SpringColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
     - _SummerColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
     - _WinterColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+  m_BuildTextureStacks: []

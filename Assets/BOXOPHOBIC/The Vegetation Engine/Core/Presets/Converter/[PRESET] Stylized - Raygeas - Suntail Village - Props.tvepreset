@@ -32,10 +32,14 @@ Material COPY_FLOAT _SurfaceSmoothness _MainSmoothnessValue
 
 Material SET_FLOAT _MainOcclusionValue 0
 
-Material COPY_VECTOR _EmissionColor _EmissiveColor
-Material COPY_TEX _Emission _EmissiveTex
-Material COPY_FLOAT_AS_VECTOR_X _Tiling _EmissiveUVs
-Material COPY_FLOAT_AS_VECTOR_Y _Tiling _EmissiveUVs
+if MATERIAL_HAS_TEX _Emission
+{
+	Material SET_FLOAT _EmissiveMode 1
+	Material COPY_VECTOR _EmissionColor _EmissiveColor
+	Material COPY_TEX _Emission _EmissiveTex
+	Material COPY_FLOAT_AS_VECTOR_X _Tiling _EmissiveUVs
+	Material COPY_FLOAT_AS_VECTOR_Y _Tiling _EmissiveUVs
+}
 
 // Combine Texture Channels
 if MATERIAL_KEYWORD_ENABLED _SMOOTHNESSSOURCE_ALBEDO_ALPHA

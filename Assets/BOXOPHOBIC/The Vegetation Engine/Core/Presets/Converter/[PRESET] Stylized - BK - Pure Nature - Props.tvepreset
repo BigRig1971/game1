@@ -48,6 +48,7 @@ if SHADER_NAME_CONTAINS StandardLayered
 	// Set Detail properties
 	Material SET_FLOAT _DetailMode 1
 	Material SET_FLOAT _DetailBlendMode 1
+	Material SET_FLOAT _DetailCoordMode 1
 	Material SET_FLOAT _DetailTypeMode 1
 	Material SET_FLOAT _DetailMaskMode 0
 
@@ -68,7 +69,7 @@ if SHADER_NAME_CONTAINS StandardLayered
 	Texture PropName _MainMaskTex
 	Texture SetRed GET_RED _MetallicGlossMap
 	Texture SetGreen GET_GREEN _MetallicGlossMap
-	Texture SetBlue GET_GREEN _MetallicGlossMap ACTION_INVERT
+	Texture SetBlue GET_GREEN _MetallicGlossMap ACTION_ONE_MINUS
 	Texture SetAlpha GET_ALPHA _MetallicGlossMap
 	Utility START_TEXTURE_PACKING
 	
@@ -76,7 +77,7 @@ if SHADER_NAME_CONTAINS StandardLayered
 	Texture PropName _SecondMaskTex
 	Texture SetRed GET_RED _DetailMetallicGlossMap
 	Texture SetGreen GET_GREEN _DetailMetallicGlossMap
-	Texture SetBlue GET_GREEN _DetailMetallicGlossMap ACTION_INVERT
+	Texture SetBlue GET_GREEN _DetailMetallicGlossMap ACTION_ONE_MINUS
 	Texture SetAlpha GET_ALPHA _DetailMetallicGlossMap
 	Utility START_TEXTURE_PACKING
 	

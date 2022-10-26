@@ -7,75 +7,33 @@ namespace Boxophobic.Constants
 {
     public static class CONSTANT
     {
-        public static Texture2D LogoImage
+        public static Color CategoryColor
         {
             get
             {
-                return Resources.Load("Boxophobic - Logo") as Texture2D;
+                if (EditorGUIUtility.isProSkin)
+                {
+                    return CONSTANT.ColorDarkGray;
+                }
+                else
+                {
+                    return CONSTANT.ColorLightGray;
+                }
             }
         }
 
-        public static Texture2D BannerImageBegin
+        public static Color LineColor
         {
             get
             {
-                return Resources.Load("Boxophobic - BannerBegin") as Texture2D;
-            }
-        }
-
-        public static Texture2D BannerImageMiddle
-        {
-            get
-            {
-                return Resources.Load("Boxophobic - BannerMiddle") as Texture2D;
-            }
-        }
-
-        public static Texture2D BannerImageEnd
-        {
-            get
-            {
-                return Resources.Load("Boxophobic - BannerEnd") as Texture2D;
-            }
-        }
-
-        public static Texture2D CategoryImageBegin
-        {
-            get
-            {
-                return Resources.Load("Boxophobic - CategoryBegin") as Texture2D;
-            }
-        }
-
-        public static Texture2D CategoryImageMiddle
-        {
-            get
-            {
-                return Resources.Load("Boxophobic - CategoryMiddle") as Texture2D;
-            }
-        }
-
-        public static Texture2D CategoryImageEnd
-        {
-            get
-            {
-                return Resources.Load("Boxophobic - CategoryEnd") as Texture2D;
-            }
-        }
-
-        public static Texture2D IconEdit
-        {
-            get
-            {
-                return Resources.Load("Boxophobic - IconEdit") as Texture2D;
-            }
-        }
-
-        public static Texture2D IconHelp
-        {
-            get
-            {
-                return Resources.Load("Boxophobic - IconHelp") as Texture2D;
+                if (EditorGUIUtility.isProSkin)
+                {
+                    return new Color(0.15f, 0.15f, 0.15f, 1.0f);
+                }
+                else
+                {
+                    return new Color(0.65f, 0.65f, 0.65f, 1.0f);
+                }
             }
         }
 
@@ -83,7 +41,7 @@ namespace Boxophobic.Constants
         {
             get
             {
-                return new Color(0.27f, 0.27f, 0.27f);
+                return new Color(0.2f, 0.2f, 0.2f, 1.0f);
             }
         }
 
@@ -91,7 +49,7 @@ namespace Boxophobic.Constants
         {
             get
             {
-                return new Color(0.83f, 0.83f, 0.83f);
+                return new Color(0.82f, 0.82f, 0.82f, 1.0f);
             }
         }
 
@@ -103,6 +61,21 @@ namespace Boxophobic.Constants
                 {
                     richText = true,
                     alignment = TextAnchor.MiddleCenter
+                };
+
+                return guiStyle;
+            }
+        }
+
+        public static GUIStyle HeaderStyle
+        {
+            get
+            {
+                GUIStyle guiStyle = new GUIStyle("label")
+                {
+                    richText = true,
+                    fontStyle = FontStyle.Bold,
+                    alignment = TextAnchor.MiddleLeft
                 };
 
                 return guiStyle;

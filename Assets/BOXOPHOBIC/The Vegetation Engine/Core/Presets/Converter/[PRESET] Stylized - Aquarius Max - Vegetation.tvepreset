@@ -12,15 +12,13 @@ InfoOnline https://assetstore.unity.com/packages/3d/vegetation/trees/stylized-tr
 *******************************************************************
 
 Mesh SetVariation GET_MASK_PROCEDURAL 3
-Mesh SetOcclusion GET_MASK_PROCEDURAL 15
-Mesh SetDetailMask NONE
-Mesh SetMultiMask GET_MASK_FROM_CHANNEL 5
+Mesh SetOcclusion GET_MASK_PROCEDURAL 6
 
-Mesh SetDetailCoord NONE
-
-Mesh SetMotion1 GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_FROM_CHANNEL 5
+Mesh SetHeight GET_MASK_PROCEDURAL 4
+Mesh SetMotion2 GET_MASK_PROCEDURAL 16
 Mesh SetMotion3 GET_MASK_FROM_CHANNEL 5
+
+Mesh SetPivots NONE
 
 *******************************************************************
 
@@ -29,7 +27,7 @@ if SHADER_NAME_CONTAINS Leaves
 	Material SET_FLOAT _RenderCull 0
 	Material SET_FLOAT _RenderNormals 2
 	Material SET_FLOAT _RenderSpecular 0
-	Material SET_FLOAT _AlphaCutoffValue 0.2
+	Material SET_FLOAT _AlphaClipValue 0.2
 
 	Material SET_FLOAT _FadeGlancingValue 0
 
@@ -56,27 +54,6 @@ if SHADER_NAME_CONTAINS Standard
 
 	Include Unity Lit Commons
 	Include Unity Lit Packer
-
-	Material SET_FLOAT _MotionValue_20 0
 }
 
-*******************************************************************
-
-Material SET_FLOAT _MotionAmplitude_10 0.1
-Material SET_FLOAT _MotionSpeed_10 2
-Material SET_FLOAT _MotionScale_10 0.1
-Material SET_FLOAT _MotionVariation_10 0
-
-Material SET_FLOAT _MotionAmplitude_20 0.1
-Material SET_FLOAT _MotionSpeed_20 6
-Material SET_FLOAT _MotionScale_20 0
-Material SET_FLOAT _MotionVariation_20 3
-
-Material SET_FLOAT _MotionAmplitude_32 0.01
-Material SET_FLOAT _MotionSpeed_32 15
-Material SET_FLOAT _MotionScale_32 10
-Material SET_FLOAT _MotionVariation_32 10
-
-Material SET_FLOAT _InteractionAmplitude 0
-Material SET_FLOAT _InteractionVariation 0
 

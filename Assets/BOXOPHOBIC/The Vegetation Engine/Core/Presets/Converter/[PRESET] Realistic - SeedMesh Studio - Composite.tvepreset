@@ -17,12 +17,9 @@ OutputValid FALSE
 Mesh SetVariation GET_MASK_PROCEDURAL 3
 Mesh SetOcclusion GET_MASK_FROM_CHANNEL 0
 Mesh SetDetailMask NONE
-Mesh SetMultiMask NONE
-
 Mesh SetDetailCoord NONE
 
-Mesh SetMotion1 GET_MASK_FROM_CHANNEL 0
-Mesh SetMotion2 GET_MASK_FROM_CHANNEL 0
+Mesh SetMotion2 GET_MASK_PROCEDURAL 16
 Mesh SetMotion3 GET_MASK_FROM_CHANNEL 0
 
 *******************************************************************
@@ -34,7 +31,7 @@ if SHADER_NAME_CONTAINS Vegetation
 	Material COPY_FLOAT _DoubleSidedNormalMode _RenderNormals
 	Material SET_FLOAT _FadeGlancingValue 0
 
-	Material COPY_FLOAT _cutoff _AlphaCutoffValue
+	Material COPY_FLOAT _cutoff _AlphaClipValue
 
 	// Copy Main props
 	Material COPY_VECTOR _Color _MainColor
@@ -126,8 +123,6 @@ if SHADER_NAME_CONTAINS Moss
 	Material SET_FLOAT _RenderCull 2
 	Material SET_FLOAT _RenderClip 0
 	
-	Material SET_FLOAT _MotionValue_20 0
-	
 	// Copy Bark Pros
 	Material COPY_COLOR Color_DC4D13CB _MainColor
 	Material COPY_TEX base_color_moss _MainAlbedoTex
@@ -149,6 +144,7 @@ if SHADER_NAME_CONTAINS Moss
 	// Enable Blending
 	Material SET_FLOAT _DetailMode 1
 	Material SET_FLOAT _DetailBlendMode 1
+	Material SET_FLOAT _DetailCoordMode 1
 	Material SET_FLOAT _DetailMaskMode 0
 
 	Material SET_FLOAT _DetailMeshValue 0

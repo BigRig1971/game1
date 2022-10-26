@@ -1,18 +1,19 @@
 ﻿// Cristian Pop - https://boxophobic.com/
 
 using UnityEngine;
-using System.Collections.Generic;
 using Boxophobic.StyledGUI;
 using UnityEngine.Serialization;
 
 namespace TheVegetationEngine
 {
+    [HelpURL("https://docs.google.com/document/d/145JOVlJ1tE-WODW45YoJ6Ixg23mFc56EnB_8Tbwloz8/edit#heading=h.hbq3w8ae720x")]
     [ExecuteInEditMode]
+    [AddComponentMenu("BOXOPHOBIC/The Vegetation Engine/TVE Manager")]
     public class TVEManager : StyledMonoBehaviour
     {
         public static TVEManager Instance;
 
-        [StyledBanner(0.890f, 0.745f, 0.309f, "The Vegetation Engine", "", "https://docs.google.com/document/d/145JOVlJ1tE-WODW45YoJ6Ixg23mFc56EnB_8Tbwloz8/edit#heading=h.hbq3w8ae720x")]
+        [StyledBanner(0.890f, 0.745f, 0.309f, "The Vegetation Engine")]
         public bool styledBanner;
 
         [HideInInspector]
@@ -24,6 +25,7 @@ namespace TheVegetationEngine
         public TVEGlobalControl globalControl;
         [HideInInspector]
         public TVEGlobalVolume globalVolume;
+
         void Awake()
         {
             Instance = this;
@@ -41,11 +43,13 @@ namespace TheVegetationEngine
 
         void OnDisable()
         {
+            Instance = null;
             Shader.SetGlobalFloat("TVE_Enabled", 0);
         }
 
         void OnDestroy()
         {
+            Instance = null;
             Shader.SetGlobalFloat("TVE_Enabled", 0);
         }
 
@@ -70,10 +74,6 @@ namespace TheVegetationEngine
                 globalMotion = go.GetComponent<TVEGlobalMotion>();
                 globalMotion.name = "Global Motion";
             }
-            else
-            {
-                globalMotion.enabled = true;
-            }
 
             if (globalDetails == null)
             {
@@ -84,10 +84,6 @@ namespace TheVegetationEngine
                 globalDetails = go.GetComponent<TVEGlobalDetails>();
                 globalDetails.name = "Global Details";
             }
-            else
-            {
-                globalDetails.enabled = true;
-            }
 
             if (globalControl == null)
             {
@@ -97,10 +93,6 @@ namespace TheVegetationEngine
 
                 globalControl = go.GetComponent<TVEGlobalControl>();
                 globalControl.name = "Global Control";
-            }
-            else
-            {
-                globalControl.enabled = true;
             }
 
             if (globalVolume == null)
@@ -113,10 +105,6 @@ namespace TheVegetationEngine
 
                 globalVolume = go.GetComponent<TVEGlobalVolume>();
                 globalVolume.name = "Global Volume";
-            }
-            else
-            {
-                globalVolume.enabled = true;
             }
         }
 

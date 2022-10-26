@@ -9,8 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Clover_01 (TVE Material)
   m_Shader: {fileID: 4800000, guid: a933075b367f9b24981408633f72ff34, type: 3}
-  m_ShaderKeywords: TVE_ALPHA_CLIP TVE_DETAIL_MODE_OFF TVE_DETAIL_TYPE_VERTEX_BLUE
-    TVE_VERTEX_DATA_BATCHED _ALPHATEST_ON
+  m_ShaderKeywords: TVE_FEATURE_BATCHING TVE_FEATURE_CLIP TVE_VERTEX_DATA_BATCHED
+    _ALPHATEST_ON
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 1
@@ -26,7 +26,6 @@ Material:
   - TransparentDepthPrepass
   - TransparentDepthPostpass
   - TransparentBackface
-  - MOTIONVECTORS
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -372,6 +371,7 @@ Material:
     - _ATDistance: 1
     - _AdvancedCat: 0
     - _AlbedoAffectEmissive: 0
+    - _AlphaClipValue: 0.1
     - _AlphaCutoff: 0.1
     - _AlphaCutoffEnable: 1
     - _AlphaCutoffPostpass: 0.1
@@ -395,6 +395,19 @@ Material:
     - _BlendMode: 0
     - _BumpScale: 1
     - _CameraFadeValue: 0
+    - _CategoryDetail: 0
+    - _CategoryEmissive: 1
+    - _CategoryGlobal: 1
+    - _CategoryGradient: 1
+    - _CategoryMain: 1
+    - _CategoryMotion: 1
+    - _CategoryNoise: 0
+    - _CategoryOcclusion: 1
+    - _CategoryPerspective: 0
+    - _CategoryRender: 1
+    - _CategoryRendering: 0
+    - _CategorySizeFade: 0
+    - _CategorySubsurface: 1
     - _CoatCoverage: 1
     - _CoatIOR: 0.5
     - _CoatMask: 0
@@ -446,7 +459,9 @@ Material:
     - _DstBlend: 0
     - _EmissiveCat: 1
     - _EmissiveColorMode: 1
+    - _EmissiveCoordMode: 0
     - _EmissiveFlagMode: 0
+    - _EmissiveMode: 0
     - _EnableAmbient: 1
     - _EnableBlendModePreserveSpecularLighting: 1
     - _EnableFogOnTransparent: 1
@@ -565,6 +580,8 @@ Material:
     - _MotionAmplitude_30: 0
     - _MotionAmplitude_32: 0.01
     - _MotionCat: 1
+    - _MotionFacingValue: 1
+    - _MotionNormalValue: 1
     - _MotionScale_10: 0
     - _MotionScale_20: 20
     - _MotionScale_30: 10
@@ -620,17 +637,20 @@ Material:
     - _RefractionMode: 0
     - _RefractionModel: 0
     - _RefractionSSRayModel: 0
+    - _RenderAmbient: 1
     - _RenderBlend: 0
     - _RenderClip: 1
     - _RenderCoverage: 0
     - _RenderCull: 2
     - _RenderCutoff: 0.5
     - _RenderDecals: 0
+    - _RenderDirect: 1
     - _RenderMode: 0
     - _RenderNormals: 0
     - _RenderPriority: 0
     - _RenderQueue: 0
     - _RenderSSR: 0
+    - _RenderShadow: 1
     - _RenderSpecular: 1
     - _RenderZWrite: 1
     - _RenderingCat: 1
@@ -651,7 +671,9 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SmoothnessViewAngleOffset: 0
     - _SpaceGlobalLayers: 0
+    - _SpaceGlobalLocals: 0
     - _SpaceGlobalPosition: 0
+    - _SpaceMotionGlobals: 0
     - _SpaceMotionHighlight: 0
     - _SpaceMotionLocals: 0
     - _SpaceRenderFade: 0
@@ -737,6 +759,7 @@ Material:
     - _VertexCat: 0
     - _VertexDataMode: 1
     - _VertexDynamicMode: 0
+    - _VertexHeightValue: 0.09738604
     - _VertexMasksMode: 0
     - _VertexMotionMode: 0
     - _VertexMotionSpace: 0
@@ -744,7 +767,9 @@ Material:
     - _VertexOcclusionMaxValue: 0
     - _VertexOcclusionMinValue: 0
     - _VertexOcclusionValue: 0
+    - _VertexPivotMode: 0
     - _VertexPivotModeFetch: 0
+    - _VertexRadiusValue: 3.3612542
     - _VertexRollingMode: 1
     - _VertexVariationMode: 0
     - _WindElasticityLvl0: 1
@@ -835,4 +860,5 @@ Material:
     - _UVMappingMaskEmissive: {r: 1, g: 0, b: 0, a: 0}
     - _VertexOcclusionColor: {r: 0, g: 0, b: 0, a: 0}
     - _VertexOcclusionRemap: {r: 0, g: 0, b: 0, a: 0}
+    - _render_normals: {r: -1, g: -1, b: -1, a: 0}
     - _render_normals_options: {r: -1, g: -1, b: -1, a: 0}

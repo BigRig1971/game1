@@ -12,18 +12,18 @@ InfoStatus ● ● ● ● ●
 *                             PRESET                              *
 *******************************************************************
 
-OutputTransform KEEP_ORIGINAL_TRANSFORMS
+OutputTransform USE_ORIGINAL_TRANSFORMS
 
 Mesh SetVariation GET_MASK_FROM_CHANNEL 0
 Mesh SetOcclusion GET_MASK_FROM_CHANNEL 3
 Mesh SetDetailMask GET_MASK_PROCEDURAL 8
-Mesh SetMultiMask NONE
-
 Mesh SetDetailCoord GET_COORD_FROM_CHANNEL 0
 
-Mesh SetMotion1 GET_MASK_PROCEDURAL 4
+Mesh SetHeight GET_MASK_PROCEDURAL 4
 Mesh SetMotion2 GET_MASK_FROM_CHANNEL 9
 Mesh SetMotion3 GET_MASK_FROM_CHANNEL 5
+
+Mesh SetPivots NONE
 
 *******************************************************************
 
@@ -57,6 +57,11 @@ Material COPY_COLOR _Color _MainColor
 Material COPY_TEX _MainTex _MainAlbedoTex
 Material COPY_ST_AS_VECTOR _MainTex _MainUVs
 Material COPY_TEX _BumpSpecMap _MainNormalTex
+
+*******************************************************************
+
+// Has proper branch variation
+Material SET_FLOAT _MotionVariation_20 10
 
 *******************************************************************
 

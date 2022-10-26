@@ -8,19 +8,48 @@ namespace Boxophobic.StyledGUI
     public class StyledSpaceDrawer : MaterialPropertyDrawer
     {
         public float space;
+        public string conditions = "";
 
         public StyledSpaceDrawer(float space)
         {
             this.space = space;
         }
 
+        public StyledSpaceDrawer(float space, string conditions)
+        {
+            this.space = space;
+            this.conditions = conditions;
+        }
+
         public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor materialEditor)
         {
-            //EditorGUI.DrawRect(position, new Color(0, 1, 0, 0.05f));
+            if (conditions == "")
+            {
+                GUILayout.Space(space);
+            }
+            else
+            {
+                Material material = materialEditor.target as Material;
 
-            //Material material = materialEditor.target as Material;
+                bool showInspector = false;
 
-            GUILayout.Space(space);
+                string[] split = conditions.Split(char.Parse(" "));
+
+                for (int i = 0; i < split.Length; i++)
+                {
+                    if (material.HasProperty(split[i]))
+                    {
+                        showInspector = true;
+                        break;
+                    }
+                }
+
+                if (showInspector)
+                {
+                    GUILayout.Space(space);
+                }
+            }
+
         }
 
         public override float GetPropertyHeight(MaterialProperty prop, string label, MaterialEditor editor)

@@ -12,9 +12,13 @@ Material COPY_FLOAT _Metallic _MainMetallicValue
 Material COPY_FLOAT _Glossiness _MainSmoothnessValue
 Material SET_FLOAT _MainOcclusionValue 0.5
 
-Material COPY_TEX _EmissionMap _EmissiveTex
-Material COPY_VECTOR _EmissionColor _EmissiveColor
-Material COPY_FLOAT_AS_VECTOR_X _EmissionIntensity _EmissiveIntensityParams
+if MATERIAL_HAS_TEX _EmissionMap
+{
+	Material SET_FLOAT _EmissiveMode 1
+	Material COPY_TEX _EmissionMap _EmissiveTex
+	Material COPY_VECTOR _EmissionColor _EmissiveColor
+	Material COPY_FLOAT_AS_VECTOR_X _EmissionIntensity _EmissiveIntensityParams
+}
 
 Material SET_FLOAT _SubsurfaceMaskMinValue 1
 Material SET_FLOAT _SubsurfaceMaskMaxValue 0
@@ -23,7 +27,6 @@ Material SET_FLOAT _SubsurfaceMaskMaxValue 0
 
 // Default values
 Material SET_FLOAT _RenderNormals 2
-Material SET_VECTOR _VertexOcclusionColor 0 0 0 0
 
 *******************************************************************
 

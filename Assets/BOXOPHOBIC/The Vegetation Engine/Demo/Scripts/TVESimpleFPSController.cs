@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace TheVegetationEngine
 {
-    [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(UnityEngine.CharacterController))]
     public class TVESimpleFPSController : MonoBehaviour
     {
         public float walkingSpeed = 2.0f;
@@ -16,12 +16,12 @@ namespace TheVegetationEngine
         [Space(10)]
         public Camera playerCamera;
 
-        CharacterController characterController;
+        UnityEngine.CharacterController characterController;
         float rotationX = 0;
 
         void Start()
         {
-            characterController = GetComponent<CharacterController>();
+            characterController = GetComponent<UnityEngine.CharacterController>();
 
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;

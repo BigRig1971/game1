@@ -12,18 +12,18 @@ InfoOnline https://assetstore.unity.com/publishers/9474
 *                             PRESET                              *
 *******************************************************************
 
-OutputTransform KEEP_ORIGINAL_TRANSFORMS
+OutputTransform USE_ORIGINAL_TRANSFORMS
 
-Mesh SetVariation GET_MASK_FROM_CHANNEL 7 ACTION_REMAP01
+Mesh SetVariation GET_MASK_FROM_CHANNEL 7 ACTION_REMAP_01
 Mesh SetOcclusion GET_MASK_FROM_CHANNEL 0
 Mesh SetDetailMask GET_MASK_PROCEDURAL 8
-Mesh SetMultiMask NONE
-
 Mesh SetDetailCoord GET_COORD_FROM_CHANNEL 0
 
-Mesh SetMotion1 GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_FROM_CHANNEL 6
+Mesh SetHeight GET_MASK_PROCEDURAL 4
+Mesh SetMotion2 GET_MASK_PROCEDURAL 16
 Mesh SetMotion3 GET_MASK_3RD_PARTY 2
+
+Mesh SetPivots NONE
 
 *******************************************************************
 
@@ -33,7 +33,7 @@ Include SpeedTree Commons
 // Combine Texture Channels
 Texture SetRed GET_GREEN _ExtraTex
 Texture SetGreen GET_BLUE _ExtraTex
-Texture SetBlue GET_GREEN _SubsurfaceTex
+Texture SetBlue GET_GREEN _SubsurfaceTex GET_CHANNEL 8
 Texture SetAlpha GET_RED _ExtraTex
 
 Utility START_TEXTURE_PACKING

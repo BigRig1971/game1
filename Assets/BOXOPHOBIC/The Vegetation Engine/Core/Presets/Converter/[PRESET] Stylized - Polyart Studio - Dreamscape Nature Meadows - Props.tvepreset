@@ -28,12 +28,16 @@ Material COPY_TEX _NormalTexture _MainNormalTex
 Material COPY_VECTOR _AlbedoTint _MainColor
 Material COPY_FLOAT _SmoothnessMultiplier _MainSmoothnessValue
 
-Material COPY_TEX _EmissiveTexture _EmissiveTex
-Material COPY_ST_AS_VECTOR _EmissiveTexture _EmissiveUVs
+if MATERIAL_HAS_TEX _EmissiveTexture
+{
+	Material SET_FLOAT _EmissiveMode 1
+	Material COPY_TEX _EmissiveTexture _EmissiveTex
+	Material COPY_ST_AS_VECTOR _EmissiveTexture _EmissiveUVs
 
-Material COPY_FLOAT_AS_VECTOR_X _EmissiveMultiplier _EmissiveColor
-Material COPY_FLOAT_AS_VECTOR_Y _EmissiveMultiplier _EmissiveColor
-Material COPY_FLOAT_AS_VECTOR_Z _EmissiveMultiplier _EmissiveColor
+	Material COPY_FLOAT_AS_VECTOR_X _EmissiveMultiplier _EmissiveColor
+	Material COPY_FLOAT_AS_VECTOR_Y _EmissiveMultiplier _EmissiveColor
+	Material COPY_FLOAT_AS_VECTOR_Z _EmissiveMultiplier _EmissiveColor
+}
 
 *******************************************************************
 
@@ -42,7 +46,7 @@ Texture PropName _MainMaskTex
 Texture SetRed GET_GREEN _MetallicTexture
 Texture SetGreen NONE
 Texture SetBlue GET_GRAY _CoverageMask
-Texture SetAlpha GET_GRAY _SmoothnessTexture ACTION_INVERT
+Texture SetAlpha GET_GRAY _SmoothnessTexture ACTION_ONE_MINUS
 
 Utility START_TEXTURE_PACKING
 
@@ -52,6 +56,7 @@ if MATERIAL_KEYWORD_ENABLED _GROUNDCOVERON_ON
 {
 	Material SET_FLOAT _DetailMode 1
 	Material SET_FLOAT _DetailBlendMode 1
+	Material SET_FLOAT _DetailCoordMode 1
 	Material SET_FLOAT _DetailTypeMode 1
 	Material SET_FLOAT _DetailMaskMode 0
 
@@ -72,6 +77,6 @@ if MATERIAL_KEYWORD_ENABLED _GROUNDCOVERON_ON
 	Texture SetRed NONE
 	Texture SetGreen NONE
 	Texture SetBlue GET_GRAY _CoverageMask
-	Texture SetAlpha GET_GRAY _CoverageSmoothnessTexture ACTION_INVERT
+	Texture SetAlpha GET_GRAY _CoverageSmoothnessTexture ACTION_ONE_MINUS
 	Utility START_TEXTURE_PACKING
 }

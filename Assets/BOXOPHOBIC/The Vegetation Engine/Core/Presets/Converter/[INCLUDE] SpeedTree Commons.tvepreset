@@ -69,7 +69,7 @@ if MATERIAL_NAME_CONTAINS Cap
 // Set default settings
 Material SET_FLOAT _GlobalSize 0
 Material SET_FLOAT _SizeFadeMode 0
-Material SET_FLOAT _AlphaCutoffValue 0.1
+Material SET_FLOAT _AlphaClipValue 0.1
 
 *******************************************************************
 
@@ -85,3 +85,10 @@ Material SET_FLOAT _MainSmoothnessValue 0.25
 Material COPY_FLOAT _Glossiness _MainSmoothnessValue
 
 Material SET_COLOR _VertexOcclusionColor 0 0 0 1
+
+*******************************************************************
+
+// Has proper branch variation
+Material SET_FLOAT _MotionVariation_20 10
+
+*******************************************************************

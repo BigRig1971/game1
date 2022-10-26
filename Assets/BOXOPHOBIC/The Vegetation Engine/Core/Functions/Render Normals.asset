@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Render Normals
   m_EditorClassIdentifier: 
   m_functionInfo: "// Made with Amplify Shader Editor\n// Available at the Unity
-    Asset Store - http://u3d.as/y3X \n/*ASEBEGIN\nVersion=18908\n1920;1;1906;1021;1638.792;1169.33;1;True;False\nNode;AmplifyShaderEditor.SwitchByFaceNode;12;-320,-768;Inherit;False;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;33;-576,-640;Inherit;False;2;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionInput;13;-896,-768;Inherit;False;Normal;3;0;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.Vector3Node;31;-896,-640;Half;False;Property;_render_normals_options;_render_normals_options;0;1;[HideInInspector];Create;False;0;0;0;False;0;False;1,1,1;0,0,0;0;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3\nNode;AmplifyShaderEditor.FunctionOutput;0;-80,-768;Inherit;False;True;-1;;0;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.CommentaryNode;32;-896,-1024;Inherit;False;893.0149;100;__normalsoptions
-    is (1,1,1) in normal mode (-1, -1, -1) in flip mode(1, 1, -1) in mirror mode.;0;;1,1,1,1;0;0\nWireConnection;12;0;13;0\nWireConnection;12;1;33;0\nWireConnection;33;0;13;0\nWireConnection;33;1;31;0\nWireConnection;0;0;12;0\nASEEND*/\n//CHKSM=3908AF3AE60303F8F8E39E0A3B71294EEDCE4181"
+    Asset Store - http://u3d.as/y3X \n/*ASEBEGIN\nVersion=18935\n1920;12;1920;1017;1654.792;1166.33;1;True;False\nNode;AmplifyShaderEditor.SwitchByFaceNode;12;-320,-768;Inherit;False;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;33;-576,-640;Inherit;False;2;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.FunctionInput;13;-896,-768;Inherit;False;Normal;3;0;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.Vector3Node;31;-896,-640;Half;False;Property;_render_normals;_render_normals;0;1;[HideInInspector];Create;False;0;0;0;False;0;False;1,1,1;0,0,0;0;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3\nNode;AmplifyShaderEditor.FunctionOutput;0;-80,-768;Inherit;False;True;-1;;0;False;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.CommentaryNode;32;-896,-1024;Inherit;False;893.0149;100;(1,1,1)
+    in normal mode (-1, -1, -1) in flip mode(1, 1, -1) in mirror mode.;0;;1,1,1,1;0;0\nWireConnection;12;0;13;0\nWireConnection;12;1;33;0\nWireConnection;33;0;13;0\nWireConnection;33;1;31;0\nWireConnection;0;0;12;0\nASEEND*/\n//CHKSM=E44D635FA59B307BA919E9AE09F8BA8B5BEAD86B"
   m_functionName: 
   m_description: Switch normal for BackFace.
   m_additionalIncludes:
@@ -39,3 +39,4 @@ MonoBehaviour:
   m_customNodeCategory: The Vegetation Engine
   m_previewPosition: 0
   m_hidden: 0
+  m_url: 

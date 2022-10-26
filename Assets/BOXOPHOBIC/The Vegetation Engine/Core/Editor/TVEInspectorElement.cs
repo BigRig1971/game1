@@ -3,6 +3,7 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using Boxophobic.Utils;
 
 namespace TheVegetationEngine
 {
@@ -22,43 +23,38 @@ namespace TheVegetationEngine
         {
             DrawInspector();
 
-            if (targetScript.inVolume)
+            var elementMaterial = targetScript.elementData.material;
+
+            if (elementMaterial != null)
             {
-                var sharedMaterial = targetScript.gameObject.GetComponent<Renderer>().sharedMaterial;
-
-                if (sharedMaterial != null)
+                if (!EditorUtility.IsPersistent(elementMaterial))
                 {
-                    if (!EditorUtility.IsPersistent(sharedMaterial))
+                    GUILayout.Space(10);
+                    EditorGUILayout.HelpBox("Save the material to be able to use it in prefabs or to enable GPU Instancing support!", MessageType.Info);
+                    GUILayout.Space(10);
+
+                    if (GUILayout.Button("Save Material to Disk"))
                     {
-                        EditorGUILayout.HelpBox("Save the material to be able to use it in prefabs or to enable GPU Instancing support!", MessageType.Info);
-                        GUILayout.Space(10);
+                        var savePath = EditorUtility.SaveFilePanelInProject("Save Material", "My Element", "mat", "Save Element material to disk!");
 
-                        if (GUILayout.Button("Save Material to Disk"))
+                        if (savePath != "")
                         {
-                            var savePath = EditorUtility.SaveFilePanelInProject("Save Material", "My Element", "mat", "Save Element material to disk!");
+                            // Add TVE Element to be able to find the material on upgrade
+                            savePath = savePath.Replace("(TVE Element)", "");
+                            savePath = savePath.Replace(".mat", " (TVE Element).mat");
 
-                            if (savePath != "")
+                            AssetDatabase.CreateAsset(elementMaterial, savePath);
+                            targetScript.gameObject.GetComponent<Renderer>().sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(savePath);
+
+                            if (Application.isPlaying == false)
                             {
-                                // Add TVE Element to be able to find the material on upgrade
-                                var fullPath = savePath.Replace(".mat", " (TVE Element).mat");
-
-                                AssetDatabase.CreateAsset(sharedMaterial, fullPath);
-                                targetScript.gameObject.GetComponent<Renderer>().sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(fullPath);
-
-                                if (Application.isPlaying == false)
-                                {
-                                    EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
-                                }
-
-                                AssetDatabase.Refresh();
+                                EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
                             }
+
+                            AssetDatabase.Refresh();
                         }
                     }
                 }
-            }
-            else
-            {
-                EditorGUILayout.HelpBox("The current element is outside the Global Volume / Follow Main Camera Volume and it is not rendered! Activate the scene Gizmos to see the volume bounds!", MessageType.Error);
             }
 
             GUILayout.Space(5);

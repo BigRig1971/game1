@@ -14,15 +14,15 @@ InfoOnline https://assetstore.unity.com/packages/3d/environments/fantasy/suntail
 *******************************************************************
 
 Mesh SetVariation GET_MASK_PROCEDURAL 3
-Mesh SetOcclusion NONE
-Mesh SetDetailMask NONE
-Mesh SetMultiMask NONE
+Mesh SetOcclusion GET_MASK_PROCEDURAL 6
+Mesh SetDetailMask GET_MASK_PROCEDURAL 8
+Mesh SetDetailCoord GET_COORD_FROM_CHANNEL 0
 
-Mesh SetDetailCoord NONE
+Mesh SetHeight GET_MASK_PROCEDURAL 4
+Mesh SetMotion2 GET_MASK_PROCEDURAL 16
+Mesh SetMotion3 GET_MASK_PROCEDURAL 16
 
-Mesh SetMotion1 GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_FROM_CHANNEL 5
-Mesh SetMotion3 GET_MASK_PROCEDURAL 4
+Mesh SetPivots NONE
 
 *******************************************************************
 
@@ -33,7 +33,7 @@ if SHADER_NAME_CONTAINS Suntail Foliage
 
 	Material SET_FLOAT _FadeGlancingValue 1
 
-	Material COPY_FLOAT _AlphaCutoff _AlphaCutoffValue
+	Material COPY_FLOAT _AlphaCutoff _AlphaClipValue
 
 	Material COPY_VECTOR _MainColor _MainColor
 	Material COPY_TEX _Albedo _MainAlbedoTex
@@ -71,12 +71,14 @@ if SHADER_NAME_CONTAINS Suntail Surface
 
 	Material SET_FLOAT _MainOcclusionValue 0
 
-	Material COPY_VECTOR _EmissionColor _EmissiveColor
-	Material COPY_TEX _Emission _EmissiveTex
-	Material COPY_FLOAT_AS_VECTOR_X _Tiling _EmissiveUVs
-	Material COPY_FLOAT_AS_VECTOR_Y _Tiling _EmissiveUVs
-	
-	Material SET_FLOAT _MotionValue_20 0
+	if MATERIAL_HAS_TEX _Emission
+	{
+		Material SET_FLOAT _EmissiveMode 1
+		Material COPY_VECTOR _EmissionColor _EmissiveColor
+		Material COPY_TEX _Emission _EmissiveTex
+		Material COPY_FLOAT_AS_VECTOR_X _Tiling _EmissiveUVs
+		Material COPY_FLOAT_AS_VECTOR_Y _Tiling _EmissiveUVs
+	}
 
 	// Combine Texture Channels
 	if MATERIAL_KEYWORD_ENABLED _SMOOTHNESSSOURCE_ALBEDO_ALPHA
@@ -89,23 +91,3 @@ if SHADER_NAME_CONTAINS Suntail Surface
 		Utility START_TEXTURE_PACKING
 	}
 }
-*******************************************************************
-
-Material SET_FLOAT _MotionAmplitude_10 0.135
-Material SET_FLOAT _MotionSpeed_10 2
-Material SET_FLOAT _MotionScale_10 0.1
-Material SET_FLOAT _MotionVariation_10 0
-
-Material SET_FLOAT _MotionAmplitude_20 0.05
-Material SET_FLOAT _MotionSpeed_20 6
-Material SET_FLOAT _MotionScale_20 1
-Material SET_FLOAT _MotionVariation_20 2.5
-
-Material SET_FLOAT _MotionAmplitude_32 0.5
-Material SET_FLOAT _MotionSpeed_32 10
-Material SET_FLOAT _MotionScale_32 19
-Material SET_FLOAT _MotionVariation_32 20
-
-Material SET_FLOAT _InteractionAmplitude 1
-Material SET_FLOAT _InteractionVariation 0
-

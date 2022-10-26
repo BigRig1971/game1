@@ -18,14 +18,14 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Orientation"
 		[HideInInspector]_MainTexMinValue("Element Min", Range( 0 , 1)) = 0
 		[HideInInspector]_MainTexMaxValue("Element Max", Range( 0 , 1)) = 1
 		[StyledVector(9)]_MainUVs("Element UVs", Vector) = (1,1,0,0)
-		[StyledToggle]_ElementDirectionMode("Use Particle Movement Direction", Float) = 0
-		[StyledToggle]_ElementInvertMode("Use Inverted Element Direction", Float) = 0
 		[StyledRemapSlider(_NoiseMinValue, _NoiseMaxValue, 0, 1, 10, 0)]_NoiseRemap("Noise Remap", Vector) = (0,0,0,0)
 		[Space(10)]_MotionPower("Motion Wind Power", Range( 0 , 1)) = 0
+		[Space(10)][StyledToggle]_ElementDirectionMode("Use Particle Movement Direction", Float) = 0
+		[StyledToggle]_ElementInvertMode("Use Inverted Element Direction", Float) = 0
 		[StyledCategory(Fading Settings)]_FadeCat("[ Fade Cat ]", Float) = 0
 		[HDR][StyledToggle]_ElementRaycastMode("Enable Raycast Fading", Float) = 0
 		[StyledToggle]_ElementVolumeFadeMode("Enable Volume Edge Fading", Float) = 0
-		[StyledMessage(Info, The Raycast feature currently only works with particle systems and non instanced materials. GPU Instancing will be disabled if the Raycast features is enabled., 10, 0)]_RaycastMessage("Raycast Message", Float) = 0
+		[StyledMessage(Info, The Raycast feature currently only works non instanced materials. GPU Instancing will be disabled if the Raycast feature is enabled., 10, 0)]_RaycastMessage("Raycast Message", Float) = 0
 		[HideInInspector]_RaycastFadeValue("Raycast Fade Mask", Float) = 1
 		[Space(10)][StyledLayers()]_RaycastLayerMask("Raycast Layer", Float) = 1
 		_RaycastDistanceEndValue("Raycast Distance", Float) = 2
@@ -33,7 +33,7 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Orientation"
 		[HideInInspector]_ElementLayerValue("Legacy Layer Value", Float) = -1
 		[HideInInspector]_InvertX("Legacy Invert Mode", Float) = 0
 		[HideInInspector]_ElementFadeSupport("Legacy Edge Fading", Float) = 0
-		[HideInInspector]_IsVersion("_IsVersion", Float) = 0
+		[HideInInspector]_IsVersion("_IsVersion", Float) = 700
 		[HideInInspector]_IsElementShader("_IsElementShader", Float) = 1
 		[HideInInspector]_IsMotionElement("_IsMotionElement", Float) = 1
 		[HideInInspector]_render_colormask("_render_colormask", Float) = 15
@@ -104,24 +104,24 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Orientation"
 
 			uniform half _IsMotionElement;
 			uniform half _Banner;
+			uniform half _ElementLayerMask;
+			uniform half _RenderCat;
+			uniform float _IsVersion;
+			uniform half _ElementCat;
 			uniform half _FadeCat;
-			uniform half _AdvancedCat;
+			uniform half _IsElementShader;
 			uniform float _ElementFadeSupport;
 			uniform half _ElementLayerValue;
-			uniform half _IsElementShader;
-			uniform half _RaycastDistanceEndValue;
-			uniform half _ElementCat;
-			uniform half _RaycastLayerMask;
+			uniform half _ElementLayerWarning;
 			uniform half _ElementRaycastMode;
-			uniform half _RaycastMessage;
-			uniform half _RenderCat;
-			uniform half _ElementLayerMessage;
-			uniform half4 _MainTexRemap;
-			uniform float _IsVersion;
+			uniform half _RaycastDistanceEndValue;
 			uniform half4 _NoiseRemap;
 			uniform float _InvertX;
-			uniform half _ElementLayerWarning;
-			uniform half _ElementLayerMask;
+			uniform half _AdvancedCat;
+			uniform half _ElementLayerMessage;
+			uniform half _RaycastMessage;
+			uniform half4 _MainTexRemap;
+			uniform half _RaycastLayerMask;
 			uniform half _Message;
 			uniform half _render_colormask;
 			uniform sampler2D _MainTex;
@@ -196,9 +196,9 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Orientation"
 				float3 WorldPosition = i.worldPos;
 				#endif
 				float4 tex2DNode17_g20191 = tex2D( _MainTex, ( ( ( 1.0 - i.ase_texcoord1.xy ) * (_MainUVs).xy ) + (_MainUVs).zw ) );
-				float temp_output_7_0_g20725 = _MainTexMinValue;
-				float4 temp_cast_0 = (temp_output_7_0_g20725).xxxx;
-				float4 break469_g20191 = saturate( ( ( tex2DNode17_g20191 - temp_cast_0 ) / ( _MainTexMaxValue - temp_output_7_0_g20725 ) ) );
+				float temp_output_7_0_g20833 = _MainTexMinValue;
+				float4 temp_cast_0 = (temp_output_7_0_g20833).xxxx;
+				float4 break469_g20191 = saturate( ( ( tex2DNode17_g20191 - temp_cast_0 ) / ( _MainTexMaxValue - temp_output_7_0_g20833 ) ) );
 				half MainTex_R73_g20191 = break469_g20191.r;
 				float temp_output_270_0_g20191 = (MainTex_R73_g20191*2.0 + -1.0);
 				half MainTex_G265_g20191 = break469_g20191.g;
@@ -221,15 +221,15 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Orientation"
 				float3 appendResult496_g20191 = (float3((Direction_TextureX1150_g20191*0.5 + 0.5) , (Direction_TextureZ1151_g20191*0.5 + 0.5) , Motion_Power1000_g20191));
 				half3 Final_MotionOrientation_RGB495_g20191 = appendResult496_g20191;
 				half MainTex_A74_g20191 = break469_g20191.a;
-				half4 Colors37_g20727 = TVE_ColorsCoords;
-				half4 Extras37_g20727 = TVE_ExtrasCoords;
-				half4 Motion37_g20727 = TVE_MotionCoords;
-				half4 Vertex37_g20727 = TVE_VertexCoords;
-				half4 localIS_ELEMENT37_g20727 = IS_ELEMENT( Colors37_g20727 , Extras37_g20727 , Motion37_g20727 , Vertex37_g20727 );
-				float4 temp_output_35_0_g20714 = localIS_ELEMENT37_g20727;
-				float temp_output_7_0_g20730 = TVE_ElementsFadeValue;
-				float2 temp_cast_3 = (temp_output_7_0_g20730).xx;
-				float2 temp_output_851_0_g20191 = saturate( ( ( abs( (( (temp_output_35_0_g20714).zw + ( (temp_output_35_0_g20714).xy * (WorldPosition).xz ) )*2.002 + -1.001) ) - temp_cast_3 ) / ( 1.0 - temp_output_7_0_g20730 ) ) );
+				half4 Colors37_g20853 = TVE_ColorsCoords;
+				half4 Extras37_g20853 = TVE_ExtrasCoords;
+				half4 Motion37_g20853 = TVE_MotionCoords;
+				half4 Vertex37_g20853 = TVE_VertexCoords;
+				half4 localIS_ELEMENT37_g20853 = IS_ELEMENT( Colors37_g20853 , Extras37_g20853 , Motion37_g20853 , Vertex37_g20853 );
+				float4 temp_output_35_0_g20854 = localIS_ELEMENT37_g20853;
+				float temp_output_7_0_g20862 = TVE_ElementsFadeValue;
+				float2 temp_cast_3 = (temp_output_7_0_g20862).xx;
+				float2 temp_output_851_0_g20191 = saturate( ( ( abs( (( (temp_output_35_0_g20854).zw + ( (temp_output_35_0_g20854).xy * (WorldPosition).xz ) )*2.002 + -1.001) ) - temp_cast_3 ) / ( 1.0 - temp_output_7_0_g20862 ) ) );
 				float2 break852_g20191 = ( temp_output_851_0_g20191 * temp_output_851_0_g20191 );
 				float lerpResult842_g20191 = lerp( 1.0 , ( 1.0 - saturate( ( break852_g20191.x + break852_g20191.y ) ) ) , _ElementVolumeFadeMode);
 				half Fade_EdgeMask656_g20191 = lerpResult842_g20191;
@@ -250,14 +250,14 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Orientation"
 	
 }
 /*ASEBEGIN
-Version=18934
-1920;0;1920;1029;1423.464;1746.379;1;True;False
-Node;AmplifyShaderEditor.FunctionNode;117;-640,-1280;Inherit;False;Define Element Motion;61;;19417;6eebc31017d99e84e811285e6a5d199d;0;0;1;FLOAT;0
+Version=18935
+1920;6;1920;1023;1423.464;1743.379;1;True;False
+Node;AmplifyShaderEditor.FunctionNode;117;-640,-1280;Inherit;False;Define Element Motion;63;;19417;6eebc31017d99e84e811285e6a5d199d;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;95;-384,-1280;Half;False;Property;_Banner;Banner;0;0;Create;True;0;0;0;True;1;StyledBanner(Motion Orientation Element);False;0;0;1;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.FunctionNode;165;-638,-1024;Inherit;False;Base Element;2;;20191;0e972c73cae2ee54ea51acc9738801d0;6,477,2,478,0,145,3,481,4,576,1,491,1;0;1;FLOAT4;0
 Node;AmplifyShaderEditor.RangedFloatNode;115;-256,-1280;Half;False;Property;_Message;Message;1;0;Create;True;0;0;0;True;1;StyledMessage(Info, Use the Motion Orientation elements to change the motion direction based on the Element Texture. Element Texture RG is used a World XZ direction and Texture A is used as alpha mask. Particle Color A is used as Element Intensity multiplier., 0,0);False;0;0;1;1;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;164;-640,-1152;Half;False;Property;_render_colormask;_render_colormask;63;1;[HideInInspector];Create;True;0;0;0;True;0;False;15;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;164;-640,-1152;Half;False;Property;_render_colormask;_render_colormask;65;1;[HideInInspector];Create;True;0;0;0;True;0;False;15;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;0;-304,-1024;Float;False;True;-1;2;TVEShaderElementGUI;0;1;BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Orientation;0770190933193b94aaa3065e307002fa;True;Unlit;0;0;Unlit;2;False;True;2;5;False;-1;10;False;-1;0;1;False;-1;0;False;-1;True;0;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;True;2;False;-1;True;True;True;True;False;False;0;True;164;False;False;False;False;False;False;False;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;2;False;-1;True;0;False;-1;True;False;0;False;-1;0;False;-1;True;4;RenderType=Transparent=RenderType;Queue=Transparent=Queue=0;PreviewType=Plane;DisableBatching=True=DisableBatching;True;0;False;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;0;;0;0;Standard;1;Vertex Position,InvertActionOnDeselection;1;0;0;1;True;False;;False;0
 WireConnection;0;0;165;0
 ASEEND*/
-//CHKSM=7E53A8D7C5D83B6CFC2DDA111EBD487577324B04
+//CHKSM=E0A177705E5EF970750136328048EE49C8516FC1

@@ -14,13 +14,13 @@ InfoOnline https://assetstore.unity.com/packages/3d/environments/fantasy/dreamsc
 Mesh SetVariation GET_MASK_PROCEDURAL 3
 Mesh SetOcclusion NONE
 Mesh SetDetailMask NONE
-Mesh SetMultiMask NONE
-
 Mesh SetDetailCoord NONE
 
-Mesh SetMotion1 GET_MASK_PROCEDURAL 4
+Mesh SetHeight GET_MASK_PROCEDURAL 4
 Mesh SetMotion2 NONE
 Mesh SetMotion3 NONE
+
+Mesh SetPivots NONE
 
 *******************************************************************
 
@@ -31,7 +31,7 @@ Material SET_FLOAT _SubsurfaceViewValue 0
 
 if SHADER_NAME_CONTAINS Foliage
 
-Material COPY_FLOAT _AlphaCutoff _AlphaCutoffValue
+Material COPY_FLOAT _AlphaCutoff _AlphaClipValue
 
 Material COPY_TEX _FoliageTexture _MainAlbedoTex
 Material COPY_ST_AS_VECTOR _FoliageTexture _MainUVs
@@ -66,7 +66,7 @@ if SHADER_NAME_CONTAINS Surface
 Texture SetRed GET_GREEN _MetallicTexture
 Texture SetGreen NONE
 Texture SetBlue NONE
-Texture SetAlpha GET_GRAY _SmoothnessTexture ACTION_INVERT
+Texture SetAlpha GET_GRAY _SmoothnessTexture ACTION_ONE_MINUS
 
 Utility START_TEXTURE_PACKING
 

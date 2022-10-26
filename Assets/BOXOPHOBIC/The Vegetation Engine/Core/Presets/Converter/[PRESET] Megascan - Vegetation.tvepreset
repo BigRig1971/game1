@@ -14,13 +14,13 @@ InfoOnline https://quixel.com/megascans/home
 Mesh SetVariation GET_MASK_PROCEDURAL 3
 Mesh SetOcclusion GET_MASK_FROM_CHANNEL 0
 Mesh SetDetailMask NONE
-Mesh SetMultiMask NONE
-
 Mesh SetDetailCoord NONE
 
-Mesh SetMotion1 GET_MASK_FROM_CHANNEL 0
+Mesh SetHeight GET_MASK_PROCEDURAL 4
 Mesh SetMotion2 GET_MASK_FROM_CHANNEL 0
-Mesh SetMotion3 GET_MASK_FROM_CHANNEL 1 ACTION_INVERT
+Mesh SetMotion3 GET_MASK_FROM_CHANNEL 1 ACTION_ONE_MINUS
+
+Mesh SetPivots NONE
 
 *******************************************************************
 

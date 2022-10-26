@@ -16,20 +16,18 @@ InfoWarning The BK Billboards are not supported and they will be disabled after 
 
 Mesh SetVariation GET_MASK_PROCEDURAL 3
 Mesh SetOcclusion NONE
-Mesh SetDetailMask NONE
-Mesh SetMultiMask NONE
 
-Mesh SetDetailCoord NONE
-
-Mesh SetMotion1 GET_MASK_PROCEDURAL 1
+Mesh SetHeight GET_MASK_PROCEDURAL 1
 Mesh SetMotion2 GET_MASK_PROCEDURAL 1
-Mesh SetMotion3 GET_MASK_FROM_CHANNEL 0 ACTION_INVERT
+Mesh SetMotion3 GET_MASK_FROM_CHANNEL 0 ACTION_ONE_MINUS
+
+Mesh SetPivots NONE
 
 *******************************************************************
 
 Material SET_FLOAT _RenderCull 2
 Material SET_FLOAT _RenderNormals 0
-Material SET_FLOAT _AlphaCutoffValue 0.25
+Material SET_FLOAT _AlphaClipValue 0.25
 Material SET_FLOAT _FadeGlancingValue 1
 
 Material COPY_TEX _Diffuse _MainAlbedoTex

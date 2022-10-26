@@ -17,13 +17,6 @@ namespace Boxophobic.StyledGUI
             this.helpURL = "";
         }
 
-        public StyledBanner(string title, string helpURL)
-        {
-            this.colorR = -1;
-            this.title = title;
-            this.helpURL = helpURL;
-        }
-
         public StyledBanner(float colorR, float colorG, float colorB, string title)
         {
             this.colorR = colorR;
@@ -31,6 +24,14 @@ namespace Boxophobic.StyledGUI
             this.colorB = colorB;
             this.title = title;
             this.helpURL = "";
+        }
+
+        // Legacy
+        public StyledBanner(string title, string helpURL)
+        {
+            this.colorR = -1;
+            this.title = title;
+            this.helpURL = helpURL;
         }
 
         public StyledBanner(float colorR, float colorG, float colorB, string title, string helpURL)
@@ -42,7 +43,6 @@ namespace Boxophobic.StyledGUI
             this.helpURL = helpURL;
         }
 
-        // Legacy
         public StyledBanner(string title, string subtitle, string helpURL)
         {
             this.colorR = -1;

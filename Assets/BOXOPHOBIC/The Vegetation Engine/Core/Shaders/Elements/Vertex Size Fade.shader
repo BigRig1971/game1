@@ -28,7 +28,7 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Vertex Size Fade"
 		[StyledCategory(Fading Settings)]_FadeCat("[ Fade Cat ]", Float) = 0
 		[HDR][StyledToggle]_ElementRaycastMode("Enable Raycast Fading", Float) = 0
 		[StyledToggle]_ElementVolumeFadeMode("Enable Volume Edge Fading", Float) = 0
-		[StyledMessage(Info, The Raycast feature currently only works with particle systems and non instanced materials. GPU Instancing will be disabled if the Raycast features is enabled., 10, 0)]_RaycastMessage("Raycast Message", Float) = 0
+		[StyledMessage(Info, The Raycast feature currently only works non instanced materials. GPU Instancing will be disabled if the Raycast feature is enabled., 10, 0)]_RaycastMessage("Raycast Message", Float) = 0
 		[HideInInspector]_RaycastFadeValue("Raycast Fade Mask", Float) = 1
 		[Space(10)][StyledLayers()]_RaycastLayerMask("Raycast Layer", Float) = 1
 		_RaycastDistanceEndValue("Raycast Distance", Float) = 2
@@ -36,7 +36,7 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Vertex Size Fade"
 		[HideInInspector]_ElementLayerValue("Legacy Layer Value", Float) = -1
 		[HideInInspector]_InvertX("Legacy Invert Mode", Float) = 0
 		[HideInInspector]_ElementFadeSupport("Legacy Edge Fading", Float) = 0
-		[HideInInspector]_IsVersion("_IsVersion", Float) = 0
+		[HideInInspector]_IsVersion("_IsVersion", Float) = 700
 		[HideInInspector]_IsElementShader("_IsElementShader", Float) = 1
 		[HideInInspector]_IsVertexElement("_IsVertexElement", Float) = 1
 		[HideInInspector]_render_src("_render_src", Float) = 2
@@ -110,24 +110,24 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Vertex Size Fade"
 			uniform float _render_src;
 			uniform half _Message;
 			uniform half _Banner;
+			uniform half _ElementLayerMask;
+			uniform half _RenderCat;
+			uniform float _IsVersion;
+			uniform half _ElementCat;
 			uniform half _FadeCat;
-			uniform half _AdvancedCat;
+			uniform half _IsElementShader;
 			uniform float _ElementFadeSupport;
 			uniform half _ElementLayerValue;
-			uniform half _IsElementShader;
-			uniform half _RaycastDistanceEndValue;
-			uniform half _ElementCat;
-			uniform half _RaycastLayerMask;
+			uniform half _ElementLayerWarning;
 			uniform half _ElementRaycastMode;
-			uniform half _RaycastMessage;
-			uniform half _RenderCat;
-			uniform half _ElementLayerMessage;
-			uniform half4 _MainTexRemap;
-			uniform float _IsVersion;
+			uniform half _RaycastDistanceEndValue;
 			uniform half4 _NoiseRemap;
 			uniform float _InvertX;
-			uniform half _ElementLayerWarning;
-			uniform half _ElementLayerMask;
+			uniform half _AdvancedCat;
+			uniform half _ElementLayerMessage;
+			uniform half _RaycastMessage;
+			uniform half4 _MainTexRemap;
+			uniform half _RaycastLayerMask;
 			uniform half _MainValue;
 			uniform half4 TVE_SeasonOptions;
 			uniform half _AdditionalValue1;
@@ -227,20 +227,20 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Vertex Size Fade"
 				float lerpResult413_g20498 = lerp( ( 1.0 - ( Value_Main157_g20498 * i.ase_color.r ) ) , ( ( ( TVE_SeasonOptions_X50_g20498 * lerpResult419_g20498 ) + ( TVE_SeasonOptions_Y51_g20498 * lerpResult422_g20498 ) + ( TVE_SeasonOptions_Z52_g20498 * lerpResult407_g20498 ) + ( TVE_SeasonOptions_W53_g20498 * lerpResult415_g20498 ) ) * i.ase_color.r ) , Element_Mode55_g20498);
 				half Base_Extras_A423_g20498 = ( 1.0 - lerpResult413_g20498 );
 				float4 tex2DNode17_g20498 = tex2D( _MainTex, ( ( ( 1.0 - i.ase_texcoord1.xy ) * (_MainUVs).xy ) + (_MainUVs).zw ) );
-				float temp_output_7_0_g20725 = _MainTexMinValue;
-				float4 temp_cast_0 = (temp_output_7_0_g20725).xxxx;
-				float4 break469_g20498 = saturate( ( ( tex2DNode17_g20498 - temp_cast_0 ) / ( _MainTexMaxValue - temp_output_7_0_g20725 ) ) );
+				float temp_output_7_0_g20833 = _MainTexMinValue;
+				float4 temp_cast_0 = (temp_output_7_0_g20833).xxxx;
+				float4 break469_g20498 = saturate( ( ( tex2DNode17_g20498 - temp_cast_0 ) / ( _MainTexMaxValue - temp_output_7_0_g20833 ) ) );
 				half MainTex_A74_g20498 = break469_g20498.a;
 				float lerpResult224_g20498 = lerp( 1.0 , Base_Extras_A423_g20498 , MainTex_A74_g20498);
-				half4 Colors37_g20727 = TVE_ColorsCoords;
-				half4 Extras37_g20727 = TVE_ExtrasCoords;
-				half4 Motion37_g20727 = TVE_MotionCoords;
-				half4 Vertex37_g20727 = TVE_VertexCoords;
-				half4 localIS_ELEMENT37_g20727 = IS_ELEMENT( Colors37_g20727 , Extras37_g20727 , Motion37_g20727 , Vertex37_g20727 );
-				float4 temp_output_35_0_g20714 = localIS_ELEMENT37_g20727;
-				float temp_output_7_0_g20730 = TVE_ElementsFadeValue;
-				float2 temp_cast_1 = (temp_output_7_0_g20730).xx;
-				float2 temp_output_851_0_g20498 = saturate( ( ( abs( (( (temp_output_35_0_g20714).zw + ( (temp_output_35_0_g20714).xy * (WorldPosition).xz ) )*2.002 + -1.001) ) - temp_cast_1 ) / ( 1.0 - temp_output_7_0_g20730 ) ) );
+				half4 Colors37_g20853 = TVE_ColorsCoords;
+				half4 Extras37_g20853 = TVE_ExtrasCoords;
+				half4 Motion37_g20853 = TVE_MotionCoords;
+				half4 Vertex37_g20853 = TVE_VertexCoords;
+				half4 localIS_ELEMENT37_g20853 = IS_ELEMENT( Colors37_g20853 , Extras37_g20853 , Motion37_g20853 , Vertex37_g20853 );
+				float4 temp_output_35_0_g20854 = localIS_ELEMENT37_g20853;
+				float temp_output_7_0_g20862 = TVE_ElementsFadeValue;
+				float2 temp_cast_1 = (temp_output_7_0_g20862).xx;
+				float2 temp_output_851_0_g20498 = saturate( ( ( abs( (( (temp_output_35_0_g20854).zw + ( (temp_output_35_0_g20854).xy * (WorldPosition).xz ) )*2.002 + -1.001) ) - temp_cast_1 ) / ( 1.0 - temp_output_7_0_g20862 ) ) );
 				float2 break852_g20498 = ( temp_output_851_0_g20498 * temp_output_851_0_g20498 );
 				float lerpResult842_g20498 = lerp( 1.0 , ( 1.0 - saturate( ( break852_g20498.x + break852_g20498.y ) ) ) , _ElementVolumeFadeMode);
 				half Fade_EdgeMask656_g20498 = lerpResult842_g20498;
@@ -263,15 +263,15 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Vertex Size Fade"
 	
 }
 /*ASEBEGIN
-Version=18934
-1920;0;1920;1029;1521.264;1634.089;1;True;False
-Node;AmplifyShaderEditor.FunctionNode;136;-768,-1280;Inherit;False;Define Element Vertex;61;;20497;9f8670cd8fdc98444822270656343d82;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;133;-608,-1152;Inherit;False;Property;_render_dst;_render_dst;64;1;[HideInInspector];Create;True;0;0;0;True;0;False;0;1;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;132;-768,-1152;Inherit;False;Property;_render_src;_render_src;63;1;[HideInInspector];Create;True;0;0;0;True;0;False;2;1;0;0;0;1;FLOAT;0
+Version=18935
+1920;6;1920;1023;1521.264;1631.089;1;True;False
+Node;AmplifyShaderEditor.FunctionNode;136;-768,-1280;Inherit;False;Define Element Vertex;63;;20497;9f8670cd8fdc98444822270656343d82;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;133;-608,-1152;Inherit;False;Property;_render_dst;_render_dst;66;1;[HideInInspector];Create;True;0;0;0;True;0;False;0;1;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;132;-768,-1152;Inherit;False;Property;_render_src;_render_src;65;1;[HideInInspector];Create;True;0;0;0;True;0;False;2;1;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;112;-384,-1280;Half;False;Property;_Message;Message;1;0;Create;True;0;0;0;True;1;StyledMessage(Info, Use the Size elements to add scale variation or combine it with seasons to add dynamic vegetation growing. Element Texture A is used as alpha mask. Particle Color R is used as values multiplier and Alpha as Element Intensity multiplier., 0,0);False;0;0;1;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;109;-512,-1280;Half;False;Property;_Banner;Banner;0;0;Create;True;0;0;0;True;1;StyledBanner(Vertex Size Element);False;0;0;1;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.FunctionNode;131;-768,-1025;Inherit;False;Base Element;2;;20498;0e972c73cae2ee54ea51acc9738801d0;6,477,3,478,0,145,1,481,4,576,1,491,1;0;1;FLOAT4;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;0;-432,-1024;Float;False;True;-1;2;TVEShaderElementGUI;0;1;BOXOPHOBIC/The Vegetation Engine/Elements/Default/Vertex Size Fade;0770190933193b94aaa3065e307002fa;True;Unlit;0;0;Unlit;2;True;True;0;2;False;-1;0;False;-1;1;0;True;132;0;True;133;True;0;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;True;2;False;-1;True;True;False;False;False;True;0;False;-1;False;False;False;False;False;False;False;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;2;False;-1;True;0;False;-1;True;False;0;False;-1;0;False;-1;True;4;RenderType=Transparent=RenderType;Queue=Transparent=Queue=0;PreviewType=Plane;DisableBatching=True=DisableBatching;True;0;False;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;0;;0;0;Standard;1;Vertex Position,InvertActionOnDeselection;1;0;0;1;True;False;;False;0
 WireConnection;0;0;131;0
 ASEEND*/
-//CHKSM=A6BADCA3DA6BA4FF9111E4DF65BD88059DCEC338
+//CHKSM=DB9B02B59E14F0F5D218035A4052AB1A29608F18

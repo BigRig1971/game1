@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Roots_System (TVE Material)
   m_Shader: {fileID: 4800000, guid: 6e6307b56f9201d40ad738f21cf03495, type: 3}
-  m_ShaderKeywords: TVE_DETAIL_MODE_OFF TVE_DETAIL_TYPE_VERTEX_BLUE
+  m_ShaderKeywords: 
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -377,6 +377,7 @@ Material:
     - _ATDistance: 1
     - _AdvancedCat: 0
     - _AlbedoAffectEmissive: 0
+    - _AlphaClipValue: 0.5
     - _AlphaCutoff: 0.5
     - _AlphaCutoffEnable: 0
     - _AlphaCutoffPostpass: 0.5
@@ -398,6 +399,19 @@ Material:
     - _BillboardShadowMode: 0
     - _BlendMode: 0
     - _BumpScale: 1
+    - _CategoryDetail: 1
+    - _CategoryEmissive: 1
+    - _CategoryGlobal: 1
+    - _CategoryGradient: 0
+    - _CategoryMain: 1
+    - _CategoryMotion: 0
+    - _CategoryNoise: 0
+    - _CategoryOcclusion: 0
+    - _CategoryPerspective: 0
+    - _CategoryRender: 1
+    - _CategoryRendering: 0
+    - _CategorySizeFade: 0
+    - _CategorySubsurface: 0
     - _CoatCoverage: 1
     - _CoatIOR: 0.5
     - _CoatMask: 0
@@ -455,7 +469,9 @@ Material:
     - _DstBlend: 0
     - _EmissiveCat: 1
     - _EmissiveColorMode: 1
+    - _EmissiveCoordMode: 0
     - _EmissiveFlagMode: 0
+    - _EmissiveMode: 0
     - _EnableBlendModePreserveSpecularLighting: 1
     - _EnableFogOnTransparent: 1
     - _EnableGeometricSpecularAA: 0
@@ -592,17 +608,20 @@ Material:
     - _RefractionMode: 0
     - _RefractionModel: 0
     - _RefractionSSRayModel: 0
+    - _RenderAmbient: 1
     - _RenderBlend: 0
     - _RenderClip: 0
     - _RenderCoverage: 0
     - _RenderCull: 2
     - _RenderCutoff: 0.5
     - _RenderDecals: 0
+    - _RenderDirect: 1
     - _RenderMode: 0
     - _RenderNormals: 0
     - _RenderPriority: 0
     - _RenderQueue: 0
     - _RenderSSR: 0
+    - _RenderShadow: 1
     - _RenderZWrite: 1
     - _RenderingCat: 1
     - _SSRefractionProjectionModel: 0
@@ -623,7 +642,9 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SmoothnessViewAngleOffset: 0
     - _SpaceGlobalLayers: 0
+    - _SpaceGlobalLocals: 0
     - _SpaceGlobalPosition: 0
+    - _SpaceMotionGlobals: 0
     - _SpaceMotionHighlight: 0
     - _SpaceMotionLocals: 0
     - _SpaceRenderFade: 0
@@ -698,6 +719,7 @@ Material:
     - _VertexMasksMode: 0
     - _VertexOcclusion: 0
     - _VertexOcclusionValue: 0
+    - _VertexPivotMode: 0
     - _VertexPivotModeFetch: 0
     - _VertexRollingMode: 1
     - _VertexVariationMode: 0
@@ -784,4 +806,5 @@ Material:
     - _UVMappingMask: {r: 1, g: 0, b: 0, a: 0}
     - _UVMappingMaskEmissive: {r: 1, g: 0, b: 0, a: 0}
     - _VertexOcclusionRemap: {r: 0, g: 0, b: 0, a: 0}
+    - _render_normals: {r: -1, g: -1, b: -1, a: 0}
     - _render_normals_options: {r: -1, g: -1, b: -1, a: 0}

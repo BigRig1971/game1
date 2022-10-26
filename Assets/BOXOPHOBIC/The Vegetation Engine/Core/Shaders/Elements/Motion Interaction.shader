@@ -18,9 +18,7 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Interaction"
 		[HideInInspector]_MainTexMinValue("Element Min", Range( 0 , 1)) = 0
 		[HideInInspector]_MainTexMaxValue("Element Max", Range( 0 , 1)) = 1
 		[StyledVector(9)]_MainUVs("Element UVs", Vector) = (1,1,0,0)
-		[StyledToggle]_ElementDirectionMode("Use Particle Movement Direction", Float) = 0
-		[StyledToggle]_ElementInvertMode("Use Inverted Element Direction", Float) = 0
-		[Space(10)][StyledTextureSingleLine]_NoiseTex("Noise Texture", 2D) = "gray" {}
+		[StyledTextureSingleLine]_NoiseTex("Noise Texture", 2D) = "gray" {}
 		[StyledRemapSlider(_NoiseMinValue, _NoiseMaxValue, 0, 1, 10, 0)]_NoiseRemap("Noise Remap", Vector) = (0,0,0,0)
 		[HideInInspector]_NoiseMinValue("Noise Min", Range( 0 , 1)) = 0
 		[HideInInspector]_NoiseMaxValue("Noise Max", Range( 0 , 1)) = 1
@@ -28,10 +26,12 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Interaction"
 		_NoiseScaleValue("Noise Scale", Range( 0 , 20)) = 1
 		_NoiseSpeedValue("Noise Speed", Range( 0 , 2)) = 1
 		[Space(10)]_MotionPower("Motion Wind Power", Range( 0 , 1)) = 0
+		[Space(10)][StyledToggle]_ElementDirectionMode("Use Particle Movement Direction", Float) = 0
+		[StyledToggle]_ElementInvertMode("Use Inverted Element Direction", Float) = 0
 		[StyledCategory(Fading Settings)]_FadeCat("[ Fade Cat ]", Float) = 0
 		[HDR][StyledToggle]_ElementRaycastMode("Enable Raycast Fading", Float) = 0
 		[StyledToggle]_ElementVolumeFadeMode("Enable Volume Edge Fading", Float) = 0
-		[StyledMessage(Info, The Raycast feature currently only works with particle systems and non instanced materials. GPU Instancing will be disabled if the Raycast features is enabled., 10, 0)]_RaycastMessage("Raycast Message", Float) = 0
+		[StyledMessage(Info, The Raycast feature currently only works non instanced materials. GPU Instancing will be disabled if the Raycast feature is enabled., 10, 0)]_RaycastMessage("Raycast Message", Float) = 0
 		[HideInInspector]_RaycastFadeValue("Raycast Fade Mask", Float) = 1
 		[Space(10)][StyledLayers()]_RaycastLayerMask("Raycast Layer", Float) = 1
 		_RaycastDistanceEndValue("Raycast Distance", Float) = 2
@@ -39,7 +39,7 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Interaction"
 		[HideInInspector]_ElementLayerValue("Legacy Layer Value", Float) = -1
 		[HideInInspector]_InvertX("Legacy Invert Mode", Float) = 0
 		[HideInInspector]_ElementFadeSupport("Legacy Edge Fading", Float) = 0
-		[HideInInspector]_IsVersion("_IsVersion", Float) = 0
+		[HideInInspector]_IsVersion("_IsVersion", Float) = 700
 		[HideInInspector]_IsElementShader("_IsElementShader", Float) = 1
 		[HideInInspector]_IsMotionElement("_IsMotionElement", Float) = 1
 		[HideInInspector]_render_colormask("_render_colormask", Float) = 15
@@ -113,24 +113,24 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Interaction"
 			uniform half _IsMotionElement;
 			uniform half _Banner;
 			uniform half _Message;
+			uniform half _ElementLayerMask;
+			uniform half _RenderCat;
+			uniform float _IsVersion;
+			uniform half _ElementCat;
 			uniform half _FadeCat;
-			uniform half _AdvancedCat;
+			uniform half _IsElementShader;
 			uniform float _ElementFadeSupport;
 			uniform half _ElementLayerValue;
-			uniform half _IsElementShader;
-			uniform half _RaycastDistanceEndValue;
-			uniform half _ElementCat;
-			uniform half _RaycastLayerMask;
+			uniform half _ElementLayerWarning;
 			uniform half _ElementRaycastMode;
-			uniform half _RaycastMessage;
-			uniform half _RenderCat;
-			uniform half _ElementLayerMessage;
-			uniform half4 _MainTexRemap;
-			uniform float _IsVersion;
+			uniform half _RaycastDistanceEndValue;
 			uniform half4 _NoiseRemap;
 			uniform float _InvertX;
-			uniform half _ElementLayerWarning;
-			uniform half _ElementLayerMask;
+			uniform half _AdvancedCat;
+			uniform half _ElementLayerMessage;
+			uniform half _RaycastMessage;
+			uniform half4 _MainTexRemap;
+			uniform half _RaycastLayerMask;
 			uniform half _render_colormask;
 			uniform sampler2D _MainTex;
 			uniform half4 _MainUVs;
@@ -211,9 +211,9 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Interaction"
 				float3 WorldPosition = i.worldPos;
 				#endif
 				float4 tex2DNode17_g20496 = tex2D( _MainTex, ( ( ( 1.0 - i.ase_texcoord1.xy ) * (_MainUVs).xy ) + (_MainUVs).zw ) );
-				float temp_output_7_0_g20725 = _MainTexMinValue;
-				float4 temp_cast_0 = (temp_output_7_0_g20725).xxxx;
-				float4 break469_g20496 = saturate( ( ( tex2DNode17_g20496 - temp_cast_0 ) / ( _MainTexMaxValue - temp_output_7_0_g20725 ) ) );
+				float temp_output_7_0_g20833 = _MainTexMinValue;
+				float4 temp_cast_0 = (temp_output_7_0_g20833).xxxx;
+				float4 break469_g20496 = saturate( ( ( tex2DNode17_g20496 - temp_cast_0 ) / ( _MainTexMaxValue - temp_output_7_0_g20833 ) ) );
 				half MainTex_R73_g20496 = break469_g20496.r;
 				float temp_output_270_0_g20496 = (MainTex_R73_g20496*2.0 + -1.0);
 				half MainTex_G265_g20496 = break469_g20496.g;
@@ -235,12 +235,11 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Interaction"
 				float2 appendResult959_g20496 = (float2(( -i.ase_texcoord2.xyz.x * Direction_TextureX1150_g20496 ) , ( -i.ase_texcoord2.xyz.z * Direction_TextureZ1151_g20496 )));
 				half Noise_Scale892_g20496 = _NoiseScaleValue;
 				half Noise_Speed898_g20496 = _NoiseSpeedValue;
-				float mulTime962_g20496 = _Time.y * Noise_Speed898_g20496;
 				half Noise_Min893_g20496 = _NoiseMinValue;
-				float temp_output_7_0_g20717 = Noise_Min893_g20496;
-				float4 temp_cast_3 = (temp_output_7_0_g20717).xxxx;
+				float temp_output_7_0_g20848 = Noise_Min893_g20496;
+				float4 temp_cast_3 = (temp_output_7_0_g20848).xxxx;
 				half Noise_Max894_g20496 = _NoiseMaxValue;
-				float4 break997_g20496 = saturate( ( ( tex2D( _NoiseTex, ( ( appendResult959_g20496 * Noise_Scale892_g20496 ) + mulTime962_g20496 ) ) - temp_cast_3 ) / ( Noise_Max894_g20496 - temp_output_7_0_g20717 ) ) );
+				float4 break997_g20496 = saturate( ( ( tex2D( _NoiseTex, ( ( appendResult959_g20496 * Noise_Scale892_g20496 ) + ( _Time.y * Noise_Speed898_g20496 ) ) ) - temp_cast_3 ) / ( Noise_Max894_g20496 - temp_output_7_0_g20848 ) ) );
 				half Noise_InteractionX972_g20496 = break997_g20496.r;
 				half Noise_Intensity965_g20496 = _NoiseIntensityValue;
 				float lerpResult979_g20496 = lerp( (Direction_TextureX1150_g20496*0.5 + 0.5) , Noise_InteractionX972_g20496 , Noise_Intensity965_g20496);
@@ -250,15 +249,15 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Interaction"
 				float3 appendResult292_g20496 = (float3(lerpResult979_g20496 , lerpResult982_g20496 , Motion_Power1000_g20496));
 				half3 Final_MotionInteraction_RGB303_g20496 = appendResult292_g20496;
 				half MainTex_A74_g20496 = break469_g20496.a;
-				half4 Colors37_g20727 = TVE_ColorsCoords;
-				half4 Extras37_g20727 = TVE_ExtrasCoords;
-				half4 Motion37_g20727 = TVE_MotionCoords;
-				half4 Vertex37_g20727 = TVE_VertexCoords;
-				half4 localIS_ELEMENT37_g20727 = IS_ELEMENT( Colors37_g20727 , Extras37_g20727 , Motion37_g20727 , Vertex37_g20727 );
-				float4 temp_output_35_0_g20714 = localIS_ELEMENT37_g20727;
-				float temp_output_7_0_g20730 = TVE_ElementsFadeValue;
-				float2 temp_cast_4 = (temp_output_7_0_g20730).xx;
-				float2 temp_output_851_0_g20496 = saturate( ( ( abs( (( (temp_output_35_0_g20714).zw + ( (temp_output_35_0_g20714).xy * (WorldPosition).xz ) )*2.002 + -1.001) ) - temp_cast_4 ) / ( 1.0 - temp_output_7_0_g20730 ) ) );
+				half4 Colors37_g20853 = TVE_ColorsCoords;
+				half4 Extras37_g20853 = TVE_ExtrasCoords;
+				half4 Motion37_g20853 = TVE_MotionCoords;
+				half4 Vertex37_g20853 = TVE_VertexCoords;
+				half4 localIS_ELEMENT37_g20853 = IS_ELEMENT( Colors37_g20853 , Extras37_g20853 , Motion37_g20853 , Vertex37_g20853 );
+				float4 temp_output_35_0_g20854 = localIS_ELEMENT37_g20853;
+				float temp_output_7_0_g20862 = TVE_ElementsFadeValue;
+				float2 temp_cast_4 = (temp_output_7_0_g20862).xx;
+				float2 temp_output_851_0_g20496 = saturate( ( ( abs( (( (temp_output_35_0_g20854).zw + ( (temp_output_35_0_g20854).xy * (WorldPosition).xz ) )*2.002 + -1.001) ) - temp_cast_4 ) / ( 1.0 - temp_output_7_0_g20862 ) ) );
 				float2 break852_g20496 = ( temp_output_851_0_g20496 * temp_output_851_0_g20496 );
 				float lerpResult842_g20496 = lerp( 1.0 , ( 1.0 - saturate( ( break852_g20496.x + break852_g20496.y ) ) ) , _ElementVolumeFadeMode);
 				half Fade_EdgeMask656_g20496 = lerpResult842_g20496;
@@ -279,14 +278,14 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Interaction"
 	
 }
 /*ASEBEGIN
-Version=18934
-1920;0;1920;1029;1364.803;1463.791;1;True;False
-Node;AmplifyShaderEditor.FunctionNode;177;-640,-1280;Inherit;False;Define Element Motion;61;;19669;6eebc31017d99e84e811285e6a5d199d;0;0;1;FLOAT;0
+Version=18935
+1920;6;1920;1023;1364.803;1460.791;1;True;False
+Node;AmplifyShaderEditor.FunctionNode;177;-640,-1280;Inherit;False;Define Element Motion;63;;19669;6eebc31017d99e84e811285e6a5d199d;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;95;-352,-1280;Half;False;Property;_Banner;Banner;0;0;Create;True;0;0;0;True;1;StyledBanner(Motion Interaction Element);False;0;0;1;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;115;-224,-1280;Half;False;Property;_Message;Message;1;0;Create;True;0;0;0;True;1;StyledMessage(Info, Use the Motion Interaction elements to add touch bending to the vegetation objects. Element Texture RG is used a World XZ bending and Texture A is used as interaction mask. Particle Color A is used as Element Intensity multiplier. The Noise direction is controled by the Element Texture RG direction and it is updated with particles or in play mode only., 0,0);False;0;0;1;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.FunctionNode;277;-639,-1024;Inherit;False;Base Element;2;;20496;0e972c73cae2ee54ea51acc9738801d0;6,477,2,478,0,145,3,481,3,576,1,491,1;0;1;FLOAT4;0
-Node;AmplifyShaderEditor.RangedFloatNode;197;-640,-1152;Half;False;Property;_render_colormask;_render_colormask;63;1;[HideInInspector];Create;True;0;0;0;True;0;False;15;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;197;-640,-1152;Half;False;Property;_render_colormask;_render_colormask;65;1;[HideInInspector];Create;True;0;0;0;True;0;False;15;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;0;-320,-1024;Float;False;True;-1;2;TVEShaderElementGUI;0;1;BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Interaction;0770190933193b94aaa3065e307002fa;True;Unlit;0;0;Unlit;2;True;True;2;5;False;-1;10;False;-1;4;1;False;-1;1;False;-1;True;0;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;True;2;False;-1;True;True;True;True;True;True;0;True;197;False;False;False;False;False;False;False;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;2;False;-1;True;0;False;-1;True;False;0;False;-1;0;False;-1;True;4;RenderType=Transparent=RenderType;Queue=Transparent=Queue=0;PreviewType=Plane;DisableBatching=True=DisableBatching;True;0;False;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;0;;0;0;Standard;1;Vertex Position,InvertActionOnDeselection;1;0;0;1;True;False;;False;0
 WireConnection;0;0;277;0
 ASEEND*/
-//CHKSM=E1716251E2FA7D39E85AB7FE8A9D15E05C59FA9A
+//CHKSM=C0A255C33C58374032AEA58CA762FB6BE9067FDE

@@ -13,16 +13,16 @@ InfoWarning CTI uses an unpacked normal map (green), make sure you uncheck sRGB 
 
 OutputTransform KEEP_ORIGINAL_TRANSFORMS
 
-Mesh SetOcclusion GET_MASK_PROCEDURAL 7
+Mesh SetVariation GET_MASK_3RD_PARTY 1 ACTION_REMAP_01
+Mesh SetOcclusion GET_MASK_PROCEDURAL 16
 Mesh SetDetailMask GET_MASK_PROCEDURAL 8
 Mesh SetDetailCoord GET_COORD_FROM_CHANNEL 0
-Mesh SetMultiMask NONE
 
-Mesh SetVariation GET_MASK_3RD_PARTY 1 ACTION_REMAP01
-
-Mesh SetMotion1 GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_3RD_PARTY 0
+Mesh SetHeight GET_MASK_PROCEDURAL 4
+Mesh SetMotion2 GET_MASK_PROCEDURAL 16
 Mesh SetMotion3 GET_MASK_3RD_PARTY 0
+
+Mesh SetPivots NONE
 
 *******************************************************************
 
@@ -32,8 +32,6 @@ if SHADER_NAME_CONTAINS Bark
 	Material SET_SHADER SHADER_DEFAULT_BARK
 	Material SET_FLOAT _RenderClip 0
 	Material SET_FLOAT _RenderCull 2
-
-	Material SET_FLOAT _MotionValue_20 0
 }
 
 *******************************************************************
@@ -48,7 +46,7 @@ Material COPY_FLOAT _Culling _RenderCull
 *******************************************************************
 
 // Copy Standard Pipeline Material Properties
-Material SET_FLOAT _AlphaCutoffValue 0.3
+Material SET_FLOAT _AlphaClipValue 0.3
 
 Material COPY_TEX _MainTex _MainAlbedoTex
 Material COPY_ST_AS_VECTOR _MainTex _MainUVs

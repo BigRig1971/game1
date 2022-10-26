@@ -27,7 +27,7 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Wind Control"
 		[StyledCategory(Fading Settings)]_FadeCat("[ Fade Cat ]", Float) = 0
 		[HDR][StyledToggle]_ElementRaycastMode("Enable Raycast Fading", Float) = 0
 		[StyledToggle]_ElementVolumeFadeMode("Enable Volume Edge Fading", Float) = 0
-		[StyledMessage(Info, The Raycast feature currently only works with particle systems and non instanced materials. GPU Instancing will be disabled if the Raycast features is enabled., 10, 0)]_RaycastMessage("Raycast Message", Float) = 0
+		[StyledMessage(Info, The Raycast feature currently only works non instanced materials. GPU Instancing will be disabled if the Raycast feature is enabled., 10, 0)]_RaycastMessage("Raycast Message", Float) = 0
 		[HideInInspector]_RaycastFadeValue("Raycast Fade Mask", Float) = 1
 		[Space(10)][StyledLayers()]_RaycastLayerMask("Raycast Layer", Float) = 1
 		_RaycastDistanceEndValue("Raycast Distance", Float) = 2
@@ -35,7 +35,7 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Wind Control"
 		[HideInInspector]_ElementLayerValue("Legacy Layer Value", Float) = -1
 		[HideInInspector]_InvertX("Legacy Invert Mode", Float) = 0
 		[HideInInspector]_ElementFadeSupport("Legacy Edge Fading", Float) = 0
-		[HideInInspector]_IsVersion("_IsVersion", Float) = 0
+		[HideInInspector]_IsVersion("_IsVersion", Float) = 700
 		[HideInInspector]_IsElementShader("_IsElementShader", Float) = 1
 		[HideInInspector]_IsMotionElement("_IsMotionElement", Float) = 1
 
@@ -106,24 +106,24 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Wind Control"
 			uniform half _IsMotionElement;
 			uniform half _Banner;
 			uniform half _Message;
+			uniform half _ElementLayerMask;
+			uniform half _RenderCat;
+			uniform float _IsVersion;
+			uniform half _ElementCat;
 			uniform half _FadeCat;
-			uniform half _AdvancedCat;
+			uniform half _IsElementShader;
 			uniform float _ElementFadeSupport;
 			uniform half _ElementLayerValue;
-			uniform half _IsElementShader;
-			uniform half _RaycastDistanceEndValue;
-			uniform half _ElementCat;
-			uniform half _RaycastLayerMask;
+			uniform half _ElementLayerWarning;
 			uniform half _ElementRaycastMode;
-			uniform half _RaycastMessage;
-			uniform half _RenderCat;
-			uniform half _ElementLayerMessage;
-			uniform half4 _MainTexRemap;
-			uniform float _IsVersion;
+			uniform half _RaycastDistanceEndValue;
 			uniform half4 _NoiseRemap;
 			uniform float _InvertX;
-			uniform half _ElementLayerWarning;
-			uniform half _ElementLayerMask;
+			uniform half _AdvancedCat;
+			uniform half _ElementLayerMessage;
+			uniform half _RaycastMessage;
+			uniform half4 _MainTexRemap;
+			uniform half _RaycastLayerMask;
 			uniform half _MainValue;
 			uniform half4 TVE_SeasonOptions;
 			uniform half _AdditionalValue1;
@@ -223,19 +223,19 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Wind Control"
 				float3 appendResult521_g53317 = (float3(temp_output_721_0_g53317 , temp_output_1101_0_g53317 , Base_Extras_RGB213_g53317));
 				half3 Final_MotionControl_RGB522_g53317 = appendResult521_g53317;
 				float4 tex2DNode17_g53317 = tex2D( _MainTex, ( ( ( 1.0 - i.ase_texcoord1.xy ) * (_MainUVs).xy ) + (_MainUVs).zw ) );
-				float temp_output_7_0_g53333 = _MainTexMinValue;
-				float4 temp_cast_2 = (temp_output_7_0_g53333).xxxx;
-				float4 break469_g53317 = saturate( ( ( tex2DNode17_g53317 - temp_cast_2 ) / ( _MainTexMaxValue - temp_output_7_0_g53333 ) ) );
+				float temp_output_7_0_g53323 = _MainTexMinValue;
+				float4 temp_cast_2 = (temp_output_7_0_g53323).xxxx;
+				float4 break469_g53317 = saturate( ( ( tex2DNode17_g53317 - temp_cast_2 ) / ( _MainTexMaxValue - temp_output_7_0_g53323 ) ) );
 				half MainTex_A74_g53317 = break469_g53317.a;
-				half4 Colors37_g53335 = TVE_ColorsCoords;
-				half4 Extras37_g53335 = TVE_ExtrasCoords;
-				half4 Motion37_g53335 = TVE_MotionCoords;
-				half4 Vertex37_g53335 = TVE_VertexCoords;
-				half4 localIS_ELEMENT37_g53335 = IS_ELEMENT( Colors37_g53335 , Extras37_g53335 , Motion37_g53335 , Vertex37_g53335 );
-				float4 temp_output_35_0_g53322 = localIS_ELEMENT37_g53335;
-				float temp_output_7_0_g53338 = TVE_ElementsFadeValue;
-				float2 temp_cast_3 = (temp_output_7_0_g53338).xx;
-				float2 temp_output_851_0_g53317 = saturate( ( ( abs( (( (temp_output_35_0_g53322).zw + ( (temp_output_35_0_g53322).xy * (WorldPosition).xz ) )*2.002 + -1.001) ) - temp_cast_3 ) / ( 1.0 - temp_output_7_0_g53338 ) ) );
+				half4 Colors37_g53337 = TVE_ColorsCoords;
+				half4 Extras37_g53337 = TVE_ExtrasCoords;
+				half4 Motion37_g53337 = TVE_MotionCoords;
+				half4 Vertex37_g53337 = TVE_VertexCoords;
+				half4 localIS_ELEMENT37_g53337 = IS_ELEMENT( Colors37_g53337 , Extras37_g53337 , Motion37_g53337 , Vertex37_g53337 );
+				float4 temp_output_35_0_g53338 = localIS_ELEMENT37_g53337;
+				float temp_output_7_0_g53344 = TVE_ElementsFadeValue;
+				float2 temp_cast_3 = (temp_output_7_0_g53344).xx;
+				float2 temp_output_851_0_g53317 = saturate( ( ( abs( (( (temp_output_35_0_g53338).zw + ( (temp_output_35_0_g53338).xy * (WorldPosition).xz ) )*2.002 + -1.001) ) - temp_cast_3 ) / ( 1.0 - temp_output_7_0_g53344 ) ) );
 				float2 break852_g53317 = ( temp_output_851_0_g53317 * temp_output_851_0_g53317 );
 				float lerpResult842_g53317 = lerp( 1.0 , ( 1.0 - saturate( ( break852_g53317.x + break852_g53317.y ) ) ) , _ElementVolumeFadeMode);
 				half Fade_EdgeMask656_g53317 = lerpResult842_g53317;
@@ -255,13 +255,13 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Wind Control"
 	
 }
 /*ASEBEGIN
-Version=18934
-1920;0;1920;1029;1772.608;1569.464;1;True;False
-Node;AmplifyShaderEditor.FunctionNode;117;-640,-1280;Inherit;False;Define Element Motion;61;;19292;6eebc31017d99e84e811285e6a5d199d;0;0;1;FLOAT;0
+Version=18935
+1920;6;1920;1023;1772.608;1566.464;1;True;False
+Node;AmplifyShaderEditor.FunctionNode;117;-640,-1280;Inherit;False;Define Element Motion;63;;19292;6eebc31017d99e84e811285e6a5d199d;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;95;-384,-1280;Half;False;Property;_Banner;Banner;0;0;Create;True;0;0;0;True;1;StyledBanner(Motion Control Element);False;0;0;1;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;115;-256,-1280;Half;False;Property;_Message;Message;1;0;Create;True;0;0;0;True;1;StyledMessage(Info, Use the Motion Wind Control elements to change the wind power and direction based on the element forward direction. Element Texture A is used as alpha mask. Particle Color A is used as Element Intensity multiplier. , 0,0);False;0;0;1;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.FunctionNode;197;-640,-1024;Inherit;False;Base Element;2;;53317;0e972c73cae2ee54ea51acc9738801d0;6,477,2,478,0,145,3,481,0,576,1,491,1;0;1;FLOAT4;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;0;-320,-1024;Float;False;True;-1;2;TVEShaderElementGUI;0;1;BOXOPHOBIC/The Vegetation Engine/Elements/Default/Motion Wind Control;0770190933193b94aaa3065e307002fa;True;Unlit;0;0;Unlit;2;False;True;2;5;False;-1;10;False;-1;0;1;False;-1;0;False;-1;True;0;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;True;2;False;-1;True;True;True;True;True;False;0;False;181;False;False;False;False;False;False;False;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;2;False;-1;True;0;False;-1;True;False;0;False;-1;0;False;-1;True;4;RenderType=Transparent=RenderType;Queue=Transparent=Queue=0;PreviewType=Plane;DisableBatching=True=DisableBatching;True;0;False;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;0;;0;0;Standard;1;Vertex Position,InvertActionOnDeselection;1;0;0;1;True;False;;False;0
 WireConnection;0;0;197;0
 ASEEND*/
-//CHKSM=21D106F95325C915DE8104C65977D692BC9536D6
+//CHKSM=0780B653F96C43E0971D783F34036DFCBF0E66F5

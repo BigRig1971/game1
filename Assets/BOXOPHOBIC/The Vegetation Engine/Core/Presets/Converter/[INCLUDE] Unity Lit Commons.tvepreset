@@ -106,6 +106,7 @@ if SHADER_NAME_CONTAINS HDRP
 	{
 		Material SET_FLOAT _DetailMode 1
 		Material SET_FLOAT _DetailBlendMode 0
+		Material SET_FLOAT _DetailCoordMode 1
 		Material SET_FLOAT _DetailMaskMode 0
 		
 		Material COPY_ST_AS_VECTOR _DetailMap _SecondUVs

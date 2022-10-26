@@ -58,7 +58,7 @@ MeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e2127bf7e79a4ec4aa3a63dace4bd7b0, type: 2}
+  - {fileID: 2100000, guid: 9a3e9baffccc4d119c8782fd7093329a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -137,7 +137,7 @@ MeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e2127bf7e79a4ec4aa3a63dace4bd7b0, type: 2}
+  - {fileID: 2100000, guid: 9a3e9baffccc4d119c8782fd7093329a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -168,7 +168,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4304407338434254}
   - component: {fileID: 205967186129942850}
-  - component: {fileID: 4982775684414228322}
+  - component: {fileID: 428783917720289823}
   m_Layer: 0
   m_Name: TVE_Meadow_Grass_01_Var3_Prefab
   m_TagString: Untagged
@@ -214,12 +214,8 @@ LODGroup:
     fadeTransitionWidth: 0.05
     renderers:
     - renderer: {fileID: 23370613202630874}
-  - screenRelativeHeight: 0.00744412
-    fadeTransitionWidth: 0
-    renderers:
-    - renderer: {fileID: 0}
   m_Enabled: 1
---- !u!114 &4982775684414228322
+--- !u!114 &428783917720289823
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -232,7 +228,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   styledBanner: 0
-  storedPrefabBackupGUID: c2df9fa2404b3184fbd43bcf5270f75a
+  storedPrefabBackupGUID: b7f4e73596d6b1742be0e86e23d0904b
   storedPreset: Automatic/Grass
   storedOverrides:
   - Normals/Make the Normals Flat (Full)

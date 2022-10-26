@@ -25,10 +25,11 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Colors Default"
 		[HDR][Gamma]_AdditionalColor3("Summer Color", Color) = (0.5019608,0.5019608,0.5019608,1)
 		[HDR][Gamma]_AdditionalColor4("Autumn Color", Color) = (0.5019608,0.5019608,0.5019608,1)
 		[StyledRemapSlider(_NoiseMinValue, _NoiseMaxValue, 0, 1, 10, 0)]_NoiseRemap("Noise Remap", Vector) = (0,0,0,0)
+		[Space(10)][StyledToggle]_ElementVertexColorMode("Use Particle Vertex Color", Float) = 1
 		[StyledCategory(Fading Settings)]_FadeCat("[ Fade Cat ]", Float) = 0
 		[HDR][StyledToggle]_ElementRaycastMode("Enable Raycast Fading", Float) = 0
 		[StyledToggle]_ElementVolumeFadeMode("Enable Volume Edge Fading", Float) = 0
-		[StyledMessage(Info, The Raycast feature currently only works with particle systems and non instanced materials. GPU Instancing will be disabled if the Raycast features is enabled., 10, 0)]_RaycastMessage("Raycast Message", Float) = 0
+		[StyledMessage(Info, The Raycast feature currently only works non instanced materials. GPU Instancing will be disabled if the Raycast feature is enabled., 10, 0)]_RaycastMessage("Raycast Message", Float) = 0
 		[HideInInspector]_RaycastFadeValue("Raycast Fade Mask", Float) = 1
 		[Space(10)][StyledLayers()]_RaycastLayerMask("Raycast Layer", Float) = 1
 		_RaycastDistanceEndValue("Raycast Distance", Float) = 2
@@ -36,7 +37,7 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Colors Default"
 		[HideInInspector]_ElementLayerValue("Legacy Layer Value", Float) = -1
 		[HideInInspector]_InvertX("Legacy Invert Mode", Float) = 0
 		[HideInInspector]_ElementFadeSupport("Legacy Edge Fading", Float) = 0
-		[HideInInspector]_IsVersion("_IsVersion", Float) = 0
+		[HideInInspector]_IsVersion("_IsVersion", Float) = 700
 		[HideInInspector]_IsElementShader("_IsElementShader", Float) = 1
 		[HideInInspector]_IsColorsElement("_IsColorsElement", Float) = 1
 		[HideInInspector]_render_colormask("_render_colormask", Float) = 15
@@ -106,26 +107,26 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Colors Default"
 
 			uniform half _IsColorsElement;
 			uniform half _Banner;
-			uniform half _Message;
 			uniform half _render_colormask;
-			uniform half _ElementFadeSupport;
+			uniform half _Message;
+			uniform half _ElementLayerMask;
+			uniform half _RenderCat;
+			uniform float _IsVersion;
+			uniform half _ElementCat;
 			uniform half _FadeCat;
 			uniform half _IsElementShader;
+			uniform float _ElementFadeSupport;
 			uniform half _ElementLayerValue;
-			uniform half _AdvancedCat;
-			uniform half _RaycastDistanceEndValue;
-			uniform half _RenderCat;
-			uniform half _ElementCat;
-			uniform half _ElementLayerMessage;
-			uniform half _IsVersion;
-			uniform half _RaycastLayerMask;
-			uniform half4 _MainTexRemap;
-			uniform half _RaycastMessage;
-			uniform half _ElementRaycastMode;
-			uniform half4 _NoiseRemap;
-			uniform half _InvertX;
 			uniform half _ElementLayerWarning;
-			uniform half _ElementLayerMask;
+			uniform half _ElementRaycastMode;
+			uniform half _RaycastDistanceEndValue;
+			uniform half4 _NoiseRemap;
+			uniform float _InvertX;
+			uniform half _AdvancedCat;
+			uniform half _ElementLayerMessage;
+			uniform half _RaycastMessage;
+			uniform half4 _MainTexRemap;
+			uniform half _RaycastLayerMask;
 			uniform half4 _MainColor;
 			uniform half4 TVE_SeasonOptions;
 			uniform half4 _AdditionalColor1;
@@ -134,6 +135,7 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Colors Default"
 			uniform half4 _AdditionalColor3;
 			uniform half4 _AdditionalColor4;
 			uniform half _ElementMode;
+			uniform half _ElementVertexColorMode;
 			uniform sampler2D _MainTex;
 			uniform half4 _MainUVs;
 			uniform half _MainTexMinValue;
@@ -202,49 +204,53 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Colors Default"
 				#ifdef ASE_NEEDS_FRAG_WORLD_POSITION
 				float3 WorldPosition = i.worldPos;
 				#endif
-				half4 Color_Main_RGBA49_g20766 = _MainColor;
-				half TVE_SeasonOptions_X50_g20766 = TVE_SeasonOptions.x;
-				half4 Color_Winter_RGBA58_g20766 = _AdditionalColor1;
-				half4 Color_Spring_RGBA59_g20766 = _AdditionalColor2;
-				half TVE_SeasonLerp54_g20766 = TVE_SeasonLerp;
-				half4 lerpResult13_g20766 = lerp( Color_Winter_RGBA58_g20766 , Color_Spring_RGBA59_g20766 , TVE_SeasonLerp54_g20766);
-				half TVE_SeasonOptions_Y51_g20766 = TVE_SeasonOptions.y;
-				half4 Color_Summer_RGBA60_g20766 = _AdditionalColor3;
-				half4 lerpResult14_g20766 = lerp( Color_Spring_RGBA59_g20766 , Color_Summer_RGBA60_g20766 , TVE_SeasonLerp54_g20766);
-				half TVE_SeasonOptions_Z52_g20766 = TVE_SeasonOptions.z;
-				half4 Color_Autumn_RGBA61_g20766 = _AdditionalColor4;
-				half4 lerpResult15_g20766 = lerp( Color_Summer_RGBA60_g20766 , Color_Autumn_RGBA61_g20766 , TVE_SeasonLerp54_g20766);
-				half TVE_SeasonOptions_W53_g20766 = TVE_SeasonOptions.w;
-				half4 lerpResult12_g20766 = lerp( Color_Autumn_RGBA61_g20766 , Color_Winter_RGBA58_g20766 , TVE_SeasonLerp54_g20766);
-				half Element_Mode55_g20766 = _ElementMode;
-				half4 lerpResult30_g20766 = lerp( Color_Main_RGBA49_g20766 , ( ( TVE_SeasonOptions_X50_g20766 * lerpResult13_g20766 ) + ( TVE_SeasonOptions_Y51_g20766 * lerpResult14_g20766 ) + ( TVE_SeasonOptions_Z52_g20766 * lerpResult15_g20766 ) + ( TVE_SeasonOptions_W53_g20766 * lerpResult12_g20766 ) ) , Element_Mode55_g20766);
-				half4 temp_output_487_0_g20766 = ( lerpResult30_g20766 * i.ase_color );
-				half3 temp_output_486_0_g20766 = (temp_output_487_0_g20766).rgb;
-				half3 Final_Colors_RGB142_g20766 = temp_output_486_0_g20766;
-				half4 tex2DNode17_g20766 = tex2D( _MainTex, ( ( ( 1.0 - i.ase_texcoord1.xy ) * (_MainUVs).xy ) + (_MainUVs).zw ) );
-				half temp_output_7_0_g20778 = _MainTexMinValue;
-				half4 temp_cast_0 = (temp_output_7_0_g20778).xxxx;
-				half4 break469_g20766 = saturate( ( ( tex2DNode17_g20766 - temp_cast_0 ) / ( _MainTexMaxValue - temp_output_7_0_g20778 ) ) );
-				half MainTex_A74_g20766 = break469_g20766.a;
-				half4 Colors37_g20779 = TVE_ColorsCoords;
-				half4 Extras37_g20779 = TVE_ExtrasCoords;
-				half4 Motion37_g20779 = TVE_MotionCoords;
-				half4 Vertex37_g20779 = TVE_VertexCoords;
-				half4 localIS_ELEMENT37_g20779 = IS_ELEMENT( Colors37_g20779 , Extras37_g20779 , Motion37_g20779 , Vertex37_g20779 );
-				half4 temp_output_35_0_g20772 = localIS_ELEMENT37_g20779;
-				half temp_output_7_0_g20781 = TVE_ElementsFadeValue;
-				half2 temp_cast_1 = (temp_output_7_0_g20781).xx;
-				half2 temp_output_851_0_g20766 = saturate( ( ( abs( (( (temp_output_35_0_g20772).zw + ( (temp_output_35_0_g20772).xy * (WorldPosition).xz ) )*2.002 + -1.001) ) - temp_cast_1 ) / ( 1.0 - temp_output_7_0_g20781 ) ) );
-				half2 break852_g20766 = ( temp_output_851_0_g20766 * temp_output_851_0_g20766 );
-				half lerpResult842_g20766 = lerp( 1.0 , ( 1.0 - saturate( ( break852_g20766.x + break852_g20766.y ) ) ) , _ElementVolumeFadeMode);
-				half Fade_EdgeMask656_g20766 = lerpResult842_g20766;
-				half Element_Intensity56_g20766 = ( _ElementIntensity * i.ase_color.a * Fade_EdgeMask656_g20766 * _RaycastFadeValue );
-				half Final_Colors_A144_g20766 = ( temp_output_487_0_g20766.a * MainTex_A74_g20766 * Element_Intensity56_g20766 );
-				half4 appendResult470_g20766 = (half4(Final_Colors_RGB142_g20766 , Final_Colors_A144_g20766));
-				half Element_EffectColors914_g20766 = _ElementColorsMode;
+				half4 Color_Main_RGBA49_g20939 = _MainColor;
+				half TVE_SeasonOptions_X50_g20939 = TVE_SeasonOptions.x;
+				half4 Color_Winter_RGBA58_g20939 = _AdditionalColor1;
+				half4 Color_Spring_RGBA59_g20939 = _AdditionalColor2;
+				half TVE_SeasonLerp54_g20939 = TVE_SeasonLerp;
+				half4 lerpResult13_g20939 = lerp( Color_Winter_RGBA58_g20939 , Color_Spring_RGBA59_g20939 , TVE_SeasonLerp54_g20939);
+				half TVE_SeasonOptions_Y51_g20939 = TVE_SeasonOptions.y;
+				half4 Color_Summer_RGBA60_g20939 = _AdditionalColor3;
+				half4 lerpResult14_g20939 = lerp( Color_Spring_RGBA59_g20939 , Color_Summer_RGBA60_g20939 , TVE_SeasonLerp54_g20939);
+				half TVE_SeasonOptions_Z52_g20939 = TVE_SeasonOptions.z;
+				half4 Color_Autumn_RGBA61_g20939 = _AdditionalColor4;
+				half4 lerpResult15_g20939 = lerp( Color_Summer_RGBA60_g20939 , Color_Autumn_RGBA61_g20939 , TVE_SeasonLerp54_g20939);
+				half TVE_SeasonOptions_W53_g20939 = TVE_SeasonOptions.w;
+				half4 lerpResult12_g20939 = lerp( Color_Autumn_RGBA61_g20939 , Color_Winter_RGBA58_g20939 , TVE_SeasonLerp54_g20939);
+				half Element_Mode55_g20939 = _ElementMode;
+				half4 lerpResult30_g20939 = lerp( Color_Main_RGBA49_g20939 , ( ( TVE_SeasonOptions_X50_g20939 * lerpResult13_g20939 ) + ( TVE_SeasonOptions_Y51_g20939 * lerpResult14_g20939 ) + ( TVE_SeasonOptions_Z52_g20939 * lerpResult15_g20939 ) + ( TVE_SeasonOptions_W53_g20939 * lerpResult12_g20939 ) ) , Element_Mode55_g20939);
+				half4 temp_cast_0 = (1.0).xxxx;
+				half Element_VertexColorMode1292_g20939 = _ElementVertexColorMode;
+				half4 lerpResult1296_g20939 = lerp( temp_cast_0 , i.ase_color , Element_VertexColorMode1292_g20939);
+				half4 Element_VertexColor1300_g20939 = lerpResult1296_g20939;
+				half4 temp_output_487_0_g20939 = ( lerpResult30_g20939 * Element_VertexColor1300_g20939 );
+				half3 temp_output_486_0_g20939 = (temp_output_487_0_g20939).rgb;
+				half3 Final_Colors_RGB142_g20939 = temp_output_486_0_g20939;
+				half4 tex2DNode17_g20939 = tex2D( _MainTex, ( ( ( 1.0 - i.ase_texcoord1.xy ) * (_MainUVs).xy ) + (_MainUVs).zw ) );
+				half temp_output_7_0_g20945 = _MainTexMinValue;
+				half4 temp_cast_1 = (temp_output_7_0_g20945).xxxx;
+				half4 break469_g20939 = saturate( ( ( tex2DNode17_g20939 - temp_cast_1 ) / ( _MainTexMaxValue - temp_output_7_0_g20945 ) ) );
+				half MainTex_A74_g20939 = break469_g20939.a;
+				half4 Colors37_g20959 = TVE_ColorsCoords;
+				half4 Extras37_g20959 = TVE_ExtrasCoords;
+				half4 Motion37_g20959 = TVE_MotionCoords;
+				half4 Vertex37_g20959 = TVE_VertexCoords;
+				half4 localIS_ELEMENT37_g20959 = IS_ELEMENT( Colors37_g20959 , Extras37_g20959 , Motion37_g20959 , Vertex37_g20959 );
+				half4 temp_output_35_0_g20960 = localIS_ELEMENT37_g20959;
+				half temp_output_7_0_g20966 = TVE_ElementsFadeValue;
+				half2 temp_cast_2 = (temp_output_7_0_g20966).xx;
+				half2 temp_output_851_0_g20939 = saturate( ( ( abs( (( (temp_output_35_0_g20960).zw + ( (temp_output_35_0_g20960).xy * (WorldPosition).xz ) )*2.002 + -1.001) ) - temp_cast_2 ) / ( 1.0 - temp_output_7_0_g20966 ) ) );
+				half2 break852_g20939 = ( temp_output_851_0_g20939 * temp_output_851_0_g20939 );
+				half lerpResult842_g20939 = lerp( 1.0 , ( 1.0 - saturate( ( break852_g20939.x + break852_g20939.y ) ) ) , _ElementVolumeFadeMode);
+				half Fade_EdgeMask656_g20939 = lerpResult842_g20939;
+				half Element_Intensity56_g20939 = ( _ElementIntensity * i.ase_color.a * Fade_EdgeMask656_g20939 * _RaycastFadeValue );
+				half Final_Colors_A144_g20939 = ( temp_output_487_0_g20939.a * MainTex_A74_g20939 * Element_Intensity56_g20939 );
+				half4 appendResult470_g20939 = (half4(Final_Colors_RGB142_g20939 , Final_Colors_A144_g20939));
+				half Element_EffectColors914_g20939 = _ElementColorsMode;
 				
 				
-				finalColor = ( appendResult470_g20766 + ( Element_EffectColors914_g20766 * 0.0 ) );
+				finalColor = ( appendResult470_g20939 + ( Element_EffectColors914_g20939 * 0.0 ) );
 				return finalColor;
 			}
 			ENDCG
@@ -255,14 +261,14 @@ Shader "BOXOPHOBIC/The Vegetation Engine/Elements/Default/Colors Default"
 	
 }
 /*ASEBEGIN
-Version=18934
-1920;0;1920;1029;1478.644;1045.456;1;True;False
-Node;AmplifyShaderEditor.FunctionNode;186;-640,-768;Inherit;False;Define Element Colors;62;;19978;378049ebac362e14aae08c2daa8ed737;0;0;1;FLOAT;0
+Version=18935
+1920;6;1920;1023;1478.644;1039.456;1;True;False
+Node;AmplifyShaderEditor.FunctionNode;186;-640,-768;Inherit;False;Define Element Colors;63;;19978;378049ebac362e14aae08c2daa8ed737;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;97;-384,-768;Half;False;Property;_Banner;Banner;0;0;Create;True;0;0;0;True;1;StyledBanner(Color Element);False;0;0;1;1;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;178;-640,-640;Half;False;Property;_render_colormask;_render_colormask;64;1;[HideInInspector];Create;True;0;0;0;True;0;False;15;14;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;178;-640,-640;Half;False;Property;_render_colormask;_render_colormask;65;1;[HideInInspector];Create;True;0;0;0;True;0;False;15;14;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;100;-256,-768;Half;False;Property;_Message;Message;1;0;Create;True;0;0;0;True;1;StyledMessage(Info, Use the Colors elements to add color tinting to the vegetation assets. Element Texture A is used as alpha mask. Particle Color is used as color multiplier and Alpha as Element Intensity multiplier., 0,0);False;0;0;1;1;0;1;FLOAT;0
-Node;AmplifyShaderEditor.FunctionNode;206;-640,-512;Inherit;False;Base Element;2;;20766;0e972c73cae2ee54ea51acc9738801d0;6,477,0,478,0,145,0,481,0,576,1,491,1;0;1;FLOAT4;0
+Node;AmplifyShaderEditor.FunctionNode;210;-640,-512;Inherit;False;Base Element;2;;20939;0e972c73cae2ee54ea51acc9738801d0;6,477,0,478,0,145,0,481,0,576,1,491,1;0;1;FLOAT4;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;0;-304,-512;Half;False;True;-1;2;TVEShaderElementGUI;0;1;BOXOPHOBIC/The Vegetation Engine/Elements/Default/Colors Default;0770190933193b94aaa3065e307002fa;True;Unlit;0;0;Unlit;2;True;True;2;5;False;-1;10;False;-1;0;1;False;-1;1;False;-1;True;0;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;True;2;False;-1;True;True;True;True;True;False;0;True;178;False;False;False;False;False;False;False;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;2;False;-1;True;0;False;-1;True;False;0;False;-1;0;False;-1;True;4;RenderType=Transparent=RenderType;Queue=Transparent=Queue=0;PreviewType=Plane;DisableBatching=True=DisableBatching;True;0;False;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;0;;0;0;Standard;1;Vertex Position,InvertActionOnDeselection;1;0;0;1;True;False;;False;0
-WireConnection;0;0;206;0
+WireConnection;0;0;210;0
 ASEEND*/
-//CHKSM=EE015D3708FCE93E696A877E3D637FBB75B82754
+//CHKSM=578007BDB58899D9BF68288F7F7220494D1CBD9E
