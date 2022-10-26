@@ -14,13 +14,13 @@ InfoOnline https://assetstore.unity.com/publishers/32104
 Mesh SetVariation GET_MASK_PROCEDURAL 3
 Mesh SetOcclusion GET_MASK_FROM_CHANNEL 3
 Mesh SetDetailMask GET_MASK_FROM_CHANNEL 2
+Mesh SetMultiMask NONE
+
 Mesh SetDetailCoord GET_COORD_FROM_CHANNEL 3
 
-Mesh SetHeight GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_PROCEDURAL 16
+Mesh SetMotion1 GET_MASK_PROCEDURAL 4
+Mesh SetMotion2 GET_MASK_FROM_CHANNEL 2
 Mesh SetMotion3 GET_MASK_FROM_CHANNEL 2
-
-Mesh SetPivots NONE
 
 *******************************************************************
 
@@ -55,7 +55,6 @@ Material SET_FLOAT _MotionAmplitude_20 0
 // The proper way to use the Detail Mask as a lerp mask
 Material SET_FLOAT _DetailMaskValue 0
 Material SET_FLOAT _DetailMeshValue 0
-Material SET_FLOAT _DetailCoordMode 1
 Material SET_FLOAT _DetailBlendMinValue 0
 Material SET_FLOAT _DetailBlendMaxValue 1
 

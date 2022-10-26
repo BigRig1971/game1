@@ -11,15 +11,15 @@ InfoOnline https://www.evolved-software.com/treeit/treeit
 *******************************************************************
 
 Mesh SetVariation GET_MASK_FROM_CHANNEL 1
-Mesh SetOcclusion GET_MASK_PROCEDURAL 6
+Mesh SetOcclusion GET_MASK_PROCEDURAL 7
 Mesh SetDetailMask GET_MASK_PROCEDURAL 8
+Mesh SetMultiMask NONE
+
 Mesh SetDetailCoord GET_COORD_FROM_CHANNEL 0
 
-Mesh SetHeight GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_PROCEDURAL 16
+Mesh SetMotion1 GET_MASK_PROCEDURAL 4
+Mesh SetMotion2 GET_MASK_FROM_CHANNEL 2
 Mesh SetMotion3 GET_MASK_FROM_CHANNEL 0
-
-Mesh SetPivots NONE
 
 *******************************************************************
 
@@ -27,10 +27,6 @@ Mesh SetPivots NONE
 Material SET_FLOAT _GlobalSize 0
 Material SET_FLOAT _SizeFadeMode 0
 
-// Has proper branch variation
-Material SET_FLOAT _MotionVariation_20 10
-
 // Include Unity Default Features
 Include Try Get Bark Shaders
 Include Unity Lit Commons
-Include Use Motion High Quality

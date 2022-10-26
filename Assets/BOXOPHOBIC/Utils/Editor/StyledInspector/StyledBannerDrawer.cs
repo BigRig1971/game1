@@ -16,7 +16,7 @@ namespace Boxophobic.StyledGUI
 
             var bannerColor = new Color(a.colorR, a.colorG, a.colorB);
 
-            StyledGUI.DrawInspectorBanner(bannerColor, a.title);
+            StyledGUI.DrawInspectorBanner(bannerColor, a.title, a.helpURL);
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)

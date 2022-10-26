@@ -2,27 +2,22 @@
 // 05.04.2022 - Preset updated
 
 *******************************************************************
-*                             INCLUDE                             *
+*                             INFO                                *
 *******************************************************************
 
+InfoTitle DE Environment
+InfoPreset Use this preset to convert prefabs using DE/DEC shaders.
+InfoWarning DE Environment contains a huge library of shaders. TVE will only transfer the basic properties and furthur adjustments will be needed!
+InfoOnline https://assetstore.unity.com/packages/vfx/shaders/de-environment-183775#description
 
-Mesh SetVariation GET_MASK_FROM_CHANNEL 1
-Mesh SetOcclusion GET_MASK_FROM_CHANNEL 3
-Mesh SetDetailMask GET_MASK_PROCEDURAL 8
-Mesh SetDetailCoord GET_COORD_FROM_CHANNEL 0
-
-Mesh SetHeight GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_PROCEDURAL 16
-Mesh SetMotion3 GET_MASK_FROM_CHANNEL 2
-
-Mesh SetPivots NONE
-
+*******************************************************************
+*                             INCLUDE                             *
 *******************************************************************
 
 Material COPY_FLOAT _CullMode _RenderCull
 Material COPY_FLOAT _Cull _RenderCull
 Material COPY_FLOAT _DoubleSidedNormalMode _RenderNormals
-Material SET_FLOAT _AlphaClipValue 0.2
+Material SET_FLOAT _AlphaCutoffValue 0.2
 
 if MATERIAL_KEYWORD_ENABLED _ALPHATEST_ON
 {
@@ -84,11 +79,10 @@ if SHADER_NAME_CONTAINS Surface
 	Material SET_SHADER SHADER_DEFAULT_BARK
 	Material SET_FLOAT _RenderClip 0
 	Material SET_FLOAT _RenderCull 2
+	Material SET_FLOAT _MotionValue_20 0
 }
 
 if SHADER_NAME_CONTAINS Billboard
 {
 	Material SET_SHADER SHADER_DEFAULT_CROSS
 }
-
-Material SET_FLOAT _MotionVariation_20 0

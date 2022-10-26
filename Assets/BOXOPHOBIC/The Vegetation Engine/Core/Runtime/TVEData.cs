@@ -6,52 +6,29 @@ using UnityEngine.Rendering;
 
 namespace TheVegetationEngine
 {
+    public enum BufferType
+    {
+        Undefined = -1,
+        Colors = 10,
+        Extras = 20,
+        Motion = 30,
+        Vertex = 40,
+        Custom = 100,
+    }
+
+    public enum RendererType
+    {
+        Mesh = 0,
+        Particle = 1,
+        Trail = 2,
+        Line = 3,
+    }
+
     public enum PropertyType
     {
         Texture = 0,
         Vector = 1,
         Value = 2,
-    }
-
-    public class TVEConstants
-    {
-        public const string ElementName = "Element";
-        public const string ElementTypeTag = "ElementType";
-        public const string ElementLayerMask = "_ElementLayerMask";
-        public const string ElementDirectionMode = "_ElementDirectionMode";
-        public const string ElementRaycastMode = "_ElementRaycastMode";
-        public const string RaycastLayerMask = "_RaycastLayerMask";
-        public const string RaycastDistanceEndValue = "_RaycastDistanceEndValue";
-    }
-
-    [System.Serializable]
-    public class TVEMeshData
-    {
-        public Mesh mesh;
-        public List<float> variationMask;
-        public List<float> occlusionMask;
-        public List<float> detailMask;
-        public List<float> heightMask;
-        public List<Vector2> detailCoord;
-        public List<float> motion2Mask;
-        public List<float> motion3Mask;
-        public List<Vector3> pivotPositions;
-
-        public TVEMeshData()
-        {
-
-        }
-    }
-
-    public class TVEMeshSettings
-    {
-        public bool isReadable = false;
-        public bool keepQuads = false;
-
-        public TVEMeshSettings()
-        {
-
-        }
     }
 
     [System.Serializable]
@@ -84,15 +61,13 @@ namespace TheVegetationEngine
     [System.Serializable]
     public class TVEElementDefaultData
     {
-        public int elementDataID = -1;
-        public int renderDataID = -1;
+        //public string bufferFilter;
         public List<int> layers;
-        public GameObject gameObject;
+        public GameObject element;
         public Mesh mesh;
+        public RendererType type;
         public Renderer renderer;
-        public Material material;
         public float fadeValue;
-        public bool useGlobalVolumeVisibility = true;
 
         public TVEElementDefaultData()
         {
@@ -103,7 +78,7 @@ namespace TheVegetationEngine
     [System.Serializable]
     public class TVEElementInstancedData
     {
-        public int renderDataID = -1;
+        //public string bufferFilter;
         public List<int> layers;
         public Material material;
         public Mesh mesh;
@@ -118,57 +93,22 @@ namespace TheVegetationEngine
     [System.Serializable]
     public class TVERenderData
     {
-        [Tooltip("When enabled, the render texture will be created and rendered.")]
         public bool isEnabled = true;
-        [Tooltip("When enabled, the elements are rendered in realtime.")]
         public bool isRendering = true;
-        [Tooltip("When enabled, the global volume follows the main camera.")]
         public bool isFollowing = false;
-        [Tooltip("When enabled, the elements are rendered by the main camera.")]
-        public bool isProjected = false;
+        [HideInInspector]
+        public bool isUpdated = false;
 
-        [Space(10)]
-        [Tooltip("Sets render texture format.")]
         public RenderTextureFormat texFormat = RenderTextureFormat.Default;
-        [Tooltip("Sets render texture width.")]
-        public int texWidth = 1024;
-        [Tooltip("Sets render texture height.")]
-        public int texHeight = 1024;
-        [ColorUsage(true, true)]
-        [Tooltip("Sets render texture background color.")]
-        public Color texColor = Color.black;
-
-        [Space(10)]
-        [Tooltip("Sets the shaders global render texture name.")]
+        public int texResolution = 1024;
         public string texName = "TVE_CustomTex";
-        [Tooltip("Sets the shaders global background color.")]
         public string texParams = "TVE_CustomParams";
-        [Tooltip("Sets the shaders global render texture coordinates.")]
         public string texCoord = "TVE_CustomCoord";
-        [Tooltip("Sets the shaders global max layers count as an int.")]
-        public string texLayers = "TVE_CustomLayers";
-        [Tooltip("Sets the shaders global layers usage as a float array.")]
         public string texUsage = "TVE_CustomUsage";
-
-        [Space(10)]
-        [Tooltip("Sets the shaders global volume position.")]
         public string volumePosition = "TVE_CustomPosition";
-        [Tooltip("Sets the shaders global volume scale.")]
         public string volumeScale = "TVE_CustomScale";
-        [Space(10)]
-        [Tooltip("The material ElementType tag used for elements filtering.")]
-        public string materialTag = "CustomElement";
-        [Tooltip("Sets the shader rendering passes.")]
-        public int materialPass = 0;
-
-        [Space(10)]
-        [Tooltip("When enabled, the render texture will render elements based on their layer.")]
-        public bool useRenderTextureArray = true;
-        [Tooltip("When enabled, the active color space will be applied to the background color.")]
-        public bool useActiveColorSpace = true;
-
-        [System.NonSerialized]
-        public int renderDataID = 0;
+        public string materialFilter = "_IsCustomElement";
+        
         [System.NonSerialized]
         public int bufferSize = 0;
         [System.NonSerialized]

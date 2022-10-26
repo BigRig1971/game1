@@ -14,8 +14,11 @@ InfoOnline https://assetstore.unity.com/packages/3d/environments/fantasy/suntail
 Mesh SetVariation GET_MASK_PROCEDURAL 3
 Mesh SetOcclusion NONE
 Mesh SetDetailMask NONE
+Mesh SetMultiMask NONE
+
 Mesh SetDetailCoord NONE
 
+Mesh SetMotion1 GET_MASK_PROCEDURAL 0
 Mesh SetMotion2 GET_MASK_PROCEDURAL 0
 Mesh SetMotion3 GET_MASK_PROCEDURAL 1
 
@@ -28,7 +31,7 @@ if SHADER_NAME_CONTAINS Suntail Foliage
 
 	Material SET_FLOAT _FadeGlancingValue 1
 
-	Material COPY_FLOAT _AlphaCutoff _AlphaClipValue
+	Material COPY_FLOAT _AlphaCutoff _AlphaCutoffValue
 
 	Material COPY_COLOR _MainColor _MainColor
 	Material COPY_TEX _Albedo _MainAlbedoTex
@@ -67,14 +70,10 @@ if SHADER_NAME_CONTAINS Suntail Surface
 
 	Material SET_FLOAT _MainOcclusionValue 0
 
-	if MATERIAL_HAS_TEX _Emission
-	{
-		Material SET_FLOAT _EmissiveMode 1
-		Material COPY_VECTOR _EmissionColor _EmissiveColor
-		Material COPY_TEX _Emission _EmissiveTex
-		Material COPY_FLOAT_AS_VECTOR_X _Tiling _EmissiveUVs
-		Material COPY_FLOAT_AS_VECTOR_Y _Tiling _EmissiveUVs
-	}
+	Material COPY_VECTOR _EmissionColor _EmissiveColor
+	Material COPY_TEX _Emission _EmissiveTex
+	Material COPY_FLOAT_AS_VECTOR_X _Tiling _EmissiveUVs
+	Material COPY_FLOAT_AS_VECTOR_Y _Tiling _EmissiveUVs
 
 	// Combine Texture Channels
 	if MATERIAL_KEYWORD_ENABLED _SMOOTHNESSSOURCE_ALBEDO_ALPHA

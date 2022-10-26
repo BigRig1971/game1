@@ -15,15 +15,15 @@ InfoWarning The BK Billboards are not supported and they will be disabled after 
 *******************************************************************
 
 Mesh SetVariation GET_MASK_PROCEDURAL 3
-Mesh SetOcclusion GET_MASK_PROCEDURAL 6
+Mesh SetOcclusion NONE
 Mesh SetDetailMask GET_MASK_PROCEDURAL 8
-Mesh SetDetailCoord GET_COORD_FROM_CHANNEL 0
+Mesh SetMultiMask GET_MASK_PROCEDURAL 19
 
-Mesh SetHeight GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_PROCEDURAL 16
+Mesh SetDetailCoord NONE
+
+Mesh SetMotion1 GET_MASK_PROCEDURAL 4
+Mesh SetMotion2 GET_MASK_FROM_CHANNEL 0
 Mesh SetMotion3 GET_MASK_FROM_CHANNEL 0
-
-Mesh SetPivots NONE
 
 *******************************************************************
 
@@ -32,7 +32,7 @@ if SHADER_NAME_CONTAINS Leaves
 	Material SET_FLOAT _RenderCull 2
 	Material SET_FLOAT _RenderNormals 0
 	Material SET_FLOAT _RenderSpecular 0
-	Material SET_FLOAT _AlphaClipValue 0.25
+	Material SET_FLOAT _AlphaCutoffValue 0.25
 	//Material SET_FLOAT _FadeGlancingValue 1
 
 	Material COPY_TEX _Diffuse _MainAlbedoTex
@@ -90,7 +90,6 @@ if SHADER_NAME_CONTAINS Trunk
 	// Set Detail properties
 	Material SET_FLOAT _DetailMode 1
 	Material SET_FLOAT _DetailBlendMode 1
-	Material SET_FLOAT _DetailCoordMode 1
 	Material SET_FLOAT _DetailMaskMode 0
 
 	Material SET_FLOAT _DetailMeshValue 0.3
@@ -113,7 +112,7 @@ if SHADER_NAME_CONTAINS Trunk
 	Texture PropName _MainMaskTex
 	Texture SetRed GET_RED _MetallicROcclusionGSmoothnessA
 	Texture SetGreen GET_GREEN _MetallicROcclusionGSmoothnessA
-	Texture SetBlue GET_GREEN _MetallicROcclusionGSmoothnessA ACTION_ONE_MINUS
+	Texture SetBlue GET_GREEN _MetallicROcclusionGSmoothnessA ACTION_INVERT
 	Texture SetAlpha GET_ALPHA _MetallicROcclusionGSmoothnessA
 	Utility START_TEXTURE_PACKING
 	
@@ -121,7 +120,7 @@ if SHADER_NAME_CONTAINS Trunk
 	Texture PropName _SecondMaskTex
 	Texture SetRed GET_RED _DetailMetallicGlossMap
 	Texture SetGreen GET_GREEN _DetailMetallicGlossMap
-	Texture SetBlue GET_GREEN _LayerMask ACTION_ONE_MINUS
+	Texture SetBlue GET_GREEN _LayerMask ACTION_INVERT
 	Texture SetAlpha GET_ALPHA _DetailMetallicGlossMap
 	Utility START_TEXTURE_PACKING
 }

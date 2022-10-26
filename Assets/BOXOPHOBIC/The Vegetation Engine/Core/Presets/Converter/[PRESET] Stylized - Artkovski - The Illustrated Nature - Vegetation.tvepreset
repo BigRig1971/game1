@@ -12,19 +12,19 @@ InfoOnline https://assetstore.unity.com/publishers/44640
 *******************************************************************
 
 Mesh SetVariation GET_MASK_PROCEDURAL 3
-Mesh SetOcclusion GET_MASK_PROCEDURAL 6
-Mesh SetDetailMask GET_MASK_PROCEDURAL 8
-Mesh SetDetailCoord GET_COORD_FROM_CHANNEL 0
+Mesh SetOcclusion NONE
+Mesh SetDetailMask NONE
+Mesh SetMultiMask NONE
 
-Mesh SetHeight GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_PROCEDURAL 16
+Mesh SetDetailCoord NONE
+
+Mesh SetMotion1 GET_MASK_PROCEDURAL 4
+Mesh SetMotion2 GET_MASK_FROM_CHANNEL 1
 Mesh SetMotion3 GET_MASK_FROM_CHANNEL 1
-
-Mesh SetPivots NONE
 
 *******************************************************************
 
-Material COPY_FLOAT _AlphaCutoff _AlphaClipValue
+Material COPY_FLOAT _AlphaCutoff _AlphaCutoffValue
 
 Material SET_FLOAT _RenderNormals 2
 Material SET_FLOAT _FadeGlancingValue 1
@@ -51,7 +51,29 @@ if SHADER_NAME_CONTAINS Branch
 	Material SET_SHADER SHADER_DEFAULT_BARK
 	Material SET_FLOAT _RenderCull 2
 	Material SET_FLOAT _RenderClip 0
+	
+	Material SET_FLOAT _MotionValue_20 0
 }
+
+*******************************************************************
+
+Material SET_FLOAT _MotionAmplitude_10 0.1
+Material SET_FLOAT _MotionSpeed_10 2
+Material SET_FLOAT _MotionScale_10 0.1
+Material SET_FLOAT _MotionVariation_10 0
+
+Material SET_FLOAT _MotionAmplitude_20 0.1
+Material SET_FLOAT _MotionSpeed_20 6
+Material SET_FLOAT _MotionScale_20 0.2
+Material SET_FLOAT _MotionVariation_20 5
+
+Material SET_FLOAT _MotionAmplitude_32 0.1
+Material SET_FLOAT _MotionSpeed_32 30
+Material SET_FLOAT _MotionScale_32 18
+Material SET_FLOAT _MotionVariation_32 19
+
+Material SET_FLOAT _InteractionAmplitude 1
+Material SET_FLOAT _InteractionVariation 0
 
 *******************************************************************
 

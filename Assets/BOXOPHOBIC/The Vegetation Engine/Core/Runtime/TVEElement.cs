@@ -10,39 +10,23 @@ using UnityEditor;
 
 namespace TheVegetationEngine
 {
-    public enum ElementVisibility
-    {
-        UseGlobalVolumeSettings = -1,
-        AlwaysHidden = 0,
-        AlwaysVisible = 10,
-        HiddenAtRuntime = 20,
-    }
-
-    [HelpURL("https://docs.google.com/document/d/145JOVlJ1tE-WODW45YoJ6Ixg23mFc56EnB_8Tbwloz8/edit#heading=h.fd5y8rbb7aia")]
+#if UNITY_EDITOR
     [ExecuteInEditMode]
     [AddComponentMenu("BOXOPHOBIC/The Vegetation Engine/TVE Element")]
+#endif
     public class TVEElement : StyledMonoBehaviour
     {
-        [StyledBanner(0.890f, 0.745f, 0.309f, "Element")]
+        const string elementLayerMask = "_ElementLayerMask";
+
+        [StyledBanner(0.890f, 0.745f, 0.309f, "Element", "", "https://docs.google.com/document/d/145JOVlJ1tE-WODW45YoJ6Ixg23mFc56EnB_8Tbwloz8/edit#heading=h.fd5y8rbb7aia")]
         public bool styledBanner;
-
-#if UNITY_EDITOR
-        [StyledMessage("Error", "The current element is outside the Global Volume / Follow Main Camera Volume or the material is missing the ElementType tag and it is not rendered! Activate the scene Gizmos to see the volume bounds!", 0, 10)]
-        public bool showValidMessage;
-#endif
-
-        [Tooltip("Sets the element visibility.")]
-        public ElementVisibility customVisibility = ElementVisibility.UseGlobalVolumeSettings;
-        [Tooltip("Sets a custom material for element rendering.")]
-        public Material customMaterial;
 
         [HideInInspector]
         public TVEElementMaterialData materialData;
-        [HideInInspector]
-        public TVEElementDefaultData elementData;
+        TVEElementDefaultData elementData;
 
         Renderer meshRenderer;
-        Material renderMaterial;
+        Material sharedMaterial;
         new ParticleSystem particleSystem;
 
         int useVertexColorDirection = 0;
@@ -52,25 +36,17 @@ namespace TheVegetationEngine
         LayerMask raycastMask;
         float raycastEnd = 0;
 
+        [HideInInspector]
+        public bool inVolume;
         bool isSelected;
-        bool isValid;
 
         void OnEnable()
         {
             meshRenderer = gameObject.GetComponent<Renderer>();
-
-            if (customMaterial != null)
-            {
-                renderMaterial = customMaterial;
-            }
-            else
-            {
-                renderMaterial = meshRenderer.sharedMaterial;
-            }
-
+            sharedMaterial = meshRenderer.sharedMaterial;
             particleSystem = gameObject.GetComponent<ParticleSystem>();
 
-            if (renderMaterial == null || renderMaterial.name == TVEConstants.ElementName)
+            if (sharedMaterial == null || sharedMaterial.name == "Element")
             {
                 if (materialData == null)
                 {
@@ -80,41 +56,38 @@ namespace TheVegetationEngine
                 if (materialData.shader == null)
                 {
 #if UNITY_EDITOR
-                    renderMaterial = new Material(Resources.Load<Material>("Internal Colors"));
-                    SaveMaterialData(renderMaterial);
+                    sharedMaterial = new Material(Resources.Load<Material>("Internal Colors"));
+                    SaveMaterialData(sharedMaterial);
 #endif
                 }
                 else
                 {
-                    renderMaterial = new Material(materialData.shader);
-                    LoadMaterialData(renderMaterial);
+                    sharedMaterial = new Material(materialData.shader);
+                    LoadMaterialData(sharedMaterial);
                 }
 
-                renderMaterial.name = TVEConstants.ElementName;
-                gameObject.GetComponent<Renderer>().sharedMaterial = renderMaterial;
+                sharedMaterial.name = "Element";
+                gameObject.GetComponent<Renderer>().sharedMaterial = sharedMaterial;
             }
 
-            if (renderMaterial != null)
+            if (sharedMaterial != null)
             {
-                TVEUtils.SetElementSettings(renderMaterial);
+                TVEMaterial.SetElementSettings(sharedMaterial);
 
                 GetMaterialParameters();
             }
 
-            elementData = TVEUtils.CreateElementData(gameObject, renderMaterial, this.GetHashCode(), customVisibility);
-
-            TVEUtils.AddElementDataToVolume(elementData);
-            TVEUtils.SetElementVisibility(elementData, customVisibility);
+            AddElementToVolume();
         }
 
         void OnDestroy()
         {
-            TVEUtils.RemoveElementDataFromVolume(elementData);
+            RemoveElementFromVolume();
         }
 
         void OnDisable()
         {
-            TVEUtils.RemoveElementDataFromVolume(elementData);
+            RemoveElementFromVolume();
         }
 
         void Update()
@@ -136,43 +109,22 @@ namespace TheVegetationEngine
 
             if (isSelected)
             {
-                if (customMaterial != null)
-                {
-                    renderMaterial = customMaterial;
-                }
-                else
-                {
-                    renderMaterial = meshRenderer.sharedMaterial;
-                }
+                sharedMaterial = meshRenderer.sharedMaterial;
 
                 GetMaterialParameters();
 
-                if (!EditorUtility.IsPersistent(renderMaterial))
+                if (!EditorUtility.IsPersistent(sharedMaterial))
                 {
-                    SaveMaterialData(renderMaterial);
+                    SaveMaterialData(sharedMaterial);
                 }
 
-                TVEUtils.RemoveElementDataFromVolume(elementData);
-
-                elementData = TVEUtils.CreateElementData(gameObject, renderMaterial, this.GetHashCode(), customVisibility);
-
-                TVEUtils.AddElementDataToVolume(elementData);
-                TVEUtils.SetElementVisibility(elementData, customVisibility);
+                RemoveElementFromVolume();
+                AddElementToVolume();
 
                 TVEManager.Instance.globalVolume.SortElementObjects();
 
                 // Needed when gizmos is not enabled
-                isValid = TVEUtils.IsValidElement(elementData);
-
-                if (isValid)
-                {
-                    showValidMessage = false;
-                }
-                else
-                {
-                    showValidMessage = true;
-                }
-
+                inVolume = IsElementInVolume();
             }
 #endif
 
@@ -293,22 +245,22 @@ namespace TheVegetationEngine
 
         void GetMaterialParameters()
         {
-            if (renderMaterial.HasProperty(TVEConstants.ElementDirectionMode))
+            if (sharedMaterial.HasProperty("_ElementDirectionMode"))
             {
-                useVertexColorDirection = renderMaterial.GetInt(TVEConstants.ElementDirectionMode);
+                useVertexColorDirection = sharedMaterial.GetInt("_ElementDirectionMode");
             }
 
-            if (renderMaterial.HasProperty(TVEConstants.ElementRaycastMode))
+            if (sharedMaterial.HasProperty("_ElementRaycastMode"))
             {
-                useRaycastFading = renderMaterial.GetInt(TVEConstants.ElementRaycastMode);
-                raycastMask = renderMaterial.GetInt(TVEConstants.RaycastLayerMask);
-                raycastEnd = renderMaterial.GetInt(TVEConstants.RaycastDistanceEndValue);
+                useRaycastFading = sharedMaterial.GetInt("_ElementRaycastMode");
+                raycastMask = sharedMaterial.GetInt("_RaycastLayerMask");
+                raycastEnd = sharedMaterial.GetInt("_RaycastDistanceEndValue");
             }
         }
 
         float GetRacastFading()
         {
-            raycastEnd = renderMaterial.GetInt(TVEConstants.RaycastDistanceEndValue);
+            raycastEnd = sharedMaterial.GetInt("_RaycastDistanceEndValue");
 
             RaycastHit hit;
             bool raycastHit = Physics.Raycast(transform.position, -Vector3.up, out hit, Mathf.Infinity, raycastMask);
@@ -320,6 +272,205 @@ namespace TheVegetationEngine
             else
             {
                 return 0;
+            }
+        }
+
+        void AddElementToVolume()
+        {
+            if (TVEManager.Instance == null)
+                return;
+
+            if (gameObject.GetComponent<MeshRenderer>() != null && gameObject.GetComponent<MeshRenderer>().sharedMaterial != null)
+            {
+                var renderer = gameObject.GetComponent<MeshRenderer>();
+
+                elementData = new TVEElementDefaultData();
+                elementData.element = gameObject;
+                elementData.type = RendererType.Mesh;
+                elementData.renderer = renderer;
+                elementData.mesh = gameObject.GetComponent<MeshFilter>().sharedMesh;
+                elementData.fadeValue = 1.0f;
+
+                AddElement();
+                SetElementVisibility(renderer);
+            }
+            else if (gameObject.GetComponent<ParticleSystemRenderer>() != null && gameObject.GetComponent<ParticleSystemRenderer>().sharedMaterial != null)
+            {
+                var renderer = gameObject.GetComponent<ParticleSystemRenderer>();
+
+                elementData = new TVEElementDefaultData();
+                elementData.element = gameObject;
+                elementData.type = RendererType.Particle;
+                elementData.renderer = renderer;
+                elementData.mesh = null;
+                elementData.fadeValue = 1.0f;
+
+                AddElement();
+                SetElementVisibility(renderer);
+            }
+            else if (gameObject.GetComponent<TrailRenderer>() != null && gameObject.GetComponent<TrailRenderer>().sharedMaterial != null)
+            {
+                var renderer = gameObject.GetComponent<TrailRenderer>();
+
+                elementData = new TVEElementDefaultData();
+                elementData.element = gameObject;
+                elementData.type = RendererType.Trail;
+                elementData.renderer = renderer;
+                elementData.mesh = null;
+                elementData.fadeValue = 1.0f;
+
+                AddElement();
+                SetElementVisibility(renderer);
+            }
+            else if (gameObject.GetComponent<LineRenderer>() != null && gameObject.GetComponent<LineRenderer>().sharedMaterial != null)
+            {
+                var renderer = gameObject.GetComponent<LineRenderer>();
+
+                elementData = new TVEElementDefaultData();
+                elementData.element = gameObject;
+                elementData.type = RendererType.Line;
+                elementData.renderer = renderer;
+                elementData.mesh = null;
+                elementData.fadeValue = 1.0f;
+
+                AddElement();
+                SetElementVisibility(renderer);
+            }
+        }
+
+        void AddElement()
+        {
+            var renderDataSet = TVEManager.Instance.globalVolume.renderDataSet;
+            var renderElements = TVEManager.Instance.globalVolume.renderElements;
+
+            for (int i = 0; i < renderDataSet.Count; i++)
+            {
+                var renderData = renderDataSet[i];
+
+                if (renderData == null)
+                {
+                    continue;
+                }
+
+                if (sharedMaterial.HasProperty(renderData.materialFilter))
+                {
+                    if (sharedMaterial.HasProperty(elementLayerMask))
+                    {
+                        var bitmask = sharedMaterial.GetInt(elementLayerMask);
+                        var maxLayer = 0;
+                        elementData.layers = new List<int>(9);
+
+                        for (int m = 0; m < 9; m++)
+                        {
+                            if (((1 << m) & bitmask) != 0)
+                            {
+                                elementData.layers.Add(1);
+                                maxLayer = m;
+                            }
+                            else
+                            {
+                                elementData.layers.Add(0);
+                            }
+                        }
+
+                        if (maxLayer > renderData.bufferSize)
+                        {
+                            renderData.bufferSize = maxLayer;
+                            renderData.isUpdated = true;
+                        }
+                    }
+                    else
+                    {
+                        elementData.layers = new List<int>(9);
+                        elementData.layers.Add(1);
+
+                        for (int m = 1; m < 9; m++)
+                        {
+                            elementData.layers.Add(0);
+                        }
+                    }
+
+                    if (!renderElements.Contains(elementData))
+                    {
+                        TVEManager.Instance.globalVolume.renderElements.Add(elementData);
+                    }
+                }
+            }
+        }
+
+        void RemoveElementFromVolume()
+        {
+            if (TVEManager.Instance == null)
+                return;
+
+            var renderElements = TVEManager.Instance.globalVolume.renderElements;
+
+            if (renderElements != null)
+            {
+                for (int i = 0; i < renderElements.Count; i++)
+                {
+                    if (renderElements[i].element == gameObject)
+                    {
+                        renderElements.RemoveAt(i);
+                    }
+                }
+            }
+
+            var renderInstanced = TVEManager.Instance.globalVolume.renderInstanced;
+
+            if (renderInstanced != null)
+            {
+                for (int i = 0; i < renderInstanced.Count; i++)
+                {
+                    for (int j = 0; j < renderInstanced[i].renderers.Count; j++)
+                    {
+                        if (renderInstanced[i].renderers[j] == meshRenderer)
+                        {
+                            renderInstanced[i].renderers.RemoveAt(j);
+                        }
+                    }
+                }
+            }
+        }
+
+        void SetElementVisibility(Renderer renderer)
+        {
+            if (TVEManager.Instance.globalVolume.elementsVisibility == TVEGlobalVolume.ElementsVisibility.AlwaysHidden)
+            {
+#if UNITY_2019_3_OR_NEWER
+                renderer.forceRenderingOff = true;
+#else
+                renderer.enabled = false;
+#endif
+            }
+
+            if (TVEManager.Instance.globalVolume.elementsVisibility == TVEGlobalVolume.ElementsVisibility.AlwaysVisible)
+            {
+#if UNITY_2019_3_OR_NEWER
+                renderer.forceRenderingOff = false;
+#else
+                renderer.enabled = true;
+#endif
+            }
+
+            if (TVEManager.Instance.globalVolume.elementsVisibility == TVEGlobalVolume.ElementsVisibility.HiddenAtRuntime)
+            {
+                if (Application.isPlaying)
+                {
+#if UNITY_2019_3_OR_NEWER
+                    renderer.forceRenderingOff = true;
+#else
+                    renderer.enabled = false;
+#endif
+                }
+                else
+                {
+#if UNITY_2019_3_OR_NEWER
+                    renderer.forceRenderingOff = false;
+#else
+                    renderer.enabled = true;
+#endif
+                }
             }
         }
 
@@ -340,19 +491,20 @@ namespace TheVegetationEngine
                 return;
             }
 
+            var sin = Mathf.SmoothStep(0, 1, Mathf.Sin(Time.realtimeSinceStartup * 4) * 0.5f + 0.5f);
+
             var genericColor = new Color(0.0f, 0.0f, 0.0f, 0.1f);
             var invalidColor = new Color(1.0f, 0.0f, 0.0f, 0.1f);
 
             if (selected)
             {
-                genericColor = new Color(0.0f, 0.0f, 0.0f, 1.0f);
-                //genericColor = new Color(0.890f, 0.745f, 0.309f, 1.0f);
-                invalidColor = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+                genericColor = new Color(0.890f, 0.745f, 0.309f, 1.0f);
+                invalidColor = new Color(1.0f, 0.05f, 0.05f, sin);
             }
 
-            isValid = TVEUtils.IsValidElement(elementData);
+            inVolume = IsElementInVolume();
 
-            if (isValid)
+            if (inVolume)
             {
                 Gizmos.color = genericColor;
             }
@@ -368,9 +520,9 @@ namespace TheVegetationEngine
                     Gizmos.DrawLine(transform.position, new Vector3(transform.position.x, transform.position.y - raycastEnd, transform.position.z));
                 }
 
-                if (elementData.mesh != null)
+                if (elementData.type == RendererType.Mesh)
                 {
-                    if (renderMaterial.shader.name.Contains("Control") || renderMaterial.shader.name.Contains("Direction") || renderMaterial.shader.name.Contains("Turbulence"))
+                    if (sharedMaterial.shader.name.Contains("Control") || sharedMaterial.shader.name.Contains("Direction") || sharedMaterial.shader.name.Contains("Turbulence"))
                     {
                         Gizmos.DrawLine(new Vector3(transform.position.x + transform.forward.x * transform.lossyScale.x * 0.1f, transform.position.y, transform.position.z + transform.forward.z * transform.lossyScale.x * 0.1f), new Vector3(transform.position.x + transform.forward.x * transform.lossyScale.x * 0.3f, transform.position.y, transform.position.z + transform.forward.z * transform.lossyScale.x * 0.3f));
                     }
@@ -379,7 +531,7 @@ namespace TheVegetationEngine
 
             Bounds gizmoBounds;
 
-            if (elementData.mesh != null)
+            if (elementData.type == RendererType.Mesh)
             {
                 gizmoBounds = elementData.mesh.bounds;
                 Gizmos.matrix = transform.localToWorldMatrix;
@@ -390,6 +542,39 @@ namespace TheVegetationEngine
             }
 
             Gizmos.DrawWireCube(gizmoBounds.center, gizmoBounds.size);
+        }
+
+        bool IsElementInVolume()
+        {
+            var inVolume = false;
+
+            var renderDataSet = TVEManager.Instance.globalVolume.renderDataSet;
+            var elementBounds = elementData.renderer.bounds;
+
+            for (int i = 0; i < renderDataSet.Count; i++)
+            {
+                var renderData = renderDataSet[i];
+
+                if (renderData == null)
+                {
+                    continue;
+                }
+
+                if (sharedMaterial.HasProperty(renderData.materialFilter))
+                {
+                    var position = Shader.GetGlobalVector(renderData.volumePosition);
+                    var scale = Shader.GetGlobalVector(renderData.volumeScale);
+
+                    var volumeBounds = new Bounds(position, scale);
+
+                    if (volumeBounds.Intersects(elementBounds))
+                    {
+                        inVolume = true;
+                    }
+                }
+            }
+
+            return inVolume;
         }
     }
 }

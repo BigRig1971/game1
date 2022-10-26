@@ -25,22 +25,6 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _AdditionalTex1:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _AdditionalTex2:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _AdditionalTex3:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _AdditionalTex4:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _AlbedoTex:
         m_Texture: {fileID: 2800000, guid: 245dfe6ec8414d6994dc95663bb53523, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -205,38 +189,6 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _MainAlbedoTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainHeightTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainMaskTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainMetallicTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainNormalTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainOcclusionTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainSmoothnessTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainSubsurfaceTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: 245dfe6ec8414d6994dc95663bb53523, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -385,8 +337,6 @@ Material:
     - _AORemapMax: 1
     - _AORemapMin: 0
     - _ATDistance: 1
-    - _AdditionalCategory: 1
-    - _AdditionalMessage: 0
     - _AlbedoAffectEmissive: 0
     - _AlphaCutoff: 0.702
     - _AlphaCutoffEnable: 1
@@ -398,7 +348,7 @@ Material:
     - _Banner: 0
     - _BarkCategory: 0
     - _BarkMessage: 0
-    - _BaseCategory: 1
+    - _BaseCategory: 0
     - _BaseMapEncoding: 0
     - _BillboardMode: 0
     - _BillboardShadowMode: 0
@@ -482,9 +432,7 @@ Material:
     - _LinkDetailsWithBase: 1
     - _MainMessage: 0
     - _MaskMapEncoding: 1
-    - _MasksMode: 0
     - _MaterialID: 5
-    - _MaterialMode: 1
     - _Metallic: 0
     - _Mode: 1
     - _MotionVectorScale: 1
@@ -504,7 +452,7 @@ Material:
     - _RefractionSSRayModel: 0
     - _SSRefractionProjectionModel: 0
     - _SSSAndTransmissionType: 2
-    - _SettingsCategory: 1
+    - _SettingsCategory: 0
     - _ShaderMode: 0
     - _ShiverDirectionality: 0.5
     - _ShiverDrag: 0.2
@@ -527,7 +475,7 @@ Material:
     - _SubsurfaceProfile: 0
     - _SubsurfaceRadius: 1
     - _SupportDBuffer: 0
-    - _SurfaceCategory: 1
+    - _SurfaceCategory: 0
     - _SurfaceMessage: 0
     - _SurfaceType: 0
     - _TexWorldScale: 1

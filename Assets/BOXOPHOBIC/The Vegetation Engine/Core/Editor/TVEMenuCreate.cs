@@ -52,13 +52,6 @@ namespace TheVegetationEngine
 
             if (Selection.activeGameObject != null)
             {
-                if (Selection.activeGameObject.GetComponent<Terrain>() != null)
-                {
-                    var bounds = Selection.activeGameObject.GetComponent<Terrain>().terrainData.bounds;
-                    element.transform.localPosition = bounds.center;
-                    element.transform.localScale = new Vector3(bounds.size.x, 1, bounds.size.z);
-                }
-
                 element.transform.parent = Selection.activeGameObject.transform;
             }
 

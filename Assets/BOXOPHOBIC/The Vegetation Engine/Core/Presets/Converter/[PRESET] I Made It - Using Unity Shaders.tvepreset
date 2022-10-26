@@ -14,27 +14,17 @@ InfoOnline https://docs.google.com/document/d/145JOVlJ1tE-WODW45YoJ6Ixg23mFc56En
 OutputMesh DEFAULT
 OutputMaterial DEFAULT
 
-// Get the variation mask from Vertex Color R
+// Set Mesh Masks
 Mesh SetVariation GET_MASK_FROM_CHANNEL 0
-
-// Get the occlusion mask from Vertex Color A
 Mesh SetOcclusion GET_MASK_FROM_CHANNEL 3
-
-// Set a procedural height mask for detail blending
 Mesh SetDetailMask GET_MASK_PROCEDURAL 8
+Mesh SetMultiMask NONE
 
-// Use UV0 texture coord as detail UVs
 Mesh SetDetailCoord GET_COORD_FROM_CHANNEL 0
 
-Mesh SetHeight GET_MASK_PROCEDURAL 4
-
-// Get the squash motion mask from Vertex Color G
+Mesh SetMotion1 GET_MASK_PROCEDURAL 4
 Mesh SetMotion2 GET_MASK_FROM_CHANNEL 1
-
-// Get the flutter motion mask from Vertex Color B
 Mesh SetMotion3 GET_MASK_FROM_CHANNEL 2
-
-Mesh SetPivots NONE
 
 *******************************************************************
 

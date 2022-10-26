@@ -17,7 +17,6 @@ public class TVEShaderElementGUI : ShaderGUI
         base.AssignNewShaderToMaterial(material, oldShader, newShader);
 
         AssignDefaultTexture(material, newShader);
-        TVEUtils.SetElementSettings(material);
     }
 
     public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] props)
@@ -32,7 +31,7 @@ public class TVEShaderElementGUI : ShaderGUI
 
         foreach (Material material in materials)
         {
-            TVEUtils.SetElementSettings(material);
+            TVEMaterial.SetElementSettings(material);
         }
     }
 

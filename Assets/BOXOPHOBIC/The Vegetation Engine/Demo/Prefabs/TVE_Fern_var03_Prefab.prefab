@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4881073129422474}
   - component: {fileID: 205329961687919748}
   - component: {fileID: 4716242718075365813}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: TVE_Fern_var03_Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27,13 +27,14 @@ Transform:
   m_GameObject: {fileID: 1055727018099338}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2.3996725, y: 2.3996725, z: 2.3996725}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4297851232988526}
   - {fileID: 4568588207117856}
   - {fileID: 4056922146107204}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!205 &205329961687919748
 LODGroup:
@@ -89,7 +90,7 @@ GameObject:
   - component: {fileID: 4568588207117856}
   - component: {fileID: 33069113719995530}
   - component: {fileID: 23902751934209644}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Fern_Var3_LOD1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -106,6 +107,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4881073129422474}
   m_RootOrder: 1
@@ -129,10 +131,12 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -157,6 +161,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1486753561181244
 GameObject:
   m_ObjectHideFlags: 0
@@ -168,7 +173,7 @@ GameObject:
   - component: {fileID: 4297851232988526}
   - component: {fileID: 33125384641822066}
   - component: {fileID: 23502313384024998}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Fern_Var3_LOD0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -185,6 +190,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4881073129422474}
   m_RootOrder: 0
@@ -208,10 +214,12 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -236,6 +244,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1561445524583756
 GameObject:
   m_ObjectHideFlags: 0
@@ -247,7 +256,7 @@ GameObject:
   - component: {fileID: 4056922146107204}
   - component: {fileID: 33562099697874406}
   - component: {fileID: 23101331835621484}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Fern_Var3_LOD2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -264,6 +273,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4881073129422474}
   m_RootOrder: 2
@@ -287,10 +297,12 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -315,3 +327,4 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}

@@ -10,15 +10,27 @@ namespace Boxophobic.StyledGUI
     {
         public static void DrawInspectorCategory(string bannerText)
         {
-            var fullRect = GUILayoutUtility.GetRect(0, 0, 18, 0);
-            var fillRect = new Rect(0, fullRect.y, fullRect.xMax + 10, 18);
-            var lineRect = new Rect(0, fullRect.y, fullRect.xMax + 10, 1);
-            var titleRect = new Rect(fullRect.position.x - 1, fullRect.position.y, fullRect.width, 18);
+            var categoryFullRect = GUILayoutUtility.GetRect(0, 0, 18, 0);
+            var categoryBeginRect = new Rect(categoryFullRect.position.x, categoryFullRect.position.y, 10, 18);
+            var categoryMiddleRect = new Rect(categoryFullRect.position.x + 10, categoryFullRect.position.y, categoryFullRect.xMax - 32, 18);
+            var categoryEndRect = new Rect(categoryFullRect.xMax - 10, categoryFullRect.position.y, 10, 18);
+            var titleRect = new Rect(categoryFullRect.position.x, categoryFullRect.position.y, categoryFullRect.width, 18);
 
-            EditorGUI.DrawRect(fillRect, CONSTANT.CategoryColor);
-            EditorGUI.DrawRect(lineRect, CONSTANT.LineColor);
+            if (EditorGUIUtility.isProSkin)
+            {
+                GUI.color = CONSTANT.ColorDarkGray;
+            }
+            else
+            {
+                GUI.color = CONSTANT.ColorLightGray;
+            }
 
-            GUI.Label(titleRect, bannerText, CONSTANT.HeaderStyle);
+            GUI.DrawTexture(categoryBeginRect, CONSTANT.CategoryImageBegin, ScaleMode.StretchToFill, true);
+            GUI.DrawTexture(categoryMiddleRect, CONSTANT.CategoryImageMiddle, ScaleMode.StretchToFill, true);
+            GUI.DrawTexture(categoryEndRect, CONSTANT.CategoryImageEnd, ScaleMode.StretchToFill, true);
+
+            GUI.color = Color.white;
+            GUI.Label(titleRect, bannerText, CONSTANT.TitleStyle);
         }
 
         public static bool DrawInspectorCategory(string bannerText, bool enabled, float top, float down, bool colapsable)
@@ -39,14 +51,24 @@ namespace Boxophobic.StyledGUI
                 GUILayout.Space(top);
             }
 
-            var fullRect = GUILayoutUtility.GetRect(0, 0, 18, 0);
-            var fillRect = new Rect(0, fullRect.y, fullRect.xMax + 10, 18);
-            var lineRect = new Rect(0, fullRect.y, fullRect.xMax + 10, 1);
-            var titleRect = new Rect(fullRect.position.x - 1, fullRect.position.y, fullRect.width, 18);
+            var categoryFullRect = GUILayoutUtility.GetRect(0, 0, 18, 0);
+            var categoryBeginRect = new Rect(categoryFullRect.position.x, categoryFullRect.position.y, 10, 18);
+            var categoryMiddleRect = new Rect(categoryFullRect.position.x + 10, categoryFullRect.position.y, categoryFullRect.xMax - 32, 18);
+            var categoryEndRect = new Rect(categoryFullRect.xMax - 10, categoryFullRect.position.y, 10, 18);
+            var titleRect = new Rect(categoryFullRect.position.x, categoryFullRect.position.y, categoryFullRect.width, 18);
+
+            if (EditorGUIUtility.isProSkin)
+            {
+                GUI.color = CONSTANT.ColorDarkGray;
+            }
+            else
+            {
+                GUI.color = CONSTANT.ColorLightGray;
+            }
 
             if (colapsable)
             {
-                if (GUI.Button(fullRect, "", GUIStyle.none))
+                if (GUI.Button(categoryFullRect, "", GUIStyle.none))
                 {
                     enabled = !enabled;
                 }
@@ -56,10 +78,12 @@ namespace Boxophobic.StyledGUI
                 enabled = true;
             }
 
-            EditorGUI.DrawRect(fillRect, CONSTANT.CategoryColor);
-            EditorGUI.DrawRect(lineRect, CONSTANT.LineColor);
+            GUI.DrawTexture(categoryBeginRect, CONSTANT.CategoryImageBegin, ScaleMode.StretchToFill, true);
+            GUI.DrawTexture(categoryMiddleRect, CONSTANT.CategoryImageMiddle, ScaleMode.StretchToFill, true);
+            GUI.DrawTexture(categoryEndRect, CONSTANT.CategoryImageEnd, ScaleMode.StretchToFill, true);
 
-            GUI.Label(titleRect, bannerText, CONSTANT.HeaderStyle);
+            GUI.color = Color.white;
+            GUI.Label(titleRect, bannerText, CONSTANT.TitleStyle);
 
             if (colapsable)
             {

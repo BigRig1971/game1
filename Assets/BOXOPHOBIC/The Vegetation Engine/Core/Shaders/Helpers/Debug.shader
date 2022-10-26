@@ -5,7 +5,6 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 	Properties
 	{
 		[StyledBanner(Debug)]_Banner("Banner", Float) = 0
-		_IsVertexShader("_IsVertexShader", Float) = 0
 		_IsSimpleShader("_IsSimpleShader", Float) = 0
 		[HideInInspector]_IsTVEShader("_IsTVEShader", Float) = 0
 		_IsStandardShader("_IsStandardShader", Float) = 0
@@ -29,19 +28,17 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 		_IsHelperShader("_IsHelperShader", Float) = 0
 		_Cutoff("_Cutoff", Float) = 0
 		_DetailMode("_DetailMode", Float) = 0
+		[StyledEnum(Default _Layer 1 _Layer 2 _Layer 3 _Layer 4 _Layer 5 _Layer 6 _Layer 7 _Layer 8)]_LayerMotionValue("Layer Motion", Float) = 0
 		_EmissiveCat("_EmissiveCat", Float) = 0
 		[HDR]_EmissiveColor("_EmissiveColor", Color) = (0,0,0,0)
 		[HDR][Space(10)]_MainColor("Main Color", Color) = (1,1,1,1)
 		[Space(10)][StyledToggle]_VertexColorMode("Use Vertex Colors as Albedo", Range( 0 , 1)) = 0
-		[HideInInspector][Enum(Single Pivot,0,Baked Pivots,1)]_VertexPivotMode("_VertexPivotMode", Float) = 0
 		[StyledToggle]_LeavesFilterMode("Use Color Filter for Leaves", Float) = 0
 		[Space(10)]_LeavesFilterColor("Leaves Color Filter", Color) = (0,0,0,1)
 		_LeavesFilterRange("Leaves Color Range", Range( 0 , 1)) = 0
 		_IsPolygonalShader("_IsPolygonalShader", Float) = 0
 		[IntRange]_MotionSpeed_10("Primary Speed", Range( 0 , 40)) = 40
-		[IntRange]_MotionVariation_10("Primary Speed", Range( 0 , 40)) = 40
 		_MotionScale_10("Primary Scale", Range( 0 , 20)) = 0
-		[HideInInspector][StyledToggle]_VertexDynamicMode("Enable Dynamic Support", Float) = 0
 		[ASEEnd][StyledMessage(Info, Use this shader to debug the original mesh or the converted mesh attributes., 0,0)]_Message("Message", Float) = 0
 		[HideInInspector] _texcoord( "", 2D ) = "white" {}
 
@@ -226,9 +223,9 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 			#define ASE_NEEDS_VERT_NORMAL
 			#define ASE_NEEDS_VERT_TANGENT
 			#if defined(SHADER_API_D3D11) || defined(SHADER_API_XBOXONE) || defined(UNITY_COMPILER_HLSLCC) || defined(SHADER_API_PSSL) || (defined(SHADER_TARGET_SURFACE_ANALYSIS) && !defined(SHADER_TARGET_SURFACE_ANALYSIS_MOJOSHADER))//ASE Sampler Macros
-			#define SAMPLE_TEXTURE2D_ARRAY_LOD(tex,samplerTex,coord,lod) tex.SampleLevel(samplerTex,coord, lod)
+			#define SAMPLE_TEXTURE2D_ARRAY(tex,samplerTex,coord) tex.Sample(samplerTex,coord)
 			#else//ASE Sampling Macros
-			#define SAMPLE_TEXTURE2D_ARRAY_LOD(tex,samplertex,coord,lod) tex2DArraylod(tex, float4(coord,lod))
+			#define SAMPLE_TEXTURE2D_ARRAY(tex,samplertex,coord) tex2DArray(tex,coord)
 			#endif//ASE Sampling Macros
 			
 
@@ -239,8 +236,8 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				float4 texcoord1 : TEXCOORD1;
 				float4 texcoord2 : TEXCOORD2;
 				float4 ase_texcoord : TEXCOORD0;
-				float4 ase_texcoord3 : TEXCOORD3;
 				float4 ase_color : COLOR;
+				float4 ase_texcoord3 : TEXCOORD3;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 			
@@ -277,8 +274,6 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				float4 ase_texcoord9 : TEXCOORD9;
 				float4 ase_texcoord10 : TEXCOORD10;
 				float4 ase_texcoord11 : TEXCOORD11;
-				float4 ase_color : COLOR;
-				float4 ase_texcoord12 : TEXCOORD12;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
 			};
@@ -302,10 +297,9 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				float _TessEdgeLength;
 				float _TessMaxDisp;
 			#endif
-			uniform half _Banner;
 			uniform half _Message;
+			uniform half _Banner;
 			uniform float _IsSimpleShader;
-			uniform float _IsVertexShader;
 			uniform half _IsTVEShader;
 			uniform half TVE_DEBUG_Type;
 			uniform float _IsBarkShader;
@@ -343,30 +337,30 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 			float4 _SecondAlbedoTex_TexelSize;
 			float4 _SecondMaskTex_TexelSize;
 			float4 _EmissiveTex_TexelSize;
-			uniform sampler2D TVE_NoiseTex;
-			uniform half _VertexPivotMode;
-			uniform float _MotionScale_10;
-			uniform half4 TVE_NoiseParams;
 			uniform half4 TVE_MotionParams;
 			UNITY_DECLARE_TEX2DARRAY_NOSAMPLER(TVE_MotionTex);
 			uniform half4 TVE_MotionCoords;
-			uniform half TVE_DEBUG_Layer;
-			SamplerState sampler_linear_repeat;
+			uniform half _LayerMotionValue;
+			SamplerState samplerTVE_MotionTex;
 			uniform float TVE_MotionUsage[10];
+			uniform float _MotionScale_10;
+			uniform half4 TVE_NoiseParams;
 			uniform float _MotionSpeed_10;
-			uniform float _MotionVariation_10;
-			uniform half _VertexDynamicMode;
 			uniform half4 TVE_ColorsParams;
 			UNITY_DECLARE_TEX2DARRAY_NOSAMPLER(TVE_ColorsTex);
 			uniform half4 TVE_ColorsCoords;
+			uniform half TVE_DEBUG_Layer;
+			SamplerState samplerTVE_ColorsTex;
 			uniform float TVE_ColorsUsage[10];
 			uniform half4 TVE_ExtrasParams;
 			UNITY_DECLARE_TEX2DARRAY_NOSAMPLER(TVE_ExtrasTex);
 			uniform half4 TVE_ExtrasCoords;
+			SamplerState samplerTVE_ExtrasTex;
 			uniform float TVE_ExtrasUsage[10];
 			uniform half4 TVE_VertexParams;
 			UNITY_DECLARE_TEX2DARRAY_NOSAMPLER(TVE_VertexTex);
 			uniform half4 TVE_VertexCoords;
+			SamplerState samplerTVE_VertexTex;
 			uniform float TVE_VertexUsage[10];
 			uniform float _IsVegetationShader;
 			uniform half4 _LeavesFilterColor;
@@ -389,14 +383,6 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				return c.z * lerp( K.xxx, saturate( p - K.xxx ), c.y );
 			}
 			
-			float2 DecodeFloatToVector2( float enc )
-			{
-				float2 result ;
-				result.y = enc % 2048;
-				result.x = floor(enc / 2048);
-				return result / (2048 - 1);
-			}
-			
 
 			v2f VertexFunction (appdata v  ) {
 				UNITY_SETUP_INSTANCE_ID(v);
@@ -405,102 +391,85 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				UNITY_TRANSFER_INSTANCE_ID(v,o);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-				float3 customSurfaceDepth676_g72326 = v.vertex.xyz;
-				float customEye676_g72326 = -UnityObjectToViewPos( customSurfaceDepth676_g72326 ).z;
-				o.ase_texcoord9.x = customEye676_g72326;
-				float Debug_Index464_g72326 = TVE_DEBUG_Index;
-				float3 ifLocalVar40_g72333 = 0;
-				if( Debug_Index464_g72326 == 0.0 )
-				ifLocalVar40_g72333 = saturate( v.vertex.xyz );
-				float3 ifLocalVar40_g72364 = 0;
-				if( Debug_Index464_g72326 == 1.0 )
-				ifLocalVar40_g72364 = v.normal;
-				float3 ifLocalVar40_g72389 = 0;
-				if( Debug_Index464_g72326 == 2.0 )
-				ifLocalVar40_g72389 = v.tangent.xyz;
-				float ifLocalVar40_g72355 = 0;
-				if( Debug_Index464_g72326 == 3.0 )
-				ifLocalVar40_g72355 = saturate( v.tangent.w );
+				float3 customSurfaceDepth676_g62695 = v.vertex.xyz;
+				float customEye676_g62695 = -UnityObjectToViewPos( customSurfaceDepth676_g62695 ).z;
+				o.ase_texcoord9.x = customEye676_g62695;
+				float Debug_Index464_g62695 = TVE_DEBUG_Index;
+				float3 ifLocalVar40_g63014 = 0;
+				if( Debug_Index464_g62695 == 0.0 )
+				ifLocalVar40_g63014 = saturate( v.vertex.xyz );
+				float3 ifLocalVar40_g62989 = 0;
+				if( Debug_Index464_g62695 == 1.0 )
+				ifLocalVar40_g62989 = v.normal;
+				float3 ifLocalVar40_g62995 = 0;
+				if( Debug_Index464_g62695 == 2.0 )
+				ifLocalVar40_g62995 = v.tangent.xyz;
+				float ifLocalVar40_g63008 = 0;
+				if( Debug_Index464_g62695 == 3.0 )
+				ifLocalVar40_g63008 = saturate( v.tangent.w );
 				float3 temp_cast_0 = (v.ase_color.r).xxx;
-				float3 hsvTorgb260_g72326 = HSVToRGB( float3(v.ase_color.r,1.0,1.0) );
-				float3 gammaToLinear266_g72326 = GammaToLinearSpace( hsvTorgb260_g72326 );
-				float _IsBarkShader347_g72326 = _IsBarkShader;
-				float _IsLeafShader360_g72326 = _IsLeafShader;
-				float _IsCrossShader342_g72326 = _IsCrossShader;
-				float _IsGrassShader341_g72326 = _IsGrassShader;
-				float _IsVegetationShader1101_g72326 = _IsVegetationShader;
-				float _IsAnyVegetationShader362_g72326 = saturate( ( _IsBarkShader347_g72326 + _IsLeafShader360_g72326 + _IsCrossShader342_g72326 + _IsGrassShader341_g72326 + _IsVegetationShader1101_g72326 ) );
-				float3 lerpResult290_g72326 = lerp( temp_cast_0 , gammaToLinear266_g72326 , _IsAnyVegetationShader362_g72326);
-				float3 ifLocalVar40_g72384 = 0;
-				if( Debug_Index464_g72326 == 5.0 )
-				ifLocalVar40_g72384 = lerpResult290_g72326;
-				float ifLocalVar40_g72429 = 0;
-				if( Debug_Index464_g72326 == 6.0 )
-				ifLocalVar40_g72429 = v.ase_color.g;
-				float ifLocalVar40_g72343 = 0;
-				if( Debug_Index464_g72326 == 7.0 )
-				ifLocalVar40_g72343 = v.ase_color.b;
-				float ifLocalVar40_g72360 = 0;
-				if( Debug_Index464_g72326 == 8.0 )
-				ifLocalVar40_g72360 = v.ase_color.a;
-				float ifLocalVar40_g72341 = 0;
-				if( Debug_Index464_g72326 == 9.0 )
-				ifLocalVar40_g72341 = v.ase_color.a;
-				float enc1154_g72326 = v.ase_texcoord.z;
-				float2 localDecodeFloatToVector21154_g72326 = DecodeFloatToVector2( enc1154_g72326 );
-				float2 break1155_g72326 = localDecodeFloatToVector21154_g72326;
-				float ifLocalVar40_g72363 = 0;
-				if( Debug_Index464_g72326 == 10.0 )
-				ifLocalVar40_g72363 = break1155_g72326.x;
-				float ifLocalVar40_g72362 = 0;
-				if( Debug_Index464_g72326 == 11.0 )
-				ifLocalVar40_g72362 = break1155_g72326.y;
-				float3 appendResult1147_g72326 = (float3(v.ase_texcoord.x , v.ase_texcoord.y , 0.0));
-				float3 ifLocalVar40_g72336 = 0;
-				if( Debug_Index464_g72326 == 12.0 )
-				ifLocalVar40_g72336 = appendResult1147_g72326;
-				float3 appendResult1148_g72326 = (float3(v.texcoord1.xyzw.x , v.texcoord1.xyzw.y , 0.0));
-				float3 ifLocalVar40_g72368 = 0;
-				if( Debug_Index464_g72326 == 13.0 )
-				ifLocalVar40_g72368 = appendResult1148_g72326;
-				float3 appendResult1149_g72326 = (float3(v.texcoord1.xyzw.z , v.texcoord1.xyzw.w , 0.0));
-				float3 ifLocalVar40_g72371 = 0;
-				if( Debug_Index464_g72326 == 14.0 )
-				ifLocalVar40_g72371 = appendResult1149_g72326;
-				float3 appendResult60_g72430 = (float3(v.ase_texcoord3.x , v.ase_texcoord3.z , v.ase_texcoord3.y));
-				float3 ifLocalVar40_g72327 = 0;
-				if( Debug_Index464_g72326 == 15.0 )
-				ifLocalVar40_g72327 = appendResult60_g72430;
-				float3 vertexToFrag328_g72326 = ( ( ifLocalVar40_g72333 + ifLocalVar40_g72364 + ifLocalVar40_g72389 + ifLocalVar40_g72355 ) + ( ifLocalVar40_g72384 + ifLocalVar40_g72429 + ifLocalVar40_g72343 + ifLocalVar40_g72360 ) + ( ifLocalVar40_g72341 + ifLocalVar40_g72363 + ifLocalVar40_g72362 ) + ( ifLocalVar40_g72336 + ifLocalVar40_g72368 + ifLocalVar40_g72371 + ifLocalVar40_g72327 ) );
-				o.ase_texcoord9.yzw = vertexToFrag328_g72326;
-				float4 color1097_g72326 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 color1096_g72326 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float2 uv_MainMaskTex1077_g72326 = v.ase_texcoord.xy;
-				float3 linearToGamma1066_g72326 = LinearToGammaSpace( _LeavesFilterColor.rgb );
+				float3 hsvTorgb260_g62695 = HSVToRGB( float3(v.ase_color.r,1.0,1.0) );
+				float3 gammaToLinear266_g62695 = GammaToLinearSpace( hsvTorgb260_g62695 );
+				float _IsBarkShader347_g62695 = _IsBarkShader;
+				float _IsLeafShader360_g62695 = _IsLeafShader;
+				float _IsCrossShader342_g62695 = _IsCrossShader;
+				float _IsGrassShader341_g62695 = _IsGrassShader;
+				float _IsVegetationShader1101_g62695 = _IsVegetationShader;
+				float _IsAnyVegetationShader362_g62695 = saturate( ( _IsBarkShader347_g62695 + _IsLeafShader360_g62695 + _IsCrossShader342_g62695 + _IsGrassShader341_g62695 + _IsVegetationShader1101_g62695 ) );
+				float3 lerpResult290_g62695 = lerp( temp_cast_0 , gammaToLinear266_g62695 , _IsAnyVegetationShader362_g62695);
+				float3 ifLocalVar40_g62998 = 0;
+				if( Debug_Index464_g62695 == 5.0 )
+				ifLocalVar40_g62998 = lerpResult290_g62695;
+				float ifLocalVar40_g62994 = 0;
+				if( Debug_Index464_g62695 == 6.0 )
+				ifLocalVar40_g62994 = v.ase_color.g;
+				float ifLocalVar40_g62999 = 0;
+				if( Debug_Index464_g62695 == 7.0 )
+				ifLocalVar40_g62999 = v.ase_color.b;
+				float ifLocalVar40_g63003 = 0;
+				if( Debug_Index464_g62695 == 8.0 )
+				ifLocalVar40_g63003 = v.ase_color.a;
+				float ifLocalVar40_g63007 = 0;
+				if( Debug_Index464_g62695 == 9.0 )
+				ifLocalVar40_g63007 = v.ase_texcoord3.x;
+				float ifLocalVar40_g63035 = 0;
+				if( Debug_Index464_g62695 == 10.0 )
+				ifLocalVar40_g63035 = v.ase_texcoord3.y;
+				float ifLocalVar40_g62986 = 0;
+				if( Debug_Index464_g62695 == 11.0 )
+				ifLocalVar40_g62986 = v.ase_texcoord3.z;
+				float3 vertexToFrag328_g62695 = ( ( ifLocalVar40_g63014 + ifLocalVar40_g62989 + ifLocalVar40_g62995 + ifLocalVar40_g63008 ) + ( ifLocalVar40_g62998 + ifLocalVar40_g62994 + ifLocalVar40_g62999 + ifLocalVar40_g63003 ) + ( ifLocalVar40_g63007 + ifLocalVar40_g63035 + ifLocalVar40_g62986 ) );
+				o.ase_texcoord10.xyz = vertexToFrag328_g62695;
+				float4 color1097_g62695 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 color1096_g62695 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float2 uv_MainMaskTex1077_g62695 = v.ase_texcoord.xy;
+				float3 linearToGamma1066_g62695 = LinearToGammaSpace( _LeavesFilterColor.rgb );
 				#ifdef UNITY_COLORSPACE_GAMMA
-				float3 staticSwitch1060_g72326 = (_LeavesFilterColor).rgb;
+				float3 staticSwitch1060_g62695 = (_LeavesFilterColor).rgb;
 				#else
-				float3 staticSwitch1060_g72326 = linearToGamma1066_g72326;
+				float3 staticSwitch1060_g62695 = linearToGamma1066_g62695;
 				#endif
-				float2 uv_MainAlbedoTex1045_g72326 = v.ase_texcoord.xy;
-				float4 tex2DNode1045_g72326 = tex2Dlod( _MainAlbedoTex, float4( uv_MainAlbedoTex1045_g72326, 0, 0.0) );
-				float3 lerpResult1043_g72326 = lerp( (tex2DNode1045_g72326).rgb , (v.ase_color).rgb , _VertexColorMode);
-				half3 Main_Albedo1078_g72326 = ( (_MainColor).rgb * lerpResult1043_g72326 );
-				float3 linearToGamma1058_g72326 = LinearToGammaSpace( Main_Albedo1078_g72326 );
+				float2 uv_MainAlbedoTex1045_g62695 = v.ase_texcoord.xy;
+				float4 tex2DNode1045_g62695 = tex2Dlod( _MainAlbedoTex, float4( uv_MainAlbedoTex1045_g62695, 0, 0.0) );
+				float3 lerpResult1043_g62695 = lerp( (tex2DNode1045_g62695).rgb , (v.ase_color).rgb , _VertexColorMode);
+				half3 Main_Albedo1078_g62695 = ( (_MainColor).rgb * lerpResult1043_g62695 );
+				float3 linearToGamma1058_g62695 = LinearToGammaSpace( Main_Albedo1078_g62695 );
 				#ifdef UNITY_COLORSPACE_GAMMA
-				float3 staticSwitch1068_g72326 = (Main_Albedo1078_g72326).xyz;
+				float3 staticSwitch1068_g62695 = (Main_Albedo1078_g62695).xyz;
 				#else
-				float3 staticSwitch1068_g72326 = linearToGamma1058_g72326;
+				float3 staticSwitch1068_g62695 = linearToGamma1058_g62695;
 				#endif
-				float lerpResult1071_g72326 = lerp( 1.0 , saturate( ( 1.0 - ceil( ( distance( staticSwitch1060_g72326 , staticSwitch1068_g72326 ) - _LeavesFilterRange ) ) ) ) , _LeavesFilterMode);
-				half Main_ColorFilter1061_g72326 = lerpResult1071_g72326;
-				float4 lerpResult1095_g72326 = lerp( color1097_g72326 , color1096_g72326 , ( tex2Dlod( _MainMaskTex, float4( uv_MainMaskTex1077_g72326, 0, 0.0) ).b * Main_ColorFilter1061_g72326 ));
-				float4 vertexToFrag11_g72328 = lerpResult1095_g72326;
-				o.ase_texcoord12 = vertexToFrag11_g72328;
+				float lerpResult1071_g62695 = lerp( 1.0 , saturate( ( 1.0 - ceil( ( distance( staticSwitch1060_g62695 , staticSwitch1068_g62695 ) - _LeavesFilterRange ) ) ) ) , _LeavesFilterMode);
+				half Main_ColorFilter1061_g62695 = lerpResult1071_g62695;
+				float4 lerpResult1095_g62695 = lerp( color1097_g62695 , color1096_g62695 , ( tex2Dlod( _MainMaskTex, float4( uv_MainMaskTex1077_g62695, 0, 0.0) ).b * Main_ColorFilter1061_g62695 ));
+				float4 vertexToFrag11_g63037 = lerpResult1095_g62695;
+				o.ase_texcoord11 = vertexToFrag11_g63037;
 				
-				o.ase_texcoord10 = v.ase_texcoord;
-				o.ase_texcoord11 = v.ase_texcoord3;
-				o.ase_color = v.ase_color;
+				o.ase_texcoord9.yz = v.ase_texcoord.xy;
+				
+				//setting value to unused interpolator channels and avoid initialization warnings
+				o.ase_texcoord9.w = 0;
+				o.ase_texcoord10.w = 0;
 				#ifdef ASE_ABSOLUTE_VERTEX_POS
 					float3 defaultVertexValue = v.vertex.xyz;
 				#else
@@ -574,8 +543,8 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				float4 texcoord1 : TEXCOORD1;
 				float4 texcoord2 : TEXCOORD2;
 				float4 ase_texcoord : TEXCOORD0;
-				float4 ase_texcoord3 : TEXCOORD3;
 				float4 ase_color : COLOR;
+				float4 ase_texcoord3 : TEXCOORD3;
 
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
@@ -597,8 +566,8 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				o.texcoord1 = v.texcoord1;
 				o.texcoord2 = v.texcoord2;
 				o.ase_texcoord = v.ase_texcoord;
-				o.ase_texcoord3 = v.ase_texcoord3;
 				o.ase_color = v.ase_color;
+				o.ase_texcoord3 = v.ase_texcoord3;
 				return o;
 			}
 
@@ -641,8 +610,8 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				o.texcoord1 = patch[0].texcoord1 * bary.x + patch[1].texcoord1 * bary.y + patch[2].texcoord1 * bary.z;
 				o.texcoord2 = patch[0].texcoord2 * bary.x + patch[1].texcoord2 * bary.y + patch[2].texcoord2 * bary.z;
 				o.ase_texcoord = patch[0].ase_texcoord * bary.x + patch[1].ase_texcoord * bary.y + patch[2].ase_texcoord * bary.z;
-				o.ase_texcoord3 = patch[0].ase_texcoord3 * bary.x + patch[1].ase_texcoord3 * bary.y + patch[2].ase_texcoord3 * bary.z;
 				o.ase_color = patch[0].ase_color * bary.x + patch[1].ase_color * bary.y + patch[2].ase_color * bary.z;
+				o.ase_texcoord3 = patch[0].ase_texcoord3 * bary.x + patch[1].ase_texcoord3 * bary.y + patch[2].ase_texcoord3 * bary.z;
 				#if defined(ASE_PHONG_TESSELLATION)
 				float3 pp[3];
 				for (int i = 0; i < 3; ++i)
@@ -691,470 +660,436 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				float4 ScreenPos = IN.screenPos;
 				#endif
 
-				float Debug_Type367_g72326 = TVE_DEBUG_Type;
-				float4 color646_g72326 = IsGammaSpace() ? float4(0.9245283,0.7969696,0.4142933,1) : float4(0.8368256,0.5987038,0.1431069,1);
-				float customEye676_g72326 = IN.ase_texcoord9.x;
-				float saferPower688_g72326 = abs( (0.0 + (customEye676_g72326 - 300.0) * (1.0 - 0.0) / (0.0 - 300.0)) );
-				float clampResult702_g72326 = clamp( pow( saferPower688_g72326 , 1.25 ) , 0.75 , 1.0 );
-				float Shading655_g72326 = clampResult702_g72326;
-				float4 Output_Converted717_g72326 = ( color646_g72326 * Shading655_g72326 );
-				float4 ifLocalVar40_g72359 = 0;
-				if( Debug_Type367_g72326 == 0.0 )
-				ifLocalVar40_g72359 = Output_Converted717_g72326;
-				float4 color466_g72326 = IsGammaSpace() ? float4(0.8113208,0.4952317,0.264062,0) : float4(0.6231937,0.2096542,0.05668841,0);
-				float _IsBarkShader347_g72326 = _IsBarkShader;
-				float4 color469_g72326 = IsGammaSpace() ? float4(0.6566009,0.3404236,0.8490566,0) : float4(0.3886527,0.09487338,0.6903409,0);
-				float _IsCrossShader342_g72326 = _IsCrossShader;
-				float4 color472_g72326 = IsGammaSpace() ? float4(0.7100264,0.8018868,0.2231666,0) : float4(0.4623997,0.6070304,0.0407874,0);
-				float _IsGrassShader341_g72326 = _IsGrassShader;
-				float4 color475_g72326 = IsGammaSpace() ? float4(0.3267961,0.7264151,0.3118103,0) : float4(0.08721471,0.4865309,0.07922345,0);
-				float _IsLeafShader360_g72326 = _IsLeafShader;
-				float4 color478_g72326 = IsGammaSpace() ? float4(0.3252937,0.6122813,0.8113208,0) : float4(0.08639329,0.3330702,0.6231937,0);
-				float _IsPropShader346_g72326 = _IsPropShader;
-				float4 color1114_g72326 = IsGammaSpace() ? float4(0.9716981,0.3162602,0.4816265,0) : float4(0.9368213,0.08154967,0.1974273,0);
-				float _IsImpostorShader1110_g72326 = _IsImpostorShader;
-				float4 color1117_g72326 = IsGammaSpace() ? float4(0.257921,0.8679245,0.8361252,0) : float4(0.05410501,0.7254258,0.6668791,0);
-				float _IsPolygonalShader1112_g72326 = _IsPolygonalShader;
-				float4 Output_Shader445_g72326 = ( ( ( color466_g72326 * _IsBarkShader347_g72326 ) + ( color469_g72326 * _IsCrossShader342_g72326 ) + ( color472_g72326 * _IsGrassShader341_g72326 ) + ( color475_g72326 * _IsLeafShader360_g72326 ) + ( color478_g72326 * _IsPropShader346_g72326 ) + ( color1114_g72326 * _IsImpostorShader1110_g72326 ) + ( color1117_g72326 * _IsPolygonalShader1112_g72326 ) ) * Shading655_g72326 );
-				float4 ifLocalVar40_g72448 = 0;
-				if( Debug_Type367_g72326 == 1.0 )
-				ifLocalVar40_g72448 = Output_Shader445_g72326;
-				float4 color529_g72326 = IsGammaSpace() ? float4(0.62,0.77,0.15,0) : float4(0.3423916,0.5542217,0.01960665,0);
-				float _IsVertexShader1158_g72326 = _IsVertexShader;
-				float4 color544_g72326 = IsGammaSpace() ? float4(0.3252937,0.6122813,0.8113208,0) : float4(0.08639329,0.3330702,0.6231937,0);
-				float _IsSimpleShader359_g72326 = _IsSimpleShader;
-				float4 color521_g72326 = IsGammaSpace() ? float4(0.6566009,0.3404236,0.8490566,0) : float4(0.3886527,0.09487338,0.6903409,0);
-				float _IsStandardShader344_g72326 = _IsStandardShader;
-				float4 color1121_g72326 = IsGammaSpace() ? float4(0.9245283,0.8421515,0.1788003,0) : float4(0.8368256,0.677754,0.02687956,0);
-				float _IsSubsurfaceShader548_g72326 = _IsSubsurfaceShader;
-				float4 Output_Lighting525_g72326 = ( ( ( color529_g72326 * _IsVertexShader1158_g72326 ) + ( color544_g72326 * _IsSimpleShader359_g72326 ) + ( color521_g72326 * _IsStandardShader344_g72326 ) + ( color1121_g72326 * _IsSubsurfaceShader548_g72326 ) ) * Shading655_g72326 );
-				float4 ifLocalVar40_g72428 = 0;
-				if( Debug_Type367_g72326 == 2.0 )
-				ifLocalVar40_g72428 = Output_Lighting525_g72326;
-				float Debug_Index464_g72326 = TVE_DEBUG_Index;
-				float2 uv_MainAlbedoTex = IN.ase_texcoord10.xy * _MainAlbedoTex_ST.xy + _MainAlbedoTex_ST.zw;
-				float4 tex2DNode586_g72326 = tex2D( _MainAlbedoTex, uv_MainAlbedoTex );
-				float3 appendResult637_g72326 = (float3(tex2DNode586_g72326.r , tex2DNode586_g72326.g , tex2DNode586_g72326.b));
-				float3 ifLocalVar40_g72361 = 0;
-				if( Debug_Index464_g72326 == 0.0 )
-				ifLocalVar40_g72361 = appendResult637_g72326;
-				float ifLocalVar40_g72373 = 0;
-				if( Debug_Index464_g72326 == 1.0 )
-				ifLocalVar40_g72373 = tex2D( _MainAlbedoTex, uv_MainAlbedoTex ).a;
-				float2 uv_MainNormalTex = IN.ase_texcoord10.xy * _MainNormalTex_ST.xy + _MainNormalTex_ST.zw;
-				float4 tex2DNode604_g72326 = tex2D( _MainNormalTex, uv_MainNormalTex );
-				float3 appendResult876_g72326 = (float3(tex2DNode604_g72326.a , tex2DNode604_g72326.g , 1.0));
-				float3 gammaToLinear878_g72326 = GammaToLinearSpace( appendResult876_g72326 );
-				float3 ifLocalVar40_g72407 = 0;
-				if( Debug_Index464_g72326 == 2.0 )
-				ifLocalVar40_g72407 = gammaToLinear878_g72326;
-				float2 uv_MainMaskTex = IN.ase_texcoord10.xy * _MainMaskTex_ST.xy + _MainMaskTex_ST.zw;
-				float ifLocalVar40_g72339 = 0;
-				if( Debug_Index464_g72326 == 3.0 )
-				ifLocalVar40_g72339 = tex2D( _MainMaskTex, uv_MainMaskTex ).r;
-				float ifLocalVar40_g72450 = 0;
-				if( Debug_Index464_g72326 == 4.0 )
-				ifLocalVar40_g72450 = tex2D( _MainMaskTex, uv_MainMaskTex ).g;
-				float ifLocalVar40_g72375 = 0;
-				if( Debug_Index464_g72326 == 5.0 )
-				ifLocalVar40_g72375 = tex2D( _MainMaskTex, uv_MainMaskTex ).b;
-				float ifLocalVar40_g72334 = 0;
-				if( Debug_Index464_g72326 == 6.0 )
-				ifLocalVar40_g72334 = tex2D( _MainMaskTex, uv_MainMaskTex ).a;
-				float2 uv_SecondAlbedoTex = IN.ase_texcoord10.xy * _SecondAlbedoTex_ST.xy + _SecondAlbedoTex_ST.zw;
-				float4 tex2DNode854_g72326 = tex2D( _SecondAlbedoTex, uv_SecondAlbedoTex );
-				float3 appendResult839_g72326 = (float3(tex2DNode854_g72326.r , tex2DNode854_g72326.g , tex2DNode854_g72326.b));
-				float3 ifLocalVar40_g72353 = 0;
-				if( Debug_Index464_g72326 == 7.0 )
-				ifLocalVar40_g72353 = appendResult839_g72326;
-				float ifLocalVar40_g72387 = 0;
-				if( Debug_Index464_g72326 == 8.0 )
-				ifLocalVar40_g72387 = tex2D( _SecondAlbedoTex, uv_SecondAlbedoTex ).a;
-				float2 uv_SecondNormalTex = IN.ase_texcoord10.xy * _SecondNormalTex_ST.xy + _SecondNormalTex_ST.zw;
-				float4 tex2DNode841_g72326 = tex2D( _SecondNormalTex, uv_SecondNormalTex );
-				float3 appendResult880_g72326 = (float3(tex2DNode841_g72326.a , tex2DNode841_g72326.g , 1.0));
-				float3 gammaToLinear879_g72326 = GammaToLinearSpace( appendResult880_g72326 );
-				float3 ifLocalVar40_g72438 = 0;
-				if( Debug_Index464_g72326 == 8.0 )
-				ifLocalVar40_g72438 = gammaToLinear879_g72326;
-				float2 uv_SecondMaskTex = IN.ase_texcoord10.xy * _SecondMaskTex_ST.xy + _SecondMaskTex_ST.zw;
-				float ifLocalVar40_g72408 = 0;
-				if( Debug_Index464_g72326 == 10.0 )
-				ifLocalVar40_g72408 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).r;
-				float ifLocalVar40_g72372 = 0;
-				if( Debug_Index464_g72326 == 11.0 )
-				ifLocalVar40_g72372 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).g;
-				float ifLocalVar40_g72427 = 0;
-				if( Debug_Index464_g72326 == 12.0 )
-				ifLocalVar40_g72427 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).b;
-				float ifLocalVar40_g72436 = 0;
-				if( Debug_Index464_g72326 == 13.0 )
-				ifLocalVar40_g72436 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).a;
-				float2 uv_EmissiveTex = IN.ase_texcoord10.xy * _EmissiveTex_ST.xy + _EmissiveTex_ST.zw;
-				float4 tex2DNode858_g72326 = tex2D( _EmissiveTex, uv_EmissiveTex );
-				float3 appendResult867_g72326 = (float3(tex2DNode858_g72326.r , tex2DNode858_g72326.g , tex2DNode858_g72326.b));
-				float3 ifLocalVar40_g72369 = 0;
-				if( Debug_Index464_g72326 == 14.0 )
-				ifLocalVar40_g72369 = appendResult867_g72326;
-				float Debug_Min721_g72326 = TVE_DEBUG_Min;
-				float temp_output_7_0_g72422 = Debug_Min721_g72326;
-				float4 temp_cast_3 = (temp_output_7_0_g72422).xxxx;
-				float Debug_Max723_g72326 = TVE_DEBUG_Max;
-				float4 Output_Maps561_g72326 = ( ( ( float4( ( ( ifLocalVar40_g72361 + ifLocalVar40_g72373 + ifLocalVar40_g72407 ) + ( ifLocalVar40_g72339 + ifLocalVar40_g72450 + ifLocalVar40_g72375 + ifLocalVar40_g72334 ) ) , 0.0 ) + float4( ( ( ( ifLocalVar40_g72353 + ifLocalVar40_g72387 + ifLocalVar40_g72438 ) + ( ifLocalVar40_g72408 + ifLocalVar40_g72372 + ifLocalVar40_g72427 + ifLocalVar40_g72436 ) ) * _DetailMode ) , 0.0 ) + ( ( float4( ifLocalVar40_g72369 , 0.0 ) * _EmissiveColor ) * _EmissiveCat ) ) - temp_cast_3 ) / ( Debug_Max723_g72326 - temp_output_7_0_g72422 ) );
-				float4 ifLocalVar40_g72421 = 0;
-				if( Debug_Type367_g72326 == 3.0 )
-				ifLocalVar40_g72421 = Output_Maps561_g72326;
-				float Resolution44_g72386 = max( _MainAlbedoTex_TexelSize.z , _MainAlbedoTex_TexelSize.w );
-				float4 color62_g72386 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
-				float4 ifLocalVar61_g72386 = 0;
-				if( Resolution44_g72386 <= 256.0 )
-				ifLocalVar61_g72386 = color62_g72386;
-				float4 color55_g72386 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
-				float4 ifLocalVar56_g72386 = 0;
-				if( Resolution44_g72386 == 512.0 )
-				ifLocalVar56_g72386 = color55_g72386;
-				float4 color42_g72386 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float4 ifLocalVar40_g72386 = 0;
-				if( Resolution44_g72386 == 1024.0 )
-				ifLocalVar40_g72386 = color42_g72386;
-				float4 color48_g72386 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
-				float4 ifLocalVar47_g72386 = 0;
-				if( Resolution44_g72386 == 2048.0 )
-				ifLocalVar47_g72386 = color48_g72386;
-				float4 color51_g72386 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 ifLocalVar52_g72386 = 0;
-				if( Resolution44_g72386 >= 4096.0 )
-				ifLocalVar52_g72386 = color51_g72386;
-				float4 ifLocalVar40_g72437 = 0;
-				if( Debug_Index464_g72326 == 0.0 )
-				ifLocalVar40_g72437 = ( ifLocalVar61_g72386 + ifLocalVar56_g72386 + ifLocalVar40_g72386 + ifLocalVar47_g72386 + ifLocalVar52_g72386 );
-				float Resolution44_g72344 = max( _MainNormalTex_TexelSize.z , _MainNormalTex_TexelSize.w );
-				float4 color62_g72344 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
-				float4 ifLocalVar61_g72344 = 0;
-				if( Resolution44_g72344 <= 256.0 )
-				ifLocalVar61_g72344 = color62_g72344;
-				float4 color55_g72344 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
-				float4 ifLocalVar56_g72344 = 0;
-				if( Resolution44_g72344 == 512.0 )
-				ifLocalVar56_g72344 = color55_g72344;
-				float4 color42_g72344 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float4 ifLocalVar40_g72344 = 0;
-				if( Resolution44_g72344 == 1024.0 )
-				ifLocalVar40_g72344 = color42_g72344;
-				float4 color48_g72344 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
-				float4 ifLocalVar47_g72344 = 0;
-				if( Resolution44_g72344 == 2048.0 )
-				ifLocalVar47_g72344 = color48_g72344;
-				float4 color51_g72344 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 ifLocalVar52_g72344 = 0;
-				if( Resolution44_g72344 >= 4096.0 )
-				ifLocalVar52_g72344 = color51_g72344;
-				float4 ifLocalVar40_g72350 = 0;
-				if( Debug_Index464_g72326 == 1.0 )
-				ifLocalVar40_g72350 = ( ifLocalVar61_g72344 + ifLocalVar56_g72344 + ifLocalVar40_g72344 + ifLocalVar47_g72344 + ifLocalVar52_g72344 );
-				float Resolution44_g72385 = max( _MainMaskTex_TexelSize.z , _MainMaskTex_TexelSize.w );
-				float4 color62_g72385 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
-				float4 ifLocalVar61_g72385 = 0;
-				if( Resolution44_g72385 <= 256.0 )
-				ifLocalVar61_g72385 = color62_g72385;
-				float4 color55_g72385 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
-				float4 ifLocalVar56_g72385 = 0;
-				if( Resolution44_g72385 == 512.0 )
-				ifLocalVar56_g72385 = color55_g72385;
-				float4 color42_g72385 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float4 ifLocalVar40_g72385 = 0;
-				if( Resolution44_g72385 == 1024.0 )
-				ifLocalVar40_g72385 = color42_g72385;
-				float4 color48_g72385 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
-				float4 ifLocalVar47_g72385 = 0;
-				if( Resolution44_g72385 == 2048.0 )
-				ifLocalVar47_g72385 = color48_g72385;
-				float4 color51_g72385 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 ifLocalVar52_g72385 = 0;
-				if( Resolution44_g72385 >= 4096.0 )
-				ifLocalVar52_g72385 = color51_g72385;
-				float4 ifLocalVar40_g72357 = 0;
-				if( Debug_Index464_g72326 == 2.0 )
-				ifLocalVar40_g72357 = ( ifLocalVar61_g72385 + ifLocalVar56_g72385 + ifLocalVar40_g72385 + ifLocalVar47_g72385 + ifLocalVar52_g72385 );
-				float Resolution44_g72383 = max( _SecondAlbedoTex_TexelSize.z , _SecondAlbedoTex_TexelSize.w );
-				float4 color62_g72383 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
-				float4 ifLocalVar61_g72383 = 0;
-				if( Resolution44_g72383 <= 256.0 )
-				ifLocalVar61_g72383 = color62_g72383;
-				float4 color55_g72383 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
-				float4 ifLocalVar56_g72383 = 0;
-				if( Resolution44_g72383 == 512.0 )
-				ifLocalVar56_g72383 = color55_g72383;
-				float4 color42_g72383 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float4 ifLocalVar40_g72383 = 0;
-				if( Resolution44_g72383 == 1024.0 )
-				ifLocalVar40_g72383 = color42_g72383;
-				float4 color48_g72383 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
-				float4 ifLocalVar47_g72383 = 0;
-				if( Resolution44_g72383 == 2048.0 )
-				ifLocalVar47_g72383 = color48_g72383;
-				float4 color51_g72383 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 ifLocalVar52_g72383 = 0;
-				if( Resolution44_g72383 >= 4096.0 )
-				ifLocalVar52_g72383 = color51_g72383;
-				float4 ifLocalVar40_g72382 = 0;
-				if( Debug_Index464_g72326 == 3.0 )
-				ifLocalVar40_g72382 = ( ifLocalVar61_g72383 + ifLocalVar56_g72383 + ifLocalVar40_g72383 + ifLocalVar47_g72383 + ifLocalVar52_g72383 );
-				float Resolution44_g72370 = max( _SecondMaskTex_TexelSize.z , _SecondMaskTex_TexelSize.w );
-				float4 color62_g72370 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
-				float4 ifLocalVar61_g72370 = 0;
-				if( Resolution44_g72370 <= 256.0 )
-				ifLocalVar61_g72370 = color62_g72370;
-				float4 color55_g72370 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
-				float4 ifLocalVar56_g72370 = 0;
-				if( Resolution44_g72370 == 512.0 )
-				ifLocalVar56_g72370 = color55_g72370;
-				float4 color42_g72370 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float4 ifLocalVar40_g72370 = 0;
-				if( Resolution44_g72370 == 1024.0 )
-				ifLocalVar40_g72370 = color42_g72370;
-				float4 color48_g72370 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
-				float4 ifLocalVar47_g72370 = 0;
-				if( Resolution44_g72370 == 2048.0 )
-				ifLocalVar47_g72370 = color48_g72370;
-				float4 color51_g72370 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 ifLocalVar52_g72370 = 0;
-				if( Resolution44_g72370 >= 4096.0 )
-				ifLocalVar52_g72370 = color51_g72370;
-				float4 ifLocalVar40_g72358 = 0;
-				if( Debug_Index464_g72326 == 4.0 )
-				ifLocalVar40_g72358 = ( ifLocalVar61_g72370 + ifLocalVar56_g72370 + ifLocalVar40_g72370 + ifLocalVar47_g72370 + ifLocalVar52_g72370 );
-				float Resolution44_g72388 = max( _SecondAlbedoTex_TexelSize.z , _SecondAlbedoTex_TexelSize.w );
-				float4 color62_g72388 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
-				float4 ifLocalVar61_g72388 = 0;
-				if( Resolution44_g72388 <= 256.0 )
-				ifLocalVar61_g72388 = color62_g72388;
-				float4 color55_g72388 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
-				float4 ifLocalVar56_g72388 = 0;
-				if( Resolution44_g72388 == 512.0 )
-				ifLocalVar56_g72388 = color55_g72388;
-				float4 color42_g72388 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float4 ifLocalVar40_g72388 = 0;
-				if( Resolution44_g72388 == 1024.0 )
-				ifLocalVar40_g72388 = color42_g72388;
-				float4 color48_g72388 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
-				float4 ifLocalVar47_g72388 = 0;
-				if( Resolution44_g72388 == 2048.0 )
-				ifLocalVar47_g72388 = color48_g72388;
-				float4 color51_g72388 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 ifLocalVar52_g72388 = 0;
-				if( Resolution44_g72388 >= 4096.0 )
-				ifLocalVar52_g72388 = color51_g72388;
-				float4 ifLocalVar40_g72381 = 0;
-				if( Debug_Index464_g72326 == 5.0 )
-				ifLocalVar40_g72381 = ( ifLocalVar61_g72388 + ifLocalVar56_g72388 + ifLocalVar40_g72388 + ifLocalVar47_g72388 + ifLocalVar52_g72388 );
-				float Resolution44_g72365 = max( _EmissiveTex_TexelSize.z , _EmissiveTex_TexelSize.w );
-				float4 color62_g72365 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
-				float4 ifLocalVar61_g72365 = 0;
-				if( Resolution44_g72365 <= 256.0 )
-				ifLocalVar61_g72365 = color62_g72365;
-				float4 color55_g72365 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
-				float4 ifLocalVar56_g72365 = 0;
-				if( Resolution44_g72365 == 512.0 )
-				ifLocalVar56_g72365 = color55_g72365;
-				float4 color42_g72365 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float4 ifLocalVar40_g72365 = 0;
-				if( Resolution44_g72365 == 1024.0 )
-				ifLocalVar40_g72365 = color42_g72365;
-				float4 color48_g72365 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
-				float4 ifLocalVar47_g72365 = 0;
-				if( Resolution44_g72365 == 2048.0 )
-				ifLocalVar47_g72365 = color48_g72365;
-				float4 color51_g72365 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 ifLocalVar52_g72365 = 0;
-				if( Resolution44_g72365 >= 4096.0 )
-				ifLocalVar52_g72365 = color51_g72365;
-				float4 ifLocalVar40_g72390 = 0;
-				if( Debug_Index464_g72326 == 6.0 )
-				ifLocalVar40_g72390 = ( ifLocalVar61_g72365 + ifLocalVar56_g72365 + ifLocalVar40_g72365 + ifLocalVar47_g72365 + ifLocalVar52_g72365 );
-				float4 Output_Resolution737_g72326 = ( ( ifLocalVar40_g72437 + ifLocalVar40_g72350 + ifLocalVar40_g72357 ) + ( ifLocalVar40_g72382 + ifLocalVar40_g72358 + ifLocalVar40_g72381 ) + ifLocalVar40_g72390 );
-				float4 ifLocalVar40_g72420 = 0;
-				if( Debug_Type367_g72326 == 4.0 )
-				ifLocalVar40_g72420 = Output_Resolution737_g72326;
-				float4x4 break19_g72453 = unity_ObjectToWorld;
-				float3 appendResult20_g72453 = (float3(break19_g72453[ 0 ][ 3 ] , break19_g72453[ 1 ][ 3 ] , break19_g72453[ 2 ][ 3 ]));
-				float3 appendResult60_g72452 = (float3(IN.ase_texcoord11.x , IN.ase_texcoord11.z , IN.ase_texcoord11.y));
-				float3 temp_output_122_0_g72453 = ( appendResult60_g72452 * _VertexPivotMode );
-				float3 PivotsOnly105_g72453 = (mul( unity_ObjectToWorld, float4( temp_output_122_0_g72453 , 0.0 ) ).xyz).xyz;
-				half3 ObjectData20_g72454 = ( appendResult20_g72453 + PivotsOnly105_g72453 );
-				half3 WorldData19_g72454 = worldPos;
-				#ifdef TVE_FEATURE_BATCHING
-				float3 staticSwitch14_g72454 = WorldData19_g72454;
-				#else
-				float3 staticSwitch14_g72454 = ObjectData20_g72454;
-				#endif
-				float3 temp_output_114_0_g72453 = staticSwitch14_g72454;
-				half3 ObjectData20_g72367 = temp_output_114_0_g72453;
-				half3 WorldData19_g72367 = worldPos;
-				#ifdef TVE_FEATURE_BATCHING
-				float3 staticSwitch14_g72367 = WorldData19_g72367;
-				#else
-				float3 staticSwitch14_g72367 = ObjectData20_g72367;
-				#endif
-				float3 ObjectPosition890_g72326 = staticSwitch14_g72367;
-				half3 Input_Position419_g72413 = ObjectPosition890_g72326;
-				float Input_MotionScale287_g72413 = ( _MotionScale_10 + 1.0 );
-				half Global_Scale448_g72413 = TVE_NoiseParams.x;
-				float2 temp_output_597_0_g72413 = (( Input_Position419_g72413 * Input_MotionScale287_g72413 * Global_Scale448_g72413 * 0.0075 )).xz;
-				float4 temp_output_91_19_g72456 = TVE_MotionCoords;
-				half2 UV94_g72456 = ( (temp_output_91_19_g72456).zw + ( (temp_output_91_19_g72456).xy * (ObjectPosition890_g72326).xz ) );
-				float Debug_Layer885_g72326 = TVE_DEBUG_Layer;
-				float temp_output_84_0_g72456 = Debug_Layer885_g72326;
-				float4 lerpResult107_g72456 = lerp( TVE_MotionParams , saturate( SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_MotionTex, sampler_linear_repeat, float3(UV94_g72456,temp_output_84_0_g72456), 0.0 ) ) , TVE_MotionUsage[(int)temp_output_84_0_g72456]);
-				float4 break322_g72451 = lerpResult107_g72456;
-				float3 appendResult397_g72451 = (float3(break322_g72451.x , 0.0 , break322_g72451.y));
-				float3 temp_output_398_0_g72451 = (appendResult397_g72451*2.0 + -1.0);
-				half2 Wind_DirectionWS1031_g72326 = (temp_output_398_0_g72451).xz;
-				half2 Input_DirectionWS423_g72413 = Wind_DirectionWS1031_g72326;
-				half Input_MotionSpeed62_g72413 = _MotionSpeed_10;
-				half Global_Speed449_g72413 = TVE_NoiseParams.y;
-				half Input_MotionVariation284_g72413 = _MotionVariation_10;
-				float3 break111_g72460 = ObjectPosition890_g72326;
-				half Input_DynamicMode120_g72460 = _VertexDynamicMode;
-				half Input_Variation124_g72460 = IN.ase_color.r;
-				half ObjectData20_g72461 = frac( ( ( ( break111_g72460.x + break111_g72460.y + break111_g72460.z ) * ( 1.0 - Input_DynamicMode120_g72460 ) ) + Input_Variation124_g72460 ) );
-				half WorldData19_g72461 = Input_Variation124_g72460;
-				#ifdef TVE_FEATURE_BATCHING
-				float staticSwitch14_g72461 = WorldData19_g72461;
-				#else
-				float staticSwitch14_g72461 = ObjectData20_g72461;
-				#endif
-				float clampResult129_g72460 = clamp( staticSwitch14_g72461 , 0.01 , 0.99 );
-				half Global_MeshVariation1176_g72326 = clampResult129_g72460;
-				half Input_GlobalVariation569_g72413 = Global_MeshVariation1176_g72326;
-				float temp_output_630_0_g72413 = ( ( ( _Time.y * Input_MotionSpeed62_g72413 * Global_Speed449_g72413 ) + ( Input_MotionVariation284_g72413 * Input_GlobalVariation569_g72413 ) ) * 0.03 );
-				float temp_output_607_0_g72413 = frac( temp_output_630_0_g72413 );
-				float4 lerpResult590_g72413 = lerp( tex2D( TVE_NoiseTex, ( temp_output_597_0_g72413 + ( -Input_DirectionWS423_g72413 * temp_output_607_0_g72413 ) ) ) , tex2D( TVE_NoiseTex, ( temp_output_597_0_g72413 + ( -Input_DirectionWS423_g72413 * frac( ( temp_output_630_0_g72413 + 0.5 ) ) ) ) ) , ( abs( ( temp_output_607_0_g72413 - 0.5 ) ) / 0.5 ));
-				float4 break613_g72413 = lerpResult590_g72413;
-				half Wind_Power369_g72451 = break322_g72451.z;
-				half Wind_Pow1128_g72326 = Wind_Power369_g72451;
-				half Input_GlobalWind327_g72413 = Wind_Pow1128_g72326;
-				float lerpResult612_g72413 = lerp( 1.4 , 0.4 , Input_GlobalWind327_g72413);
-				float temp_output_604_0_g72413 = pow( ( break613_g72413.r + 0.2 ) , lerpResult612_g72413 );
-				half Motion_Noise915_g72326 = temp_output_604_0_g72413;
-				float ifLocalVar40_g72340 = 0;
-				if( Debug_Index464_g72326 == 0.0 )
-				ifLocalVar40_g72340 = Motion_Noise915_g72326;
-				float4 temp_output_91_19_g72403 = TVE_ColorsCoords;
-				float3 WorldPosition893_g72326 = worldPos;
-				half2 UV94_g72403 = ( (temp_output_91_19_g72403).zw + ( (temp_output_91_19_g72403).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_82_0_g72403 = Debug_Layer885_g72326;
-				float4 lerpResult108_g72403 = lerp( TVE_ColorsParams , SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_ColorsTex, sampler_linear_repeat, float3(UV94_g72403,temp_output_82_0_g72403), 0.0 ) , TVE_ColorsUsage[(int)temp_output_82_0_g72403]);
-				float3 ifLocalVar40_g72366 = 0;
-				if( Debug_Index464_g72326 == 1.0 )
-				ifLocalVar40_g72366 = (lerpResult108_g72403).rgb;
-				float4 temp_output_91_19_g72391 = TVE_ColorsCoords;
-				half2 UV94_g72391 = ( (temp_output_91_19_g72391).zw + ( (temp_output_91_19_g72391).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_82_0_g72391 = Debug_Layer885_g72326;
-				float4 lerpResult108_g72391 = lerp( TVE_ColorsParams , SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_ColorsTex, sampler_linear_repeat, float3(UV94_g72391,temp_output_82_0_g72391), 0.0 ) , TVE_ColorsUsage[(int)temp_output_82_0_g72391]);
-				float ifLocalVar40_g72380 = 0;
-				if( Debug_Index464_g72326 == 2.0 )
-				ifLocalVar40_g72380 = saturate( (lerpResult108_g72391).a );
-				float4 temp_output_93_19_g72399 = TVE_ExtrasCoords;
-				half2 UV96_g72399 = ( (temp_output_93_19_g72399).zw + ( (temp_output_93_19_g72399).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72399 = Debug_Layer885_g72326;
-				float4 lerpResult109_g72399 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_ExtrasTex, sampler_linear_repeat, float3(UV96_g72399,temp_output_84_0_g72399), 0.0 ) , TVE_ExtrasUsage[(int)temp_output_84_0_g72399]);
-				float4 break89_g72399 = lerpResult109_g72399;
-				float ifLocalVar40_g72351 = 0;
-				if( Debug_Index464_g72326 == 3.0 )
-				ifLocalVar40_g72351 = break89_g72399.r;
-				float4 temp_output_93_19_g72329 = TVE_ExtrasCoords;
-				half2 UV96_g72329 = ( (temp_output_93_19_g72329).zw + ( (temp_output_93_19_g72329).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72329 = Debug_Layer885_g72326;
-				float4 lerpResult109_g72329 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_ExtrasTex, sampler_linear_repeat, float3(UV96_g72329,temp_output_84_0_g72329), 0.0 ) , TVE_ExtrasUsage[(int)temp_output_84_0_g72329]);
-				float4 break89_g72329 = lerpResult109_g72329;
-				float ifLocalVar40_g72449 = 0;
-				if( Debug_Index464_g72326 == 4.0 )
-				ifLocalVar40_g72449 = break89_g72329.g;
-				float4 temp_output_93_19_g72409 = TVE_ExtrasCoords;
-				half2 UV96_g72409 = ( (temp_output_93_19_g72409).zw + ( (temp_output_93_19_g72409).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72409 = Debug_Layer885_g72326;
-				float4 lerpResult109_g72409 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_ExtrasTex, sampler_linear_repeat, float3(UV96_g72409,temp_output_84_0_g72409), 0.0 ) , TVE_ExtrasUsage[(int)temp_output_84_0_g72409]);
-				float4 break89_g72409 = lerpResult109_g72409;
-				float ifLocalVar40_g72352 = 0;
-				if( Debug_Index464_g72326 == 5.0 )
-				ifLocalVar40_g72352 = break89_g72409.b;
-				float4 temp_output_93_19_g72439 = TVE_ExtrasCoords;
-				half2 UV96_g72439 = ( (temp_output_93_19_g72439).zw + ( (temp_output_93_19_g72439).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72439 = Debug_Layer885_g72326;
-				float4 lerpResult109_g72439 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_ExtrasTex, sampler_linear_repeat, float3(UV96_g72439,temp_output_84_0_g72439), 0.0 ) , TVE_ExtrasUsage[(int)temp_output_84_0_g72439]);
-				float4 break89_g72439 = lerpResult109_g72439;
-				float ifLocalVar40_g72345 = 0;
-				if( Debug_Index464_g72326 == 6.0 )
-				ifLocalVar40_g72345 = saturate( break89_g72439.a );
-				float4 temp_output_91_19_g72395 = TVE_MotionCoords;
-				half2 UV94_g72395 = ( (temp_output_91_19_g72395).zw + ( (temp_output_91_19_g72395).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72395 = Debug_Layer885_g72326;
-				float4 lerpResult107_g72395 = lerp( TVE_MotionParams , saturate( SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_MotionTex, sampler_linear_repeat, float3(UV94_g72395,temp_output_84_0_g72395), 0.0 ) ) , TVE_MotionUsage[(int)temp_output_84_0_g72395]);
-				float3 appendResult1012_g72326 = (float3((lerpResult107_g72395).rg , 0.0));
-				float3 ifLocalVar40_g72335 = 0;
-				if( Debug_Index464_g72326 == 7.0 )
-				ifLocalVar40_g72335 = appendResult1012_g72326;
-				float4 temp_output_91_19_g72423 = TVE_MotionCoords;
-				half2 UV94_g72423 = ( (temp_output_91_19_g72423).zw + ( (temp_output_91_19_g72423).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72423 = Debug_Layer885_g72326;
-				float4 lerpResult107_g72423 = lerp( TVE_MotionParams , saturate( SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_MotionTex, sampler_linear_repeat, float3(UV94_g72423,temp_output_84_0_g72423), 0.0 ) ) , TVE_MotionUsage[(int)temp_output_84_0_g72423]);
-				float ifLocalVar40_g72356 = 0;
-				if( Debug_Index464_g72326 == 8.0 )
-				ifLocalVar40_g72356 = (lerpResult107_g72423).b;
-				float4 temp_output_91_19_g72431 = TVE_MotionCoords;
-				half2 UV94_g72431 = ( (temp_output_91_19_g72431).zw + ( (temp_output_91_19_g72431).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72431 = Debug_Layer885_g72326;
-				float4 lerpResult107_g72431 = lerp( TVE_MotionParams , saturate( SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_MotionTex, sampler_linear_repeat, float3(UV94_g72431,temp_output_84_0_g72431), 0.0 ) ) , TVE_MotionUsage[(int)temp_output_84_0_g72431]);
-				float ifLocalVar40_g72435 = 0;
-				if( Debug_Index464_g72326 == 9.0 )
-				ifLocalVar40_g72435 = (lerpResult107_g72431).a;
-				float4 temp_output_94_19_g72444 = TVE_VertexCoords;
-				half2 UV97_g72444 = ( (temp_output_94_19_g72444).zw + ( (temp_output_94_19_g72444).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72444 = Debug_Layer885_g72326;
-				float4 lerpResult109_g72444 = lerp( TVE_VertexParams , SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_VertexTex, sampler_linear_repeat, float3(UV97_g72444,temp_output_84_0_g72444), 0.0 ) , TVE_VertexUsage[(int)temp_output_84_0_g72444]);
-				float ifLocalVar40_g72374 = 0;
-				if( Debug_Index464_g72326 == 10.0 )
-				ifLocalVar40_g72374 = (lerpResult109_g72444).a;
-				float3 Output_Globals888_g72326 = ( ifLocalVar40_g72340 + ( ifLocalVar40_g72366 + ifLocalVar40_g72380 ) + ( ifLocalVar40_g72351 + ifLocalVar40_g72449 + ifLocalVar40_g72352 + ifLocalVar40_g72345 ) + ( ifLocalVar40_g72335 + ifLocalVar40_g72356 + ifLocalVar40_g72435 ) + ( ifLocalVar40_g72374 + 0.0 ) );
-				float3 ifLocalVar40_g72338 = 0;
-				if( Debug_Type367_g72326 == 8.0 )
-				ifLocalVar40_g72338 = Output_Globals888_g72326;
-				float3 vertexToFrag328_g72326 = IN.ase_texcoord9.yzw;
-				float4 color1016_g72326 = IsGammaSpace() ? float4(0.5831653,0.6037736,0.2135992,0) : float4(0.2992498,0.3229691,0.03750122,0);
-				float4 color1017_g72326 = IsGammaSpace() ? float4(0.8117647,0.3488252,0.2627451,0) : float4(0.6239604,0.0997834,0.05612849,0);
-				float4 switchResult1015_g72326 = (((ase_vface>0)?(color1016_g72326):(color1017_g72326)));
-				float3 ifLocalVar40_g72342 = 0;
-				if( Debug_Index464_g72326 == 4.0 )
-				ifLocalVar40_g72342 = (switchResult1015_g72326).rgb;
-				float temp_output_7_0_g72354 = Debug_Min721_g72326;
-				float3 temp_cast_30 = (temp_output_7_0_g72354).xxx;
-				float3 Output_Mesh316_g72326 = saturate( ( ( ( vertexToFrag328_g72326 + ifLocalVar40_g72342 ) - temp_cast_30 ) / ( Debug_Max723_g72326 - temp_output_7_0_g72354 ) ) );
-				float3 ifLocalVar40_g72337 = 0;
-				if( Debug_Type367_g72326 == 9.0 )
-				ifLocalVar40_g72337 = Output_Mesh316_g72326;
-				float4 color1086_g72326 = IsGammaSpace() ? float4(0.1226415,0.1226415,0.1226415,0) : float4(0.01390275,0.01390275,0.01390275,0);
-				float4 vertexToFrag11_g72328 = IN.ase_texcoord12;
-				float _IsVegetationShader1101_g72326 = _IsVegetationShader;
-				float4 lerpResult1089_g72326 = lerp( color1086_g72326 , vertexToFrag11_g72328 , ( _IsPolygonalShader1112_g72326 * _IsVegetationShader1101_g72326 ));
-				float3 Output_Misc1080_g72326 = (lerpResult1089_g72326).rgb;
-				float3 ifLocalVar40_g72418 = 0;
-				if( Debug_Type367_g72326 == 10.0 )
-				ifLocalVar40_g72418 = Output_Misc1080_g72326;
-				float4 temp_output_459_0_g72326 = ( ifLocalVar40_g72359 + ifLocalVar40_g72448 + ifLocalVar40_g72428 + ifLocalVar40_g72421 + ifLocalVar40_g72420 + float4( ifLocalVar40_g72338 , 0.0 ) + float4( ifLocalVar40_g72337 , 0.0 ) + float4( ifLocalVar40_g72418 , 0.0 ) );
-				float4 color690_g72326 = IsGammaSpace() ? float4(0.1226415,0.1226415,0.1226415,0) : float4(0.01390275,0.01390275,0.01390275,0);
-				float _IsTVEShader647_g72326 = _IsTVEShader;
-				float4 lerpResult689_g72326 = lerp( color690_g72326 , temp_output_459_0_g72326 , _IsTVEShader647_g72326);
-				float Debug_Filter322_g72326 = TVE_DEBUG_Filter;
-				float4 lerpResult326_g72326 = lerp( temp_output_459_0_g72326 , lerpResult689_g72326 , Debug_Filter322_g72326);
-				float Debug_Clip623_g72326 = TVE_DEBUG_Clip;
-				float lerpResult622_g72326 = lerp( 1.0 , tex2D( _MainAlbedoTex, uv_MainAlbedoTex ).a , ( Debug_Clip623_g72326 * _RenderClip ));
-				clip( lerpResult622_g72326 - _Cutoff);
+				float Debug_Type367_g62695 = TVE_DEBUG_Type;
+				float4 color646_g62695 = IsGammaSpace() ? float4(0.9245283,0.7969696,0.4142933,1) : float4(0.8368256,0.5987038,0.1431069,1);
+				float customEye676_g62695 = IN.ase_texcoord9.x;
+				float saferPower688_g62695 = abs( (0.0 + (customEye676_g62695 - 300.0) * (1.0 - 0.0) / (0.0 - 300.0)) );
+				float clampResult702_g62695 = clamp( pow( saferPower688_g62695 , 1.25 ) , 0.75 , 1.0 );
+				float Shading655_g62695 = clampResult702_g62695;
+				float4 Output_Converted717_g62695 = ( color646_g62695 * Shading655_g62695 );
+				float4 ifLocalVar40_g63004 = 0;
+				if( Debug_Type367_g62695 == 0.0 )
+				ifLocalVar40_g63004 = Output_Converted717_g62695;
+				float4 color466_g62695 = IsGammaSpace() ? float4(0.8113208,0.4952317,0.264062,0) : float4(0.6231937,0.2096542,0.05668841,0);
+				float _IsBarkShader347_g62695 = _IsBarkShader;
+				float4 color469_g62695 = IsGammaSpace() ? float4(0.6566009,0.3404236,0.8490566,0) : float4(0.3886527,0.09487338,0.6903409,0);
+				float _IsCrossShader342_g62695 = _IsCrossShader;
+				float4 color472_g62695 = IsGammaSpace() ? float4(0.7100264,0.8018868,0.2231666,0) : float4(0.4623997,0.6070304,0.0407874,0);
+				float _IsGrassShader341_g62695 = _IsGrassShader;
+				float4 color475_g62695 = IsGammaSpace() ? float4(0.3267961,0.7264151,0.3118103,0) : float4(0.08721471,0.4865309,0.07922345,0);
+				float _IsLeafShader360_g62695 = _IsLeafShader;
+				float4 color478_g62695 = IsGammaSpace() ? float4(0.3252937,0.6122813,0.8113208,0) : float4(0.08639329,0.3330702,0.6231937,0);
+				float _IsPropShader346_g62695 = _IsPropShader;
+				float4 color1114_g62695 = IsGammaSpace() ? float4(0.9716981,0.3162602,0.4816265,0) : float4(0.9368213,0.08154967,0.1974273,0);
+				float _IsImpostorShader1110_g62695 = _IsImpostorShader;
+				float4 color1117_g62695 = IsGammaSpace() ? float4(0.257921,0.8679245,0.8361252,0) : float4(0.05410501,0.7254258,0.6668791,0);
+				float _IsPolygonalShader1112_g62695 = _IsPolygonalShader;
+				float4 Output_Shader445_g62695 = ( ( ( color466_g62695 * _IsBarkShader347_g62695 ) + ( color469_g62695 * _IsCrossShader342_g62695 ) + ( color472_g62695 * _IsGrassShader341_g62695 ) + ( color475_g62695 * _IsLeafShader360_g62695 ) + ( color478_g62695 * _IsPropShader346_g62695 ) + ( color1114_g62695 * _IsImpostorShader1110_g62695 ) + ( color1117_g62695 * _IsPolygonalShader1112_g62695 ) ) * Shading655_g62695 );
+				float4 ifLocalVar40_g62984 = 0;
+				if( Debug_Type367_g62695 == 1.0 )
+				ifLocalVar40_g62984 = Output_Shader445_g62695;
+				float4 color544_g62695 = IsGammaSpace() ? float4(0.3252937,0.6122813,0.8113208,0) : float4(0.08639329,0.3330702,0.6231937,0);
+				float _IsSimpleShader359_g62695 = _IsSimpleShader;
+				float4 color521_g62695 = IsGammaSpace() ? float4(0.6566009,0.3404236,0.8490566,0) : float4(0.3886527,0.09487338,0.6903409,0);
+				float _IsStandardShader344_g62695 = _IsStandardShader;
+				float4 color1121_g62695 = IsGammaSpace() ? float4(0.9245283,0.8421515,0.1788003,0) : float4(0.8368256,0.677754,0.02687956,0);
+				float _IsSubsurfaceShader548_g62695 = _IsSubsurfaceShader;
+				float4 Output_Lighting525_g62695 = ( ( ( color544_g62695 * _IsSimpleShader359_g62695 ) + ( color521_g62695 * _IsStandardShader344_g62695 ) + ( color1121_g62695 * _IsSubsurfaceShader548_g62695 ) ) * Shading655_g62695 );
+				float4 ifLocalVar40_g62978 = 0;
+				if( Debug_Type367_g62695 == 2.0 )
+				ifLocalVar40_g62978 = Output_Lighting525_g62695;
+				float Debug_Index464_g62695 = TVE_DEBUG_Index;
+				float2 uv_MainAlbedoTex = IN.ase_texcoord9.yz * _MainAlbedoTex_ST.xy + _MainAlbedoTex_ST.zw;
+				float4 tex2DNode586_g62695 = tex2D( _MainAlbedoTex, uv_MainAlbedoTex );
+				float3 appendResult637_g62695 = (float3(tex2DNode586_g62695.r , tex2DNode586_g62695.g , tex2DNode586_g62695.b));
+				float3 ifLocalVar40_g63010 = 0;
+				if( Debug_Index464_g62695 == 0.0 )
+				ifLocalVar40_g63010 = appendResult637_g62695;
+				float ifLocalVar40_g63032 = 0;
+				if( Debug_Index464_g62695 == 1.0 )
+				ifLocalVar40_g63032 = tex2D( _MainAlbedoTex, uv_MainAlbedoTex ).a;
+				float2 uv_MainNormalTex = IN.ase_texcoord9.yz * _MainNormalTex_ST.xy + _MainNormalTex_ST.zw;
+				float4 tex2DNode604_g62695 = tex2D( _MainNormalTex, uv_MainNormalTex );
+				float3 appendResult876_g62695 = (float3(tex2DNode604_g62695.a , tex2DNode604_g62695.g , 1.0));
+				float3 gammaToLinear878_g62695 = GammaToLinearSpace( appendResult876_g62695 );
+				float3 ifLocalVar40_g62951 = 0;
+				if( Debug_Index464_g62695 == 2.0 )
+				ifLocalVar40_g62951 = gammaToLinear878_g62695;
+				float2 uv_MainMaskTex = IN.ase_texcoord9.yz * _MainMaskTex_ST.xy + _MainMaskTex_ST.zw;
+				float ifLocalVar40_g63024 = 0;
+				if( Debug_Index464_g62695 == 3.0 )
+				ifLocalVar40_g63024 = tex2D( _MainMaskTex, uv_MainMaskTex ).r;
+				float ifLocalVar40_g62976 = 0;
+				if( Debug_Index464_g62695 == 4.0 )
+				ifLocalVar40_g62976 = tex2D( _MainMaskTex, uv_MainMaskTex ).g;
+				float ifLocalVar40_g62997 = 0;
+				if( Debug_Index464_g62695 == 5.0 )
+				ifLocalVar40_g62997 = tex2D( _MainMaskTex, uv_MainMaskTex ).b;
+				float ifLocalVar40_g63013 = 0;
+				if( Debug_Index464_g62695 == 6.0 )
+				ifLocalVar40_g63013 = tex2D( _MainMaskTex, uv_MainMaskTex ).a;
+				float2 uv_SecondAlbedoTex = IN.ase_texcoord9.yz * _SecondAlbedoTex_ST.xy + _SecondAlbedoTex_ST.zw;
+				float4 tex2DNode854_g62695 = tex2D( _SecondAlbedoTex, uv_SecondAlbedoTex );
+				float3 appendResult839_g62695 = (float3(tex2DNode854_g62695.r , tex2DNode854_g62695.g , tex2DNode854_g62695.b));
+				float3 ifLocalVar40_g63020 = 0;
+				if( Debug_Index464_g62695 == 7.0 )
+				ifLocalVar40_g63020 = appendResult839_g62695;
+				float ifLocalVar40_g62934 = 0;
+				if( Debug_Index464_g62695 == 8.0 )
+				ifLocalVar40_g62934 = tex2D( _SecondAlbedoTex, uv_SecondAlbedoTex ).a;
+				float2 uv_SecondNormalTex = IN.ase_texcoord9.yz * _SecondNormalTex_ST.xy + _SecondNormalTex_ST.zw;
+				float4 tex2DNode841_g62695 = tex2D( _SecondNormalTex, uv_SecondNormalTex );
+				float3 appendResult880_g62695 = (float3(tex2DNode841_g62695.a , tex2DNode841_g62695.g , 1.0));
+				float3 gammaToLinear879_g62695 = GammaToLinearSpace( appendResult880_g62695 );
+				float3 ifLocalVar40_g62985 = 0;
+				if( Debug_Index464_g62695 == 8.0 )
+				ifLocalVar40_g62985 = gammaToLinear879_g62695;
+				float2 uv_SecondMaskTex = IN.ase_texcoord9.yz * _SecondMaskTex_ST.xy + _SecondMaskTex_ST.zw;
+				float ifLocalVar40_g62950 = 0;
+				if( Debug_Index464_g62695 == 10.0 )
+				ifLocalVar40_g62950 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).r;
+				float ifLocalVar40_g62955 = 0;
+				if( Debug_Index464_g62695 == 11.0 )
+				ifLocalVar40_g62955 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).g;
+				float ifLocalVar40_g62983 = 0;
+				if( Debug_Index464_g62695 == 12.0 )
+				ifLocalVar40_g62983 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).b;
+				float ifLocalVar40_g62988 = 0;
+				if( Debug_Index464_g62695 == 13.0 )
+				ifLocalVar40_g62988 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).a;
+				float2 uv_EmissiveTex = IN.ase_texcoord9.yz * _EmissiveTex_ST.xy + _EmissiveTex_ST.zw;
+				float4 tex2DNode858_g62695 = tex2D( _EmissiveTex, uv_EmissiveTex );
+				float3 appendResult867_g62695 = (float3(tex2DNode858_g62695.r , tex2DNode858_g62695.g , tex2DNode858_g62695.b));
+				float3 ifLocalVar40_g62956 = 0;
+				if( Debug_Index464_g62695 == 14.0 )
+				ifLocalVar40_g62956 = appendResult867_g62695;
+				float Debug_Min721_g62695 = TVE_DEBUG_Min;
+				float temp_output_7_0_g62962 = Debug_Min721_g62695;
+				float4 temp_cast_3 = (temp_output_7_0_g62962).xxxx;
+				float Debug_Max723_g62695 = TVE_DEBUG_Max;
+				float4 Output_Maps561_g62695 = ( ( ( float4( ( ( ifLocalVar40_g63010 + ifLocalVar40_g63032 + ifLocalVar40_g62951 ) + ( ifLocalVar40_g63024 + ifLocalVar40_g62976 + ifLocalVar40_g62997 + ifLocalVar40_g63013 ) ) , 0.0 ) + float4( ( ( ( ifLocalVar40_g63020 + ifLocalVar40_g62934 + ifLocalVar40_g62985 ) + ( ifLocalVar40_g62950 + ifLocalVar40_g62955 + ifLocalVar40_g62983 + ifLocalVar40_g62988 ) ) * _DetailMode ) , 0.0 ) + ( ( float4( ifLocalVar40_g62956 , 0.0 ) * _EmissiveColor ) * _EmissiveCat ) ) - temp_cast_3 ) / ( Debug_Max723_g62695 - temp_output_7_0_g62962 ) );
+				float4 ifLocalVar40_g62936 = 0;
+				if( Debug_Type367_g62695 == 3.0 )
+				ifLocalVar40_g62936 = Output_Maps561_g62695;
+				float Resolution44_g62953 = max( _MainAlbedoTex_TexelSize.z , _MainAlbedoTex_TexelSize.w );
+				float4 color62_g62953 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
+				float4 ifLocalVar61_g62953 = 0;
+				if( Resolution44_g62953 <= 256.0 )
+				ifLocalVar61_g62953 = color62_g62953;
+				float4 color55_g62953 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
+				float4 ifLocalVar56_g62953 = 0;
+				if( Resolution44_g62953 == 512.0 )
+				ifLocalVar56_g62953 = color55_g62953;
+				float4 color42_g62953 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float4 ifLocalVar40_g62953 = 0;
+				if( Resolution44_g62953 == 1024.0 )
+				ifLocalVar40_g62953 = color42_g62953;
+				float4 color48_g62953 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
+				float4 ifLocalVar47_g62953 = 0;
+				if( Resolution44_g62953 == 2048.0 )
+				ifLocalVar47_g62953 = color48_g62953;
+				float4 color51_g62953 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 ifLocalVar52_g62953 = 0;
+				if( Resolution44_g62953 >= 4096.0 )
+				ifLocalVar52_g62953 = color51_g62953;
+				float4 ifLocalVar40_g62987 = 0;
+				if( Debug_Index464_g62695 == 0.0 )
+				ifLocalVar40_g62987 = ( ifLocalVar61_g62953 + ifLocalVar56_g62953 + ifLocalVar40_g62953 + ifLocalVar47_g62953 + ifLocalVar52_g62953 );
+				float Resolution44_g63000 = max( _MainNormalTex_TexelSize.z , _MainNormalTex_TexelSize.w );
+				float4 color62_g63000 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
+				float4 ifLocalVar61_g63000 = 0;
+				if( Resolution44_g63000 <= 256.0 )
+				ifLocalVar61_g63000 = color62_g63000;
+				float4 color55_g63000 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
+				float4 ifLocalVar56_g63000 = 0;
+				if( Resolution44_g63000 == 512.0 )
+				ifLocalVar56_g63000 = color55_g63000;
+				float4 color42_g63000 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float4 ifLocalVar40_g63000 = 0;
+				if( Resolution44_g63000 == 1024.0 )
+				ifLocalVar40_g63000 = color42_g63000;
+				float4 color48_g63000 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
+				float4 ifLocalVar47_g63000 = 0;
+				if( Resolution44_g63000 == 2048.0 )
+				ifLocalVar47_g63000 = color48_g63000;
+				float4 color51_g63000 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 ifLocalVar52_g63000 = 0;
+				if( Resolution44_g63000 >= 4096.0 )
+				ifLocalVar52_g63000 = color51_g63000;
+				float4 ifLocalVar40_g63025 = 0;
+				if( Debug_Index464_g62695 == 1.0 )
+				ifLocalVar40_g63025 = ( ifLocalVar61_g63000 + ifLocalVar56_g63000 + ifLocalVar40_g63000 + ifLocalVar47_g63000 + ifLocalVar52_g63000 );
+				float Resolution44_g62954 = max( _MainMaskTex_TexelSize.z , _MainMaskTex_TexelSize.w );
+				float4 color62_g62954 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
+				float4 ifLocalVar61_g62954 = 0;
+				if( Resolution44_g62954 <= 256.0 )
+				ifLocalVar61_g62954 = color62_g62954;
+				float4 color55_g62954 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
+				float4 ifLocalVar56_g62954 = 0;
+				if( Resolution44_g62954 == 512.0 )
+				ifLocalVar56_g62954 = color55_g62954;
+				float4 color42_g62954 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float4 ifLocalVar40_g62954 = 0;
+				if( Resolution44_g62954 == 1024.0 )
+				ifLocalVar40_g62954 = color42_g62954;
+				float4 color48_g62954 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
+				float4 ifLocalVar47_g62954 = 0;
+				if( Resolution44_g62954 == 2048.0 )
+				ifLocalVar47_g62954 = color48_g62954;
+				float4 color51_g62954 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 ifLocalVar52_g62954 = 0;
+				if( Resolution44_g62954 >= 4096.0 )
+				ifLocalVar52_g62954 = color51_g62954;
+				float4 ifLocalVar40_g63001 = 0;
+				if( Debug_Index464_g62695 == 2.0 )
+				ifLocalVar40_g63001 = ( ifLocalVar61_g62954 + ifLocalVar56_g62954 + ifLocalVar40_g62954 + ifLocalVar47_g62954 + ifLocalVar52_g62954 );
+				float Resolution44_g62963 = max( _SecondAlbedoTex_TexelSize.z , _SecondAlbedoTex_TexelSize.w );
+				float4 color62_g62963 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
+				float4 ifLocalVar61_g62963 = 0;
+				if( Resolution44_g62963 <= 256.0 )
+				ifLocalVar61_g62963 = color62_g62963;
+				float4 color55_g62963 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
+				float4 ifLocalVar56_g62963 = 0;
+				if( Resolution44_g62963 == 512.0 )
+				ifLocalVar56_g62963 = color55_g62963;
+				float4 color42_g62963 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float4 ifLocalVar40_g62963 = 0;
+				if( Resolution44_g62963 == 1024.0 )
+				ifLocalVar40_g62963 = color42_g62963;
+				float4 color48_g62963 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
+				float4 ifLocalVar47_g62963 = 0;
+				if( Resolution44_g62963 == 2048.0 )
+				ifLocalVar47_g62963 = color48_g62963;
+				float4 color51_g62963 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 ifLocalVar52_g62963 = 0;
+				if( Resolution44_g62963 >= 4096.0 )
+				ifLocalVar52_g62963 = color51_g62963;
+				float4 ifLocalVar40_g62996 = 0;
+				if( Debug_Index464_g62695 == 3.0 )
+				ifLocalVar40_g62996 = ( ifLocalVar61_g62963 + ifLocalVar56_g62963 + ifLocalVar40_g62963 + ifLocalVar47_g62963 + ifLocalVar52_g62963 );
+				float Resolution44_g63036 = max( _SecondMaskTex_TexelSize.z , _SecondMaskTex_TexelSize.w );
+				float4 color62_g63036 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
+				float4 ifLocalVar61_g63036 = 0;
+				if( Resolution44_g63036 <= 256.0 )
+				ifLocalVar61_g63036 = color62_g63036;
+				float4 color55_g63036 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
+				float4 ifLocalVar56_g63036 = 0;
+				if( Resolution44_g63036 == 512.0 )
+				ifLocalVar56_g63036 = color55_g63036;
+				float4 color42_g63036 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float4 ifLocalVar40_g63036 = 0;
+				if( Resolution44_g63036 == 1024.0 )
+				ifLocalVar40_g63036 = color42_g63036;
+				float4 color48_g63036 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
+				float4 ifLocalVar47_g63036 = 0;
+				if( Resolution44_g63036 == 2048.0 )
+				ifLocalVar47_g63036 = color48_g63036;
+				float4 color51_g63036 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 ifLocalVar52_g63036 = 0;
+				if( Resolution44_g63036 >= 4096.0 )
+				ifLocalVar52_g63036 = color51_g63036;
+				float4 ifLocalVar40_g63009 = 0;
+				if( Debug_Index464_g62695 == 4.0 )
+				ifLocalVar40_g63009 = ( ifLocalVar61_g63036 + ifLocalVar56_g63036 + ifLocalVar40_g63036 + ifLocalVar47_g63036 + ifLocalVar52_g63036 );
+				float Resolution44_g62964 = max( _SecondAlbedoTex_TexelSize.z , _SecondAlbedoTex_TexelSize.w );
+				float4 color62_g62964 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
+				float4 ifLocalVar61_g62964 = 0;
+				if( Resolution44_g62964 <= 256.0 )
+				ifLocalVar61_g62964 = color62_g62964;
+				float4 color55_g62964 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
+				float4 ifLocalVar56_g62964 = 0;
+				if( Resolution44_g62964 == 512.0 )
+				ifLocalVar56_g62964 = color55_g62964;
+				float4 color42_g62964 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float4 ifLocalVar40_g62964 = 0;
+				if( Resolution44_g62964 == 1024.0 )
+				ifLocalVar40_g62964 = color42_g62964;
+				float4 color48_g62964 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
+				float4 ifLocalVar47_g62964 = 0;
+				if( Resolution44_g62964 == 2048.0 )
+				ifLocalVar47_g62964 = color48_g62964;
+				float4 color51_g62964 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 ifLocalVar52_g62964 = 0;
+				if( Resolution44_g62964 >= 4096.0 )
+				ifLocalVar52_g62964 = color51_g62964;
+				float4 ifLocalVar40_g63033 = 0;
+				if( Debug_Index464_g62695 == 5.0 )
+				ifLocalVar40_g63033 = ( ifLocalVar61_g62964 + ifLocalVar56_g62964 + ifLocalVar40_g62964 + ifLocalVar47_g62964 + ifLocalVar52_g62964 );
+				float Resolution44_g63038 = max( _EmissiveTex_TexelSize.z , _EmissiveTex_TexelSize.w );
+				float4 color62_g63038 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
+				float4 ifLocalVar61_g63038 = 0;
+				if( Resolution44_g63038 <= 256.0 )
+				ifLocalVar61_g63038 = color62_g63038;
+				float4 color55_g63038 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
+				float4 ifLocalVar56_g63038 = 0;
+				if( Resolution44_g63038 == 512.0 )
+				ifLocalVar56_g63038 = color55_g63038;
+				float4 color42_g63038 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float4 ifLocalVar40_g63038 = 0;
+				if( Resolution44_g63038 == 1024.0 )
+				ifLocalVar40_g63038 = color42_g63038;
+				float4 color48_g63038 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
+				float4 ifLocalVar47_g63038 = 0;
+				if( Resolution44_g63038 == 2048.0 )
+				ifLocalVar47_g63038 = color48_g63038;
+				float4 color51_g63038 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 ifLocalVar52_g63038 = 0;
+				if( Resolution44_g63038 >= 4096.0 )
+				ifLocalVar52_g63038 = color51_g63038;
+				float4 ifLocalVar40_g62961 = 0;
+				if( Debug_Index464_g62695 == 6.0 )
+				ifLocalVar40_g62961 = ( ifLocalVar61_g63038 + ifLocalVar56_g63038 + ifLocalVar40_g63038 + ifLocalVar47_g63038 + ifLocalVar52_g63038 );
+				float4 Output_Resolution737_g62695 = ( ( ifLocalVar40_g62987 + ifLocalVar40_g63025 + ifLocalVar40_g63001 ) + ( ifLocalVar40_g62996 + ifLocalVar40_g63009 + ifLocalVar40_g63033 ) + ifLocalVar40_g62961 );
+				float4 ifLocalVar40_g62941 = 0;
+				if( Debug_Type367_g62695 == 4.0 )
+				ifLocalVar40_g62941 = Output_Resolution737_g62695;
+				float3 WorldPosition893_g62695 = worldPos;
+				half3 Input_Position419_g62965 = -WorldPosition893_g62695;
+				float4 temp_output_91_19_g62942 = TVE_MotionCoords;
+				float3 Position83_g62942 = WorldPosition893_g62695;
+				float temp_output_84_0_g62942 = _LayerMotionValue;
+				float4 lerpResult87_g62942 = lerp( TVE_MotionParams , SAMPLE_TEXTURE2D_ARRAY( TVE_MotionTex, samplerTVE_MotionTex, float3(( (temp_output_91_19_g62942).zw + ( (temp_output_91_19_g62942).xy * (Position83_g62942).xz ) ),temp_output_84_0_g62942) ) , TVE_MotionUsage[(int)temp_output_84_0_g62942]);
+				float4 break322_g62966 = lerpResult87_g62942;
+				float3 appendResult397_g62966 = (float3(break322_g62966.x , 0.0 , break322_g62966.y));
+				float3 temp_output_398_0_g62966 = (appendResult397_g62966*2.0 + -1.0);
+				half2 Wind_DirectionWS1031_g62695 = (temp_output_398_0_g62966).xz;
+				half2 Input_DirectionWS423_g62965 = Wind_DirectionWS1031_g62695;
+				float Motion_Scale287_g62965 = ( _MotionScale_10 + 1.0 );
+				half Global_Scale448_g62965 = TVE_NoiseParams.y;
+				half Input_Speed62_g62965 = _MotionSpeed_10;
+				half Global_Speed449_g62965 = TVE_NoiseParams.x;
+				float mulTime426_g62965 = _Time.y * ( Input_Speed62_g62965 * Global_Speed449_g62965 );
+				half Global_DistortionScale453_g62965 = TVE_NoiseParams.w;
+				float3 break461_g62965 = ( Input_Position419_g62965 * Global_DistortionScale453_g62965 );
+				half Global_Distortion452_g62965 = TVE_NoiseParams.z;
+				float Noise_Distortion469_g62965 = ( sin( ( break461_g62965.x + break461_g62965.z ) ) * Global_Distortion452_g62965 );
+				half Motion_Variation284_g62965 = 0.0;
+				float2 temp_output_425_0_g62965 = ( ( (Input_Position419_g62965).xz * Input_DirectionWS423_g62965 * Motion_Scale287_g62965 * Global_Scale448_g62965 ) + ( mulTime426_g62965 + Noise_Distortion469_g62965 + Motion_Variation284_g62965 ) );
+				float2 break500_g62965 = ( temp_output_425_0_g62965 * 0.1178 );
+				float2 break494_g62965 = ( temp_output_425_0_g62965 * 0.1742 );
+				half Wind_Power369_g62966 = break322_g62966.z;
+				half Wind_Pow1128_g62695 = Wind_Power369_g62966;
+				half Input_WindPower327_g62965 = Wind_Pow1128_g62695;
+				float lerpResult430_g62965 = lerp( 1.0 , 0.4 , Input_WindPower327_g62965);
+				half Motion_Noise915_g62695 = pow( (( sin( ( break500_g62965.x + break500_g62965.y ) ) * sin( ( break494_g62965.x + break494_g62965.y ) ) )*0.5 + 0.5) , lerpResult430_g62965 );
+				float ifLocalVar40_g63023 = 0;
+				if( Debug_Index464_g62695 == 0.0 )
+				ifLocalVar40_g63023 = Motion_Noise915_g62695;
+				float4 temp_output_91_19_g62930 = TVE_ColorsCoords;
+				float3 Position58_g62930 = WorldPosition893_g62695;
+				float Debug_Layer885_g62695 = TVE_DEBUG_Layer;
+				float temp_output_82_0_g62930 = Debug_Layer885_g62695;
+				float4 lerpResult88_g62930 = lerp( TVE_ColorsParams , SAMPLE_TEXTURE2D_ARRAY( TVE_ColorsTex, samplerTVE_ColorsTex, float3(( (temp_output_91_19_g62930).zw + ( (temp_output_91_19_g62930).xy * (Position58_g62930).xz ) ),temp_output_82_0_g62930) ) , TVE_ColorsUsage[(int)temp_output_82_0_g62930]);
+				float3 ifLocalVar40_g63040 = 0;
+				if( Debug_Index464_g62695 == 1.0 )
+				ifLocalVar40_g63040 = (lerpResult88_g62930).rgb;
+				float4 temp_output_91_19_g62926 = TVE_ColorsCoords;
+				float3 Position58_g62926 = WorldPosition893_g62695;
+				float temp_output_82_0_g62926 = Debug_Layer885_g62695;
+				float4 lerpResult88_g62926 = lerp( TVE_ColorsParams , SAMPLE_TEXTURE2D_ARRAY( TVE_ColorsTex, samplerTVE_ColorsTex, float3(( (temp_output_91_19_g62926).zw + ( (temp_output_91_19_g62926).xy * (Position58_g62926).xz ) ),temp_output_82_0_g62926) ) , TVE_ColorsUsage[(int)temp_output_82_0_g62926]);
+				float ifLocalVar40_g63031 = 0;
+				if( Debug_Index464_g62695 == 2.0 )
+				ifLocalVar40_g63031 = (lerpResult88_g62926).a;
+				float4 temp_output_93_19_g62922 = TVE_ExtrasCoords;
+				float3 Position82_g62922 = WorldPosition893_g62695;
+				float temp_output_84_0_g62922 = Debug_Layer885_g62695;
+				float4 lerpResult88_g62922 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY( TVE_ExtrasTex, samplerTVE_ExtrasTex, float3(( (temp_output_93_19_g62922).zw + ( (temp_output_93_19_g62922).xy * (Position82_g62922).xz ) ),temp_output_84_0_g62922) ) , TVE_ExtrasUsage[(int)temp_output_84_0_g62922]);
+				float4 break89_g62922 = lerpResult88_g62922;
+				float ifLocalVar40_g63021 = 0;
+				if( Debug_Index464_g62695 == 3.0 )
+				ifLocalVar40_g63021 = break89_g62922.r;
+				float4 temp_output_93_19_g63016 = TVE_ExtrasCoords;
+				float3 Position82_g63016 = WorldPosition893_g62695;
+				float temp_output_84_0_g63016 = Debug_Layer885_g62695;
+				float4 lerpResult88_g63016 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY( TVE_ExtrasTex, samplerTVE_ExtrasTex, float3(( (temp_output_93_19_g63016).zw + ( (temp_output_93_19_g63016).xy * (Position82_g63016).xz ) ),temp_output_84_0_g63016) ) , TVE_ExtrasUsage[(int)temp_output_84_0_g63016]);
+				float4 break89_g63016 = lerpResult88_g63016;
+				float ifLocalVar40_g63022 = 0;
+				if( Debug_Index464_g62695 == 4.0 )
+				ifLocalVar40_g63022 = break89_g63016.g;
+				float4 temp_output_93_19_g62946 = TVE_ExtrasCoords;
+				float3 Position82_g62946 = WorldPosition893_g62695;
+				float temp_output_84_0_g62946 = Debug_Layer885_g62695;
+				float4 lerpResult88_g62946 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY( TVE_ExtrasTex, samplerTVE_ExtrasTex, float3(( (temp_output_93_19_g62946).zw + ( (temp_output_93_19_g62946).xy * (Position82_g62946).xz ) ),temp_output_84_0_g62946) ) , TVE_ExtrasUsage[(int)temp_output_84_0_g62946]);
+				float4 break89_g62946 = lerpResult88_g62946;
+				float ifLocalVar40_g63015 = 0;
+				if( Debug_Index464_g62695 == 5.0 )
+				ifLocalVar40_g63015 = break89_g62946.b;
+				float4 temp_output_93_19_g62957 = TVE_ExtrasCoords;
+				float3 Position82_g62957 = WorldPosition893_g62695;
+				float temp_output_84_0_g62957 = Debug_Layer885_g62695;
+				float4 lerpResult88_g62957 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY( TVE_ExtrasTex, samplerTVE_ExtrasTex, float3(( (temp_output_93_19_g62957).zw + ( (temp_output_93_19_g62957).xy * (Position82_g62957).xz ) ),temp_output_84_0_g62957) ) , TVE_ExtrasUsage[(int)temp_output_84_0_g62957]);
+				float4 break89_g62957 = lerpResult88_g62957;
+				float ifLocalVar40_g63002 = 0;
+				if( Debug_Index464_g62695 == 6.0 )
+				ifLocalVar40_g63002 = break89_g62957.a;
+				float4 temp_output_91_19_g62937 = TVE_MotionCoords;
+				float3 Position83_g62937 = WorldPosition893_g62695;
+				float temp_output_84_0_g62937 = Debug_Layer885_g62695;
+				float4 lerpResult87_g62937 = lerp( TVE_MotionParams , SAMPLE_TEXTURE2D_ARRAY( TVE_MotionTex, samplerTVE_MotionTex, float3(( (temp_output_91_19_g62937).zw + ( (temp_output_91_19_g62937).xy * (Position83_g62937).xz ) ),temp_output_84_0_g62937) ) , TVE_MotionUsage[(int)temp_output_84_0_g62937]);
+				float3 appendResult1012_g62695 = (float3((lerpResult87_g62937).rg , 0.0));
+				float3 ifLocalVar40_g63005 = 0;
+				if( Debug_Index464_g62695 == 7.0 )
+				ifLocalVar40_g63005 = appendResult1012_g62695;
+				float4 temp_output_91_19_g62979 = TVE_MotionCoords;
+				float3 Position83_g62979 = WorldPosition893_g62695;
+				float temp_output_84_0_g62979 = Debug_Layer885_g62695;
+				float4 lerpResult87_g62979 = lerp( TVE_MotionParams , SAMPLE_TEXTURE2D_ARRAY( TVE_MotionTex, samplerTVE_MotionTex, float3(( (temp_output_91_19_g62979).zw + ( (temp_output_91_19_g62979).xy * (Position83_g62979).xz ) ),temp_output_84_0_g62979) ) , TVE_MotionUsage[(int)temp_output_84_0_g62979]);
+				float ifLocalVar40_g63006 = 0;
+				if( Debug_Index464_g62695 == 8.0 )
+				ifLocalVar40_g63006 = (lerpResult87_g62979).b;
+				float4 temp_output_91_19_g62990 = TVE_MotionCoords;
+				float3 Position83_g62990 = WorldPosition893_g62695;
+				float temp_output_84_0_g62990 = Debug_Layer885_g62695;
+				float4 lerpResult87_g62990 = lerp( TVE_MotionParams , SAMPLE_TEXTURE2D_ARRAY( TVE_MotionTex, samplerTVE_MotionTex, float3(( (temp_output_91_19_g62990).zw + ( (temp_output_91_19_g62990).xy * (Position83_g62990).xz ) ),temp_output_84_0_g62990) ) , TVE_MotionUsage[(int)temp_output_84_0_g62990]);
+				float ifLocalVar40_g62977 = 0;
+				if( Debug_Index464_g62695 == 9.0 )
+				ifLocalVar40_g62977 = (lerpResult87_g62990).a;
+				float4 temp_output_94_19_g62967 = TVE_VertexCoords;
+				float3 Position83_g62967 = WorldPosition893_g62695;
+				float temp_output_84_0_g62967 = Debug_Layer885_g62695;
+				float4 lerpResult87_g62967 = lerp( TVE_VertexParams , SAMPLE_TEXTURE2D_ARRAY( TVE_VertexTex, samplerTVE_VertexTex, float3(( (temp_output_94_19_g62967).zw + ( (temp_output_94_19_g62967).xy * (Position83_g62967).xz ) ),temp_output_84_0_g62967) ) , TVE_VertexUsage[(int)temp_output_84_0_g62967]);
+				float ifLocalVar40_g62952 = 0;
+				if( Debug_Index464_g62695 == 10.0 )
+				ifLocalVar40_g62952 = (lerpResult87_g62967).a;
+				float3 Output_Globals888_g62695 = ( ifLocalVar40_g63023 + ( ifLocalVar40_g63040 + ifLocalVar40_g63031 ) + ( ifLocalVar40_g63021 + ifLocalVar40_g63022 + ifLocalVar40_g63015 + ifLocalVar40_g63002 ) + ( ifLocalVar40_g63005 + ifLocalVar40_g63006 + ifLocalVar40_g62977 ) + ( ifLocalVar40_g62952 + 0.0 ) );
+				float3 ifLocalVar40_g63034 = 0;
+				if( Debug_Type367_g62695 == 8.0 )
+				ifLocalVar40_g63034 = Output_Globals888_g62695;
+				float3 vertexToFrag328_g62695 = IN.ase_texcoord10.xyz;
+				float4 color1016_g62695 = IsGammaSpace() ? float4(0.5831653,0.6037736,0.2135992,0) : float4(0.2992498,0.3229691,0.03750122,0);
+				float4 color1017_g62695 = IsGammaSpace() ? float4(0.8117647,0.3488252,0.2627451,0) : float4(0.6239604,0.0997834,0.05612849,0);
+				float4 switchResult1015_g62695 = (((ase_vface>0)?(color1016_g62695):(color1017_g62695)));
+				float3 ifLocalVar40_g63012 = 0;
+				if( Debug_Index464_g62695 == 4.0 )
+				ifLocalVar40_g63012 = (switchResult1015_g62695).rgb;
+				float temp_output_7_0_g63011 = Debug_Min721_g62695;
+				float3 temp_cast_28 = (temp_output_7_0_g63011).xxx;
+				float3 Output_Mesh316_g62695 = saturate( ( ( ( vertexToFrag328_g62695 + ifLocalVar40_g63012 ) - temp_cast_28 ) / ( Debug_Max723_g62695 - temp_output_7_0_g63011 ) ) );
+				float3 ifLocalVar40_g63039 = 0;
+				if( Debug_Type367_g62695 == 9.0 )
+				ifLocalVar40_g63039 = Output_Mesh316_g62695;
+				float4 color1086_g62695 = IsGammaSpace() ? float4(0.1226415,0.1226415,0.1226415,0) : float4(0.01390275,0.01390275,0.01390275,0);
+				float4 vertexToFrag11_g63037 = IN.ase_texcoord11;
+				float _IsVegetationShader1101_g62695 = _IsVegetationShader;
+				float4 lerpResult1089_g62695 = lerp( color1086_g62695 , vertexToFrag11_g63037 , ( _IsPolygonalShader1112_g62695 * _IsVegetationShader1101_g62695 ));
+				float3 Output_Misc1080_g62695 = (lerpResult1089_g62695).rgb;
+				float3 ifLocalVar40_g62935 = 0;
+				if( Debug_Type367_g62695 == 10.0 )
+				ifLocalVar40_g62935 = Output_Misc1080_g62695;
+				float4 temp_output_459_0_g62695 = ( ifLocalVar40_g63004 + ifLocalVar40_g62984 + ifLocalVar40_g62978 + ifLocalVar40_g62936 + ifLocalVar40_g62941 + float4( ifLocalVar40_g63034 , 0.0 ) + float4( ifLocalVar40_g63039 , 0.0 ) + float4( ifLocalVar40_g62935 , 0.0 ) );
+				float4 color690_g62695 = IsGammaSpace() ? float4(0.1226415,0.1226415,0.1226415,0) : float4(0.01390275,0.01390275,0.01390275,0);
+				float _IsTVEShader647_g62695 = _IsTVEShader;
+				float4 lerpResult689_g62695 = lerp( color690_g62695 , temp_output_459_0_g62695 , _IsTVEShader647_g62695);
+				float Debug_Filter322_g62695 = TVE_DEBUG_Filter;
+				float4 lerpResult326_g62695 = lerp( temp_output_459_0_g62695 , lerpResult689_g62695 , Debug_Filter322_g62695);
+				float Debug_Clip623_g62695 = TVE_DEBUG_Clip;
+				float lerpResult622_g62695 = lerp( 1.0 , tex2D( _MainAlbedoTex, uv_MainAlbedoTex ).a , ( Debug_Clip623_g62695 * _RenderClip ));
+				clip( lerpResult622_g62695 - _Cutoff);
 				clip( ( 1.0 - saturate( ( _IsElementShader + _IsHelperShader ) ) ) - 1.0);
 				
 				o.Albedo = fixed3( 0.5, 0.5, 0.5 );
 				o.Normal = fixed3( 0, 0, 1 );
-				o.Emission = lerpResult326_g72326.rgb;
+				o.Emission = lerpResult326_g62695.rgb;
 				#if defined(_SPECULAR_SETUP)
 					o.Specular = fixed3( 0, 0, 0 );
 				#else
@@ -1350,9 +1285,9 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 			#define ASE_NEEDS_VERT_NORMAL
 			#define ASE_NEEDS_VERT_TANGENT
 			#if defined(SHADER_API_D3D11) || defined(SHADER_API_XBOXONE) || defined(UNITY_COMPILER_HLSLCC) || defined(SHADER_API_PSSL) || (defined(SHADER_TARGET_SURFACE_ANALYSIS) && !defined(SHADER_TARGET_SURFACE_ANALYSIS_MOJOSHADER))//ASE Sampler Macros
-			#define SAMPLE_TEXTURE2D_ARRAY_LOD(tex,samplerTex,coord,lod) tex.SampleLevel(samplerTex,coord, lod)
+			#define SAMPLE_TEXTURE2D_ARRAY(tex,samplerTex,coord) tex.Sample(samplerTex,coord)
 			#else//ASE Sampling Macros
-			#define SAMPLE_TEXTURE2D_ARRAY_LOD(tex,samplertex,coord,lod) tex2DArraylod(tex, float4(coord,lod))
+			#define SAMPLE_TEXTURE2D_ARRAY(tex,samplertex,coord) tex2DArray(tex,coord)
 			#endif//ASE Sampling Macros
 			
 
@@ -1363,8 +1298,8 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				float4 texcoord1 : TEXCOORD1;
 				float4 texcoord2 : TEXCOORD2;
 				float4 ase_texcoord : TEXCOORD0;
-				float4 ase_texcoord3 : TEXCOORD3;
 				float4 ase_color : COLOR;
+				float4 ase_texcoord3 : TEXCOORD3;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
@@ -1390,8 +1325,6 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				float4 ase_texcoord8 : TEXCOORD8;
 				float4 ase_texcoord9 : TEXCOORD9;
 				float4 ase_texcoord10 : TEXCOORD10;
-				float4 ase_color : COLOR;
-				float4 ase_texcoord11 : TEXCOORD11;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
 			};
@@ -1408,10 +1341,9 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				float _TessEdgeLength;
 				float _TessMaxDisp;
 			#endif
-			uniform half _Banner;
 			uniform half _Message;
+			uniform half _Banner;
 			uniform float _IsSimpleShader;
-			uniform float _IsVertexShader;
 			uniform half _IsTVEShader;
 			uniform half TVE_DEBUG_Type;
 			uniform float _IsBarkShader;
@@ -1449,30 +1381,30 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 			float4 _SecondAlbedoTex_TexelSize;
 			float4 _SecondMaskTex_TexelSize;
 			float4 _EmissiveTex_TexelSize;
-			uniform sampler2D TVE_NoiseTex;
-			uniform half _VertexPivotMode;
-			uniform float _MotionScale_10;
-			uniform half4 TVE_NoiseParams;
 			uniform half4 TVE_MotionParams;
 			UNITY_DECLARE_TEX2DARRAY_NOSAMPLER(TVE_MotionTex);
 			uniform half4 TVE_MotionCoords;
-			uniform half TVE_DEBUG_Layer;
-			SamplerState sampler_linear_repeat;
+			uniform half _LayerMotionValue;
+			SamplerState samplerTVE_MotionTex;
 			uniform float TVE_MotionUsage[10];
+			uniform float _MotionScale_10;
+			uniform half4 TVE_NoiseParams;
 			uniform float _MotionSpeed_10;
-			uniform float _MotionVariation_10;
-			uniform half _VertexDynamicMode;
 			uniform half4 TVE_ColorsParams;
 			UNITY_DECLARE_TEX2DARRAY_NOSAMPLER(TVE_ColorsTex);
 			uniform half4 TVE_ColorsCoords;
+			uniform half TVE_DEBUG_Layer;
+			SamplerState samplerTVE_ColorsTex;
 			uniform float TVE_ColorsUsage[10];
 			uniform half4 TVE_ExtrasParams;
 			UNITY_DECLARE_TEX2DARRAY_NOSAMPLER(TVE_ExtrasTex);
 			uniform half4 TVE_ExtrasCoords;
+			SamplerState samplerTVE_ExtrasTex;
 			uniform float TVE_ExtrasUsage[10];
 			uniform half4 TVE_VertexParams;
 			UNITY_DECLARE_TEX2DARRAY_NOSAMPLER(TVE_VertexTex);
 			uniform half4 TVE_VertexCoords;
+			SamplerState samplerTVE_VertexTex;
 			uniform float TVE_VertexUsage[10];
 			uniform float _IsVegetationShader;
 			uniform half4 _LeavesFilterColor;
@@ -1495,14 +1427,6 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				return c.z * lerp( K.xxx, saturate( p - K.xxx ), c.y );
 			}
 			
-			float2 DecodeFloatToVector2( float enc )
-			{
-				float2 result ;
-				result.y = enc % 2048;
-				result.x = floor(enc / 2048);
-				return result / (2048 - 1);
-			}
-			
 
 			v2f VertexFunction (appdata v  ) {
 				UNITY_SETUP_INSTANCE_ID(v);
@@ -1511,102 +1435,85 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				UNITY_TRANSFER_INSTANCE_ID(v,o);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-				float3 customSurfaceDepth676_g72326 = v.vertex.xyz;
-				float customEye676_g72326 = -UnityObjectToViewPos( customSurfaceDepth676_g72326 ).z;
-				o.ase_texcoord8.x = customEye676_g72326;
-				float Debug_Index464_g72326 = TVE_DEBUG_Index;
-				float3 ifLocalVar40_g72333 = 0;
-				if( Debug_Index464_g72326 == 0.0 )
-				ifLocalVar40_g72333 = saturate( v.vertex.xyz );
-				float3 ifLocalVar40_g72364 = 0;
-				if( Debug_Index464_g72326 == 1.0 )
-				ifLocalVar40_g72364 = v.normal;
-				float3 ifLocalVar40_g72389 = 0;
-				if( Debug_Index464_g72326 == 2.0 )
-				ifLocalVar40_g72389 = v.tangent.xyz;
-				float ifLocalVar40_g72355 = 0;
-				if( Debug_Index464_g72326 == 3.0 )
-				ifLocalVar40_g72355 = saturate( v.tangent.w );
+				float3 customSurfaceDepth676_g62695 = v.vertex.xyz;
+				float customEye676_g62695 = -UnityObjectToViewPos( customSurfaceDepth676_g62695 ).z;
+				o.ase_texcoord8.x = customEye676_g62695;
+				float Debug_Index464_g62695 = TVE_DEBUG_Index;
+				float3 ifLocalVar40_g63014 = 0;
+				if( Debug_Index464_g62695 == 0.0 )
+				ifLocalVar40_g63014 = saturate( v.vertex.xyz );
+				float3 ifLocalVar40_g62989 = 0;
+				if( Debug_Index464_g62695 == 1.0 )
+				ifLocalVar40_g62989 = v.normal;
+				float3 ifLocalVar40_g62995 = 0;
+				if( Debug_Index464_g62695 == 2.0 )
+				ifLocalVar40_g62995 = v.tangent.xyz;
+				float ifLocalVar40_g63008 = 0;
+				if( Debug_Index464_g62695 == 3.0 )
+				ifLocalVar40_g63008 = saturate( v.tangent.w );
 				float3 temp_cast_0 = (v.ase_color.r).xxx;
-				float3 hsvTorgb260_g72326 = HSVToRGB( float3(v.ase_color.r,1.0,1.0) );
-				float3 gammaToLinear266_g72326 = GammaToLinearSpace( hsvTorgb260_g72326 );
-				float _IsBarkShader347_g72326 = _IsBarkShader;
-				float _IsLeafShader360_g72326 = _IsLeafShader;
-				float _IsCrossShader342_g72326 = _IsCrossShader;
-				float _IsGrassShader341_g72326 = _IsGrassShader;
-				float _IsVegetationShader1101_g72326 = _IsVegetationShader;
-				float _IsAnyVegetationShader362_g72326 = saturate( ( _IsBarkShader347_g72326 + _IsLeafShader360_g72326 + _IsCrossShader342_g72326 + _IsGrassShader341_g72326 + _IsVegetationShader1101_g72326 ) );
-				float3 lerpResult290_g72326 = lerp( temp_cast_0 , gammaToLinear266_g72326 , _IsAnyVegetationShader362_g72326);
-				float3 ifLocalVar40_g72384 = 0;
-				if( Debug_Index464_g72326 == 5.0 )
-				ifLocalVar40_g72384 = lerpResult290_g72326;
-				float ifLocalVar40_g72429 = 0;
-				if( Debug_Index464_g72326 == 6.0 )
-				ifLocalVar40_g72429 = v.ase_color.g;
-				float ifLocalVar40_g72343 = 0;
-				if( Debug_Index464_g72326 == 7.0 )
-				ifLocalVar40_g72343 = v.ase_color.b;
-				float ifLocalVar40_g72360 = 0;
-				if( Debug_Index464_g72326 == 8.0 )
-				ifLocalVar40_g72360 = v.ase_color.a;
-				float ifLocalVar40_g72341 = 0;
-				if( Debug_Index464_g72326 == 9.0 )
-				ifLocalVar40_g72341 = v.ase_color.a;
-				float enc1154_g72326 = v.ase_texcoord.z;
-				float2 localDecodeFloatToVector21154_g72326 = DecodeFloatToVector2( enc1154_g72326 );
-				float2 break1155_g72326 = localDecodeFloatToVector21154_g72326;
-				float ifLocalVar40_g72363 = 0;
-				if( Debug_Index464_g72326 == 10.0 )
-				ifLocalVar40_g72363 = break1155_g72326.x;
-				float ifLocalVar40_g72362 = 0;
-				if( Debug_Index464_g72326 == 11.0 )
-				ifLocalVar40_g72362 = break1155_g72326.y;
-				float3 appendResult1147_g72326 = (float3(v.ase_texcoord.x , v.ase_texcoord.y , 0.0));
-				float3 ifLocalVar40_g72336 = 0;
-				if( Debug_Index464_g72326 == 12.0 )
-				ifLocalVar40_g72336 = appendResult1147_g72326;
-				float3 appendResult1148_g72326 = (float3(v.texcoord1.xyzw.x , v.texcoord1.xyzw.y , 0.0));
-				float3 ifLocalVar40_g72368 = 0;
-				if( Debug_Index464_g72326 == 13.0 )
-				ifLocalVar40_g72368 = appendResult1148_g72326;
-				float3 appendResult1149_g72326 = (float3(v.texcoord1.xyzw.z , v.texcoord1.xyzw.w , 0.0));
-				float3 ifLocalVar40_g72371 = 0;
-				if( Debug_Index464_g72326 == 14.0 )
-				ifLocalVar40_g72371 = appendResult1149_g72326;
-				float3 appendResult60_g72430 = (float3(v.ase_texcoord3.x , v.ase_texcoord3.z , v.ase_texcoord3.y));
-				float3 ifLocalVar40_g72327 = 0;
-				if( Debug_Index464_g72326 == 15.0 )
-				ifLocalVar40_g72327 = appendResult60_g72430;
-				float3 vertexToFrag328_g72326 = ( ( ifLocalVar40_g72333 + ifLocalVar40_g72364 + ifLocalVar40_g72389 + ifLocalVar40_g72355 ) + ( ifLocalVar40_g72384 + ifLocalVar40_g72429 + ifLocalVar40_g72343 + ifLocalVar40_g72360 ) + ( ifLocalVar40_g72341 + ifLocalVar40_g72363 + ifLocalVar40_g72362 ) + ( ifLocalVar40_g72336 + ifLocalVar40_g72368 + ifLocalVar40_g72371 + ifLocalVar40_g72327 ) );
-				o.ase_texcoord8.yzw = vertexToFrag328_g72326;
-				float4 color1097_g72326 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 color1096_g72326 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float2 uv_MainMaskTex1077_g72326 = v.ase_texcoord.xy;
-				float3 linearToGamma1066_g72326 = LinearToGammaSpace( _LeavesFilterColor.rgb );
+				float3 hsvTorgb260_g62695 = HSVToRGB( float3(v.ase_color.r,1.0,1.0) );
+				float3 gammaToLinear266_g62695 = GammaToLinearSpace( hsvTorgb260_g62695 );
+				float _IsBarkShader347_g62695 = _IsBarkShader;
+				float _IsLeafShader360_g62695 = _IsLeafShader;
+				float _IsCrossShader342_g62695 = _IsCrossShader;
+				float _IsGrassShader341_g62695 = _IsGrassShader;
+				float _IsVegetationShader1101_g62695 = _IsVegetationShader;
+				float _IsAnyVegetationShader362_g62695 = saturate( ( _IsBarkShader347_g62695 + _IsLeafShader360_g62695 + _IsCrossShader342_g62695 + _IsGrassShader341_g62695 + _IsVegetationShader1101_g62695 ) );
+				float3 lerpResult290_g62695 = lerp( temp_cast_0 , gammaToLinear266_g62695 , _IsAnyVegetationShader362_g62695);
+				float3 ifLocalVar40_g62998 = 0;
+				if( Debug_Index464_g62695 == 5.0 )
+				ifLocalVar40_g62998 = lerpResult290_g62695;
+				float ifLocalVar40_g62994 = 0;
+				if( Debug_Index464_g62695 == 6.0 )
+				ifLocalVar40_g62994 = v.ase_color.g;
+				float ifLocalVar40_g62999 = 0;
+				if( Debug_Index464_g62695 == 7.0 )
+				ifLocalVar40_g62999 = v.ase_color.b;
+				float ifLocalVar40_g63003 = 0;
+				if( Debug_Index464_g62695 == 8.0 )
+				ifLocalVar40_g63003 = v.ase_color.a;
+				float ifLocalVar40_g63007 = 0;
+				if( Debug_Index464_g62695 == 9.0 )
+				ifLocalVar40_g63007 = v.ase_texcoord3.x;
+				float ifLocalVar40_g63035 = 0;
+				if( Debug_Index464_g62695 == 10.0 )
+				ifLocalVar40_g63035 = v.ase_texcoord3.y;
+				float ifLocalVar40_g62986 = 0;
+				if( Debug_Index464_g62695 == 11.0 )
+				ifLocalVar40_g62986 = v.ase_texcoord3.z;
+				float3 vertexToFrag328_g62695 = ( ( ifLocalVar40_g63014 + ifLocalVar40_g62989 + ifLocalVar40_g62995 + ifLocalVar40_g63008 ) + ( ifLocalVar40_g62998 + ifLocalVar40_g62994 + ifLocalVar40_g62999 + ifLocalVar40_g63003 ) + ( ifLocalVar40_g63007 + ifLocalVar40_g63035 + ifLocalVar40_g62986 ) );
+				o.ase_texcoord9.xyz = vertexToFrag328_g62695;
+				float4 color1097_g62695 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 color1096_g62695 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float2 uv_MainMaskTex1077_g62695 = v.ase_texcoord.xy;
+				float3 linearToGamma1066_g62695 = LinearToGammaSpace( _LeavesFilterColor.rgb );
 				#ifdef UNITY_COLORSPACE_GAMMA
-				float3 staticSwitch1060_g72326 = (_LeavesFilterColor).rgb;
+				float3 staticSwitch1060_g62695 = (_LeavesFilterColor).rgb;
 				#else
-				float3 staticSwitch1060_g72326 = linearToGamma1066_g72326;
+				float3 staticSwitch1060_g62695 = linearToGamma1066_g62695;
 				#endif
-				float2 uv_MainAlbedoTex1045_g72326 = v.ase_texcoord.xy;
-				float4 tex2DNode1045_g72326 = tex2Dlod( _MainAlbedoTex, float4( uv_MainAlbedoTex1045_g72326, 0, 0.0) );
-				float3 lerpResult1043_g72326 = lerp( (tex2DNode1045_g72326).rgb , (v.ase_color).rgb , _VertexColorMode);
-				half3 Main_Albedo1078_g72326 = ( (_MainColor).rgb * lerpResult1043_g72326 );
-				float3 linearToGamma1058_g72326 = LinearToGammaSpace( Main_Albedo1078_g72326 );
+				float2 uv_MainAlbedoTex1045_g62695 = v.ase_texcoord.xy;
+				float4 tex2DNode1045_g62695 = tex2Dlod( _MainAlbedoTex, float4( uv_MainAlbedoTex1045_g62695, 0, 0.0) );
+				float3 lerpResult1043_g62695 = lerp( (tex2DNode1045_g62695).rgb , (v.ase_color).rgb , _VertexColorMode);
+				half3 Main_Albedo1078_g62695 = ( (_MainColor).rgb * lerpResult1043_g62695 );
+				float3 linearToGamma1058_g62695 = LinearToGammaSpace( Main_Albedo1078_g62695 );
 				#ifdef UNITY_COLORSPACE_GAMMA
-				float3 staticSwitch1068_g72326 = (Main_Albedo1078_g72326).xyz;
+				float3 staticSwitch1068_g62695 = (Main_Albedo1078_g62695).xyz;
 				#else
-				float3 staticSwitch1068_g72326 = linearToGamma1058_g72326;
+				float3 staticSwitch1068_g62695 = linearToGamma1058_g62695;
 				#endif
-				float lerpResult1071_g72326 = lerp( 1.0 , saturate( ( 1.0 - ceil( ( distance( staticSwitch1060_g72326 , staticSwitch1068_g72326 ) - _LeavesFilterRange ) ) ) ) , _LeavesFilterMode);
-				half Main_ColorFilter1061_g72326 = lerpResult1071_g72326;
-				float4 lerpResult1095_g72326 = lerp( color1097_g72326 , color1096_g72326 , ( tex2Dlod( _MainMaskTex, float4( uv_MainMaskTex1077_g72326, 0, 0.0) ).b * Main_ColorFilter1061_g72326 ));
-				float4 vertexToFrag11_g72328 = lerpResult1095_g72326;
-				o.ase_texcoord11 = vertexToFrag11_g72328;
+				float lerpResult1071_g62695 = lerp( 1.0 , saturate( ( 1.0 - ceil( ( distance( staticSwitch1060_g62695 , staticSwitch1068_g62695 ) - _LeavesFilterRange ) ) ) ) , _LeavesFilterMode);
+				half Main_ColorFilter1061_g62695 = lerpResult1071_g62695;
+				float4 lerpResult1095_g62695 = lerp( color1097_g62695 , color1096_g62695 , ( tex2Dlod( _MainMaskTex, float4( uv_MainMaskTex1077_g62695, 0, 0.0) ).b * Main_ColorFilter1061_g62695 ));
+				float4 vertexToFrag11_g63037 = lerpResult1095_g62695;
+				o.ase_texcoord10 = vertexToFrag11_g63037;
 				
-				o.ase_texcoord9 = v.ase_texcoord;
-				o.ase_texcoord10 = v.ase_texcoord3;
-				o.ase_color = v.ase_color;
+				o.ase_texcoord8.yz = v.ase_texcoord.xy;
+				
+				//setting value to unused interpolator channels and avoid initialization warnings
+				o.ase_texcoord8.w = 0;
+				o.ase_texcoord9.w = 0;
 				#ifdef ASE_ABSOLUTE_VERTEX_POS
 					float3 defaultVertexValue = v.vertex.xyz;
 				#else
@@ -1662,8 +1569,8 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				float4 texcoord1 : TEXCOORD1;
 				float4 texcoord2 : TEXCOORD2;
 				float4 ase_texcoord : TEXCOORD0;
-				float4 ase_texcoord3 : TEXCOORD3;
 				float4 ase_color : COLOR;
+				float4 ase_texcoord3 : TEXCOORD3;
 
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
@@ -1685,8 +1592,8 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				o.texcoord1 = v.texcoord1;
 				o.texcoord2 = v.texcoord2;
 				o.ase_texcoord = v.ase_texcoord;
-				o.ase_texcoord3 = v.ase_texcoord3;
 				o.ase_color = v.ase_color;
+				o.ase_texcoord3 = v.ase_texcoord3;
 				return o;
 			}
 
@@ -1729,8 +1636,8 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				o.texcoord1 = patch[0].texcoord1 * bary.x + patch[1].texcoord1 * bary.y + patch[2].texcoord1 * bary.z;
 				o.texcoord2 = patch[0].texcoord2 * bary.x + patch[1].texcoord2 * bary.y + patch[2].texcoord2 * bary.z;
 				o.ase_texcoord = patch[0].ase_texcoord * bary.x + patch[1].ase_texcoord * bary.y + patch[2].ase_texcoord * bary.z;
-				o.ase_texcoord3 = patch[0].ase_texcoord3 * bary.x + patch[1].ase_texcoord3 * bary.y + patch[2].ase_texcoord3 * bary.z;
 				o.ase_color = patch[0].ase_color * bary.x + patch[1].ase_color * bary.y + patch[2].ase_color * bary.z;
+				o.ase_texcoord3 = patch[0].ase_texcoord3 * bary.x + patch[1].ase_texcoord3 * bary.y + patch[2].ase_texcoord3 * bary.z;
 				#if defined(ASE_PHONG_TESSELLATION)
 				float3 pp[3];
 				for (int i = 0; i < 3; ++i)
@@ -1779,470 +1686,436 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 				float3 worldViewDir = normalize(UnityWorldSpaceViewDir(worldPos));
 				half atten = 1;
 
-				float Debug_Type367_g72326 = TVE_DEBUG_Type;
-				float4 color646_g72326 = IsGammaSpace() ? float4(0.9245283,0.7969696,0.4142933,1) : float4(0.8368256,0.5987038,0.1431069,1);
-				float customEye676_g72326 = IN.ase_texcoord8.x;
-				float saferPower688_g72326 = abs( (0.0 + (customEye676_g72326 - 300.0) * (1.0 - 0.0) / (0.0 - 300.0)) );
-				float clampResult702_g72326 = clamp( pow( saferPower688_g72326 , 1.25 ) , 0.75 , 1.0 );
-				float Shading655_g72326 = clampResult702_g72326;
-				float4 Output_Converted717_g72326 = ( color646_g72326 * Shading655_g72326 );
-				float4 ifLocalVar40_g72359 = 0;
-				if( Debug_Type367_g72326 == 0.0 )
-				ifLocalVar40_g72359 = Output_Converted717_g72326;
-				float4 color466_g72326 = IsGammaSpace() ? float4(0.8113208,0.4952317,0.264062,0) : float4(0.6231937,0.2096542,0.05668841,0);
-				float _IsBarkShader347_g72326 = _IsBarkShader;
-				float4 color469_g72326 = IsGammaSpace() ? float4(0.6566009,0.3404236,0.8490566,0) : float4(0.3886527,0.09487338,0.6903409,0);
-				float _IsCrossShader342_g72326 = _IsCrossShader;
-				float4 color472_g72326 = IsGammaSpace() ? float4(0.7100264,0.8018868,0.2231666,0) : float4(0.4623997,0.6070304,0.0407874,0);
-				float _IsGrassShader341_g72326 = _IsGrassShader;
-				float4 color475_g72326 = IsGammaSpace() ? float4(0.3267961,0.7264151,0.3118103,0) : float4(0.08721471,0.4865309,0.07922345,0);
-				float _IsLeafShader360_g72326 = _IsLeafShader;
-				float4 color478_g72326 = IsGammaSpace() ? float4(0.3252937,0.6122813,0.8113208,0) : float4(0.08639329,0.3330702,0.6231937,0);
-				float _IsPropShader346_g72326 = _IsPropShader;
-				float4 color1114_g72326 = IsGammaSpace() ? float4(0.9716981,0.3162602,0.4816265,0) : float4(0.9368213,0.08154967,0.1974273,0);
-				float _IsImpostorShader1110_g72326 = _IsImpostorShader;
-				float4 color1117_g72326 = IsGammaSpace() ? float4(0.257921,0.8679245,0.8361252,0) : float4(0.05410501,0.7254258,0.6668791,0);
-				float _IsPolygonalShader1112_g72326 = _IsPolygonalShader;
-				float4 Output_Shader445_g72326 = ( ( ( color466_g72326 * _IsBarkShader347_g72326 ) + ( color469_g72326 * _IsCrossShader342_g72326 ) + ( color472_g72326 * _IsGrassShader341_g72326 ) + ( color475_g72326 * _IsLeafShader360_g72326 ) + ( color478_g72326 * _IsPropShader346_g72326 ) + ( color1114_g72326 * _IsImpostorShader1110_g72326 ) + ( color1117_g72326 * _IsPolygonalShader1112_g72326 ) ) * Shading655_g72326 );
-				float4 ifLocalVar40_g72448 = 0;
-				if( Debug_Type367_g72326 == 1.0 )
-				ifLocalVar40_g72448 = Output_Shader445_g72326;
-				float4 color529_g72326 = IsGammaSpace() ? float4(0.62,0.77,0.15,0) : float4(0.3423916,0.5542217,0.01960665,0);
-				float _IsVertexShader1158_g72326 = _IsVertexShader;
-				float4 color544_g72326 = IsGammaSpace() ? float4(0.3252937,0.6122813,0.8113208,0) : float4(0.08639329,0.3330702,0.6231937,0);
-				float _IsSimpleShader359_g72326 = _IsSimpleShader;
-				float4 color521_g72326 = IsGammaSpace() ? float4(0.6566009,0.3404236,0.8490566,0) : float4(0.3886527,0.09487338,0.6903409,0);
-				float _IsStandardShader344_g72326 = _IsStandardShader;
-				float4 color1121_g72326 = IsGammaSpace() ? float4(0.9245283,0.8421515,0.1788003,0) : float4(0.8368256,0.677754,0.02687956,0);
-				float _IsSubsurfaceShader548_g72326 = _IsSubsurfaceShader;
-				float4 Output_Lighting525_g72326 = ( ( ( color529_g72326 * _IsVertexShader1158_g72326 ) + ( color544_g72326 * _IsSimpleShader359_g72326 ) + ( color521_g72326 * _IsStandardShader344_g72326 ) + ( color1121_g72326 * _IsSubsurfaceShader548_g72326 ) ) * Shading655_g72326 );
-				float4 ifLocalVar40_g72428 = 0;
-				if( Debug_Type367_g72326 == 2.0 )
-				ifLocalVar40_g72428 = Output_Lighting525_g72326;
-				float Debug_Index464_g72326 = TVE_DEBUG_Index;
-				float2 uv_MainAlbedoTex = IN.ase_texcoord9.xy * _MainAlbedoTex_ST.xy + _MainAlbedoTex_ST.zw;
-				float4 tex2DNode586_g72326 = tex2D( _MainAlbedoTex, uv_MainAlbedoTex );
-				float3 appendResult637_g72326 = (float3(tex2DNode586_g72326.r , tex2DNode586_g72326.g , tex2DNode586_g72326.b));
-				float3 ifLocalVar40_g72361 = 0;
-				if( Debug_Index464_g72326 == 0.0 )
-				ifLocalVar40_g72361 = appendResult637_g72326;
-				float ifLocalVar40_g72373 = 0;
-				if( Debug_Index464_g72326 == 1.0 )
-				ifLocalVar40_g72373 = tex2D( _MainAlbedoTex, uv_MainAlbedoTex ).a;
-				float2 uv_MainNormalTex = IN.ase_texcoord9.xy * _MainNormalTex_ST.xy + _MainNormalTex_ST.zw;
-				float4 tex2DNode604_g72326 = tex2D( _MainNormalTex, uv_MainNormalTex );
-				float3 appendResult876_g72326 = (float3(tex2DNode604_g72326.a , tex2DNode604_g72326.g , 1.0));
-				float3 gammaToLinear878_g72326 = GammaToLinearSpace( appendResult876_g72326 );
-				float3 ifLocalVar40_g72407 = 0;
-				if( Debug_Index464_g72326 == 2.0 )
-				ifLocalVar40_g72407 = gammaToLinear878_g72326;
-				float2 uv_MainMaskTex = IN.ase_texcoord9.xy * _MainMaskTex_ST.xy + _MainMaskTex_ST.zw;
-				float ifLocalVar40_g72339 = 0;
-				if( Debug_Index464_g72326 == 3.0 )
-				ifLocalVar40_g72339 = tex2D( _MainMaskTex, uv_MainMaskTex ).r;
-				float ifLocalVar40_g72450 = 0;
-				if( Debug_Index464_g72326 == 4.0 )
-				ifLocalVar40_g72450 = tex2D( _MainMaskTex, uv_MainMaskTex ).g;
-				float ifLocalVar40_g72375 = 0;
-				if( Debug_Index464_g72326 == 5.0 )
-				ifLocalVar40_g72375 = tex2D( _MainMaskTex, uv_MainMaskTex ).b;
-				float ifLocalVar40_g72334 = 0;
-				if( Debug_Index464_g72326 == 6.0 )
-				ifLocalVar40_g72334 = tex2D( _MainMaskTex, uv_MainMaskTex ).a;
-				float2 uv_SecondAlbedoTex = IN.ase_texcoord9.xy * _SecondAlbedoTex_ST.xy + _SecondAlbedoTex_ST.zw;
-				float4 tex2DNode854_g72326 = tex2D( _SecondAlbedoTex, uv_SecondAlbedoTex );
-				float3 appendResult839_g72326 = (float3(tex2DNode854_g72326.r , tex2DNode854_g72326.g , tex2DNode854_g72326.b));
-				float3 ifLocalVar40_g72353 = 0;
-				if( Debug_Index464_g72326 == 7.0 )
-				ifLocalVar40_g72353 = appendResult839_g72326;
-				float ifLocalVar40_g72387 = 0;
-				if( Debug_Index464_g72326 == 8.0 )
-				ifLocalVar40_g72387 = tex2D( _SecondAlbedoTex, uv_SecondAlbedoTex ).a;
-				float2 uv_SecondNormalTex = IN.ase_texcoord9.xy * _SecondNormalTex_ST.xy + _SecondNormalTex_ST.zw;
-				float4 tex2DNode841_g72326 = tex2D( _SecondNormalTex, uv_SecondNormalTex );
-				float3 appendResult880_g72326 = (float3(tex2DNode841_g72326.a , tex2DNode841_g72326.g , 1.0));
-				float3 gammaToLinear879_g72326 = GammaToLinearSpace( appendResult880_g72326 );
-				float3 ifLocalVar40_g72438 = 0;
-				if( Debug_Index464_g72326 == 8.0 )
-				ifLocalVar40_g72438 = gammaToLinear879_g72326;
-				float2 uv_SecondMaskTex = IN.ase_texcoord9.xy * _SecondMaskTex_ST.xy + _SecondMaskTex_ST.zw;
-				float ifLocalVar40_g72408 = 0;
-				if( Debug_Index464_g72326 == 10.0 )
-				ifLocalVar40_g72408 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).r;
-				float ifLocalVar40_g72372 = 0;
-				if( Debug_Index464_g72326 == 11.0 )
-				ifLocalVar40_g72372 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).g;
-				float ifLocalVar40_g72427 = 0;
-				if( Debug_Index464_g72326 == 12.0 )
-				ifLocalVar40_g72427 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).b;
-				float ifLocalVar40_g72436 = 0;
-				if( Debug_Index464_g72326 == 13.0 )
-				ifLocalVar40_g72436 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).a;
-				float2 uv_EmissiveTex = IN.ase_texcoord9.xy * _EmissiveTex_ST.xy + _EmissiveTex_ST.zw;
-				float4 tex2DNode858_g72326 = tex2D( _EmissiveTex, uv_EmissiveTex );
-				float3 appendResult867_g72326 = (float3(tex2DNode858_g72326.r , tex2DNode858_g72326.g , tex2DNode858_g72326.b));
-				float3 ifLocalVar40_g72369 = 0;
-				if( Debug_Index464_g72326 == 14.0 )
-				ifLocalVar40_g72369 = appendResult867_g72326;
-				float Debug_Min721_g72326 = TVE_DEBUG_Min;
-				float temp_output_7_0_g72422 = Debug_Min721_g72326;
-				float4 temp_cast_3 = (temp_output_7_0_g72422).xxxx;
-				float Debug_Max723_g72326 = TVE_DEBUG_Max;
-				float4 Output_Maps561_g72326 = ( ( ( float4( ( ( ifLocalVar40_g72361 + ifLocalVar40_g72373 + ifLocalVar40_g72407 ) + ( ifLocalVar40_g72339 + ifLocalVar40_g72450 + ifLocalVar40_g72375 + ifLocalVar40_g72334 ) ) , 0.0 ) + float4( ( ( ( ifLocalVar40_g72353 + ifLocalVar40_g72387 + ifLocalVar40_g72438 ) + ( ifLocalVar40_g72408 + ifLocalVar40_g72372 + ifLocalVar40_g72427 + ifLocalVar40_g72436 ) ) * _DetailMode ) , 0.0 ) + ( ( float4( ifLocalVar40_g72369 , 0.0 ) * _EmissiveColor ) * _EmissiveCat ) ) - temp_cast_3 ) / ( Debug_Max723_g72326 - temp_output_7_0_g72422 ) );
-				float4 ifLocalVar40_g72421 = 0;
-				if( Debug_Type367_g72326 == 3.0 )
-				ifLocalVar40_g72421 = Output_Maps561_g72326;
-				float Resolution44_g72386 = max( _MainAlbedoTex_TexelSize.z , _MainAlbedoTex_TexelSize.w );
-				float4 color62_g72386 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
-				float4 ifLocalVar61_g72386 = 0;
-				if( Resolution44_g72386 <= 256.0 )
-				ifLocalVar61_g72386 = color62_g72386;
-				float4 color55_g72386 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
-				float4 ifLocalVar56_g72386 = 0;
-				if( Resolution44_g72386 == 512.0 )
-				ifLocalVar56_g72386 = color55_g72386;
-				float4 color42_g72386 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float4 ifLocalVar40_g72386 = 0;
-				if( Resolution44_g72386 == 1024.0 )
-				ifLocalVar40_g72386 = color42_g72386;
-				float4 color48_g72386 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
-				float4 ifLocalVar47_g72386 = 0;
-				if( Resolution44_g72386 == 2048.0 )
-				ifLocalVar47_g72386 = color48_g72386;
-				float4 color51_g72386 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 ifLocalVar52_g72386 = 0;
-				if( Resolution44_g72386 >= 4096.0 )
-				ifLocalVar52_g72386 = color51_g72386;
-				float4 ifLocalVar40_g72437 = 0;
-				if( Debug_Index464_g72326 == 0.0 )
-				ifLocalVar40_g72437 = ( ifLocalVar61_g72386 + ifLocalVar56_g72386 + ifLocalVar40_g72386 + ifLocalVar47_g72386 + ifLocalVar52_g72386 );
-				float Resolution44_g72344 = max( _MainNormalTex_TexelSize.z , _MainNormalTex_TexelSize.w );
-				float4 color62_g72344 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
-				float4 ifLocalVar61_g72344 = 0;
-				if( Resolution44_g72344 <= 256.0 )
-				ifLocalVar61_g72344 = color62_g72344;
-				float4 color55_g72344 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
-				float4 ifLocalVar56_g72344 = 0;
-				if( Resolution44_g72344 == 512.0 )
-				ifLocalVar56_g72344 = color55_g72344;
-				float4 color42_g72344 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float4 ifLocalVar40_g72344 = 0;
-				if( Resolution44_g72344 == 1024.0 )
-				ifLocalVar40_g72344 = color42_g72344;
-				float4 color48_g72344 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
-				float4 ifLocalVar47_g72344 = 0;
-				if( Resolution44_g72344 == 2048.0 )
-				ifLocalVar47_g72344 = color48_g72344;
-				float4 color51_g72344 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 ifLocalVar52_g72344 = 0;
-				if( Resolution44_g72344 >= 4096.0 )
-				ifLocalVar52_g72344 = color51_g72344;
-				float4 ifLocalVar40_g72350 = 0;
-				if( Debug_Index464_g72326 == 1.0 )
-				ifLocalVar40_g72350 = ( ifLocalVar61_g72344 + ifLocalVar56_g72344 + ifLocalVar40_g72344 + ifLocalVar47_g72344 + ifLocalVar52_g72344 );
-				float Resolution44_g72385 = max( _MainMaskTex_TexelSize.z , _MainMaskTex_TexelSize.w );
-				float4 color62_g72385 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
-				float4 ifLocalVar61_g72385 = 0;
-				if( Resolution44_g72385 <= 256.0 )
-				ifLocalVar61_g72385 = color62_g72385;
-				float4 color55_g72385 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
-				float4 ifLocalVar56_g72385 = 0;
-				if( Resolution44_g72385 == 512.0 )
-				ifLocalVar56_g72385 = color55_g72385;
-				float4 color42_g72385 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float4 ifLocalVar40_g72385 = 0;
-				if( Resolution44_g72385 == 1024.0 )
-				ifLocalVar40_g72385 = color42_g72385;
-				float4 color48_g72385 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
-				float4 ifLocalVar47_g72385 = 0;
-				if( Resolution44_g72385 == 2048.0 )
-				ifLocalVar47_g72385 = color48_g72385;
-				float4 color51_g72385 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 ifLocalVar52_g72385 = 0;
-				if( Resolution44_g72385 >= 4096.0 )
-				ifLocalVar52_g72385 = color51_g72385;
-				float4 ifLocalVar40_g72357 = 0;
-				if( Debug_Index464_g72326 == 2.0 )
-				ifLocalVar40_g72357 = ( ifLocalVar61_g72385 + ifLocalVar56_g72385 + ifLocalVar40_g72385 + ifLocalVar47_g72385 + ifLocalVar52_g72385 );
-				float Resolution44_g72383 = max( _SecondAlbedoTex_TexelSize.z , _SecondAlbedoTex_TexelSize.w );
-				float4 color62_g72383 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
-				float4 ifLocalVar61_g72383 = 0;
-				if( Resolution44_g72383 <= 256.0 )
-				ifLocalVar61_g72383 = color62_g72383;
-				float4 color55_g72383 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
-				float4 ifLocalVar56_g72383 = 0;
-				if( Resolution44_g72383 == 512.0 )
-				ifLocalVar56_g72383 = color55_g72383;
-				float4 color42_g72383 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float4 ifLocalVar40_g72383 = 0;
-				if( Resolution44_g72383 == 1024.0 )
-				ifLocalVar40_g72383 = color42_g72383;
-				float4 color48_g72383 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
-				float4 ifLocalVar47_g72383 = 0;
-				if( Resolution44_g72383 == 2048.0 )
-				ifLocalVar47_g72383 = color48_g72383;
-				float4 color51_g72383 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 ifLocalVar52_g72383 = 0;
-				if( Resolution44_g72383 >= 4096.0 )
-				ifLocalVar52_g72383 = color51_g72383;
-				float4 ifLocalVar40_g72382 = 0;
-				if( Debug_Index464_g72326 == 3.0 )
-				ifLocalVar40_g72382 = ( ifLocalVar61_g72383 + ifLocalVar56_g72383 + ifLocalVar40_g72383 + ifLocalVar47_g72383 + ifLocalVar52_g72383 );
-				float Resolution44_g72370 = max( _SecondMaskTex_TexelSize.z , _SecondMaskTex_TexelSize.w );
-				float4 color62_g72370 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
-				float4 ifLocalVar61_g72370 = 0;
-				if( Resolution44_g72370 <= 256.0 )
-				ifLocalVar61_g72370 = color62_g72370;
-				float4 color55_g72370 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
-				float4 ifLocalVar56_g72370 = 0;
-				if( Resolution44_g72370 == 512.0 )
-				ifLocalVar56_g72370 = color55_g72370;
-				float4 color42_g72370 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float4 ifLocalVar40_g72370 = 0;
-				if( Resolution44_g72370 == 1024.0 )
-				ifLocalVar40_g72370 = color42_g72370;
-				float4 color48_g72370 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
-				float4 ifLocalVar47_g72370 = 0;
-				if( Resolution44_g72370 == 2048.0 )
-				ifLocalVar47_g72370 = color48_g72370;
-				float4 color51_g72370 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 ifLocalVar52_g72370 = 0;
-				if( Resolution44_g72370 >= 4096.0 )
-				ifLocalVar52_g72370 = color51_g72370;
-				float4 ifLocalVar40_g72358 = 0;
-				if( Debug_Index464_g72326 == 4.0 )
-				ifLocalVar40_g72358 = ( ifLocalVar61_g72370 + ifLocalVar56_g72370 + ifLocalVar40_g72370 + ifLocalVar47_g72370 + ifLocalVar52_g72370 );
-				float Resolution44_g72388 = max( _SecondAlbedoTex_TexelSize.z , _SecondAlbedoTex_TexelSize.w );
-				float4 color62_g72388 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
-				float4 ifLocalVar61_g72388 = 0;
-				if( Resolution44_g72388 <= 256.0 )
-				ifLocalVar61_g72388 = color62_g72388;
-				float4 color55_g72388 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
-				float4 ifLocalVar56_g72388 = 0;
-				if( Resolution44_g72388 == 512.0 )
-				ifLocalVar56_g72388 = color55_g72388;
-				float4 color42_g72388 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float4 ifLocalVar40_g72388 = 0;
-				if( Resolution44_g72388 == 1024.0 )
-				ifLocalVar40_g72388 = color42_g72388;
-				float4 color48_g72388 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
-				float4 ifLocalVar47_g72388 = 0;
-				if( Resolution44_g72388 == 2048.0 )
-				ifLocalVar47_g72388 = color48_g72388;
-				float4 color51_g72388 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 ifLocalVar52_g72388 = 0;
-				if( Resolution44_g72388 >= 4096.0 )
-				ifLocalVar52_g72388 = color51_g72388;
-				float4 ifLocalVar40_g72381 = 0;
-				if( Debug_Index464_g72326 == 5.0 )
-				ifLocalVar40_g72381 = ( ifLocalVar61_g72388 + ifLocalVar56_g72388 + ifLocalVar40_g72388 + ifLocalVar47_g72388 + ifLocalVar52_g72388 );
-				float Resolution44_g72365 = max( _EmissiveTex_TexelSize.z , _EmissiveTex_TexelSize.w );
-				float4 color62_g72365 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
-				float4 ifLocalVar61_g72365 = 0;
-				if( Resolution44_g72365 <= 256.0 )
-				ifLocalVar61_g72365 = color62_g72365;
-				float4 color55_g72365 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
-				float4 ifLocalVar56_g72365 = 0;
-				if( Resolution44_g72365 == 512.0 )
-				ifLocalVar56_g72365 = color55_g72365;
-				float4 color42_g72365 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
-				float4 ifLocalVar40_g72365 = 0;
-				if( Resolution44_g72365 == 1024.0 )
-				ifLocalVar40_g72365 = color42_g72365;
-				float4 color48_g72365 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
-				float4 ifLocalVar47_g72365 = 0;
-				if( Resolution44_g72365 == 2048.0 )
-				ifLocalVar47_g72365 = color48_g72365;
-				float4 color51_g72365 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
-				float4 ifLocalVar52_g72365 = 0;
-				if( Resolution44_g72365 >= 4096.0 )
-				ifLocalVar52_g72365 = color51_g72365;
-				float4 ifLocalVar40_g72390 = 0;
-				if( Debug_Index464_g72326 == 6.0 )
-				ifLocalVar40_g72390 = ( ifLocalVar61_g72365 + ifLocalVar56_g72365 + ifLocalVar40_g72365 + ifLocalVar47_g72365 + ifLocalVar52_g72365 );
-				float4 Output_Resolution737_g72326 = ( ( ifLocalVar40_g72437 + ifLocalVar40_g72350 + ifLocalVar40_g72357 ) + ( ifLocalVar40_g72382 + ifLocalVar40_g72358 + ifLocalVar40_g72381 ) + ifLocalVar40_g72390 );
-				float4 ifLocalVar40_g72420 = 0;
-				if( Debug_Type367_g72326 == 4.0 )
-				ifLocalVar40_g72420 = Output_Resolution737_g72326;
-				float4x4 break19_g72453 = unity_ObjectToWorld;
-				float3 appendResult20_g72453 = (float3(break19_g72453[ 0 ][ 3 ] , break19_g72453[ 1 ][ 3 ] , break19_g72453[ 2 ][ 3 ]));
-				float3 appendResult60_g72452 = (float3(IN.ase_texcoord10.x , IN.ase_texcoord10.z , IN.ase_texcoord10.y));
-				float3 temp_output_122_0_g72453 = ( appendResult60_g72452 * _VertexPivotMode );
-				float3 PivotsOnly105_g72453 = (mul( unity_ObjectToWorld, float4( temp_output_122_0_g72453 , 0.0 ) ).xyz).xyz;
-				half3 ObjectData20_g72454 = ( appendResult20_g72453 + PivotsOnly105_g72453 );
-				half3 WorldData19_g72454 = worldPos;
-				#ifdef TVE_FEATURE_BATCHING
-				float3 staticSwitch14_g72454 = WorldData19_g72454;
-				#else
-				float3 staticSwitch14_g72454 = ObjectData20_g72454;
-				#endif
-				float3 temp_output_114_0_g72453 = staticSwitch14_g72454;
-				half3 ObjectData20_g72367 = temp_output_114_0_g72453;
-				half3 WorldData19_g72367 = worldPos;
-				#ifdef TVE_FEATURE_BATCHING
-				float3 staticSwitch14_g72367 = WorldData19_g72367;
-				#else
-				float3 staticSwitch14_g72367 = ObjectData20_g72367;
-				#endif
-				float3 ObjectPosition890_g72326 = staticSwitch14_g72367;
-				half3 Input_Position419_g72413 = ObjectPosition890_g72326;
-				float Input_MotionScale287_g72413 = ( _MotionScale_10 + 1.0 );
-				half Global_Scale448_g72413 = TVE_NoiseParams.x;
-				float2 temp_output_597_0_g72413 = (( Input_Position419_g72413 * Input_MotionScale287_g72413 * Global_Scale448_g72413 * 0.0075 )).xz;
-				float4 temp_output_91_19_g72456 = TVE_MotionCoords;
-				half2 UV94_g72456 = ( (temp_output_91_19_g72456).zw + ( (temp_output_91_19_g72456).xy * (ObjectPosition890_g72326).xz ) );
-				float Debug_Layer885_g72326 = TVE_DEBUG_Layer;
-				float temp_output_84_0_g72456 = Debug_Layer885_g72326;
-				float4 lerpResult107_g72456 = lerp( TVE_MotionParams , saturate( SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_MotionTex, sampler_linear_repeat, float3(UV94_g72456,temp_output_84_0_g72456), 0.0 ) ) , TVE_MotionUsage[(int)temp_output_84_0_g72456]);
-				float4 break322_g72451 = lerpResult107_g72456;
-				float3 appendResult397_g72451 = (float3(break322_g72451.x , 0.0 , break322_g72451.y));
-				float3 temp_output_398_0_g72451 = (appendResult397_g72451*2.0 + -1.0);
-				half2 Wind_DirectionWS1031_g72326 = (temp_output_398_0_g72451).xz;
-				half2 Input_DirectionWS423_g72413 = Wind_DirectionWS1031_g72326;
-				half Input_MotionSpeed62_g72413 = _MotionSpeed_10;
-				half Global_Speed449_g72413 = TVE_NoiseParams.y;
-				half Input_MotionVariation284_g72413 = _MotionVariation_10;
-				float3 break111_g72460 = ObjectPosition890_g72326;
-				half Input_DynamicMode120_g72460 = _VertexDynamicMode;
-				half Input_Variation124_g72460 = IN.ase_color.r;
-				half ObjectData20_g72461 = frac( ( ( ( break111_g72460.x + break111_g72460.y + break111_g72460.z ) * ( 1.0 - Input_DynamicMode120_g72460 ) ) + Input_Variation124_g72460 ) );
-				half WorldData19_g72461 = Input_Variation124_g72460;
-				#ifdef TVE_FEATURE_BATCHING
-				float staticSwitch14_g72461 = WorldData19_g72461;
-				#else
-				float staticSwitch14_g72461 = ObjectData20_g72461;
-				#endif
-				float clampResult129_g72460 = clamp( staticSwitch14_g72461 , 0.01 , 0.99 );
-				half Global_MeshVariation1176_g72326 = clampResult129_g72460;
-				half Input_GlobalVariation569_g72413 = Global_MeshVariation1176_g72326;
-				float temp_output_630_0_g72413 = ( ( ( _Time.y * Input_MotionSpeed62_g72413 * Global_Speed449_g72413 ) + ( Input_MotionVariation284_g72413 * Input_GlobalVariation569_g72413 ) ) * 0.03 );
-				float temp_output_607_0_g72413 = frac( temp_output_630_0_g72413 );
-				float4 lerpResult590_g72413 = lerp( tex2D( TVE_NoiseTex, ( temp_output_597_0_g72413 + ( -Input_DirectionWS423_g72413 * temp_output_607_0_g72413 ) ) ) , tex2D( TVE_NoiseTex, ( temp_output_597_0_g72413 + ( -Input_DirectionWS423_g72413 * frac( ( temp_output_630_0_g72413 + 0.5 ) ) ) ) ) , ( abs( ( temp_output_607_0_g72413 - 0.5 ) ) / 0.5 ));
-				float4 break613_g72413 = lerpResult590_g72413;
-				half Wind_Power369_g72451 = break322_g72451.z;
-				half Wind_Pow1128_g72326 = Wind_Power369_g72451;
-				half Input_GlobalWind327_g72413 = Wind_Pow1128_g72326;
-				float lerpResult612_g72413 = lerp( 1.4 , 0.4 , Input_GlobalWind327_g72413);
-				float temp_output_604_0_g72413 = pow( ( break613_g72413.r + 0.2 ) , lerpResult612_g72413 );
-				half Motion_Noise915_g72326 = temp_output_604_0_g72413;
-				float ifLocalVar40_g72340 = 0;
-				if( Debug_Index464_g72326 == 0.0 )
-				ifLocalVar40_g72340 = Motion_Noise915_g72326;
-				float4 temp_output_91_19_g72403 = TVE_ColorsCoords;
-				float3 WorldPosition893_g72326 = worldPos;
-				half2 UV94_g72403 = ( (temp_output_91_19_g72403).zw + ( (temp_output_91_19_g72403).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_82_0_g72403 = Debug_Layer885_g72326;
-				float4 lerpResult108_g72403 = lerp( TVE_ColorsParams , SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_ColorsTex, sampler_linear_repeat, float3(UV94_g72403,temp_output_82_0_g72403), 0.0 ) , TVE_ColorsUsage[(int)temp_output_82_0_g72403]);
-				float3 ifLocalVar40_g72366 = 0;
-				if( Debug_Index464_g72326 == 1.0 )
-				ifLocalVar40_g72366 = (lerpResult108_g72403).rgb;
-				float4 temp_output_91_19_g72391 = TVE_ColorsCoords;
-				half2 UV94_g72391 = ( (temp_output_91_19_g72391).zw + ( (temp_output_91_19_g72391).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_82_0_g72391 = Debug_Layer885_g72326;
-				float4 lerpResult108_g72391 = lerp( TVE_ColorsParams , SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_ColorsTex, sampler_linear_repeat, float3(UV94_g72391,temp_output_82_0_g72391), 0.0 ) , TVE_ColorsUsage[(int)temp_output_82_0_g72391]);
-				float ifLocalVar40_g72380 = 0;
-				if( Debug_Index464_g72326 == 2.0 )
-				ifLocalVar40_g72380 = saturate( (lerpResult108_g72391).a );
-				float4 temp_output_93_19_g72399 = TVE_ExtrasCoords;
-				half2 UV96_g72399 = ( (temp_output_93_19_g72399).zw + ( (temp_output_93_19_g72399).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72399 = Debug_Layer885_g72326;
-				float4 lerpResult109_g72399 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_ExtrasTex, sampler_linear_repeat, float3(UV96_g72399,temp_output_84_0_g72399), 0.0 ) , TVE_ExtrasUsage[(int)temp_output_84_0_g72399]);
-				float4 break89_g72399 = lerpResult109_g72399;
-				float ifLocalVar40_g72351 = 0;
-				if( Debug_Index464_g72326 == 3.0 )
-				ifLocalVar40_g72351 = break89_g72399.r;
-				float4 temp_output_93_19_g72329 = TVE_ExtrasCoords;
-				half2 UV96_g72329 = ( (temp_output_93_19_g72329).zw + ( (temp_output_93_19_g72329).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72329 = Debug_Layer885_g72326;
-				float4 lerpResult109_g72329 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_ExtrasTex, sampler_linear_repeat, float3(UV96_g72329,temp_output_84_0_g72329), 0.0 ) , TVE_ExtrasUsage[(int)temp_output_84_0_g72329]);
-				float4 break89_g72329 = lerpResult109_g72329;
-				float ifLocalVar40_g72449 = 0;
-				if( Debug_Index464_g72326 == 4.0 )
-				ifLocalVar40_g72449 = break89_g72329.g;
-				float4 temp_output_93_19_g72409 = TVE_ExtrasCoords;
-				half2 UV96_g72409 = ( (temp_output_93_19_g72409).zw + ( (temp_output_93_19_g72409).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72409 = Debug_Layer885_g72326;
-				float4 lerpResult109_g72409 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_ExtrasTex, sampler_linear_repeat, float3(UV96_g72409,temp_output_84_0_g72409), 0.0 ) , TVE_ExtrasUsage[(int)temp_output_84_0_g72409]);
-				float4 break89_g72409 = lerpResult109_g72409;
-				float ifLocalVar40_g72352 = 0;
-				if( Debug_Index464_g72326 == 5.0 )
-				ifLocalVar40_g72352 = break89_g72409.b;
-				float4 temp_output_93_19_g72439 = TVE_ExtrasCoords;
-				half2 UV96_g72439 = ( (temp_output_93_19_g72439).zw + ( (temp_output_93_19_g72439).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72439 = Debug_Layer885_g72326;
-				float4 lerpResult109_g72439 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_ExtrasTex, sampler_linear_repeat, float3(UV96_g72439,temp_output_84_0_g72439), 0.0 ) , TVE_ExtrasUsage[(int)temp_output_84_0_g72439]);
-				float4 break89_g72439 = lerpResult109_g72439;
-				float ifLocalVar40_g72345 = 0;
-				if( Debug_Index464_g72326 == 6.0 )
-				ifLocalVar40_g72345 = saturate( break89_g72439.a );
-				float4 temp_output_91_19_g72395 = TVE_MotionCoords;
-				half2 UV94_g72395 = ( (temp_output_91_19_g72395).zw + ( (temp_output_91_19_g72395).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72395 = Debug_Layer885_g72326;
-				float4 lerpResult107_g72395 = lerp( TVE_MotionParams , saturate( SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_MotionTex, sampler_linear_repeat, float3(UV94_g72395,temp_output_84_0_g72395), 0.0 ) ) , TVE_MotionUsage[(int)temp_output_84_0_g72395]);
-				float3 appendResult1012_g72326 = (float3((lerpResult107_g72395).rg , 0.0));
-				float3 ifLocalVar40_g72335 = 0;
-				if( Debug_Index464_g72326 == 7.0 )
-				ifLocalVar40_g72335 = appendResult1012_g72326;
-				float4 temp_output_91_19_g72423 = TVE_MotionCoords;
-				half2 UV94_g72423 = ( (temp_output_91_19_g72423).zw + ( (temp_output_91_19_g72423).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72423 = Debug_Layer885_g72326;
-				float4 lerpResult107_g72423 = lerp( TVE_MotionParams , saturate( SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_MotionTex, sampler_linear_repeat, float3(UV94_g72423,temp_output_84_0_g72423), 0.0 ) ) , TVE_MotionUsage[(int)temp_output_84_0_g72423]);
-				float ifLocalVar40_g72356 = 0;
-				if( Debug_Index464_g72326 == 8.0 )
-				ifLocalVar40_g72356 = (lerpResult107_g72423).b;
-				float4 temp_output_91_19_g72431 = TVE_MotionCoords;
-				half2 UV94_g72431 = ( (temp_output_91_19_g72431).zw + ( (temp_output_91_19_g72431).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72431 = Debug_Layer885_g72326;
-				float4 lerpResult107_g72431 = lerp( TVE_MotionParams , saturate( SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_MotionTex, sampler_linear_repeat, float3(UV94_g72431,temp_output_84_0_g72431), 0.0 ) ) , TVE_MotionUsage[(int)temp_output_84_0_g72431]);
-				float ifLocalVar40_g72435 = 0;
-				if( Debug_Index464_g72326 == 9.0 )
-				ifLocalVar40_g72435 = (lerpResult107_g72431).a;
-				float4 temp_output_94_19_g72444 = TVE_VertexCoords;
-				half2 UV97_g72444 = ( (temp_output_94_19_g72444).zw + ( (temp_output_94_19_g72444).xy * (WorldPosition893_g72326).xz ) );
-				float temp_output_84_0_g72444 = Debug_Layer885_g72326;
-				float4 lerpResult109_g72444 = lerp( TVE_VertexParams , SAMPLE_TEXTURE2D_ARRAY_LOD( TVE_VertexTex, sampler_linear_repeat, float3(UV97_g72444,temp_output_84_0_g72444), 0.0 ) , TVE_VertexUsage[(int)temp_output_84_0_g72444]);
-				float ifLocalVar40_g72374 = 0;
-				if( Debug_Index464_g72326 == 10.0 )
-				ifLocalVar40_g72374 = (lerpResult109_g72444).a;
-				float3 Output_Globals888_g72326 = ( ifLocalVar40_g72340 + ( ifLocalVar40_g72366 + ifLocalVar40_g72380 ) + ( ifLocalVar40_g72351 + ifLocalVar40_g72449 + ifLocalVar40_g72352 + ifLocalVar40_g72345 ) + ( ifLocalVar40_g72335 + ifLocalVar40_g72356 + ifLocalVar40_g72435 ) + ( ifLocalVar40_g72374 + 0.0 ) );
-				float3 ifLocalVar40_g72338 = 0;
-				if( Debug_Type367_g72326 == 8.0 )
-				ifLocalVar40_g72338 = Output_Globals888_g72326;
-				float3 vertexToFrag328_g72326 = IN.ase_texcoord8.yzw;
-				float4 color1016_g72326 = IsGammaSpace() ? float4(0.5831653,0.6037736,0.2135992,0) : float4(0.2992498,0.3229691,0.03750122,0);
-				float4 color1017_g72326 = IsGammaSpace() ? float4(0.8117647,0.3488252,0.2627451,0) : float4(0.6239604,0.0997834,0.05612849,0);
-				float4 switchResult1015_g72326 = (((ase_vface>0)?(color1016_g72326):(color1017_g72326)));
-				float3 ifLocalVar40_g72342 = 0;
-				if( Debug_Index464_g72326 == 4.0 )
-				ifLocalVar40_g72342 = (switchResult1015_g72326).rgb;
-				float temp_output_7_0_g72354 = Debug_Min721_g72326;
-				float3 temp_cast_30 = (temp_output_7_0_g72354).xxx;
-				float3 Output_Mesh316_g72326 = saturate( ( ( ( vertexToFrag328_g72326 + ifLocalVar40_g72342 ) - temp_cast_30 ) / ( Debug_Max723_g72326 - temp_output_7_0_g72354 ) ) );
-				float3 ifLocalVar40_g72337 = 0;
-				if( Debug_Type367_g72326 == 9.0 )
-				ifLocalVar40_g72337 = Output_Mesh316_g72326;
-				float4 color1086_g72326 = IsGammaSpace() ? float4(0.1226415,0.1226415,0.1226415,0) : float4(0.01390275,0.01390275,0.01390275,0);
-				float4 vertexToFrag11_g72328 = IN.ase_texcoord11;
-				float _IsVegetationShader1101_g72326 = _IsVegetationShader;
-				float4 lerpResult1089_g72326 = lerp( color1086_g72326 , vertexToFrag11_g72328 , ( _IsPolygonalShader1112_g72326 * _IsVegetationShader1101_g72326 ));
-				float3 Output_Misc1080_g72326 = (lerpResult1089_g72326).rgb;
-				float3 ifLocalVar40_g72418 = 0;
-				if( Debug_Type367_g72326 == 10.0 )
-				ifLocalVar40_g72418 = Output_Misc1080_g72326;
-				float4 temp_output_459_0_g72326 = ( ifLocalVar40_g72359 + ifLocalVar40_g72448 + ifLocalVar40_g72428 + ifLocalVar40_g72421 + ifLocalVar40_g72420 + float4( ifLocalVar40_g72338 , 0.0 ) + float4( ifLocalVar40_g72337 , 0.0 ) + float4( ifLocalVar40_g72418 , 0.0 ) );
-				float4 color690_g72326 = IsGammaSpace() ? float4(0.1226415,0.1226415,0.1226415,0) : float4(0.01390275,0.01390275,0.01390275,0);
-				float _IsTVEShader647_g72326 = _IsTVEShader;
-				float4 lerpResult689_g72326 = lerp( color690_g72326 , temp_output_459_0_g72326 , _IsTVEShader647_g72326);
-				float Debug_Filter322_g72326 = TVE_DEBUG_Filter;
-				float4 lerpResult326_g72326 = lerp( temp_output_459_0_g72326 , lerpResult689_g72326 , Debug_Filter322_g72326);
-				float Debug_Clip623_g72326 = TVE_DEBUG_Clip;
-				float lerpResult622_g72326 = lerp( 1.0 , tex2D( _MainAlbedoTex, uv_MainAlbedoTex ).a , ( Debug_Clip623_g72326 * _RenderClip ));
-				clip( lerpResult622_g72326 - _Cutoff);
+				float Debug_Type367_g62695 = TVE_DEBUG_Type;
+				float4 color646_g62695 = IsGammaSpace() ? float4(0.9245283,0.7969696,0.4142933,1) : float4(0.8368256,0.5987038,0.1431069,1);
+				float customEye676_g62695 = IN.ase_texcoord8.x;
+				float saferPower688_g62695 = abs( (0.0 + (customEye676_g62695 - 300.0) * (1.0 - 0.0) / (0.0 - 300.0)) );
+				float clampResult702_g62695 = clamp( pow( saferPower688_g62695 , 1.25 ) , 0.75 , 1.0 );
+				float Shading655_g62695 = clampResult702_g62695;
+				float4 Output_Converted717_g62695 = ( color646_g62695 * Shading655_g62695 );
+				float4 ifLocalVar40_g63004 = 0;
+				if( Debug_Type367_g62695 == 0.0 )
+				ifLocalVar40_g63004 = Output_Converted717_g62695;
+				float4 color466_g62695 = IsGammaSpace() ? float4(0.8113208,0.4952317,0.264062,0) : float4(0.6231937,0.2096542,0.05668841,0);
+				float _IsBarkShader347_g62695 = _IsBarkShader;
+				float4 color469_g62695 = IsGammaSpace() ? float4(0.6566009,0.3404236,0.8490566,0) : float4(0.3886527,0.09487338,0.6903409,0);
+				float _IsCrossShader342_g62695 = _IsCrossShader;
+				float4 color472_g62695 = IsGammaSpace() ? float4(0.7100264,0.8018868,0.2231666,0) : float4(0.4623997,0.6070304,0.0407874,0);
+				float _IsGrassShader341_g62695 = _IsGrassShader;
+				float4 color475_g62695 = IsGammaSpace() ? float4(0.3267961,0.7264151,0.3118103,0) : float4(0.08721471,0.4865309,0.07922345,0);
+				float _IsLeafShader360_g62695 = _IsLeafShader;
+				float4 color478_g62695 = IsGammaSpace() ? float4(0.3252937,0.6122813,0.8113208,0) : float4(0.08639329,0.3330702,0.6231937,0);
+				float _IsPropShader346_g62695 = _IsPropShader;
+				float4 color1114_g62695 = IsGammaSpace() ? float4(0.9716981,0.3162602,0.4816265,0) : float4(0.9368213,0.08154967,0.1974273,0);
+				float _IsImpostorShader1110_g62695 = _IsImpostorShader;
+				float4 color1117_g62695 = IsGammaSpace() ? float4(0.257921,0.8679245,0.8361252,0) : float4(0.05410501,0.7254258,0.6668791,0);
+				float _IsPolygonalShader1112_g62695 = _IsPolygonalShader;
+				float4 Output_Shader445_g62695 = ( ( ( color466_g62695 * _IsBarkShader347_g62695 ) + ( color469_g62695 * _IsCrossShader342_g62695 ) + ( color472_g62695 * _IsGrassShader341_g62695 ) + ( color475_g62695 * _IsLeafShader360_g62695 ) + ( color478_g62695 * _IsPropShader346_g62695 ) + ( color1114_g62695 * _IsImpostorShader1110_g62695 ) + ( color1117_g62695 * _IsPolygonalShader1112_g62695 ) ) * Shading655_g62695 );
+				float4 ifLocalVar40_g62984 = 0;
+				if( Debug_Type367_g62695 == 1.0 )
+				ifLocalVar40_g62984 = Output_Shader445_g62695;
+				float4 color544_g62695 = IsGammaSpace() ? float4(0.3252937,0.6122813,0.8113208,0) : float4(0.08639329,0.3330702,0.6231937,0);
+				float _IsSimpleShader359_g62695 = _IsSimpleShader;
+				float4 color521_g62695 = IsGammaSpace() ? float4(0.6566009,0.3404236,0.8490566,0) : float4(0.3886527,0.09487338,0.6903409,0);
+				float _IsStandardShader344_g62695 = _IsStandardShader;
+				float4 color1121_g62695 = IsGammaSpace() ? float4(0.9245283,0.8421515,0.1788003,0) : float4(0.8368256,0.677754,0.02687956,0);
+				float _IsSubsurfaceShader548_g62695 = _IsSubsurfaceShader;
+				float4 Output_Lighting525_g62695 = ( ( ( color544_g62695 * _IsSimpleShader359_g62695 ) + ( color521_g62695 * _IsStandardShader344_g62695 ) + ( color1121_g62695 * _IsSubsurfaceShader548_g62695 ) ) * Shading655_g62695 );
+				float4 ifLocalVar40_g62978 = 0;
+				if( Debug_Type367_g62695 == 2.0 )
+				ifLocalVar40_g62978 = Output_Lighting525_g62695;
+				float Debug_Index464_g62695 = TVE_DEBUG_Index;
+				float2 uv_MainAlbedoTex = IN.ase_texcoord8.yz * _MainAlbedoTex_ST.xy + _MainAlbedoTex_ST.zw;
+				float4 tex2DNode586_g62695 = tex2D( _MainAlbedoTex, uv_MainAlbedoTex );
+				float3 appendResult637_g62695 = (float3(tex2DNode586_g62695.r , tex2DNode586_g62695.g , tex2DNode586_g62695.b));
+				float3 ifLocalVar40_g63010 = 0;
+				if( Debug_Index464_g62695 == 0.0 )
+				ifLocalVar40_g63010 = appendResult637_g62695;
+				float ifLocalVar40_g63032 = 0;
+				if( Debug_Index464_g62695 == 1.0 )
+				ifLocalVar40_g63032 = tex2D( _MainAlbedoTex, uv_MainAlbedoTex ).a;
+				float2 uv_MainNormalTex = IN.ase_texcoord8.yz * _MainNormalTex_ST.xy + _MainNormalTex_ST.zw;
+				float4 tex2DNode604_g62695 = tex2D( _MainNormalTex, uv_MainNormalTex );
+				float3 appendResult876_g62695 = (float3(tex2DNode604_g62695.a , tex2DNode604_g62695.g , 1.0));
+				float3 gammaToLinear878_g62695 = GammaToLinearSpace( appendResult876_g62695 );
+				float3 ifLocalVar40_g62951 = 0;
+				if( Debug_Index464_g62695 == 2.0 )
+				ifLocalVar40_g62951 = gammaToLinear878_g62695;
+				float2 uv_MainMaskTex = IN.ase_texcoord8.yz * _MainMaskTex_ST.xy + _MainMaskTex_ST.zw;
+				float ifLocalVar40_g63024 = 0;
+				if( Debug_Index464_g62695 == 3.0 )
+				ifLocalVar40_g63024 = tex2D( _MainMaskTex, uv_MainMaskTex ).r;
+				float ifLocalVar40_g62976 = 0;
+				if( Debug_Index464_g62695 == 4.0 )
+				ifLocalVar40_g62976 = tex2D( _MainMaskTex, uv_MainMaskTex ).g;
+				float ifLocalVar40_g62997 = 0;
+				if( Debug_Index464_g62695 == 5.0 )
+				ifLocalVar40_g62997 = tex2D( _MainMaskTex, uv_MainMaskTex ).b;
+				float ifLocalVar40_g63013 = 0;
+				if( Debug_Index464_g62695 == 6.0 )
+				ifLocalVar40_g63013 = tex2D( _MainMaskTex, uv_MainMaskTex ).a;
+				float2 uv_SecondAlbedoTex = IN.ase_texcoord8.yz * _SecondAlbedoTex_ST.xy + _SecondAlbedoTex_ST.zw;
+				float4 tex2DNode854_g62695 = tex2D( _SecondAlbedoTex, uv_SecondAlbedoTex );
+				float3 appendResult839_g62695 = (float3(tex2DNode854_g62695.r , tex2DNode854_g62695.g , tex2DNode854_g62695.b));
+				float3 ifLocalVar40_g63020 = 0;
+				if( Debug_Index464_g62695 == 7.0 )
+				ifLocalVar40_g63020 = appendResult839_g62695;
+				float ifLocalVar40_g62934 = 0;
+				if( Debug_Index464_g62695 == 8.0 )
+				ifLocalVar40_g62934 = tex2D( _SecondAlbedoTex, uv_SecondAlbedoTex ).a;
+				float2 uv_SecondNormalTex = IN.ase_texcoord8.yz * _SecondNormalTex_ST.xy + _SecondNormalTex_ST.zw;
+				float4 tex2DNode841_g62695 = tex2D( _SecondNormalTex, uv_SecondNormalTex );
+				float3 appendResult880_g62695 = (float3(tex2DNode841_g62695.a , tex2DNode841_g62695.g , 1.0));
+				float3 gammaToLinear879_g62695 = GammaToLinearSpace( appendResult880_g62695 );
+				float3 ifLocalVar40_g62985 = 0;
+				if( Debug_Index464_g62695 == 8.0 )
+				ifLocalVar40_g62985 = gammaToLinear879_g62695;
+				float2 uv_SecondMaskTex = IN.ase_texcoord8.yz * _SecondMaskTex_ST.xy + _SecondMaskTex_ST.zw;
+				float ifLocalVar40_g62950 = 0;
+				if( Debug_Index464_g62695 == 10.0 )
+				ifLocalVar40_g62950 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).r;
+				float ifLocalVar40_g62955 = 0;
+				if( Debug_Index464_g62695 == 11.0 )
+				ifLocalVar40_g62955 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).g;
+				float ifLocalVar40_g62983 = 0;
+				if( Debug_Index464_g62695 == 12.0 )
+				ifLocalVar40_g62983 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).b;
+				float ifLocalVar40_g62988 = 0;
+				if( Debug_Index464_g62695 == 13.0 )
+				ifLocalVar40_g62988 = tex2D( _SecondMaskTex, uv_SecondMaskTex ).a;
+				float2 uv_EmissiveTex = IN.ase_texcoord8.yz * _EmissiveTex_ST.xy + _EmissiveTex_ST.zw;
+				float4 tex2DNode858_g62695 = tex2D( _EmissiveTex, uv_EmissiveTex );
+				float3 appendResult867_g62695 = (float3(tex2DNode858_g62695.r , tex2DNode858_g62695.g , tex2DNode858_g62695.b));
+				float3 ifLocalVar40_g62956 = 0;
+				if( Debug_Index464_g62695 == 14.0 )
+				ifLocalVar40_g62956 = appendResult867_g62695;
+				float Debug_Min721_g62695 = TVE_DEBUG_Min;
+				float temp_output_7_0_g62962 = Debug_Min721_g62695;
+				float4 temp_cast_3 = (temp_output_7_0_g62962).xxxx;
+				float Debug_Max723_g62695 = TVE_DEBUG_Max;
+				float4 Output_Maps561_g62695 = ( ( ( float4( ( ( ifLocalVar40_g63010 + ifLocalVar40_g63032 + ifLocalVar40_g62951 ) + ( ifLocalVar40_g63024 + ifLocalVar40_g62976 + ifLocalVar40_g62997 + ifLocalVar40_g63013 ) ) , 0.0 ) + float4( ( ( ( ifLocalVar40_g63020 + ifLocalVar40_g62934 + ifLocalVar40_g62985 ) + ( ifLocalVar40_g62950 + ifLocalVar40_g62955 + ifLocalVar40_g62983 + ifLocalVar40_g62988 ) ) * _DetailMode ) , 0.0 ) + ( ( float4( ifLocalVar40_g62956 , 0.0 ) * _EmissiveColor ) * _EmissiveCat ) ) - temp_cast_3 ) / ( Debug_Max723_g62695 - temp_output_7_0_g62962 ) );
+				float4 ifLocalVar40_g62936 = 0;
+				if( Debug_Type367_g62695 == 3.0 )
+				ifLocalVar40_g62936 = Output_Maps561_g62695;
+				float Resolution44_g62953 = max( _MainAlbedoTex_TexelSize.z , _MainAlbedoTex_TexelSize.w );
+				float4 color62_g62953 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
+				float4 ifLocalVar61_g62953 = 0;
+				if( Resolution44_g62953 <= 256.0 )
+				ifLocalVar61_g62953 = color62_g62953;
+				float4 color55_g62953 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
+				float4 ifLocalVar56_g62953 = 0;
+				if( Resolution44_g62953 == 512.0 )
+				ifLocalVar56_g62953 = color55_g62953;
+				float4 color42_g62953 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float4 ifLocalVar40_g62953 = 0;
+				if( Resolution44_g62953 == 1024.0 )
+				ifLocalVar40_g62953 = color42_g62953;
+				float4 color48_g62953 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
+				float4 ifLocalVar47_g62953 = 0;
+				if( Resolution44_g62953 == 2048.0 )
+				ifLocalVar47_g62953 = color48_g62953;
+				float4 color51_g62953 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 ifLocalVar52_g62953 = 0;
+				if( Resolution44_g62953 >= 4096.0 )
+				ifLocalVar52_g62953 = color51_g62953;
+				float4 ifLocalVar40_g62987 = 0;
+				if( Debug_Index464_g62695 == 0.0 )
+				ifLocalVar40_g62987 = ( ifLocalVar61_g62953 + ifLocalVar56_g62953 + ifLocalVar40_g62953 + ifLocalVar47_g62953 + ifLocalVar52_g62953 );
+				float Resolution44_g63000 = max( _MainNormalTex_TexelSize.z , _MainNormalTex_TexelSize.w );
+				float4 color62_g63000 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
+				float4 ifLocalVar61_g63000 = 0;
+				if( Resolution44_g63000 <= 256.0 )
+				ifLocalVar61_g63000 = color62_g63000;
+				float4 color55_g63000 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
+				float4 ifLocalVar56_g63000 = 0;
+				if( Resolution44_g63000 == 512.0 )
+				ifLocalVar56_g63000 = color55_g63000;
+				float4 color42_g63000 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float4 ifLocalVar40_g63000 = 0;
+				if( Resolution44_g63000 == 1024.0 )
+				ifLocalVar40_g63000 = color42_g63000;
+				float4 color48_g63000 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
+				float4 ifLocalVar47_g63000 = 0;
+				if( Resolution44_g63000 == 2048.0 )
+				ifLocalVar47_g63000 = color48_g63000;
+				float4 color51_g63000 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 ifLocalVar52_g63000 = 0;
+				if( Resolution44_g63000 >= 4096.0 )
+				ifLocalVar52_g63000 = color51_g63000;
+				float4 ifLocalVar40_g63025 = 0;
+				if( Debug_Index464_g62695 == 1.0 )
+				ifLocalVar40_g63025 = ( ifLocalVar61_g63000 + ifLocalVar56_g63000 + ifLocalVar40_g63000 + ifLocalVar47_g63000 + ifLocalVar52_g63000 );
+				float Resolution44_g62954 = max( _MainMaskTex_TexelSize.z , _MainMaskTex_TexelSize.w );
+				float4 color62_g62954 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
+				float4 ifLocalVar61_g62954 = 0;
+				if( Resolution44_g62954 <= 256.0 )
+				ifLocalVar61_g62954 = color62_g62954;
+				float4 color55_g62954 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
+				float4 ifLocalVar56_g62954 = 0;
+				if( Resolution44_g62954 == 512.0 )
+				ifLocalVar56_g62954 = color55_g62954;
+				float4 color42_g62954 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float4 ifLocalVar40_g62954 = 0;
+				if( Resolution44_g62954 == 1024.0 )
+				ifLocalVar40_g62954 = color42_g62954;
+				float4 color48_g62954 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
+				float4 ifLocalVar47_g62954 = 0;
+				if( Resolution44_g62954 == 2048.0 )
+				ifLocalVar47_g62954 = color48_g62954;
+				float4 color51_g62954 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 ifLocalVar52_g62954 = 0;
+				if( Resolution44_g62954 >= 4096.0 )
+				ifLocalVar52_g62954 = color51_g62954;
+				float4 ifLocalVar40_g63001 = 0;
+				if( Debug_Index464_g62695 == 2.0 )
+				ifLocalVar40_g63001 = ( ifLocalVar61_g62954 + ifLocalVar56_g62954 + ifLocalVar40_g62954 + ifLocalVar47_g62954 + ifLocalVar52_g62954 );
+				float Resolution44_g62963 = max( _SecondAlbedoTex_TexelSize.z , _SecondAlbedoTex_TexelSize.w );
+				float4 color62_g62963 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
+				float4 ifLocalVar61_g62963 = 0;
+				if( Resolution44_g62963 <= 256.0 )
+				ifLocalVar61_g62963 = color62_g62963;
+				float4 color55_g62963 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
+				float4 ifLocalVar56_g62963 = 0;
+				if( Resolution44_g62963 == 512.0 )
+				ifLocalVar56_g62963 = color55_g62963;
+				float4 color42_g62963 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float4 ifLocalVar40_g62963 = 0;
+				if( Resolution44_g62963 == 1024.0 )
+				ifLocalVar40_g62963 = color42_g62963;
+				float4 color48_g62963 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
+				float4 ifLocalVar47_g62963 = 0;
+				if( Resolution44_g62963 == 2048.0 )
+				ifLocalVar47_g62963 = color48_g62963;
+				float4 color51_g62963 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 ifLocalVar52_g62963 = 0;
+				if( Resolution44_g62963 >= 4096.0 )
+				ifLocalVar52_g62963 = color51_g62963;
+				float4 ifLocalVar40_g62996 = 0;
+				if( Debug_Index464_g62695 == 3.0 )
+				ifLocalVar40_g62996 = ( ifLocalVar61_g62963 + ifLocalVar56_g62963 + ifLocalVar40_g62963 + ifLocalVar47_g62963 + ifLocalVar52_g62963 );
+				float Resolution44_g63036 = max( _SecondMaskTex_TexelSize.z , _SecondMaskTex_TexelSize.w );
+				float4 color62_g63036 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
+				float4 ifLocalVar61_g63036 = 0;
+				if( Resolution44_g63036 <= 256.0 )
+				ifLocalVar61_g63036 = color62_g63036;
+				float4 color55_g63036 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
+				float4 ifLocalVar56_g63036 = 0;
+				if( Resolution44_g63036 == 512.0 )
+				ifLocalVar56_g63036 = color55_g63036;
+				float4 color42_g63036 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float4 ifLocalVar40_g63036 = 0;
+				if( Resolution44_g63036 == 1024.0 )
+				ifLocalVar40_g63036 = color42_g63036;
+				float4 color48_g63036 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
+				float4 ifLocalVar47_g63036 = 0;
+				if( Resolution44_g63036 == 2048.0 )
+				ifLocalVar47_g63036 = color48_g63036;
+				float4 color51_g63036 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 ifLocalVar52_g63036 = 0;
+				if( Resolution44_g63036 >= 4096.0 )
+				ifLocalVar52_g63036 = color51_g63036;
+				float4 ifLocalVar40_g63009 = 0;
+				if( Debug_Index464_g62695 == 4.0 )
+				ifLocalVar40_g63009 = ( ifLocalVar61_g63036 + ifLocalVar56_g63036 + ifLocalVar40_g63036 + ifLocalVar47_g63036 + ifLocalVar52_g63036 );
+				float Resolution44_g62964 = max( _SecondAlbedoTex_TexelSize.z , _SecondAlbedoTex_TexelSize.w );
+				float4 color62_g62964 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
+				float4 ifLocalVar61_g62964 = 0;
+				if( Resolution44_g62964 <= 256.0 )
+				ifLocalVar61_g62964 = color62_g62964;
+				float4 color55_g62964 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
+				float4 ifLocalVar56_g62964 = 0;
+				if( Resolution44_g62964 == 512.0 )
+				ifLocalVar56_g62964 = color55_g62964;
+				float4 color42_g62964 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float4 ifLocalVar40_g62964 = 0;
+				if( Resolution44_g62964 == 1024.0 )
+				ifLocalVar40_g62964 = color42_g62964;
+				float4 color48_g62964 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
+				float4 ifLocalVar47_g62964 = 0;
+				if( Resolution44_g62964 == 2048.0 )
+				ifLocalVar47_g62964 = color48_g62964;
+				float4 color51_g62964 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 ifLocalVar52_g62964 = 0;
+				if( Resolution44_g62964 >= 4096.0 )
+				ifLocalVar52_g62964 = color51_g62964;
+				float4 ifLocalVar40_g63033 = 0;
+				if( Debug_Index464_g62695 == 5.0 )
+				ifLocalVar40_g63033 = ( ifLocalVar61_g62964 + ifLocalVar56_g62964 + ifLocalVar40_g62964 + ifLocalVar47_g62964 + ifLocalVar52_g62964 );
+				float Resolution44_g63038 = max( _EmissiveTex_TexelSize.z , _EmissiveTex_TexelSize.w );
+				float4 color62_g63038 = IsGammaSpace() ? float4(0.484069,0.862666,0.9245283,0) : float4(0.1995908,0.7155456,0.8368256,0);
+				float4 ifLocalVar61_g63038 = 0;
+				if( Resolution44_g63038 <= 256.0 )
+				ifLocalVar61_g63038 = color62_g63038;
+				float4 color55_g63038 = IsGammaSpace() ? float4(0.1933962,0.7383016,1,0) : float4(0.03108436,0.5044825,1,0);
+				float4 ifLocalVar56_g63038 = 0;
+				if( Resolution44_g63038 == 512.0 )
+				ifLocalVar56_g63038 = color55_g63038;
+				float4 color42_g63038 = IsGammaSpace() ? float4(0.4431373,0.7921569,0.1764706,0) : float4(0.1651322,0.5906189,0.02624122,0);
+				float4 ifLocalVar40_g63038 = 0;
+				if( Resolution44_g63038 == 1024.0 )
+				ifLocalVar40_g63038 = color42_g63038;
+				float4 color48_g63038 = IsGammaSpace() ? float4(1,0.6889491,0.07075471,0) : float4(1,0.4324122,0.006068094,0);
+				float4 ifLocalVar47_g63038 = 0;
+				if( Resolution44_g63038 == 2048.0 )
+				ifLocalVar47_g63038 = color48_g63038;
+				float4 color51_g63038 = IsGammaSpace() ? float4(1,0.2066492,0.0990566,0) : float4(1,0.03521443,0.009877041,0);
+				float4 ifLocalVar52_g63038 = 0;
+				if( Resolution44_g63038 >= 4096.0 )
+				ifLocalVar52_g63038 = color51_g63038;
+				float4 ifLocalVar40_g62961 = 0;
+				if( Debug_Index464_g62695 == 6.0 )
+				ifLocalVar40_g62961 = ( ifLocalVar61_g63038 + ifLocalVar56_g63038 + ifLocalVar40_g63038 + ifLocalVar47_g63038 + ifLocalVar52_g63038 );
+				float4 Output_Resolution737_g62695 = ( ( ifLocalVar40_g62987 + ifLocalVar40_g63025 + ifLocalVar40_g63001 ) + ( ifLocalVar40_g62996 + ifLocalVar40_g63009 + ifLocalVar40_g63033 ) + ifLocalVar40_g62961 );
+				float4 ifLocalVar40_g62941 = 0;
+				if( Debug_Type367_g62695 == 4.0 )
+				ifLocalVar40_g62941 = Output_Resolution737_g62695;
+				float3 WorldPosition893_g62695 = worldPos;
+				half3 Input_Position419_g62965 = -WorldPosition893_g62695;
+				float4 temp_output_91_19_g62942 = TVE_MotionCoords;
+				float3 Position83_g62942 = WorldPosition893_g62695;
+				float temp_output_84_0_g62942 = _LayerMotionValue;
+				float4 lerpResult87_g62942 = lerp( TVE_MotionParams , SAMPLE_TEXTURE2D_ARRAY( TVE_MotionTex, samplerTVE_MotionTex, float3(( (temp_output_91_19_g62942).zw + ( (temp_output_91_19_g62942).xy * (Position83_g62942).xz ) ),temp_output_84_0_g62942) ) , TVE_MotionUsage[(int)temp_output_84_0_g62942]);
+				float4 break322_g62966 = lerpResult87_g62942;
+				float3 appendResult397_g62966 = (float3(break322_g62966.x , 0.0 , break322_g62966.y));
+				float3 temp_output_398_0_g62966 = (appendResult397_g62966*2.0 + -1.0);
+				half2 Wind_DirectionWS1031_g62695 = (temp_output_398_0_g62966).xz;
+				half2 Input_DirectionWS423_g62965 = Wind_DirectionWS1031_g62695;
+				float Motion_Scale287_g62965 = ( _MotionScale_10 + 1.0 );
+				half Global_Scale448_g62965 = TVE_NoiseParams.y;
+				half Input_Speed62_g62965 = _MotionSpeed_10;
+				half Global_Speed449_g62965 = TVE_NoiseParams.x;
+				float mulTime426_g62965 = _Time.y * ( Input_Speed62_g62965 * Global_Speed449_g62965 );
+				half Global_DistortionScale453_g62965 = TVE_NoiseParams.w;
+				float3 break461_g62965 = ( Input_Position419_g62965 * Global_DistortionScale453_g62965 );
+				half Global_Distortion452_g62965 = TVE_NoiseParams.z;
+				float Noise_Distortion469_g62965 = ( sin( ( break461_g62965.x + break461_g62965.z ) ) * Global_Distortion452_g62965 );
+				half Motion_Variation284_g62965 = 0.0;
+				float2 temp_output_425_0_g62965 = ( ( (Input_Position419_g62965).xz * Input_DirectionWS423_g62965 * Motion_Scale287_g62965 * Global_Scale448_g62965 ) + ( mulTime426_g62965 + Noise_Distortion469_g62965 + Motion_Variation284_g62965 ) );
+				float2 break500_g62965 = ( temp_output_425_0_g62965 * 0.1178 );
+				float2 break494_g62965 = ( temp_output_425_0_g62965 * 0.1742 );
+				half Wind_Power369_g62966 = break322_g62966.z;
+				half Wind_Pow1128_g62695 = Wind_Power369_g62966;
+				half Input_WindPower327_g62965 = Wind_Pow1128_g62695;
+				float lerpResult430_g62965 = lerp( 1.0 , 0.4 , Input_WindPower327_g62965);
+				half Motion_Noise915_g62695 = pow( (( sin( ( break500_g62965.x + break500_g62965.y ) ) * sin( ( break494_g62965.x + break494_g62965.y ) ) )*0.5 + 0.5) , lerpResult430_g62965 );
+				float ifLocalVar40_g63023 = 0;
+				if( Debug_Index464_g62695 == 0.0 )
+				ifLocalVar40_g63023 = Motion_Noise915_g62695;
+				float4 temp_output_91_19_g62930 = TVE_ColorsCoords;
+				float3 Position58_g62930 = WorldPosition893_g62695;
+				float Debug_Layer885_g62695 = TVE_DEBUG_Layer;
+				float temp_output_82_0_g62930 = Debug_Layer885_g62695;
+				float4 lerpResult88_g62930 = lerp( TVE_ColorsParams , SAMPLE_TEXTURE2D_ARRAY( TVE_ColorsTex, samplerTVE_ColorsTex, float3(( (temp_output_91_19_g62930).zw + ( (temp_output_91_19_g62930).xy * (Position58_g62930).xz ) ),temp_output_82_0_g62930) ) , TVE_ColorsUsage[(int)temp_output_82_0_g62930]);
+				float3 ifLocalVar40_g63040 = 0;
+				if( Debug_Index464_g62695 == 1.0 )
+				ifLocalVar40_g63040 = (lerpResult88_g62930).rgb;
+				float4 temp_output_91_19_g62926 = TVE_ColorsCoords;
+				float3 Position58_g62926 = WorldPosition893_g62695;
+				float temp_output_82_0_g62926 = Debug_Layer885_g62695;
+				float4 lerpResult88_g62926 = lerp( TVE_ColorsParams , SAMPLE_TEXTURE2D_ARRAY( TVE_ColorsTex, samplerTVE_ColorsTex, float3(( (temp_output_91_19_g62926).zw + ( (temp_output_91_19_g62926).xy * (Position58_g62926).xz ) ),temp_output_82_0_g62926) ) , TVE_ColorsUsage[(int)temp_output_82_0_g62926]);
+				float ifLocalVar40_g63031 = 0;
+				if( Debug_Index464_g62695 == 2.0 )
+				ifLocalVar40_g63031 = (lerpResult88_g62926).a;
+				float4 temp_output_93_19_g62922 = TVE_ExtrasCoords;
+				float3 Position82_g62922 = WorldPosition893_g62695;
+				float temp_output_84_0_g62922 = Debug_Layer885_g62695;
+				float4 lerpResult88_g62922 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY( TVE_ExtrasTex, samplerTVE_ExtrasTex, float3(( (temp_output_93_19_g62922).zw + ( (temp_output_93_19_g62922).xy * (Position82_g62922).xz ) ),temp_output_84_0_g62922) ) , TVE_ExtrasUsage[(int)temp_output_84_0_g62922]);
+				float4 break89_g62922 = lerpResult88_g62922;
+				float ifLocalVar40_g63021 = 0;
+				if( Debug_Index464_g62695 == 3.0 )
+				ifLocalVar40_g63021 = break89_g62922.r;
+				float4 temp_output_93_19_g63016 = TVE_ExtrasCoords;
+				float3 Position82_g63016 = WorldPosition893_g62695;
+				float temp_output_84_0_g63016 = Debug_Layer885_g62695;
+				float4 lerpResult88_g63016 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY( TVE_ExtrasTex, samplerTVE_ExtrasTex, float3(( (temp_output_93_19_g63016).zw + ( (temp_output_93_19_g63016).xy * (Position82_g63016).xz ) ),temp_output_84_0_g63016) ) , TVE_ExtrasUsage[(int)temp_output_84_0_g63016]);
+				float4 break89_g63016 = lerpResult88_g63016;
+				float ifLocalVar40_g63022 = 0;
+				if( Debug_Index464_g62695 == 4.0 )
+				ifLocalVar40_g63022 = break89_g63016.g;
+				float4 temp_output_93_19_g62946 = TVE_ExtrasCoords;
+				float3 Position82_g62946 = WorldPosition893_g62695;
+				float temp_output_84_0_g62946 = Debug_Layer885_g62695;
+				float4 lerpResult88_g62946 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY( TVE_ExtrasTex, samplerTVE_ExtrasTex, float3(( (temp_output_93_19_g62946).zw + ( (temp_output_93_19_g62946).xy * (Position82_g62946).xz ) ),temp_output_84_0_g62946) ) , TVE_ExtrasUsage[(int)temp_output_84_0_g62946]);
+				float4 break89_g62946 = lerpResult88_g62946;
+				float ifLocalVar40_g63015 = 0;
+				if( Debug_Index464_g62695 == 5.0 )
+				ifLocalVar40_g63015 = break89_g62946.b;
+				float4 temp_output_93_19_g62957 = TVE_ExtrasCoords;
+				float3 Position82_g62957 = WorldPosition893_g62695;
+				float temp_output_84_0_g62957 = Debug_Layer885_g62695;
+				float4 lerpResult88_g62957 = lerp( TVE_ExtrasParams , SAMPLE_TEXTURE2D_ARRAY( TVE_ExtrasTex, samplerTVE_ExtrasTex, float3(( (temp_output_93_19_g62957).zw + ( (temp_output_93_19_g62957).xy * (Position82_g62957).xz ) ),temp_output_84_0_g62957) ) , TVE_ExtrasUsage[(int)temp_output_84_0_g62957]);
+				float4 break89_g62957 = lerpResult88_g62957;
+				float ifLocalVar40_g63002 = 0;
+				if( Debug_Index464_g62695 == 6.0 )
+				ifLocalVar40_g63002 = break89_g62957.a;
+				float4 temp_output_91_19_g62937 = TVE_MotionCoords;
+				float3 Position83_g62937 = WorldPosition893_g62695;
+				float temp_output_84_0_g62937 = Debug_Layer885_g62695;
+				float4 lerpResult87_g62937 = lerp( TVE_MotionParams , SAMPLE_TEXTURE2D_ARRAY( TVE_MotionTex, samplerTVE_MotionTex, float3(( (temp_output_91_19_g62937).zw + ( (temp_output_91_19_g62937).xy * (Position83_g62937).xz ) ),temp_output_84_0_g62937) ) , TVE_MotionUsage[(int)temp_output_84_0_g62937]);
+				float3 appendResult1012_g62695 = (float3((lerpResult87_g62937).rg , 0.0));
+				float3 ifLocalVar40_g63005 = 0;
+				if( Debug_Index464_g62695 == 7.0 )
+				ifLocalVar40_g63005 = appendResult1012_g62695;
+				float4 temp_output_91_19_g62979 = TVE_MotionCoords;
+				float3 Position83_g62979 = WorldPosition893_g62695;
+				float temp_output_84_0_g62979 = Debug_Layer885_g62695;
+				float4 lerpResult87_g62979 = lerp( TVE_MotionParams , SAMPLE_TEXTURE2D_ARRAY( TVE_MotionTex, samplerTVE_MotionTex, float3(( (temp_output_91_19_g62979).zw + ( (temp_output_91_19_g62979).xy * (Position83_g62979).xz ) ),temp_output_84_0_g62979) ) , TVE_MotionUsage[(int)temp_output_84_0_g62979]);
+				float ifLocalVar40_g63006 = 0;
+				if( Debug_Index464_g62695 == 8.0 )
+				ifLocalVar40_g63006 = (lerpResult87_g62979).b;
+				float4 temp_output_91_19_g62990 = TVE_MotionCoords;
+				float3 Position83_g62990 = WorldPosition893_g62695;
+				float temp_output_84_0_g62990 = Debug_Layer885_g62695;
+				float4 lerpResult87_g62990 = lerp( TVE_MotionParams , SAMPLE_TEXTURE2D_ARRAY( TVE_MotionTex, samplerTVE_MotionTex, float3(( (temp_output_91_19_g62990).zw + ( (temp_output_91_19_g62990).xy * (Position83_g62990).xz ) ),temp_output_84_0_g62990) ) , TVE_MotionUsage[(int)temp_output_84_0_g62990]);
+				float ifLocalVar40_g62977 = 0;
+				if( Debug_Index464_g62695 == 9.0 )
+				ifLocalVar40_g62977 = (lerpResult87_g62990).a;
+				float4 temp_output_94_19_g62967 = TVE_VertexCoords;
+				float3 Position83_g62967 = WorldPosition893_g62695;
+				float temp_output_84_0_g62967 = Debug_Layer885_g62695;
+				float4 lerpResult87_g62967 = lerp( TVE_VertexParams , SAMPLE_TEXTURE2D_ARRAY( TVE_VertexTex, samplerTVE_VertexTex, float3(( (temp_output_94_19_g62967).zw + ( (temp_output_94_19_g62967).xy * (Position83_g62967).xz ) ),temp_output_84_0_g62967) ) , TVE_VertexUsage[(int)temp_output_84_0_g62967]);
+				float ifLocalVar40_g62952 = 0;
+				if( Debug_Index464_g62695 == 10.0 )
+				ifLocalVar40_g62952 = (lerpResult87_g62967).a;
+				float3 Output_Globals888_g62695 = ( ifLocalVar40_g63023 + ( ifLocalVar40_g63040 + ifLocalVar40_g63031 ) + ( ifLocalVar40_g63021 + ifLocalVar40_g63022 + ifLocalVar40_g63015 + ifLocalVar40_g63002 ) + ( ifLocalVar40_g63005 + ifLocalVar40_g63006 + ifLocalVar40_g62977 ) + ( ifLocalVar40_g62952 + 0.0 ) );
+				float3 ifLocalVar40_g63034 = 0;
+				if( Debug_Type367_g62695 == 8.0 )
+				ifLocalVar40_g63034 = Output_Globals888_g62695;
+				float3 vertexToFrag328_g62695 = IN.ase_texcoord9.xyz;
+				float4 color1016_g62695 = IsGammaSpace() ? float4(0.5831653,0.6037736,0.2135992,0) : float4(0.2992498,0.3229691,0.03750122,0);
+				float4 color1017_g62695 = IsGammaSpace() ? float4(0.8117647,0.3488252,0.2627451,0) : float4(0.6239604,0.0997834,0.05612849,0);
+				float4 switchResult1015_g62695 = (((ase_vface>0)?(color1016_g62695):(color1017_g62695)));
+				float3 ifLocalVar40_g63012 = 0;
+				if( Debug_Index464_g62695 == 4.0 )
+				ifLocalVar40_g63012 = (switchResult1015_g62695).rgb;
+				float temp_output_7_0_g63011 = Debug_Min721_g62695;
+				float3 temp_cast_28 = (temp_output_7_0_g63011).xxx;
+				float3 Output_Mesh316_g62695 = saturate( ( ( ( vertexToFrag328_g62695 + ifLocalVar40_g63012 ) - temp_cast_28 ) / ( Debug_Max723_g62695 - temp_output_7_0_g63011 ) ) );
+				float3 ifLocalVar40_g63039 = 0;
+				if( Debug_Type367_g62695 == 9.0 )
+				ifLocalVar40_g63039 = Output_Mesh316_g62695;
+				float4 color1086_g62695 = IsGammaSpace() ? float4(0.1226415,0.1226415,0.1226415,0) : float4(0.01390275,0.01390275,0.01390275,0);
+				float4 vertexToFrag11_g63037 = IN.ase_texcoord10;
+				float _IsVegetationShader1101_g62695 = _IsVegetationShader;
+				float4 lerpResult1089_g62695 = lerp( color1086_g62695 , vertexToFrag11_g63037 , ( _IsPolygonalShader1112_g62695 * _IsVegetationShader1101_g62695 ));
+				float3 Output_Misc1080_g62695 = (lerpResult1089_g62695).rgb;
+				float3 ifLocalVar40_g62935 = 0;
+				if( Debug_Type367_g62695 == 10.0 )
+				ifLocalVar40_g62935 = Output_Misc1080_g62695;
+				float4 temp_output_459_0_g62695 = ( ifLocalVar40_g63004 + ifLocalVar40_g62984 + ifLocalVar40_g62978 + ifLocalVar40_g62936 + ifLocalVar40_g62941 + float4( ifLocalVar40_g63034 , 0.0 ) + float4( ifLocalVar40_g63039 , 0.0 ) + float4( ifLocalVar40_g62935 , 0.0 ) );
+				float4 color690_g62695 = IsGammaSpace() ? float4(0.1226415,0.1226415,0.1226415,0) : float4(0.01390275,0.01390275,0.01390275,0);
+				float _IsTVEShader647_g62695 = _IsTVEShader;
+				float4 lerpResult689_g62695 = lerp( color690_g62695 , temp_output_459_0_g62695 , _IsTVEShader647_g62695);
+				float Debug_Filter322_g62695 = TVE_DEBUG_Filter;
+				float4 lerpResult326_g62695 = lerp( temp_output_459_0_g62695 , lerpResult689_g62695 , Debug_Filter322_g62695);
+				float Debug_Clip623_g62695 = TVE_DEBUG_Clip;
+				float lerpResult622_g62695 = lerp( 1.0 , tex2D( _MainAlbedoTex, uv_MainAlbedoTex ).a , ( Debug_Clip623_g62695 * _RenderClip ));
+				clip( lerpResult622_g62695 - _Cutoff);
 				clip( ( 1.0 - saturate( ( _IsElementShader + _IsHelperShader ) ) ) - 1.0);
 				
 				o.Albedo = fixed3( 0.5, 0.5, 0.5 );
 				o.Normal = fixed3( 0, 0, 1 );
-				o.Emission = lerpResult326_g72326.rgb;
+				o.Emission = lerpResult326_g62695.rgb;
 				#if defined(_SPECULAR_SETUP)
 					o.Specular = fixed3( 0, 0, 0 );
 				#else
@@ -2351,44 +2224,44 @@ Shader "Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug"
 }
 /*ASEBEGIN
 Version=18935
-1920;0;1920;1029;2536.057;5927.257;1.3;True;False
+1920;0;1920;1029;2288.421;5752.535;1;True;False
 Node;AmplifyShaderEditor.RangedFloatNode;2069;-1792,-4992;Half;False;Global;TVE_DEBUG_Min;TVE_DEBUG_Min;4;0;Create;True;0;5;Vertex Colors;100;Texture Coords;200;Vertex Postion;300;Vertex Normals;301;Vertex Tangents;302;0;True;2;Space(10);StyledEnum (Vertex Position _Vertex Normals _VertexTangents _Vertex Sign _Vertex Red (Variation) _Vertex Green (Occlusion) _Vertex Blue (Blend) _Vertex Alpha (Height) _Motion Bending _Motion Rolling _Motion Flutter);False;0;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;2155;-1792,-5248;Half;False;Global;TVE_DEBUG_Layer;TVE_DEBUG_Layer;4;0;Create;True;0;5;Vertex Colors;100;Texture Coords;200;Vertex Postion;300;Vertex Normals;301;Vertex Tangents;302;0;True;0;False;0;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;2013;-1792,-5312;Half;False;Global;TVE_DEBUG_Index;TVE_DEBUG_Index;4;0;Create;True;0;5;Vertex Colors;100;Texture Coords;200;Vertex Postion;300;Vertex Normals;301;Vertex Tangents;302;0;True;0;False;0;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;1908;-1792,-5376;Half;False;Global;TVE_DEBUG_Type;TVE_DEBUG_Type;4;0;Create;True;0;5;Vertex Colors;100;Texture Coords;200;Vertex Postion;300;Vertex Normals;301;Vertex Tangents;302;0;True;2;Space(10);StyledEnum (Vertex Position _Vertex Normals _VertexTangents _Vertex Sign _Vertex Red (Variation) _Vertex Green (Occlusion) _Vertex Blue (Blend) _Vertex Alpha (Height) _Motion Bending _Motion Rolling _Motion Flutter);False;0;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;1908;-1792,-5376;Half;False;Global;TVE_DEBUG_Type;TVE_DEBUG_Type;4;0;Create;True;0;5;Vertex Colors;100;Texture Coords;200;Vertex Postion;300;Vertex Normals;301;Vertex Tangents;302;0;True;2;Space(10);StyledEnum (Vertex Position _Vertex Normals _VertexTangents _Vertex Sign _Vertex Red (Variation) _Vertex Green (Occlusion) _Vertex Blue (Blend) _Vertex Alpha (Height) _Motion Bending _Motion Rolling _Motion Flutter);False;0;8;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;1953;-1792,-5120;Half;False;Global;TVE_DEBUG_Filter;TVE_DEBUG_Filter;4;0;Create;True;0;5;Vertex Colors;100;Texture Coords;200;Vertex Postion;300;Vertex Normals;301;Vertex Tangents;302;0;True;2;Space(10);StyledEnum (Vertex Position _Vertex Normals _VertexTangents _Vertex Sign _Vertex Red (Variation) _Vertex Green (Occlusion) _Vertex Blue (Blend) _Vertex Alpha (Height) _Motion Bending _Motion Rolling _Motion Flutter);False;0;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;2032;-1792,-5056;Half;False;Global;TVE_DEBUG_Clip;TVE_DEBUG_Clip;4;0;Create;True;0;5;Vertex Colors;100;Texture Coords;200;Vertex Postion;300;Vertex Normals;301;Vertex Tangents;302;0;True;2;Space(10);StyledEnum (Vertex Position _Vertex Normals _VertexTangents _Vertex Sign _Vertex Red (Variation) _Vertex Green (Occlusion) _Vertex Blue (Blend) _Vertex Alpha (Height) _Motion Bending _Motion Rolling _Motion Flutter);False;0;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;2070;-1792,-4928;Half;False;Global;TVE_DEBUG_Max;TVE_DEBUG_Max;4;0;Create;True;0;5;Vertex Colors;100;Texture Coords;200;Vertex Postion;300;Vertex Normals;301;Vertex Tangents;302;0;True;2;Space(10);StyledEnum (Vertex Position _Vertex Normals _VertexTangents _Vertex Sign _Vertex Red (Variation) _Vertex Green (Occlusion) _Vertex Blue (Blend) _Vertex Alpha (Height) _Motion Bending _Motion Rolling _Motion Flutter);False;0;0;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;2032;-1792,-5056;Half;False;Global;TVE_DEBUG_Clip;TVE_DEBUG_Clip;4;0;Create;True;0;5;Vertex Colors;100;Texture Coords;200;Vertex Postion;300;Vertex Normals;301;Vertex Tangents;302;0;True;2;Space(10);StyledEnum (Vertex Position _Vertex Normals _VertexTangents _Vertex Sign _Vertex Red (Variation) _Vertex Green (Occlusion) _Vertex Blue (Blend) _Vertex Alpha (Height) _Motion Bending _Motion Rolling _Motion Flutter);False;0;1;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;2070;-1792,-4928;Half;False;Global;TVE_DEBUG_Max;TVE_DEBUG_Max;4;0;Create;True;0;5;Vertex Colors;100;Texture Coords;200;Vertex Postion;300;Vertex Normals;301;Vertex Tangents;302;0;True;2;Space(10);StyledEnum (Vertex Position _Vertex Normals _VertexTangents _Vertex Sign _Vertex Red (Variation) _Vertex Green (Occlusion) _Vertex Blue (Blend) _Vertex Alpha (Height) _Motion Bending _Motion Rolling _Motion Flutter);False;0;1;0;0;0;1;FLOAT;0
+Node;AmplifyShaderEditor.TFHCRemapNode;1803;-1344,2944;Inherit;False;5;0;FLOAT;0;False;1;FLOAT;-1;False;2;FLOAT;1;False;3;FLOAT;0.3;False;4;FLOAT;0.7;False;1;FLOAT;0
+Node;AmplifyShaderEditor.FunctionNode;2191;-1408,-5376;Inherit;False;Tool Debug;1;;62695;d48cde928c5068141abea1713047719b;0;7;336;FLOAT;0;False;465;FLOAT;0;False;884;FLOAT;0;False;337;FLOAT;0;False;624;FLOAT;0;False;720;FLOAT;0;False;722;FLOAT;0;False;1;COLOR;338
+Node;AmplifyShaderEditor.RangedFloatNode;1878;-1792,-5632;Half;False;Property;_Banner;Banner;0;0;Create;True;0;0;0;True;1;StyledBanner(Debug);False;0;0;1;1;0;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;1772;-1088,3072;Float;False;Constant;_Float3;Float 3;31;0;Create;True;0;0;0;False;0;False;24;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;1881;-1600,-5632;Half;False;Property;_Message;Message;74;0;Create;True;0;0;0;True;1;StyledMessage(Info, Use this shader to debug the original mesh or the converted mesh attributes., 0,0);False;0;0;1;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;1804;-1792,2944;Inherit;False;Constant;_Float1;Float 1;0;0;Create;True;0;0;0;False;0;False;3;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.SinOpNode;1800;-1472,2944;Inherit;False;1;0;FLOAT;0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.GetLocalVarNode;1771;-1088,2944;Inherit;False;-1;;1;0;OBJECT;0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.SimpleTimeNode;1843;-1632,2944;Inherit;False;1;0;FLOAT;1;False;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;1931;-1408,-5632;Half;False;Property;_DebugCategory;[ Debug Category ];73;0;Create;True;0;0;0;False;1;StyledCategory(Debug Settings, 5, 10);False;0;0;1;1;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;1772;-1088,3072;Float;False;Constant;_Float3;Float 3;31;0;Create;True;0;0;0;False;0;False;24;0;0;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.RangedFloatNode;1878;-1792,-5632;Half;False;Property;_Banner;Banner;0;0;Create;True;0;0;0;True;1;StyledBanner(Debug);False;0;0;1;1;0;1;FLOAT;0
-Node;AmplifyShaderEditor.TFHCRemapNode;1803;-1344,2944;Inherit;False;5;0;FLOAT;0;False;1;FLOAT;-1;False;2;FLOAT;1;False;3;FLOAT;0.3;False;4;FLOAT;0.7;False;1;FLOAT;0
 Node;AmplifyShaderEditor.ConditionalIfNode;1774;-880,2944;Inherit;False;True;5;0;FLOAT;0;False;1;FLOAT;1;False;2;FLOAT;0;False;3;FLOAT;0;False;4;COLOR;0,0,0,0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.FunctionNode;2197;-1408,-5376;Inherit;False;Tool Debug;1;;72326;d48cde928c5068141abea1713047719b;0;7;336;FLOAT;0;False;465;FLOAT;0;False;884;FLOAT;0;False;337;FLOAT;0;False;624;FLOAT;0;False;720;FLOAT;0;False;722;FLOAT;0;False;1;COLOR;338
+Node;AmplifyShaderEditor.RangedFloatNode;1931;-1408,-5632;Half;False;Property;_DebugCategory;[ Debug Category ];73;0;Create;True;0;0;0;False;1;StyledCategory(Debug Settings, 5, 10);False;0;0;1;1;0;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleTimeNode;1843;-1632,2944;Inherit;False;1;0;FLOAT;1;False;1;FLOAT;0
+Node;AmplifyShaderEditor.GetLocalVarNode;1771;-1088,2944;Inherit;False;-1;;1;0;OBJECT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.SinOpNode;1800;-1472,2944;Inherit;False;1;0;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;2110;-896,-5376;Float;False;False;-1;2;ASEMaterialInspector;0;9;New Amplify Shader;ed95fe726fd7b4644bb42f4d1ddd2bcd;True;ForwardAdd;0;2;ForwardAdd;0;False;True;0;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;True;0;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;True;0;False;-1;False;True;True;True;True;True;0;False;-1;False;False;False;False;False;False;False;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;DisableBatching=False=DisableBatching;True;2;False;0;False;True;4;1;False;-1;1;False;-1;0;1;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;2;False;-1;False;False;True;1;LightMode=ForwardAdd;False;False;0;True;1;LightMode=ForwardAdd;0;Standard;0;False;0
+Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;2108;-896,-5376;Float;False;False;-1;2;ASEMaterialInspector;0;9;New Amplify Shader;ed95fe726fd7b4644bb42f4d1ddd2bcd;True;ExtraPrePass;0;0;ExtraPrePass;6;False;True;0;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;True;0;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;True;0;False;-1;False;True;True;True;True;True;0;False;-1;False;False;False;False;False;False;False;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;DisableBatching=False=DisableBatching;True;2;False;0;False;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;True;True;True;True;True;0;False;-1;True;False;False;False;False;False;False;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;1;LightMode=ForwardBase;False;False;0;-1;59;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;LightMode=ForwardBase;=;=;=;=;=;=;=;=;=;=;0;Standard;0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;2109;-896,-5376;Float;False;True;-1;2;;0;9;Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug;ed95fe726fd7b4644bb42f4d1ddd2bcd;True;ForwardBase;0;1;ForwardBase;18;False;True;0;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;True;0;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;True;2;False;-1;False;True;True;True;True;True;0;False;-1;False;False;False;False;False;False;False;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;True;True;1;False;-1;True;3;False;-1;False;True;3;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;DisableBatching=True=DisableBatching;True;7;False;0;False;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;1;LightMode=ForwardBase;False;False;0;;1;LightMode=ForwardBase;0;Standard;40;Workflow,InvertActionOnDeselection;1;0;Surface;0;0;  Blend;0;0;  Refraction Model;0;0;  Dither Shadows;1;0;Two Sided;0;0;Deferred Pass;1;0;Transmission;0;0;  Transmission Shadow;0.5,False,-1;0;Translucency;0;0;  Translucency Strength;1,False,-1;0;  Normal Distortion;0.5,False,-1;0;  Scattering;2,False,-1;0;  Direct;0.9,False,-1;0;  Ambient;0.1,False,-1;0;  Shadow;0.5,False,-1;0;Cast Shadows;0;0;  Use Shadow Threshold;0;0;Receive Shadows;0;0;GPU Instancing;0;0;LOD CrossFade;0;0;Built-in Fog;0;0;Ambient Light;0;0;Meta Pass;0;0;Add Pass;0;0;Override Baked GI;0;0;Extra Pre Pass;0;0;Tessellation;0;0;  Phong;0;0;  Strength;0.5,False,-1;0;  Type;0;0;  Tess;16,False,-1;0;  Min;10,False,-1;0;  Max;25,False,-1;0;  Edge Length;16,False,-1;0;  Max Displacement;25,False,-1;0;Fwd Specular Highlights Toggle;0;0;Fwd Reflections Toggle;0;0;Disable Batching;1;0;Vertex Position,InvertActionOnDeselection;1;0;0;6;False;True;False;True;False;False;False;;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;2112;-896,-5376;Float;False;False;-1;2;ASEMaterialInspector;0;9;New Amplify Shader;ed95fe726fd7b4644bb42f4d1ddd2bcd;True;Meta;0;4;Meta;0;False;True;0;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;True;0;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;True;0;False;-1;False;True;True;True;True;True;0;False;-1;False;False;False;False;False;False;False;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;DisableBatching=False=DisableBatching;True;2;False;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;2;False;-1;False;False;True;False;False;False;False;False;False;False;False;False;False;False;True;1;LightMode=Meta;False;False;0;False;0;0;Standard;0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;2113;-896,-5376;Float;False;False;-1;2;ASEMaterialInspector;0;9;New Amplify Shader;ed95fe726fd7b4644bb42f4d1ddd2bcd;True;ShadowCaster;0;5;ShadowCaster;0;False;True;0;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;True;0;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;True;0;False;-1;False;True;True;True;True;True;0;False;-1;False;False;False;False;False;False;False;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;DisableBatching=False=DisableBatching;True;2;False;0;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;False;True;False;False;False;False;False;False;False;False;False;False;True;1;False;-1;True;3;False;-1;False;True;1;LightMode=ShadowCaster;False;False;0;True;1;=;0;Standard;0;False;0
-Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;2110;-896,-5376;Float;False;False;-1;2;ASEMaterialInspector;0;9;New Amplify Shader;ed95fe726fd7b4644bb42f4d1ddd2bcd;True;ForwardAdd;0;2;ForwardAdd;0;False;True;0;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;True;0;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;True;0;False;-1;False;True;True;True;True;True;0;False;-1;False;False;False;False;False;False;False;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;DisableBatching=False=DisableBatching;True;2;False;0;False;True;4;1;False;-1;1;False;-1;0;1;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;2;False;-1;False;False;True;1;LightMode=ForwardAdd;False;False;0;True;1;LightMode=ForwardAdd;0;Standard;0;False;0
-Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;2108;-896,-5376;Float;False;False;-1;2;ASEMaterialInspector;0;9;New Amplify Shader;ed95fe726fd7b4644bb42f4d1ddd2bcd;True;ExtraPrePass;0;0;ExtraPrePass;6;False;True;0;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;True;0;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;True;0;False;-1;False;True;True;True;True;True;0;False;-1;False;False;False;False;False;False;False;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;DisableBatching=False=DisableBatching;True;2;False;0;False;True;1;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;True;True;True;True;True;0;False;-1;True;False;False;False;False;False;False;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;1;LightMode=ForwardBase;False;False;0;-1;59;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;=;LightMode=ForwardBase;=;=;=;=;=;=;=;=;=;=;0;Standard;0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;2111;-896,-5376;Float;False;False;-1;2;ASEMaterialInspector;0;9;New Amplify Shader;ed95fe726fd7b4644bb42f4d1ddd2bcd;True;Deferred;0;3;Deferred;0;False;True;0;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;True;0;False;-1;0;False;-1;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;True;0;False;-1;False;True;True;True;True;True;0;False;-1;False;False;False;False;False;False;False;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;False;True;1;False;-1;True;3;False;-1;False;True;3;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;DisableBatching=False=DisableBatching;True;2;False;0;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;-1;False;False;True;False;False;False;False;False;False;False;False;False;False;False;False;False;True;1;LightMode=Deferred;True;2;True;17;d3d9;d3d11_9x;d3d11;glcore;gles;gles3;metal;vulkan;xbox360;xboxone;xboxseries;ps4;playstation;psp2;n3ds;wiiu;switch;0;False;0;0;Standard;0;False;0
-WireConnection;1800;0;1843;0
-WireConnection;1843;0;1804;0
 WireConnection;1803;0;1800;0
+WireConnection;2191;336;1908;0
+WireConnection;2191;465;2013;0
+WireConnection;2191;884;2155;0
+WireConnection;2191;337;1953;0
+WireConnection;2191;624;2032;0
+WireConnection;2191;720;2069;0
+WireConnection;2191;722;2070;0
 WireConnection;1774;0;1771;0
 WireConnection;1774;1;1772;0
 WireConnection;1774;3;1803;0
-WireConnection;2197;336;1908;0
-WireConnection;2197;465;2013;0
-WireConnection;2197;884;2155;0
-WireConnection;2197;337;1953;0
-WireConnection;2197;624;2032;0
-WireConnection;2197;720;2069;0
-WireConnection;2197;722;2070;0
-WireConnection;2109;2;2197;338
+WireConnection;1843;0;1804;0
+WireConnection;1800;0;1843;0
+WireConnection;2109;2;2191;338
 ASEEND*/
-//CHKSM=5475C26E223C6CC4F4393FBF2B36A1C2874FF926
+//CHKSM=DC46DEF7DEBD2F61A6F24206B627F5F83E1C81BD

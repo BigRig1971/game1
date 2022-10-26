@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4487488506127532}
   - component: {fileID: 33278957127677974}
   - component: {fileID: 23454455180311424}
-  m_Layer: 21
+  m_Layer: 3
   m_Name: Meadow_Grass_01_Var6_LOD0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28,6 +28,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4302059575617914}
   m_RootOrder: 0
@@ -51,10 +52,12 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -79,6 +82,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1377032641787058
 GameObject:
   m_ObjectHideFlags: 0
@@ -90,7 +94,7 @@ GameObject:
   - component: {fileID: 4431149469306348}
   - component: {fileID: 33828538445880820}
   - component: {fileID: 23015165418412434}
-  m_Layer: 21
+  m_Layer: 3
   m_Name: Meadow_Grass_01_Var6_LOD1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -107,6 +111,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4302059575617914}
   m_RootOrder: 1
@@ -130,10 +135,12 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -158,6 +165,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1997880846982194
 GameObject:
   m_ObjectHideFlags: 0
@@ -168,8 +176,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4302059575617914}
   - component: {fileID: 205609898309392298}
-  - component: {fileID: 7096897719988103233}
-  m_Layer: 21
+  - component: {fileID: 8378561386764797876}
+  m_Layer: 3
   m_Name: TVE_Meadow_Grass_01_Var6_Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -185,7 +193,8 @@ Transform:
   m_GameObject: {fileID: 1997880846982194}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.9357454, y: 0.9357454, z: 0.9357454}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4487488506127532}
   - {fileID: 4431149469306348}
@@ -214,8 +223,12 @@ LODGroup:
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 23015165418412434}
+  - screenRelativeHeight: 0.01
+    fadeTransitionWidth: 0
+    renderers:
+    - renderer: {fileID: 0}
   m_Enabled: 1
---- !u!114 &7096897719988103233
+--- !u!114 &8378561386764797876
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -228,7 +241,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   styledBanner: 0
-  storedPrefabBackupGUID: c0831f575514a0c4dba8ec02e41e5d00
+  storedPrefabBackupGUID: ca84780cc3671a849913213e311c1902
   storedPreset: Automatic/Grass
   storedOverrides:
   - Normals/Make the Normals Flat (Full)

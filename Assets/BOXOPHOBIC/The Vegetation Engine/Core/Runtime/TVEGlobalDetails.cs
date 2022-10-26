@@ -7,21 +7,20 @@ using UnityEngine.Serialization;
 
 namespace TheVegetationEngine
 {
-    [HelpURL("https://docs.google.com/document/d/145JOVlJ1tE-WODW45YoJ6Ixg23mFc56EnB_8Tbwloz8/edit#heading=h.pq49kopnu8z2")]
     [ExecuteInEditMode]
     [AddComponentMenu("BOXOPHOBIC/The Vegetation Engine/TVE Global Details")]
     public class TVEGlobalDetails : StyledMonoBehaviour
     {
-        [StyledBanner(0.890f, 0.745f, 0.309f, "Global Details")]
+        [StyledBanner(0.890f, 0.745f, 0.309f, "Global Details", "", "https://docs.google.com/document/d/145JOVlJ1tE-WODW45YoJ6Ixg23mFc56EnB_8Tbwloz8/edit#heading=h.pq49kopnu8z2")]
         public bool styledBanner;
 
         [StyledMessage("Info", "The Detail settings are used to control the terrain grass and details for the Terrain Detail Module!")]
         public bool styledMessage = true;
 
-//#if !THE_VEGETATION_ENGINE_DETAILS
-//        [StyledInteractive()]
-//        public bool inspectorEnabled = false;
-//#endif
+#if !THE_VEGETATION_ENGINE_DETAILS
+        [StyledInteractive()]
+        public bool inspectorEnabled = false;
+#endif
 
         [StyledCategory("Global Settings")]
         public bool globalCat;
@@ -75,26 +74,26 @@ namespace TheVegetationEngine
 
         [Space(10)]
         [Range(0, 2)]
-        public float bendingAmplitude = 1f;
-        [Range(0, 40)]
-        public int bendingSpeed = 6;
-        [Range(0, 20)]
-        public float bendingScale = 2;
+        public float motionAmplitude = 1f;
+        [Range(0, 30)]
+        public int motionSpeed = 8;
+        [Range(0, 10)]
+        public float motionScale = 1;
 
         [Space(10)]
         [Range(0, 2)]
         public float flutterAmplitude = 0.1f;
-        [Range(0, 40)]
+        [Range(0, 30)]
         public int flutterSpeed = 20;
-        [Range(0, 20)]
-        public float flutterScale = 10;
+        [Range(0, 10)]
+        public float flutterScale = 2;
 
         [Space(10)]
-        [Range(0, 2)]
+        [Range(0, 10)]
         public float interactionAmplitude = 1;
 
-        //[StyledInteractive()]
-        //public bool inspectorReset = true;
+        [StyledInteractive()]
+        public bool inspectorReset = true;
 
         [StyledSpace(5)]
         public bool styledSpace0;
@@ -116,7 +115,7 @@ namespace TheVegetationEngine
 
         void SetGlobalShaderProperties()
         {
-//#if THE_VEGETATION_ENGINE_DETAILS
+#if THE_VEGETATION_ENGINE_DETAILS
             Shader.SetGlobalFloat("TVE_DetailLayerColors", layerColors);
             Shader.SetGlobalFloat("TVE_DetailLayerExtras", layerExtras);
             Shader.SetGlobalFloat("TVE_DetailLayerMotion", layerMotion);
@@ -138,14 +137,14 @@ namespace TheVegetationEngine
             Shader.SetGlobalFloat("TVE_DetailPerspectiveAngle", perspectiveAngle);
 
             Shader.SetGlobalColor("TVE_DetailMotionHighlightColor", motionHighlight);
-            Shader.SetGlobalFloat("TVE_DetailMotionAmplitude_10", bendingAmplitude);
-            Shader.SetGlobalFloat("TVE_DetailMotionSpeed_10", bendingSpeed);
-            Shader.SetGlobalFloat("TVE_DetailMotionScale_10", bendingScale);
+            Shader.SetGlobalFloat("TVE_DetailMotionAmplitude_10", motionAmplitude);
+            Shader.SetGlobalFloat("TVE_DetailMotionSpeed_10", motionSpeed);
+            Shader.SetGlobalFloat("TVE_DetailMotionScale_10", motionScale);
             Shader.SetGlobalFloat("TVE_DetailMotionAmplitude_32", flutterAmplitude);
             Shader.SetGlobalFloat("TVE_DetailMotionSpeed_32", flutterSpeed);
             Shader.SetGlobalFloat("TVE_DetailMotionScale_32", flutterScale);
             Shader.SetGlobalFloat("TVE_DetailInteractionAmplitude", interactionAmplitude);
-//#endif
+#endif
         }
     }
 }

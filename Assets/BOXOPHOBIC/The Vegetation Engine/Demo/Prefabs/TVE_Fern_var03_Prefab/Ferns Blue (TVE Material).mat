@@ -2,14 +2,18 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Ferns Blue (TVE Material)
   m_Shader: {fileID: 4800000, guid: a933075b367f9b24981408633f72ff34, type: 3}
-  m_ShaderKeywords: TVE_FEATURE_CLIP
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - TVE_ALPHA_CLIP
+  m_InvalidKeywords: []
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 1
@@ -25,6 +29,8 @@ Material:
   - TransparentDepthPrepass
   - TransparentDepthPostpass
   - TransparentBackface
+  - MOTIONVECTORS
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -364,18 +370,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - unity_Lightmaps:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_LightmapsInd:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_ShadowMasks:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _AORemapMax: 1
     - _AORemapMin: 0
@@ -383,7 +378,6 @@ Material:
     - _AddPrecomputedVelocity: 1
     - _AdvancedCat: 0
     - _AlbedoAffectEmissive: 0
-    - _AlphaClipValue: 0.116
     - _AlphaCutoff: 0.116
     - _AlphaCutoffEnable: 1
     - _AlphaCutoffPostpass: 0.116
@@ -391,8 +385,6 @@ Material:
     - _AlphaCutoffValue: 0.116
     - _AlphaDstBlend: 0
     - _AlphaSrcBlend: 1
-    - _AlphaToMask: 0
-    - _AlphaToMaskInspectorValue: 0
     - _AlphaVariationValue: 0
     - _Anisotropy: 0
     - _Asperity: 0.5
@@ -411,19 +403,6 @@ Material:
     - _BlendMode: 0
     - _BumpScale: 1
     - _CameraFadeValue: 1
-    - _CategoryDetail: 0
-    - _CategoryEmissive: 1
-    - _CategoryGlobal: 1
-    - _CategoryGradient: 1
-    - _CategoryMain: 1
-    - _CategoryMotion: 1
-    - _CategoryNoise: 0
-    - _CategoryOcclusion: 1
-    - _CategoryPerspective: 0
-    - _CategoryRender: 1
-    - _CategoryRendering: 1
-    - _CategorySizeFade: 0
-    - _CategorySubsurface: 1
     - _CoatCoverage: 1
     - _CoatIOR: 0.5
     - _CoatMask: 0
@@ -476,10 +455,8 @@ Material:
     - _DstBlend: 0
     - _EmissiveCat: 1
     - _EmissiveColorMode: 1
-    - _EmissiveCoordMode: 0
     - _EmissiveExposureValue: 0.6
     - _EmissiveFlagMode: 0
-    - _EmissiveMode: 1
     - _EnableAmbient: 1
     - _EnableBlendModePreserveSpecularLighting: 1
     - _EnableFogOnTransparent: 1
@@ -595,16 +572,13 @@ Material:
     - _Metallic: 0
     - _Mode: 1
     - _MoiseCat: 0
-    - _MotionAmplitude_10: 0.1
-    - _MotionAmplitude_20: 0
+    - _MotionAmplitude_10: 0.2
+    - _MotionAmplitude_20: 0.2
     - _MotionAmplitude_21: 0
-    - _MotionAmplitude_22: 0.5
+    - _MotionAmplitude_22: 0
     - _MotionAmplitude_30: 0
-    - _MotionAmplitude_32: 0.02
+    - _MotionAmplitude_32: 0.05
     - _MotionCat: 1
-    - _MotionFacingValue: 0
-    - _MotionNormalValue: 1
-    - _MotionNormal_32: 1
     - _MotionScale_10: 0
     - _MotionScale_20: 1
     - _MotionScale_30: 20
@@ -640,7 +614,6 @@ Material:
     - _ObjectThicknessValue: 0
     - _OcclusionCat: 1
     - _OcclusionStrength: 0
-    - _OpaqueCullMode: 2
     - _OverlayBottomValue: 1
     - _OverlayContrast: 0
     - _OverlayContrastValue: 10
@@ -663,21 +636,18 @@ Material:
     - _RefractionMode: 0
     - _RefractionModel: 0
     - _RefractionSSRayModel: 0
-    - _RenderAmbient: 1
     - _RenderBlend: 0
     - _RenderClip: 1
     - _RenderCoverage: 0
     - _RenderCull: 0
     - _RenderCutoff: 0.5
     - _RenderDecals: 0
-    - _RenderDirect: 1
     - _RenderMode: 0
     - _RenderNormals: 0
     - _RenderPriority: 0
     - _RenderQueue: 0
     - _RenderQueueType: 1
     - _RenderSSR: 0
-    - _RenderShadow: 1
     - _RenderSpecular: 1
     - _RenderZWrite: 0
     - _RenderingCat: 1
@@ -699,9 +669,7 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SmoothnessViewAngleOffset: 0
     - _SpaceGlobalLayers: 0
-    - _SpaceGlobalLocals: 0
     - _SpaceGlobalPosition: 0
-    - _SpaceMotionGlobals: 0
     - _SpaceMotionHighlight: 0
     - _SpaceMotionLocals: 0
     - _SpaceRenderFade: 0
@@ -711,10 +679,10 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _StencilRef: 0
-    - _StencilRefDepth: 0
+    - _StencilRefDepth: 8
     - _StencilRefDistortionVec: 4
-    - _StencilRefGBuffer: 2
-    - _StencilRefMV: 32
+    - _StencilRefGBuffer: 10
+    - _StencilRefMV: 40
     - _StencilWriteMask: 6
     - _StencilWriteMaskDepth: 8
     - _StencilWriteMaskDistortionVec: 4
@@ -724,7 +692,7 @@ Material:
     - _SubsurfaceAmbientValue: 0.2
     - _SubsurfaceAngleValue: 8
     - _SubsurfaceCat: 1
-    - _SubsurfaceDiffusion: 2.6486764
+    - _SubsurfaceDiffusion: 3.5648174
     - _SubsurfaceDirectValue: 1
     - _SubsurfaceLightValue: 1
     - _SubsurfaceMask: 1
@@ -798,7 +766,6 @@ Material:
     - _VertexCat: 0
     - _VertexDataMode: 0
     - _VertexDynamicMode: 0
-    - _VertexHeightValue: 0.91847914
     - _VertexMasksMode: 0
     - _VertexMotionMode: 0
     - _VertexMotionSpace: 0
@@ -806,9 +773,7 @@ Material:
     - _VertexOcclusionMaxValue: 0.5470085
     - _VertexOcclusionMinValue: 0
     - _VertexOcclusionValue: 0
-    - _VertexPivotMode: 0
     - _VertexPivotModeFetch: 0
-    - _VertexRadiusValue: 1.5089474
     - _VertexRollingMode: 1
     - _VertexVariationMode: 0
     - _WindElasticityLvl0: 1
@@ -889,10 +854,8 @@ Material:
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
     - _SubsurfaceColor: {r: 5.3798823, g: 6.3213615, b: 0.06724853, a: 1}
-    - _SubsurfaceDiffusion_Asset: {r: -3.698545e+22, g: 20.616848, b: -5.291675e-28,
-        a: -1.3520143e+18}
-    - _SubsurfaceDiffusion_asset: {r: -3.698545e+22, g: 20.616848, b: -5.291675e-28,
-        a: -1.3520143e+18}
+    - _SubsurfaceDiffusion_Asset: {r: 2.2888926e+38, g: 1.2389358e-26, b: 7.69327e-37, a: 0.00018220427}
+    - _SubsurfaceDiffusion_asset: {r: 2.2888926e+38, g: 1.2389358e-26, b: 7.69327e-37, a: 0.00018220427}
     - _SubsurfaceMaskRemap: {r: 0.42937854, g: 1, b: 0, a: 0}
     - _ThicknessRemap: {r: 0, g: 0.493397, b: 0, a: 0}
     - _TransmittanceColor: {r: 1, g: 1, b: 1, a: 1}
@@ -901,5 +864,5 @@ Material:
     - _UVMappingMaskEmissive: {r: 1, g: 0, b: 0, a: 0}
     - _VertexOcclusionColor: {r: 0, g: 0.32156864, b: 0.066492416, a: 1}
     - _VertexOcclusionRemap: {r: 0, g: 0.5470085, b: 0, a: 0}
-    - _render_normals: {r: -1, g: -1, b: -1, a: 0}
     - _render_normals_options: {r: -1, g: -1, b: -1, a: 0}
+  m_BuildTextureStacks: []

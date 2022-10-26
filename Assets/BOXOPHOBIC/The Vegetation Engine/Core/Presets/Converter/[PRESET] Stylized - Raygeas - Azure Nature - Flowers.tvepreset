@@ -12,15 +12,15 @@ InfoOnline https://assetstore.unity.com/packages/3d/environments/fantasy/azure-n
 *******************************************************************
 
 Mesh SetVariation GET_MASK_PROCEDURAL 3
-Mesh SetOcclusion GET_MASK_PROCEDURAL 4
+Mesh SetOcclusion GET_MASK_PROCEDURAL 12
 Mesh SetDetailMask NONE
+Mesh SetMultiMask GET_MASK_FROM_CHANNEL 5
+
 Mesh SetDetailCoord GET_COORD_PROCEDURAL 3
 
-Mesh SetHeight GET_MASK_PROCEDURAL 4
+Mesh SetMotion1 GET_MASK_PROCEDURAL 4
 Mesh SetMotion2 GET_MASK_PROCEDURAL 4
 Mesh SetMotion3 GET_MASK_PROCEDURAL 4
-
-Mesh SetPivots NONE
 
 *******************************************************************
 

@@ -11,11 +11,10 @@ Material:
   m_Shader: {fileID: 4800000, guid: 8aca4d3e46e8b7b458ec65a9bb11f144, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 1
+  m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 3000
-  stringTagMap:
-    ElementType: MotionElement
+  stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
@@ -114,7 +113,7 @@ Material:
     - _IsStandardPipeline: 0
     - _IsTVEElement: 1
     - _IsTVEShader: 1
-    - _IsVersion: 700
+    - _IsVersion: 600
     - _MainTexInvertMode: 0
     - _MainTexMaxValue: 1
     - _MainTexMinValue: 0
@@ -133,7 +132,7 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _RaycastDistanceEndValue: 2
-    - _RaycastFadeValue: 1
+    - _RaycastFadeValue: 0.44499993
     - _RaycastLayerMask: 1
     - _RaycastMessage: 0
     - _RenderCat: 1
@@ -165,4 +164,3 @@ Material:
     - _SpringColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
     - _SummerColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
     - _WinterColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
-  m_BuildTextureStacks: []

@@ -6,12 +6,11 @@ using UnityEngine.Serialization;
 
 namespace TheVegetationEngine
 {
-    [HelpURL("https://docs.google.com/document/d/145JOVlJ1tE-WODW45YoJ6Ixg23mFc56EnB_8Tbwloz8/edit#heading=h.q3sme6mi00gy")]
     [ExecuteInEditMode]
     [AddComponentMenu("BOXOPHOBIC/The Vegetation Engine/TVE Global Control")]
     public class TVEGlobalControl : StyledMonoBehaviour
     {
-        [StyledBanner(0.890f, 0.745f, 0.309f, "Global Control")]
+        [StyledBanner(0.890f, 0.745f, 0.309f, "Global Control", "", "https://docs.google.com/document/d/145JOVlJ1tE-WODW45YoJ6Ixg23mFc56EnB_8Tbwloz8/edit#heading=h.q3sme6mi00gy")]
         public bool styledBanner;
 
         [StyledCategory("Light Settings", 5, 10)]
@@ -19,14 +18,6 @@ namespace TheVegetationEngine
 
         [Tooltip("Sets the main light used as the sun in the scene.")]
         public Light mainLight;
-
-        //[Space(10)]
-        //[Tooltip("Sets the skybox color used for Vertex Lit shaders.")]
-        //[ColorUsage(false, true)]
-        //public Color skyboxColor = new Color(0.11f, 0.12f, 0.15f, 1.0f);
-        //[Tooltip("Sets the ground color used for Vertex Lit shaders.")]
-        //[ColorUsage(false, true)]
-        //public Color groundColor = new Color(0.16f, 0.08f, 0.08f, 1.0f);
 
         [StyledCategory("Season Settings")]
         public bool seasonCat;
@@ -91,7 +82,7 @@ namespace TheVegetationEngine
         public bool noiseCat;
 
         [Tooltip("Sets the global world space 3D noise texture used for material noise settings.")]
-        private Texture3D worldNoiseTexture;
+        public Texture3D worldNoiseTexture;
 
         [Tooltip("Sets the global screen space 3D noise texture used for camera distance and glancing angle fade.")]
         public Texture3D screenNoiseTexture;
@@ -110,6 +101,10 @@ namespace TheVegetationEngine
         [FormerlySerializedAs("cameraFadeBias")]
         [Range(0.0f, 20.0f)]
         public float cameraFadeDistance = 1.0f;
+        [Tooltip("Controls the Details Motion (Flutter) fade out distance in world units.")]
+        [FormerlySerializedAs("motionFadeBias")]
+        [Range(0.0f, 200.0f)]
+        public float motionFadeDistance = 100.0f;
 
         [StyledSpace(10)]
         public bool styledSpace0;
@@ -146,23 +141,19 @@ namespace TheVegetationEngine
         {
             if (mainLight != null)
             {
-                var mainLightColor = mainLight.color.linear;
-                var mainLightValue = new Color(mainLight.intensity, mainLight.intensity, mainLight.intensity).linear;
-                var mainLightParams = new Color(mainLightColor.r, mainLightColor.g, mainLightColor.b, mainLightValue.r);
+                //var intensity = Mathf.Clamp01(mainLight.intensity * mainLightSubsurface);
+                var mainLightParams = new Vector4(mainLight.color.r, mainLight.color.g, mainLight.color.b, globalSubsurface);
 
                 Shader.SetGlobalVector("TVE_MainLightParams", mainLightParams);
                 Shader.SetGlobalVector("TVE_MainLightDirection", Vector4.Normalize(-mainLight.transform.forward));
             }
             else
             {
-                var mainLightParams = new Vector4(1, 1, 1, 1);
+                var mainLightParams = new Vector4(1, 1, 1, globalSubsurface);
 
                 Shader.SetGlobalVector("TVE_MainLightParams", mainLightParams);
                 Shader.SetGlobalVector("TVE_MainLightDirection", new Vector4(0, 1, 0, 0));
             }
-
-            //Shader.SetGlobalVector("TVE_AmbientSkyboxColor", skyboxColor);
-            //Shader.SetGlobalVector("TVE_AmbientGroundColor", groundColor);
 
             float seasonLerp = 0;
 
@@ -203,7 +194,6 @@ namespace TheVegetationEngine
             Shader.SetGlobalFloat("TVE_WetnessValue", globalWetness);
             Shader.SetGlobalFloat("TVE_EmissiveValue", globalEmissive);
             Shader.SetGlobalFloat("TVE_AlphaValue", globalAlpha);
-            Shader.SetGlobalFloat("TVE_SubsurfaceValue", globalSubsurface);
             Shader.SetGlobalFloat("TVE_SizeValue", globalSizeFade);
 
             Shader.SetGlobalColor("TVE_OverlayColor", overlayColor);
@@ -226,6 +216,8 @@ namespace TheVegetationEngine
             Shader.SetGlobalFloat("TVE_DistanceFadeBias", sizeFadeDistanceBias + 0.01f);
             Shader.SetGlobalFloat("TVE_CameraFadeStart", (cameraFadeDistance + 0.01f) * 0.5f);
             Shader.SetGlobalFloat("TVE_CameraFadeEnd", cameraFadeDistance + 0.01f);
+            Shader.SetGlobalFloat("TVE_MotionFadeStart", (motionFadeDistance + 0.01f) * 0.5f);
+            Shader.SetGlobalFloat("TVE_MotionFadeEnd", motionFadeDistance + 0.01f);
         }
 
         void SetGlobalLightingMainLight()

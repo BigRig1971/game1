@@ -13,15 +13,15 @@ InfoWarning The bark conversion cannot be detected properly! If the bark is beco
 *******************************************************************
 
 Mesh SetVariation GET_MASK_PROCEDURAL 3
-Mesh SetOcclusion GET_MASK_PROCEDURAL 6
+Mesh SetOcclusion GET_MASK_PROCEDURAL 7
 Mesh SetDetailMask NONE
+Mesh SetMultiMask NONE
+
 Mesh SetDetailCoord GET_COORD_3RD_PARTY 0
 
-Mesh SetHeight GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_PROCEDURAL 16
+Mesh SetMotion1 GET_MASK_PROCEDURAL 4
+Mesh SetMotion2 GET_MASK_3RD_PARTY 3
 Mesh SetMotion3 GET_MASK_3RD_PARTY 3
-
-Mesh SetPivots NONE
 
 *******************************************************************
 
@@ -80,7 +80,6 @@ if MATERIAL_FLOAT_EQUALS _BarkUseUV3 1
 
 Material SET_FLOAT _DetailMode 1
 Material SET_FLOAT _DetailBlendMode 1
-Material SET_FLOAT _DetailCoordMode 1
 Material SET_FLOAT _DetailMaskMode 0
 
 Material SET_FLOAT _DetailMeshValue -0.1
@@ -116,7 +115,7 @@ Material COPY_TEX _BarkMaskMap _SecondMaskTex
 *******************************************************************
 
 // Copy Leaf Pros
-Material COPY_FLOAT _AlphaCutoff _AlphaClipValue
+Material COPY_FLOAT _AlphaCutoff _AlphaCutoffValue
 Material COPY_COLOR _HealthyColor _MainColor
 Material COPY_TEX _BaseColorMap _MainAlbedoTex
 Material COPY_VECTOR _Tiling_and_Offset _MainUVs

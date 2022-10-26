@@ -30,12 +30,10 @@ if SHADER_NAME_CONTAINS Standard Snow
 		Material SET_FLOAT _RenderClip 1
 	}
 
-	Material COPY_FLOAT _Cutoff _AlphaClipValue
-	Material COPY_FLOAT _AlphaCutoff _AlphaClipValue
+	Material COPY_FLOAT _Cutoff _AlphaCutoffValue
+	Material COPY_FLOAT _AlphaCutoff _AlphaCutoffValue
 
 	// Copy Main props
-	Material COPY_TEX _MainTex _MainAlbedoTex
-	Material COPY_TEX _Albedo _MainAlbedoTex
 	Material COPY_TEX _BaseColor _MainAlbedoTex
 	Material COPY_TEX _Normal _MainNormalTex
 	Material COPY_ST_AS_VECTOR _MainTex _MainUVs

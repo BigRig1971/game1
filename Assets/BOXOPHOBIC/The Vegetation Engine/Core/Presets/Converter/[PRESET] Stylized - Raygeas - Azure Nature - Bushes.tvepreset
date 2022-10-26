@@ -14,13 +14,13 @@ InfoOnline https://assetstore.unity.com/packages/3d/environments/fantasy/azure-n
 Mesh SetVariation GET_MASK_PROCEDURAL 3
 Mesh SetOcclusion GET_MASK_FROM_CHANNEL 3
 Mesh SetDetailMask NONE
+Mesh SetMultiMask GET_MASK_PROCEDURAL 4
+
 Mesh SetDetailCoord NONE
 
-Mesh SetHeight GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_PROCEDURAL 16
+Mesh SetMotion1 GET_MASK_PROCEDURAL 4
+Mesh SetMotion2 GET_MASK_PROCEDURAL 7
 Mesh SetMotion3 GET_MASK_FROM_CHANNEL 5
-
-Mesh SetPivots NONE
 
 *******************************************************************
 
@@ -72,7 +72,6 @@ if !SHADER_NAME_CONTAINS Vegetation
 		//Enable Betail shading
 		Material SET_FLOAT _DetailMode 1
 		Material SET_FLOAT _DetailBlendMode 1
-		Material SET_FLOAT _DetailCoordMode 1
 		Material SET_FLOAT _DetailMaskMode 1
 		
 		// Combine Texture

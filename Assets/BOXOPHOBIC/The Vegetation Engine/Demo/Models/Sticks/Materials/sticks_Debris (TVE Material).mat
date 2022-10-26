@@ -2,14 +2,21 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: sticks_Debris (TVE Material)
   m_Shader: {fileID: 4800000, guid: 6e6307b56f9201d40ad738f21cf03495, type: 3}
-  m_ShaderKeywords: TVE_FEATURE_CLIP _ALPHATEST_ON
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - TVE_ALPHA_CLIP
+  - TVE_DETAIL_MODE_OFF
+  - TVE_DETAIL_TYPE_VERTEX_BLUE
+  m_InvalidKeywords:
+  - _ALPHATEST_ON
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 1
@@ -24,6 +31,7 @@ Material:
   - TransparentDepthPostpass
   - TransparentBackface
   - MOTIONVECTORS
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -331,18 +339,20 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _AORemapMax: 1
     - _AORemapMin: 0
     - _ATDistance: 1
     - _AdvancedCat: 0
     - _AlbedoAffectEmissive: 0
-    - _AlphaClipValue: 0.5
     - _AlphaCutoff: 0.5
     - _AlphaCutoffEnable: 1
     - _AlphaCutoffPostpass: 0.5
     - _AlphaCutoffPrepass: 0.5
     - _AlphaCutoffValue: 0.5
+    - _AlphaDstBlend: 0
+    - _AlphaSrcBlend: 1
     - _Anisotropy: 0
     - _Asperity: 0
     - _BackfaceSmoothnessScale: 1
@@ -356,19 +366,6 @@ Material:
     - _BillboardShadowMode: 0
     - _BlendMode: 0
     - _BumpScale: 1
-    - _CategoryDetail: 1
-    - _CategoryEmissive: 1
-    - _CategoryGlobal: 1
-    - _CategoryGradient: 0
-    - _CategoryMain: 1
-    - _CategoryMotion: 0
-    - _CategoryNoise: 0
-    - _CategoryOcclusion: 0
-    - _CategoryPerspective: 0
-    - _CategoryRender: 1
-    - _CategoryRendering: 0
-    - _CategorySizeFade: 0
-    - _CategorySubsurface: 0
     - _CoatCoverage: 1
     - _CoatIOR: 0.5
     - _CoatMask: 0
@@ -424,9 +421,8 @@ Material:
     - _DstBlend: 0
     - _EmissiveCat: 1
     - _EmissiveColorMode: 1
-    - _EmissiveCoordMode: 0
+    - _EmissiveExposureValue: 1
     - _EmissiveFlagMode: 0
-    - _EmissiveMode: 0
     - _EnableAmbient: 1
     - _EnableBlendModePreserveSpecularLighting: 1
     - _EnableFogOnTransparent: 1
@@ -558,24 +554,25 @@ Material:
     - _PivotsMessage: 0
     - _PreRefractionPass: 0
     - _ReceiveSpace: 0
+    - _ReceivesSSR: 1
+    - _ReceivesSSRTransparent: 0
     - _RefractionMode: 0
     - _RefractionModel: 0
     - _RefractionSSRayModel: 0
-    - _RenderAmbient: 1
     - _RenderBlend: 0
     - _RenderClip: 1
     - _RenderCoverage: 0
     - _RenderCull: 0
     - _RenderDecals: 0
-    - _RenderDirect: 1
     - _RenderMode: 0
     - _RenderNormals: 0
     - _RenderPriority: 0
     - _RenderQueue: 0
+    - _RenderQueueType: 1
     - _RenderSSR: 0
-    - _RenderShadow: 1
     - _RenderZWrite: 1
     - _RenderingCat: 1
+    - _RequireSplitLighting: 0
     - _SSRefractionProjectionModel: 0
     - _SSSAndTransmissionType: 0
     - _SecondMetallicValue: 0
@@ -592,9 +589,7 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SmoothnessViewAngleOffset: 0
     - _SpaceGlobalLayers: 0
-    - _SpaceGlobalLocals: 0
     - _SpaceGlobalPosition: 0
-    - _SpaceMotionGlobals: 0
     - _SpaceMotionHighlight: 0
     - _SpaceMotionLocals: 0
     - _SpaceRenderFade: 0
@@ -604,8 +599,14 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _StencilRef: 2
+    - _StencilRefDepth: 8
+    - _StencilRefDistortionVec: 4
+    - _StencilRefGBuffer: 10
     - _StencilRefMV: 128
     - _StencilWriteMask: 7
+    - _StencilWriteMaskDepth: 8
+    - _StencilWriteMaskDistortionVec: 4
+    - _StencilWriteMaskGBuffer: 14
     - _StencilWriteMaskMV: 128
     - _Stiffness: 1
     - _SubsurfaceAmbientValue: 0.2
@@ -624,6 +625,7 @@ Material:
     - _SubsurfaceScatteringValue: 2
     - _SubsurfaceShadowValue: 1
     - _SupportDBuffer: 1
+    - _SupportDecals: 1
     - _SurfaceType: 0
     - _TexWorldScale: 1
     - _TexWorldScaleEmissive: 1
@@ -640,9 +642,11 @@ Material:
     - _TransmissionEnable: 1
     - _TransmissionSelfOcclusion: 1
     - _TransparentBackfaceEnable: 0
+    - _TransparentCullMode: 0
     - _TransparentDepthPostpassEnable: 0
     - _TransparentDepthPrepassEnable: 0
     - _TransparentSortPriority: 0
+    - _TransparentZWrite: 1
     - _Tree12Width: 10
     - _TreeAO: 1
     - _TreeAO2: 2.4
@@ -656,6 +660,7 @@ Material:
     - _UVDetail: 0
     - _UVEmissive: 0
     - _UVSec: 0
+    - _UseShadowThreshold: 0
     - _UseTreeOcclusion: 0
     - _VariationGlobalsMessage: 0
     - _VariationMessage: 0
@@ -664,7 +669,6 @@ Material:
     - _VertexMasksMode: 0
     - _VertexOcclusion: 0
     - _VertexOcclusionValue: 0
-    - _VertexPivotMode: 0
     - _VertexPivotModeFetch: 0
     - _VertexRollingMode: 1
     - _VertexVariationMode: 0
@@ -691,6 +695,7 @@ Material:
     - _ZTestGBuffer: 4
     - _ZTestMode: 8
     - _ZTestModeDistortion: 8
+    - _ZTestTransparent: 4
     - _ZWrite: 1
     - __dirty: 1
     - _material_batching: 0
@@ -738,10 +743,8 @@ Material:
     - _SecondColor: {r: 1, g: 1, b: 1, a: 1}
     - _SecondUVs: {r: 1, g: 1, b: 0, a: 0}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
-    - _SubsurfaceDiffusion_Asset: {r: 2.2888926e+38, g: 1.2389358e-26, b: 7.69327e-37,
-        a: 0.00018220427}
-    - _SubsurfaceDiffusion_asset: {r: 2.2888926e+38, g: 1.2389358e-26, b: 7.69327e-37,
-        a: 0.00018220427}
+    - _SubsurfaceDiffusion_Asset: {r: 2.2888926e+38, g: 1.2389358e-26, b: 7.69327e-37, a: 0.00018220427}
+    - _SubsurfaceDiffusion_asset: {r: 2.2888926e+38, g: 1.2389358e-26, b: 7.69327e-37, a: 0.00018220427}
     - _SubsurfaceMaskRemap: {r: 0, g: 0, b: 0, a: 0}
     - _ThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
     - _TransmittanceColor: {r: 1, g: 1, b: 1, a: 1}
@@ -749,5 +752,5 @@ Material:
     - _UVMappingMask: {r: 1, g: 0, b: 0, a: 0}
     - _UVMappingMaskEmissive: {r: 1, g: 0, b: 0, a: 0}
     - _VertexOcclusionRemap: {r: 0, g: 0, b: 0, a: 0}
-    - _render_normals: {r: -1, g: -1, b: -1, a: 0}
     - _render_normals_options: {r: -1, g: -1, b: -1, a: 0}
+  m_BuildTextureStacks: []

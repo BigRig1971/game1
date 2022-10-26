@@ -14,8 +14,7 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap:
-    ElementType: ColorsElement
+  stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
@@ -91,9 +90,6 @@ Material:
     - _ElementLayerVegetationMessage: 0
     - _ElementLayerWarning: 0
     - _ElementMode: 0
-    - _ElementRaycastMode: 0
-    - _ElementVolumeFadeMode: 0
-    - _FadeCat: 1
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
@@ -118,10 +114,6 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _RaycastDistanceEndValue: 2
-    - _RaycastFadeValue: 1
-    - _RaycastLayerMask: 1
-    - _RaycastMessage: 0
     - _RenderCat: 1
     - _SeasonMode: 0
     - _SeasonMode_Seasons: 0
@@ -141,7 +133,7 @@ Material:
     - _WinterValue: 0
     - _ZWrite: 1
     - __priority: 0
-    - _render_colormask: 1
+    - _render_colormask: 15
     - _render_priority: 0
     m_Colors:
     - _AdditionalColor1: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}

@@ -7,10 +7,16 @@ using TheVegetationEngine;
 
 public class TVEShaderHelperGUI : ShaderGUI
 {
+    bool multiSelection = false;
+    //bool showAdditionalInfo = false;
+
     public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] props)
     {
         var material0 = materialEditor.target as Material;
         var materials = materialEditor.targets;
+
+        if (materials.Length > 1)
+            multiSelection = true;
 
         DrawDynamicInspector(material0, materialEditor, props);
 
@@ -23,7 +29,7 @@ public class TVEShaderHelperGUI : ShaderGUI
             else
             {
                 material.SetFloat("_IsTVEMaterial", 0);
-            }
+            }          
         }
     }
 
@@ -31,28 +37,31 @@ public class TVEShaderHelperGUI : ShaderGUI
     {
         var customPropsList = new List<MaterialProperty>();
 
-        for (int i = 0; i < props.Length; i++)
+        if (multiSelection)
         {
-            var prop = props[i];
-
-            if (prop.flags == MaterialProperty.PropFlags.HideInInspector)
+            for (int i = 0; i < props.Length; i++)
             {
-                continue;
+                var prop = props[i];
+
+                if (prop.flags == MaterialProperty.PropFlags.HideInInspector)
+                    continue;
+
+                customPropsList.Add(prop);
             }
+        }
+        else
+        {
+            for (int i = 0; i < props.Length; i++)
+            {
+                var prop = props[i];
 
-            if (prop.name == "unity_Lightmaps")
-                continue;
+                if (prop.flags == MaterialProperty.PropFlags.HideInInspector)
+                {
+                    continue;
+                }
 
-            if (prop.name == "unity_LightmapsInd")
-                continue;
-
-            if (prop.name == "unity_ShadowMasks")
-                continue;
-
-            if (prop.name.Contains("_Banner"))
-                continue;
-
-            customPropsList.Add(prop);
+                customPropsList.Add(prop);
+            }
         }
 
         //Draw Custom GUI

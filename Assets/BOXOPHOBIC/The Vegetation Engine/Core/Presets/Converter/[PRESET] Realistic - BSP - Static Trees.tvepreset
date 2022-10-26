@@ -12,15 +12,15 @@ InfoOnline https://assetstore.unity.com/publishers/24828
 *******************************************************************
 
 Mesh SetVariation GET_MASK_PROCEDURAL 3
-Mesh SetOcclusion GET_MASK_PROCEDURAL 6
+Mesh SetOcclusion GET_MASK_PROCEDURAL 7
 Mesh SetDetailMask GET_MASK_PROCEDURAL 8
+Mesh SetMultiMask NONE
+
 Mesh SetDetailCoord GET_COORD_FROM_CHANNEL 0
 
-Mesh SetHeight GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_PROCEDURAL 16
+Mesh SetMotion1 GET_MASK_PROCEDURAL 4
+Mesh SetMotion2 GET_MASK_PROCEDURAL 7
 Mesh SetMotion3 GET_MASK_FROM_CHANNEL 5
-
-Mesh SetPivots NONE
 
 *******************************************************************
 

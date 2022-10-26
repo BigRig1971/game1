@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Pine_06_Trunk (TVE Material)
   m_Shader: {fileID: 4800000, guid: d085bd08ca5fe5a4792e19b6523918c1, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: TVE_DETAIL_MODE_OFF TVE_DETAIL_TYPE_VERTEX_BLUE
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
@@ -25,6 +25,7 @@ Material:
   - TransparentDepthPrepass
   - TransparentDepthPostpass
   - TransparentBackface
+  - MOTIONVECTORS
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -382,7 +383,6 @@ Material:
     - _ATDistance: 1
     - _AdvancedCat: 0
     - _AlbedoAffectEmissive: 0
-    - _AlphaClipValue: 0.5
     - _AlphaCutoff: 0.5
     - _AlphaCutoffEnable: 0
     - _AlphaCutoffPostpass: 0.5
@@ -405,19 +405,6 @@ Material:
     - _BlendMode: 0
     - _BumpScale: 1
     - _CameraFadeValue: 1
-    - _CategoryDetail: 1
-    - _CategoryEmissive: 1
-    - _CategoryGlobal: 1
-    - _CategoryGradient: 0
-    - _CategoryMain: 1
-    - _CategoryMotion: 1
-    - _CategoryNoise: 0
-    - _CategoryOcclusion: 1
-    - _CategoryPerspective: 0
-    - _CategoryRender: 1
-    - _CategoryRendering: 0
-    - _CategorySizeFade: 0
-    - _CategorySubsurface: 0
     - _CoatCoverage: 1
     - _CoatIOR: 0.5
     - _CoatMask: 0
@@ -434,7 +421,6 @@ Material:
     - _DetailBlendMinValue: 0.2
     - _DetailBlendMode: 1
     - _DetailCat: 1
-    - _DetailCoordMode: 0
     - _DetailMapsMode: 0
     - _DetailMaskContrast: 0.25
     - _DetailMaskInvertMode: 0
@@ -475,9 +461,7 @@ Material:
     - _DstBlend: 0
     - _EmissiveCat: 1
     - _EmissiveColorMode: 1
-    - _EmissiveCoordMode: 0
     - _EmissiveFlagMode: 0
-    - _EmissiveMode: 0
     - _EnableAmbient: 1
     - _EnableBlendModePreserveSpecularLighting: 1
     - _EnableFogOnTransparent: 1
@@ -579,14 +563,13 @@ Material:
     - _MessageTranslucencyHD: 0
     - _Metallic: 0
     - _Mode: 0
-    - _MotionAmplitude_10: 0.3
-    - _MotionAmplitude_20: 2
+    - _MotionAmplitude_10: 0.2
+    - _MotionAmplitude_20: 0.2
     - _MotionAmplitude_21: 0.1
-    - _MotionAmplitude_22: 2
+    - _MotionAmplitude_22: 0.4
     - _MotionAmplitude_30: 1.267
     - _MotionAmplitude_32: 0.511
     - _MotionCat: 1
-    - _MotionFacingValue: 1
     - _MotionScale_10: 0
     - _MotionScale_20: 0
     - _MotionScale_30: 0.1
@@ -638,20 +621,17 @@ Material:
     - _RefractionMode: 0
     - _RefractionModel: 0
     - _RefractionSSRayModel: 0
-    - _RenderAmbient: 1
     - _RenderBlend: 0
     - _RenderClip: 0
     - _RenderCoverage: 0
     - _RenderCull: 2
     - _RenderCutoff: 0.5
     - _RenderDecals: 0
-    - _RenderDirect: 1
     - _RenderMode: 0
     - _RenderNormals: 0
     - _RenderPriority: 0
     - _RenderQueue: 0
     - _RenderSSR: 0
-    - _RenderShadow: 1
     - _RenderSpecular: 1
     - _RenderZWrite: 1
     - _RenderingCat: 1
@@ -676,9 +656,7 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SmoothnessViewAngleOffset: 0
     - _SpaceGlobalLayers: 0
-    - _SpaceGlobalLocals: 0
     - _SpaceGlobalPosition: 0
-    - _SpaceMotionGlobals: 0
     - _SpaceMotionHighlight: 0
     - _SpaceMotionLocals: 0
     - _SpaceRenderFade: 0
@@ -765,7 +743,6 @@ Material:
     - _VertexCat: 0
     - _VertexDataMode: 0
     - _VertexDynamicMode: 0
-    - _VertexHeightValue: 6.5035186
     - _VertexMasksMode: 0
     - _VertexMotionMode: 0
     - _VertexMotionSpace: 0
@@ -773,9 +750,7 @@ Material:
     - _VertexOcclusionMaxValue: 0
     - _VertexOcclusionMinValue: 0
     - _VertexOcclusionValue: 0
-    - _VertexPivotMode: 0
     - _VertexPivotModeFetch: 0
-    - _VertexRadiusValue: 1.589742
     - _VertexRollingMode: 1
     - _VertexVariationMode: 0
     - _WindElasticityLvl0: 0.24
@@ -864,5 +839,4 @@ Material:
     - _UVMappingMaskEmissive: {r: 1, g: 0, b: 0, a: 0}
     - _VertexOcclusionColor: {r: 1, g: 1, b: 1, a: 1}
     - _VertexOcclusionRemap: {r: 0, g: 0, b: 0, a: 0}
-    - _render_normals: {r: -1, g: -1, b: -1, a: 0}
     - _render_normals_options: {r: -1, g: -1, b: -1, a: 0}

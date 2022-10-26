@@ -11,7 +11,6 @@ using UnityEditor;
 
 namespace TheVegetationEngine
 {
-    [HelpURL("https://docs.google.com/document/d/145JOVlJ1tE-WODW45YoJ6Ixg23mFc56EnB_8Tbwloz8/edit#heading=h.a39m1w5ouu94")]
     [ExecuteInEditMode]
     [AddComponentMenu("BOXOPHOBIC/The Vegetation Engine/TVE Global Volume")]
     public class TVEGlobalVolume : StyledMonoBehaviour
@@ -44,7 +43,7 @@ namespace TheVegetationEngine
             InsideGlobalVolume4096 = 4096,
         }
 
-        [StyledBanner(0.890f, 0.745f, 0.309f, "Global Volume")]
+        [StyledBanner(0.890f, 0.745f, 0.309f, "Global Volume", "", "https://docs.google.com/document/d/145JOVlJ1tE-WODW45YoJ6Ixg23mFc56EnB_8Tbwloz8/edit#heading=h.a39m1w5ouu94")]
         public bool styledBanner;
 
         [StyledCategory("Camera Settings", 5, 10)]
@@ -53,7 +52,6 @@ namespace TheVegetationEngine
         [StyledMessage("Error", "Main Camera not found! Make sure you have a main camera with Main Camera tag in your scene! Particle elements updating will be skipped without it. Enter play mode to update the status!", 0, 10)]
         public bool styledCameraMessaage = false;
 
-        [Tooltip("Sets the main camera used for scene rendering.")]
         public Camera mainCamera;
 
         [StyledCategory("Elements Settings")]
@@ -126,13 +124,13 @@ namespace TheVegetationEngine
         public bool styledSpace0;
 
         [System.NonSerialized]
-        public TVERenderData colorsData = new TVERenderData();
+        public TVERenderData colorsData;
         [System.NonSerialized]
-        public TVERenderData extrasData = new TVERenderData();
+        public TVERenderData extrasData;
         [System.NonSerialized]
-        public TVERenderData motionData = new TVERenderData();
+        public TVERenderData motionData;
         [System.NonSerialized]
-        public TVERenderData vertexData = new TVERenderData();
+        public TVERenderData vertexData;
 
         MaterialPropertyBlock properties;
 
@@ -155,7 +153,7 @@ namespace TheVegetationEngine
             SortElementObjects();
             SetElementsVisibility();
 
-            if (SystemInfo.supportsInstancing && Application.isPlaying)
+            if (Application.isPlaying)
             {
                 BuildInstancedElements();
             }
@@ -184,6 +182,8 @@ namespace TheVegetationEngine
 
                 elementsVisibilityOld = elementsVisibility;
             }
+
+            CheckRenderBuffers();
 
             UpdateRenderBuffers();
             ExecuteRenderBuffers();
@@ -239,19 +239,14 @@ namespace TheVegetationEngine
             colorsData.texName = "TVE_ColorsTex";
             colorsData.texParams = "TVE_ColorsParams";
             colorsData.texCoord = "TVE_ColorsCoords";
-            colorsData.texLayers = "TVE_ColorsLayers";
             colorsData.texUsage = "TVE_ColorsUsage";
             colorsData.volumePosition = "TVE_ColorsPosition";
             colorsData.volumeScale = "TVE_ColorsScale";
 
-            colorsData.materialTag = "ColorsElement";
-            colorsData.materialPass = 0;
+            colorsData.materialFilter = "_IsColorsElement";
 
-            colorsData.renderDataID = colorsData.materialTag.GetHashCode();
-            colorsData.texWidth = 1024;
-            colorsData.texHeight = 1024;
+            colorsData.texResolution = 1024;
             colorsData.bufferSize = -1;
-            colorsData.useRenderTextureArray = true;
 
             if (useHighPrecisionRendering)
             {
@@ -268,19 +263,14 @@ namespace TheVegetationEngine
             extrasData.texName = "TVE_ExtrasTex";
             extrasData.texParams = "TVE_ExtrasParams";
             extrasData.texCoord = "TVE_ExtrasCoords";
-            extrasData.texLayers = "TVE_ExtrasLayers";
             extrasData.texUsage = "TVE_ExtrasUsage";
             extrasData.volumePosition = "TVE_ExtrasPosition";
             extrasData.volumeScale = "TVE_ExtrasScale";
 
-            extrasData.materialTag = "ExtrasElement";
-            extrasData.materialPass = 0;
+            extrasData.materialFilter = "_IsExtrasElement";
 
-            extrasData.renderDataID = extrasData.materialTag.GetHashCode();
-            extrasData.texWidth = 1024;
-            extrasData.texHeight = 1024;
+            extrasData.texResolution = 1024;
             extrasData.bufferSize = -1;
-            extrasData.useRenderTextureArray = true;
             extrasData.texFormat = RenderTextureFormat.Default;
 
             motionData = new TVERenderData();
@@ -289,19 +279,14 @@ namespace TheVegetationEngine
             motionData.texName = "TVE_MotionTex";
             motionData.texParams = "TVE_MotionParams";
             motionData.texCoord = "TVE_MotionCoords";
-            motionData.texLayers = "TVE_MotionLayers";
             motionData.texUsage = "TVE_MotionUsage";
             motionData.volumePosition = "TVE_MotionPosition";
             motionData.volumeScale = "TVE_MotionScale";
 
-            motionData.materialTag = "MotionElement";
-            motionData.materialPass = 0;
+            motionData.materialFilter = "_IsMotionElement";
 
-            motionData.renderDataID = motionData.materialTag.GetHashCode();
-            motionData.texWidth = 1024;
-            motionData.texHeight = 1024;
+            motionData.texResolution = 1024;
             motionData.bufferSize = -1;
-            motionData.useRenderTextureArray = true;
 
             if (useHighPrecisionRendering)
             {
@@ -317,20 +302,15 @@ namespace TheVegetationEngine
             vertexData.texName = "TVE_VertexTex";
             vertexData.texParams = "TVE_VertexParams";
             vertexData.texCoord = "TVE_VertexCoords";
-            vertexData.texLayers = "TVE_VertexLayers";
             vertexData.texUsage = "TVE_VertexUsage";
             vertexData.volumePosition = "TVE_VertexPosition";
             vertexData.volumeScale = "TVE_VertexScale";
 
-            vertexData.materialTag = "VertexElement";
-            vertexData.materialPass = 0;
+            vertexData.materialFilter = "_IsVertexElement";
 
-            vertexData.renderDataID = vertexData.materialTag.GetHashCode();
-            vertexData.texWidth = 1024;
-            vertexData.texHeight = 1024;
+            vertexData.texResolution = 1024;
             vertexData.bufferSize = -1;
-            vertexData.useRenderTextureArray = true;
-            vertexData.texFormat = RenderTextureFormat.ARGBHalf;
+            vertexData.texFormat = RenderTextureFormat.Default;
 
             UpdateRenderData(colorsData, renderColors);
             UpdateRenderData(extrasData, renderExtras);
@@ -348,79 +328,68 @@ namespace TheVegetationEngine
             if (renderDataMode == RenderDataMode.Off)
             {
                 renderData.isEnabled = false;
-                renderData.texWidth = 32;
-                renderData.texHeight = 32;
+                renderData.texResolution = 32;
                 renderData.bufferSize = -1;
                 renderData.isFollowing = false;
             }
             else if (renderDataMode == RenderDataMode.FollowMainCamera256)
             {
                 renderData.isEnabled = true;
-                renderData.texWidth = 256;
-                renderData.texHeight = 256;
+                renderData.texResolution = 256;
                 renderData.isFollowing = true;
             }
             else if (renderDataMode == RenderDataMode.FollowMainCamera512)
             {
                 renderData.isEnabled = true;
-                renderData.texWidth = 512;
-                renderData.texHeight = 512;
+                renderData.texResolution = 512;
                 renderData.isFollowing = true;
             }
             else if (renderDataMode == RenderDataMode.FollowMainCamera1024)
             {
                 renderData.isEnabled = true;
-                renderData.texWidth = 1024;
-                renderData.texHeight = 1024;
+                renderData.texResolution = 1024;
                 renderData.isFollowing = true;
             }
             else if (renderDataMode == RenderDataMode.FollowMainCamera2048)
             {
                 renderData.isEnabled = true;
-                renderData.texWidth = 2048;
-                renderData.texHeight = 2048;
+                renderData.texResolution = 2048;
                 renderData.isFollowing = true;
             }
             else if (renderDataMode == RenderDataMode.FollowMainCamera4096)
             {
                 renderData.isEnabled = true;
-                renderData.texWidth = 4096;
-                renderData.texHeight = 4096;
+                renderData.texResolution = 4096;
                 renderData.isFollowing = true;
             }
             else if (renderDataMode == RenderDataMode.InsideGlobalVolume256)
             {
                 renderData.isEnabled = true;
-                renderData.texWidth = 256;
-                renderData.texHeight = 256;
+                renderData.texResolution = 256;
                 renderData.isFollowing = false;
             }
             else if (renderDataMode == RenderDataMode.InsideGlobalVolume512)
             {
                 renderData.isEnabled = true;
-                renderData.texWidth = 512;
-                renderData.texHeight = 512;
+                renderData.texResolution = 512;
                 renderData.isFollowing = false;
             }
             else if (renderDataMode == RenderDataMode.InsideGlobalVolume1024)
             {
                 renderData.isEnabled = true;
-                renderData.texWidth = 1024;
-                renderData.texHeight = 1024;
+                renderData.texResolution = 1024;
                 renderData.isFollowing = false;
             }
             else if (renderDataMode == RenderDataMode.InsideGlobalVolume2048)
             {
                 renderData.isEnabled = true;
-                renderData.texWidth = 2048;
-                renderData.texHeight = 2048;
+                renderData.texResolution = 2048;
                 renderData.isFollowing = false;
             }
             else if (renderDataMode == RenderDataMode.InsideGlobalVolume4096)
             {
                 renderData.isEnabled = true;
-                renderData.texWidth = 4096;
-                renderData.texHeight = 4096;
+                renderData.texResolution = 4096;
                 renderData.isFollowing = false;
             }
         }
@@ -436,68 +405,63 @@ namespace TheVegetationEngine
                     continue;
                 }
 
-                CreateRenderBuffer(renderData);
-            }
-        }
-
-        public void CreateRenderBuffer(TVERenderData renderData)
-        {
-            if (renderData.texObject != null)
-            {
-                renderData.texObject.Release();
-            }
-
-            if (renderData.commandBuffers != null)
-            {
-                for (int b = 0; b < renderData.commandBuffers.Length; b++)
+                if (renderData.texObject != null)
                 {
-                    renderData.commandBuffers[b].Clear();
+                    renderData.texObject.Release();
                 }
-            }
 
-            renderData.bufferUsage = new float[9];
-            Shader.SetGlobalFloatArray(renderData.texUsage, renderData.bufferUsage);
-
-            if (renderData.isEnabled && renderData.bufferSize > -1)
-            {
-                renderData.texObject = new RenderTexture(renderData.texWidth, renderData.texHeight, 0, renderData.texFormat);
-
-                if (renderData.useRenderTextureArray)
+                if (renderData.commandBuffers != null)
                 {
+                    for (int b = 0; b < renderData.commandBuffers.Length; b++)
+                    {
+                        renderData.commandBuffers[b].Clear();
+                    }
+                }
+
+                renderData.bufferUsage = new float[9];
+                Shader.SetGlobalFloatArray(renderData.texUsage, renderData.bufferUsage);
+
+                if (renderData.isEnabled && renderData.bufferSize > -1)
+                {
+                    renderData.texObject = new RenderTexture(renderData.texResolution, renderData.texResolution, 0, renderData.texFormat);
                     renderData.texObject.dimension = TextureDimension.Tex2DArray;
+                    renderData.texObject.volumeDepth = renderData.bufferSize + 1;
+                    renderData.texObject.name = renderData.texName;
+                    renderData.texObject.wrapMode = TextureWrapMode.Clamp;
+
+                    renderData.commandBuffers = new CommandBuffer[renderData.bufferSize + 1];
+
+                    for (int b = 0; b < renderData.commandBuffers.Length; b++)
+                    {
+                        renderData.commandBuffers[b] = new CommandBuffer();
+                        renderData.commandBuffers[b].name = renderData.texName;
+                    }
+
+                    Shader.SetGlobalTexture(renderData.texName, renderData.texObject);
                 }
                 else
-                {
-                    renderData.texObject.dimension = TextureDimension.Tex2D;
-                }
-
-                renderData.texObject.volumeDepth = renderData.bufferSize + 1;
-                renderData.texObject.name = renderData.texName;
-                renderData.texObject.wrapMode = TextureWrapMode.Clamp;
-
-                renderData.commandBuffers = new CommandBuffer[renderData.bufferSize + 1];
-
-                for (int b = 0; b < renderData.commandBuffers.Length; b++)
-                {
-                    renderData.commandBuffers[b] = new CommandBuffer();
-                    renderData.commandBuffers[b].name = renderData.texName;
-                }
-
-                Shader.SetGlobalTexture(renderData.texName, renderData.texObject);
-                Shader.SetGlobalInt(renderData.texLayers, renderData.bufferSize + 1);
-            }
-            else
-            {
-                if (renderData.useRenderTextureArray)
                 {
                     Shader.SetGlobalTexture(renderData.texName, Resources.Load<Texture2DArray>("Internal ArrayTex"));
                 }
-                else
+            }
+        }
+
+        void CheckRenderBuffers()
+        {
+            for (int i = 0; i < renderDataSet.Count; i++)
+            {
+                var renderData = renderDataSet[i];
+
+                if (renderData == null)
                 {
-                    Shader.SetGlobalTexture(renderData.texName, Texture2D.whiteTexture);
+                    continue;
                 }
 
-                Shader.SetGlobalInt(renderData.texLayers, 1);
+                if (renderData.isUpdated)
+                {
+                    CreateRenderBuffers();
+                    renderData.isUpdated = false;
+                }
             }
         }
 
@@ -524,7 +488,7 @@ namespace TheVegetationEngine
                     {
                         var elementData = renderElements[e];
 
-                        if (renderData.renderDataID == elementData.renderDataID)
+                        if (elementData.renderer.sharedMaterial.HasProperty(renderData.materialFilter))
                         {
                             //bufferUsage[b] = 0;
 
@@ -535,7 +499,7 @@ namespace TheVegetationEngine
                                 properties.SetFloat("_RaycastFadeValue", elementData.fadeValue);
                                 elementData.renderer.SetPropertyBlock(properties);
 
-                                renderData.commandBuffers[b].DrawRenderer(elementData.renderer, elementData.material, 0, renderData.materialPass);
+                                renderData.commandBuffers[b].DrawRenderer(elementData.renderer, elementData.renderer.sharedMaterial, 0, 0);
                                 renderData.bufferUsage[b] = 1;
                             }
                         }
@@ -550,7 +514,7 @@ namespace TheVegetationEngine
                     {
                         var elementData = renderInstanced[e];
 
-                        if (renderData.renderDataID == elementData.renderDataID)
+                        if (elementData.material.HasProperty(renderData.materialFilter))
                         {
                             //bufferUsage[b] = 0;
 
@@ -563,7 +527,7 @@ namespace TheVegetationEngine
                                     matrix4X4s[m] = elementData.renderers[m].localToWorldMatrix;
                                 }
 
-                                renderData.commandBuffers[b].DrawMeshInstanced(elementData.mesh, 0, elementData.material, renderData.materialPass, matrix4X4s);
+                                renderData.commandBuffers[b].DrawMeshInstanced(elementData.mesh, 0, elementData.material, 0, matrix4X4s);
                                 renderData.bufferUsage[b] = 1;
                             }
                         }
@@ -581,6 +545,9 @@ namespace TheVegetationEngine
 
         void ExecuteRenderBuffers()
         {
+            GL.PushMatrix();
+            RenderTexture currentRenderTexture = RenderTexture.active;
+
             for (int i = 0; i < renderDataSet.Count; i++)
             {
                 var renderData = renderDataSet[i];
@@ -590,22 +557,19 @@ namespace TheVegetationEngine
                     continue;
                 }
 
-                GL.PushMatrix();
-                RenderTexture currentRenderTexture = RenderTexture.active;
-
                 var position = Vector3.zero;
                 var scale = Vector3.zero;
 
                 if (renderData.isFollowing)
                 {
-                    if (mainCamera != null && !renderData.isProjected)
+                    if (mainCamera != null)
                     {
                         var offsetX = followMainCameraVolume.x / 2 * mainCamera.transform.forward.x * followMainCameraOffset;
                         var offsetZ = followMainCameraVolume.z / 2 * mainCamera.transform.forward.z * followMainCameraOffset;
                         var cameraPos = mainCamera.transform.position + new Vector3(offsetX, 1, offsetZ);
 
-                        float gridX = followMainCameraVolume.x / renderData.texWidth;
-                        float gridZ = followMainCameraVolume.z / renderData.texHeight;
+                        float gridX = followMainCameraVolume.x / renderData.texResolution;
+                        float gridZ = followMainCameraVolume.z / renderData.texResolution;
                         float posX = Mathf.Round(cameraPos.x / gridX) * gridX;
                         float posZ = Mathf.Round(cameraPos.z / gridZ) * gridZ;
 
@@ -619,24 +583,12 @@ namespace TheVegetationEngine
                     scale = gameObject.transform.lossyScale;
                 }
 
-                if (renderData.isProjected)
-                {
-                    if (mainCamera != null)
-                    {
-                        projectionMatrix = mainCamera.projectionMatrix;
-                    }
-                }
-                else
-                {
-                    GL.modelview = modelViewMatrix;
-
-                    projectionMatrix = Matrix4x4.Ortho(-scale.x / 2 + position.x,
-                                                        scale.x / 2 + position.x,
-                                                        scale.z / 2 - position.z,
-                                                       -scale.z / 2 - position.z,
-                                                       -scale.y / 2 + position.y,
-                                                        scale.y / 2 + position.y);
-                }
+                projectionMatrix = Matrix4x4.Ortho(-scale.x / 2 + position.x,
+                                                    scale.x / 2 + position.x,
+                                                    scale.z / 2 + -position.z,
+                                                    -scale.z / 2 + -position.z,
+                                                    -scale.y / 2 + position.y,
+                                                    scale.y / 2 + position.y);
 
                 var x = 1 / scale.x;
                 var y = 1 / scale.z;
@@ -645,6 +597,7 @@ namespace TheVegetationEngine
                 var coord = new Vector4(x, y, -z, -w);
 
                 GL.LoadProjectionMatrix(projectionMatrix);
+                GL.modelview = modelViewMatrix;
 
                 Shader.SetGlobalVector(renderData.texCoord, coord);
                 Shader.SetGlobalVector(renderData.volumePosition, position);
@@ -655,10 +608,10 @@ namespace TheVegetationEngine
                     Graphics.SetRenderTarget(renderData.texObject, 0, CubemapFace.Unknown, b);
                     Graphics.ExecuteCommandBuffer(renderData.commandBuffers[b]);
                 }
-
-                RenderTexture.active = currentRenderTexture;
-                GL.PopMatrix();
             }
+
+            RenderTexture.active = currentRenderTexture;
+            GL.PopMatrix();
         }
 
         void SetGlobalShaderParameters()
@@ -672,7 +625,7 @@ namespace TheVegetationEngine
             {
                 for (int j = 0; j < renderElements.Count - 1; j++)
                 {
-                    if (renderElements[j] != null && renderElements[j].gameObject.transform.position.y > renderElements[j + 1].gameObject.transform.position.y)
+                    if (renderElements[j] != null && renderElements[j].element.transform.position.y > renderElements[j + 1].element.transform.position.y)
                     {
                         var next = renderElements[j + 1];
                         renderElements[j + 1] = renderElements[j];
@@ -695,12 +648,11 @@ namespace TheVegetationEngine
             {
                 var elementData = renderElements[i];
 
-                if (elementData.mesh != null && elementData.material.enableInstancing == true)
+                if (elementData.type == RendererType.Mesh && elementData.renderer.sharedMaterial.enableInstancing == true)
                 {
                     var elementInstanced = new TVEElementInstancedData();
-                    elementInstanced.renderDataID = elementData.renderDataID;
                     elementInstanced.layers = elementData.layers;
-                    elementInstanced.material = elementData.material;
+                    elementInstanced.material = elementData.renderer.sharedMaterial;
                     elementInstanced.mesh = elementData.mesh;
 
                     instanced.Add(elementInstanced);
@@ -718,7 +670,7 @@ namespace TheVegetationEngine
                         break;
                     }
 
-                    if (instanced[i].material == renderElements[j].material && instanced[i].mesh == renderElements[j].mesh)
+                    if (instanced[i].material == renderElements[j].renderer.sharedMaterial && instanced[i].mesh == renderElements[j].mesh)
                     {
                         renderersList.Add(renderElements[j].renderer);
                         renderElements.Remove(renderElements[j]);
@@ -769,11 +721,13 @@ namespace TheVegetationEngine
         {
             for (int i = 0; i < renderElements.Count; i++)
             {
-                var elementData = renderElements[i];
-
-                if (elementData != null && elementData.useGlobalVolumeVisibility)
+                if (renderElements[i] != null)
                 {
-                    elementData.renderer.enabled = true;
+#if UNITY_2019_3_OR_NEWER
+                    renderElements[i].renderer.forceRenderingOff = false;
+#else
+                    volumeElements[i].renderer.enabled = true;
+#endif
                 }
             }
         }
@@ -782,11 +736,13 @@ namespace TheVegetationEngine
         {
             for (int i = 0; i < renderElements.Count; i++)
             {
-                var elementData = renderElements[i];
-
-                if (elementData != null && elementData.useGlobalVolumeVisibility)
+                if (renderElements[i] != null)
                 {
-                    elementData.renderer.enabled = false;
+#if UNITY_2019_3_OR_NEWER
+                    renderElements[i].renderer.forceRenderingOff = true;
+#else
+                    volumeElements[i].renderer.enabled = false;
+#endif
                 }
             }
         }
@@ -794,14 +750,13 @@ namespace TheVegetationEngine
 #if UNITY_EDITOR        
         void OnDrawGizmosSelected()
         {
-            Gizmos.color = Color.black;
-            //Gizmos.color = new Color(0.890f, 0.745f, 0.309f, 1f);
+            Gizmos.color = new Color(0.890f, 0.745f, 0.309f, 1f);
             Gizmos.DrawWireCube(transform.position, transform.lossyScale);
         }
 
         void OnDrawGizmos()
         {
-            Gizmos.color = new Color(0.0f, 0.0f, 0.0f, 0.1f);
+            Gizmos.color = new Color(0.0f, 0.0f, 0.0f, 0.11f);
             Gizmos.DrawWireCube(transform.position, transform.lossyScale);
 
             if (useFollowMainCamera)
@@ -810,8 +765,7 @@ namespace TheVegetationEngine
                 {
                     if (Selection.Contains(mainCamera.gameObject))
                     {
-                        Gizmos.color = Color.black;
-                        //Gizmos.color = new Color(0.890f, 0.745f, 0.309f, 1f);
+                        Gizmos.color = new Color(0.890f, 0.745f, 0.309f, 1f);
                     }
 
                     var offsetX = followMainCameraVolume.x / 2 * mainCamera.transform.forward.x * followMainCameraOffset;

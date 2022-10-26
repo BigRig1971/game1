@@ -14,19 +14,19 @@ InfoOnline https://assetstore.unity.com/packages/tools/modeling/mtree-tree-creat
 Mesh SetVariation GET_MASK_FROM_CHANNEL 1
 Mesh SetOcclusion GET_MASK_FROM_CHANNEL 3
 Mesh SetDetailMask GET_MASK_PROCEDURAL 8
+Mesh SetMultiMask NONE
+
 Mesh SetDetailCoord GET_COORD_FROM_CHANNEL 0
 
-Mesh SetHeight GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_PROCEDURAL 16
-Mesh SetMotion3 GET_MASK_FROM_CHANNEL 2 ACTION_REMAP_01
-
-Mesh SetPivots NONE
+Mesh SetMotion1 GET_MASK_PROCEDURAL 4 
+Mesh SetMotion2 GET_MASK_FROM_CHANNEL 2 ACTION_REMAP01
+Mesh SetMotion3 GET_MASK_FROM_CHANNEL 2 ACTION_REMAP01
 
 *******************************************************************
 
 if SHADER_NAME_CONTAINS Leafs
 {
-	Material COPY_FLOAT _CutoffHDRP _AlphaClipValue
+	Material COPY_FLOAT _CutoffHDRP _AlphaCutoffValue
 
 	Material COPY_COLOR _Color _MainColor
 	Material COPY_TEX _MainTex _MainAlbedoTex
@@ -53,6 +53,8 @@ if SHADER_NAME_CONTAINS Bark
 	Material SET_FLOAT _RenderClip 0
 	Material SET_FLOAT _RenderCull 2
 
+	Material SET_FLOAT _MotionValue_20 0
+
 	// Standard RP
 	Material COPY_COLOR _Color _MainColor
 	Material COPY_TEX _MainTex _MainAlbedoTex
@@ -76,7 +78,6 @@ if SHADER_NAME_CONTAINS Bark
 	{
 		Material SET_FLOAT _DetailMode 1
 		Material SET_FLOAT _DetailBlendMode 1
-		Material SET_FLOAT _DetailCoordMode 1
 		Material SET_FLOAT _DetailMaskMode 0
 
 		Material SET_FLOAT _DetailMeshValue -0.2
@@ -117,7 +118,7 @@ if SHADER_NAME_CONTAINS Billboard
 {
 	Material SET_SHADER SHADER_DEFAULT_CROSS
 	
-	Material COPY_FLOAT _CutoffHDRP _AlphaClipValue
+	Material COPY_FLOAT _CutoffHDRP _AlphaCutoffValue
 
 	Material COPY_COLOR _Color _MainColor
 	Material COPY_TEX _MainTex _MainAlbedoTex
@@ -136,3 +137,5 @@ if SHADER_NAME_CONTAINS Billboard
 	Material COPY_FLOAT _CullMode _RenderCull
 	Material COPY_FLOAT _DoubleSidedNormalMode _RenderNormals
 }
+
+Material SET_FLOAT _MotionAmplitude_32 0.05

@@ -2,13 +2,12 @@
 
 using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
 using Boxophobic.StyledGUI;
 using Boxophobic.Utils;
-using System;
 using System.IO;
-using System.Linq;
+using System.Collections.Generic;
 using System.Globalization;
+using System;
 
 namespace TheVegetationEngine
 {
@@ -18,7 +17,6 @@ namespace TheVegetationEngine
         Converted = 10,
         Supported = 20,
         Unsupported = 30,
-        ConvertedMissingBackup = 40,
     }
 
     [System.Serializable]
@@ -36,12 +34,13 @@ namespace TheVegetationEngine
 
     public class TVEPrefabConverter : EditorWindow
     {
+        const int SPACE_SMALL = 5;
+        const int GUI_MESH = 24;
+
         const int NONE = 0;
 
-        const int GUI_SPACE_SMALL = 5;
-        const int GUI_SELECTION_HEIGHT = 24;
-        const int GUI_SQUARE_BUTTON_WIDTH = 20;
-        const int GUI_SQUARE_BUTTON_HEIGHT = 18;
+        const int SQUARE_BUTTON_WIDTH = 20;
+        const int SQUARE_BUTTON_HEIGHT = 18;
         float GUI_HALF_EDITOR_WIDTH = 200;
 
         const string BACKUP_DATA_PATH = "/Assets Data/Backup Data";
@@ -80,13 +79,13 @@ namespace TheVegetationEngine
         string[] SourceMaskProceduralEnum = new string[]
         {
         "[0]  Constant Black", "[1]  Constant White", "[2]  Random Element Variation", "[3]  Predictive Element Variation", "[4]  Height", "[5]  Sphere", "[6]  Cylinder", "[7]  Capsule",
-        "[8]  Base To Top", "[9]  Bottom Projection", "[10]  Top Projection", "[11]  Height Offset (Low)", "[12]  Height Offset (Medium)", "[13]  Height Offset (High)",
-        "[14]  Height Grass", "[15] Sphere Plant", "[16] Cylinder Tree", "[17] Capsule Tree", "[18] Normalized Pos X", "[19] Normalized Pos Y", "[20] Normalized Pos Z",
+        "[8]  Bottom To Top", "[9]  Top To Bottom", "[10]  Bottom Projection", "[11]  Top Projection", "[12]  Height Exp", "[13]  Hemi Sphere", "[14]  Hemi Cylinder", "[15]  Hemi Capsule",
+        "[16]  Height Offset (Low)", "[17]  Height Offset (Medium)", "[18]  Height Offset (High)", "[19]  Mesh Normal Y"
         };
 
         string[] SourceMask3rdPartyEnum = new string[]
         {
-        "[0]  CTI Leaves Mask", "[1]  CTI Leaves Variation", "[2]  ST8 Leaves Mask", "[3]  NM Leaves Mask", "[4]  Nicrom Leaves Mask", "[5]  Nicrom Detail Mask"
+        "[0]  CTI Leaves Mask", "[1]  CTI Leaves Variation", "[2]  ST8 Leaves Mask", "[3]  NM Leaves Mask"
         };
 
         string[] SourceFromTextureEnum = new string[]
@@ -106,22 +105,12 @@ namespace TheVegetationEngine
 
         string[] SourceCoordProceduralEnum = new string[]
         {
-        "[0]  Automatic", "[1]  Planar XZ", "[2]  Planar XY", "[3]  Planar ZY",
+        "[0]  Planar XZ", "[1]  Planar XY", "[2]  Planar ZY", "[3]  Procedural Pivots",
         };
 
         string[] SourceCoord3rdPartyEnum = new string[]
         {
         "[0]  NM Trunk Blend"
-        };
-
-        string[] SourcePivotsEnum = new string[]
-        {
-        "None", "Procedural",
-        };
-
-        string[] SourcePivotsProceduralEnum = new string[]
-        {
-        "[0]  Procedural Pivots",
         };
 
         string[] SourceNormalsEnum = new string[]
@@ -148,7 +137,7 @@ namespace TheVegetationEngine
 
         string[] SourceActionEnum = new string[]
         {
-        "None", "One Minus", "Negative", "Remap 0-1", "Power Of 2", "Multiply by Height"
+        "None", "Invert", "Negate", "Remap 0-1", "Multiply by Height"
         };
 
         string[] ReadWriteModeEnum = new string[]
@@ -160,8 +149,8 @@ namespace TheVegetationEngine
         {
             Off = 0,
             Default = 10,
-            Polygonal = 20,
-            VertexColors = 30,
+            VertexColors = 20,
+            Polygonal = 30,
             DEEnvironment = 100,
         }
 
@@ -171,22 +160,14 @@ namespace TheVegetationEngine
             Default = 10,
         }
 
-        enum OutputTexture
-        {
-            UseCurrentResolution = 0,
-            UseHighestResolution = 10,
-            UsePreviewResolution = 20,
-        }
-
         enum OutputTransform
         {
-            UseOriginalTransforms = 0,
+            KeepOriginalTransforms = 0,
             TransformToWorldSpace = 10,
         }
 
         OutputMesh outputMeshIndex = OutputMesh.Default;
         OutputMaterial outputMaterialIndex = OutputMaterial.Default;
-        OutputTexture outputTextureIndex = OutputTexture.UseHighestResolution;
         OutputTransform outputTransformIndex = OutputTransform.TransformToWorldSpace;
         string outputSuffix = "TVE";
         bool outputValid = true;
@@ -203,50 +184,40 @@ namespace TheVegetationEngine
         int sourceVariation = 0;
         int optionVariation = 0;
         int actionVariation = 0;
-        int coordVariation = 0;
         Texture2D textureVariation;
-        List<Texture2D> textureVariationList;
 
         int sourceOcclusion = 0;
         int optionOcclusion = 0;
         int actionOcclusion = 0;
-        int coordOcclusion = 0;
         Texture2D textureOcclusion;
-        List<Texture2D> textureOcclusionList;
 
         int sourceDetail = 0;
         int optionDetail = 0;
         int actionDetail = 0;
-        int coordDetail = 0;
         Texture2D textureDetail;
-        List<Texture2D> textureDetailList;
 
-        int sourceHeight = 0;
-        int optionHeight = 0;
-        int actionHeight = 0;
-        int coordHeight = 0;
-        Texture2D textureHeight;
-        List<Texture2D> textureHeightList;
+        int sourceMulti = 0;
+        int optionMulti = 0;
+        int actionMulti = 0;
+        Texture2D textureMulti;
 
         int sourceDetailCoord = 0;
         int optionDetailCoord = 0;
 
+        int sourceMotion1 = 0;
+        int optionMotion1 = 0;
+        int actionMotion1 = 0;
+        Texture2D textureMotion1;
+
         int sourceMotion2 = 0;
         int optionMotion2 = 0;
         int actionMotion2 = 0;
-        int coordMotion2 = 0;
         Texture2D textureMotion2;
-        List<Texture2D> textureMotion2List;
 
         int sourceMotion3 = 0;
         int optionMotion3 = 0;
         int actionMotion3 = 0;
-        int coordMotion3 = 0;
         Texture2D textureMotion3;
-        List<Texture2D> textureMotion3List;
-
-        int sourcePivots = 0;
-        int optionPivots = 0;
 
         int sourceNormals = 0;
         int optionNormals = 0;
@@ -288,8 +259,6 @@ namespace TheVegetationEngine
         int[] sourceimportSizes;
 
         int[] maskChannels;
-        int[] maskCoords;
-        //int[] maskLayers;
         int[] maskActions0;
         int[] maskActions1;
         int[] maskActions2;
@@ -335,7 +304,7 @@ namespace TheVegetationEngine
         bool useLine;
         List<bool> useLines;
         bool isValid = true;
-        bool showSelection = true;
+        bool showSelectedPrefabs = true;
         float seed = 1;
 
         GUIStyle stylePopup;
@@ -343,6 +312,7 @@ namespace TheVegetationEngine
         GUIStyle styleMiniToggleButton;
         Color bannerColor;
         string bannerText;
+        string helpURL;
         static TVEPrefabConverter window;
         Vector2 scrollPosition = Vector2.zero;
 
@@ -357,8 +327,9 @@ namespace TheVegetationEngine
         {
             bannerColor = new Color(0.890f, 0.745f, 0.309f);
             bannerText = "Prefab Converter";
+            helpURL = "https://docs.google.com/document/d/145JOVlJ1tE-WODW45YoJ6Ixg23mFc56EnB_8Tbwloz8/edit#heading=h.46l51yqt2zky";
 
-            if (TVEManager.Instance == null)
+            if (GameObject.Find("The Vegetation Engine") == null)
             {
                 isValid = false;
             }
@@ -434,7 +405,7 @@ namespace TheVegetationEngine
 
             SetGUIStyles();
 
-            StyledGUI.DrawWindowBanner(bannerColor, bannerText);
+            StyledGUI.DrawWindowBanner(bannerColor, bannerText, helpURL);
 
             GUILayout.BeginHorizontal();
             GUILayout.Space(15);
@@ -487,95 +458,113 @@ namespace TheVegetationEngine
         {
             GUILayout.Space(-2);
 
-            if (EditorSettings.serializationMode != UnityEditor.SerializationMode.ForceText)
+            if (isValid && validPrefabCount > 0)
             {
-                EditorGUILayout.HelpBox("The Prefab Converter cannot be used because the Asset Serialization Mode is not set to Force Text under Project Settings > Editor! Please change the settings to use the converter!", MessageType.Error, true);
-            }
-            else
-            {
-                if (isValid && validPrefabCount > 0)
+                if (presetIndex != 0)
                 {
-                    if (presetIndex != 0)
+                    var preset = "";
+                    var status = "";
+                    //var warning = "";
+                    //var error = "";
+
+                    if (infoPreset != "")
                     {
-                        var preset = "";
-                        var status = "";
-                        //var warning = "";
-                        //var error = "";
-
-                        if (infoPreset != "")
-                        {
-                            preset = "\n" + infoPreset + "\n";
-                        }
-
-                        if (infoStatus != "")
-                        {
-                            status = "\n" + infoStatus + "\n";
-                        }
-
-                        if (GUILayout.Button("\n<size=14>" + infoTitle + "</size>\n"
-                                            + preset
-                                            + status
-                                            , styleCenteredHelpBox))
-                        {
-                            Application.OpenURL(infoOnline);
-                        }
-
-                        if (infoWarning != "")
-                        {
-                            GUILayout.Space(10);
-                            EditorGUILayout.HelpBox(infoWarning, MessageType.Warning, true);
-                        }
-
-                        if (infoError != "")
-                        {
-                            GUILayout.Space(10);
-                            EditorGUILayout.HelpBox(infoError, MessageType.Error, true);
-                        }
+                        preset = "\n" + infoPreset + "\n";
                     }
-                    else
+
+                    if (infoStatus != "")
                     {
-                        if (presetMixedValues)
-                        {
-                            GUILayout.Button("\n<size=14>Multiple conversion presets detected!</size>\n", styleCenteredHelpBox);
-                        }
-                        else
-                        {
-                            GUILayout.Button("\n<size=14>Choose a preset to convert the selected prefabs!</size>\n", styleCenteredHelpBox);
-                        }
+                        status = "\n" + infoStatus + "\n";
+                    }
+
+                    //if (infoWarning != "")
+                    //{
+                    //    if (EditorGUIUtility.isProSkin)
+                    //    {
+                    //        warning = "\n<b><color=#ddbc59>Warning! " + infoWarning + "</color></b>";
+                    //    }
+                    //    else
+                    //    {
+                    //        warning = "\n<b><color=#e16f00>Warning! " + infoWarning + "</color></b>";
+                    //    }
+                    //}
+
+                    //if (infoError != "")
+                    //{
+                    //    if (EditorGUIUtility.isProSkin)
+                    //    {
+                    //        warning = "\n<b><color=#ff8260>Error! " + infoError + "</color></b>";
+                    //    }
+                    //    else
+                    //    {
+                    //        warning = "\n<b><color=#be1600>Error! " + infoError + "</color></b>";
+                    //    }
+                    //}
+
+                    if (GUILayout.Button("\n<size=14>" + infoTitle + "</size>\n"
+                                        /*+ "\n\n" + infoPreset + " Click here for more details!"*/
+                                        + preset
+                                        + status
+                                        , styleCenteredHelpBox))
+                    {
+                        Application.OpenURL(infoOnline);
+                    }
+
+                    if (infoWarning != "")
+                    {
+                        GUILayout.Space(10);
+                        EditorGUILayout.HelpBox(infoWarning, MessageType.Warning, true);
+                    }
+
+                    if (infoError != "")
+                    {
+                        GUILayout.Space(10);
+                        EditorGUILayout.HelpBox(infoError, MessageType.Error, true);
                     }
                 }
                 else
                 {
-                    if (isValid == false)
+                    if (presetMixedValues)
                     {
-                        GUILayout.Button("\n<size=14>The Vegetation Engine manager is missing from your scene!</size>\n", styleCenteredHelpBox);
+                        GUILayout.Button("\n<size=14>Multiple conversion presets detected!</size>\n", styleCenteredHelpBox);
+                    }
+                    else
+                    {
+                        GUILayout.Button("\n<size=14>Choose a preset to convert the selected prefabs!</size>\n", styleCenteredHelpBox);
+                    }
+                }
+            }
+            else
+            {
+                if (isValid == false)
+                {
+                    GUILayout.Button("\n<size=14>The Vegetation Engine manager is missing from your scene!</size>\n", styleCenteredHelpBox);
 
-                        GUILayout.Space(10);
+                    GUILayout.Space(10);
 
-                        if (GUILayout.Button("Create Scene Manager", GUILayout.Height(24)))
+                    if (GUILayout.Button("Create Scene Manager"))
+                    {
+                        if (GameObject.Find("The Vegetation Engine") != null)
                         {
-                            if (GameObject.Find("The Vegetation Engine") != null)
-                            {
-                                Debug.Log("<b>[The Vegetation Engine]</b> " + "The Vegetation Engine Manager is already set in your scene!");
-                                isValid = true;
-                                return;
-                            }
-
-                            GameObject manager = new GameObject();
-                            manager.AddComponent<TVEManager>();
-                            manager.name = "The Vegetation Engine";
-
-                            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene());
-
-                            Debug.Log("<b>[The Vegetation Engine]</b> " + "The Vegetation Engine is set in the current scene!");
-
+                            Debug.Log("<b>[The Vegetation Engine]</b> " + "The Vegetation Engine Manager is already set in your scene!");
                             isValid = true;
+                            return;
                         }
+
+                        GameObject manager = new GameObject();
+                        manager.AddComponent<TVEManager>();
+                        manager.name = "The Vegetation Engine";
+
+                        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene());
+
+                        Debug.Log("<b>[The Vegetation Engine]</b> " + "The Vegetation Engine is set in the current scene!");
+
+                        isValid = true;
                     }
-                    else if (validPrefabCount == 0)
-                    {
-                        GUILayout.Button("\n<size=14>Select one or multiple prefabs to get started!</size>\n", styleCenteredHelpBox);
-                    }
+                }
+                else if (validPrefabCount == 0)
+                {
+                    GUILayout.Button("\n<size=14>Select one or multiple prefabs to get started!</size>\n", styleCenteredHelpBox);
                 }
             }
         }
@@ -586,18 +575,18 @@ namespace TheVegetationEngine
             {
                 GUILayout.Space(10);
 
-                if (showSelection)
+                if (showSelectedPrefabs)
                 {
                     if (StyledButton("Hide Prefab Selection"))
-                        showSelection = !showSelection;
+                        showSelectedPrefabs = !showSelectedPrefabs;
                 }
                 else
                 {
                     if (StyledButton("Show Prefab Selection"))
-                        showSelection = !showSelection;
+                        showSelectedPrefabs = !showSelectedPrefabs;
                 }
 
-                if (showSelection)
+                if (showSelectedPrefabs)
                 {
                     for (int i = 0; i < prefabObjects.Count; i++)
                     {
@@ -619,14 +608,10 @@ namespace TheVegetationEngine
 
             if (presetIndex != 0)
             {
-                if (StyledMiniToggleButton("", "Select the preset file.", 12, false))
+                if (StyledMiniToggleButton("S", "Select the preset file.", 12, false))
                 {
                     EditorGUIUtility.PingObject(AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(presetPaths[presetIndex]));
                 }
-
-                var lastRect = GUILayoutUtility.GetLastRect();
-                var iconRect = new Rect(lastRect.x - 1, lastRect.y - 1, GUI_SQUARE_BUTTON_WIDTH, GUI_SQUARE_BUTTON_WIDTH);
-                GUI.Label(iconRect, EditorGUIUtility.IconContent("Preset.Context"));
             }
 
             GUILayout.EndHorizontal();
@@ -638,24 +623,12 @@ namespace TheVegetationEngine
                     GUILayout.BeginHorizontal();
 
                     overrideIndices[i] = StyledPresetPopup("Conversion Override", "Adds extra functionality over the currently used preset.", overrideIndices[i], OverrideOptions);
-
-                    if (overrideIndices[i] == 0)
-                    {
-                        GUI.enabled = false;
-                    }
-
-                    overrideGlobals[i] = StyledMiniToggleButton("", "Set Override as global for future conversions.", 11, overrideGlobals[i]);
-
-                    var lastRect = GUILayoutUtility.GetLastRect();
-                    var iconRect = new Rect(lastRect.x - 1, lastRect.y - 1, GUI_SQUARE_BUTTON_WIDTH, GUI_SQUARE_BUTTON_WIDTH);
-                    GUI.Label(iconRect, EditorGUIUtility.IconContent("InspectorLock"));
+                    overrideGlobals[i] = StyledMiniToggleButton("G", "Set Override as global for future conversions.", 11, overrideGlobals[i]);
 
                     if (overrideIndices[i] == 0)
                     {
                         overrideGlobals[i] = false;
                     }
-
-                    GUI.enabled = true;
 
                     GUILayout.EndHorizontal();
                 }
@@ -670,14 +643,14 @@ namespace TheVegetationEngine
 
                     if (overridesCount > 1)
                     {
-                        if (GUILayout.Button(new GUIContent("-", "Remove the last override."), GUILayout.MaxWidth(GUI_SQUARE_BUTTON_WIDTH), GUILayout.MaxHeight(GUI_SQUARE_BUTTON_HEIGHT)))
+                        if (GUILayout.Button(new GUIContent("-", "Remove the last override."), GUILayout.MaxWidth(SQUARE_BUTTON_WIDTH), GUILayout.MaxHeight(SQUARE_BUTTON_HEIGHT)))
                         {
                             overrideIndices.RemoveAt(overridesCount - 1);
                             overrideGlobals.RemoveAt(overridesCount - 1);
                         }
                     }
 
-                    if (GUILayout.Button(new GUIContent("+", "Add a new override."), GUILayout.MaxWidth(GUI_SQUARE_BUTTON_WIDTH), GUILayout.MaxHeight(GUI_SQUARE_BUTTON_HEIGHT)))
+                    if (GUILayout.Button(new GUIContent("+", "Add a new override."), GUILayout.MaxWidth(SQUARE_BUTTON_WIDTH), GUILayout.MaxHeight(SQUARE_BUTTON_HEIGHT)))
                     {
                         overrideIndices.Add(0);
                         overrideGlobals.Add(false);
@@ -779,11 +752,6 @@ namespace TheVegetationEngine
                     outputMaterialIndex = (OutputMaterial)EditorGUILayout.EnumPopup(outputMaterialIndex, stylePopup);
                     GUILayout.EndHorizontal();
 
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label(new GUIContent("Output Textures", "Texture conversion for the current preset."), GUILayout.Width(GUI_HALF_EDITOR_WIDTH - 5));
-                    outputTextureIndex = (OutputTexture)EditorGUILayout.EnumPopup(outputTextureIndex, stylePopup);
-                    GUILayout.EndHorizontal();
-
                     if (outputMeshIndex != OutputMesh.Off)
                     {
                         GUILayout.BeginHorizontal();
@@ -802,45 +770,6 @@ namespace TheVegetationEngine
                         hasOutputModifications = true;
                     }
 
-                    if (outputMeshIndex == OutputMesh.Off)
-                    {
-                        GUILayout.Space(10);
-                        StyledGUI.DrawWindowCategory("Mesh Settings");
-                        GUILayout.Space(10);
-
-                        if (hasMeshModifications)
-                        {
-                            EditorGUILayout.HelpBox("The mesh settings have been overriden and they will not update when changing the preset or adding overrides!", MessageType.Info, true);
-                            GUILayout.Space(10);
-                        }
-
-                        EditorGUI.BeginChangeCheck();
-
-                        readWriteMode = StyledPopup("ReadWrite Mode", "Set meshes readable mode.", readWriteMode, ReadWriteModeEnum);
-
-                        sourceBounds = StyledSourcePopup("Bounds", "Mesh vertex bounds override.", sourceBounds, SourceBoundsEnum);
-                        optionBounds = StyledBoundsOptionEnum("Bounds", "", sourceBounds, optionBounds);
-
-                        sourceNormals = StyledSourcePopup("Normals", "Mesh vertex normals override.", sourceNormals, SourceNormalsEnum);
-                        optionNormals = StyledNormalsOptionEnum("Normals", "", sourceNormals, optionNormals);
-
-                        GUILayout.Space(10);
-
-                        sourceDetail = StyledSourcePopup("Detail Mask", "Detail mask used for layer blending for bark. Stored in Vertex Blue.", sourceDetail, SourceMaskEnum);
-                        textureDetail = StyledTexture("Detail Mask", "", sourceDetail, textureDetail);
-                        optionDetail = StyledMaskOptionEnum("Detail Mask", "", sourceDetail, optionDetail, false);
-                        coordDetail = StyledTextureCoord("Detail Mask", "", sourceDetail, coordDetail);
-                        actionDetail = StyledActionOptionEnum("Detail Mask", "", sourceDetail, actionDetail, true);
-
-                        sourceDetailCoord = StyledSourcePopup("Detail Coord", "Detail UVs used for layer blending for bark and props. Stored in UV2.ZW.", sourceDetailCoord, SourceCoordEnum);
-                        optionDetailCoord = StyledCoordOptionEnum("Detail Coord", "", sourceDetailCoord, optionDetailCoord);
-
-                        if (EditorGUI.EndChangeCheck())
-                        {
-                            hasMeshModifications = true;
-                        }
-                    }
-
                     if (outputMeshIndex == OutputMesh.Default)
                     {
                         GUILayout.Space(10);
@@ -855,6 +784,8 @@ namespace TheVegetationEngine
 
                         EditorGUI.BeginChangeCheck();
 
+                        GUILayout.Space(10);
+
                         readWriteMode = StyledPopup("ReadWrite Mode", "Set meshes readable mode.", readWriteMode, ReadWriteModeEnum);
 
                         sourceBounds = StyledSourcePopup("Bounds", "Mesh vertex bounds override.", sourceBounds, SourceBoundsEnum);
@@ -866,87 +797,46 @@ namespace TheVegetationEngine
                         GUILayout.Space(10);
 
                         sourceVariation = StyledSourcePopup("Variation", "Variation mask used for wind animation and global effects. Stored in Vertex Red.", sourceVariation, SourceMaskEnum);
-                        textureVariation = StyledTexture("Variation", "", sourceVariation, textureVariation);
                         optionVariation = StyledMaskOptionEnum("Variation", "", sourceVariation, optionVariation, false);
-                        coordVariation = StyledTextureCoord("Variation", "", sourceVariation, coordVariation);
+                        textureVariation = StyledTexture("Variation", "", sourceVariation, textureVariation);
                         actionVariation = StyledActionOptionEnum("Variation", "", sourceVariation, actionVariation, true);
 
                         sourceOcclusion = StyledSourcePopup("Occlusion", "Vertex Occlusion mask used to add depth and light scattering mask. Stored in Vertex Green.", sourceOcclusion, SourceMaskEnum);
-                        textureOcclusion = StyledTexture("Occlusion", "", sourceOcclusion, textureOcclusion);
                         optionOcclusion = StyledMaskOptionEnum("Occlusion", "", sourceOcclusion, optionOcclusion, false);
-                        coordOcclusion = StyledTextureCoord("Occlsuion", "", sourceOcclusion, coordOcclusion);
+                        textureOcclusion = StyledTexture("Occlusion", "", sourceOcclusion, textureOcclusion);
                         actionOcclusion = StyledActionOptionEnum("Occlusion", "", sourceOcclusion, actionOcclusion, true);
 
                         sourceDetail = StyledSourcePopup("Detail Mask", "Detail mask used for layer blending for bark. Stored in Vertex Blue.", sourceDetail, SourceMaskEnum);
-                        textureDetail = StyledTexture("Detail Mask", "", sourceDetail, textureDetail);
                         optionDetail = StyledMaskOptionEnum("Detail Mask", "", sourceDetail, optionDetail, false);
-                        coordDetail = StyledTextureCoord("Detail Mask", "", sourceDetail, coordDetail);
+                        textureDetail = StyledTexture("Detail Mask", "", sourceDetail, textureDetail);
                         actionDetail = StyledActionOptionEnum("Detail Mask", "", sourceDetail, actionDetail, true);
 
-                        sourceDetailCoord = StyledSourcePopup("Detail Coord", "Detail UVs used for layer blending for bark and props. Stored in UV2.ZW.", sourceDetailCoord, SourceCoordEnum);
-                        optionDetailCoord = StyledCoordOptionEnum("Detail Coord", "", sourceDetailCoord, optionDetailCoord);
-
-                        sourceHeight = StyledSourcePopup("Height Mask", "Multi mask used for bending motion, gradient colors for leaves and subsurface/overlay mask for grass. The default value is set to height. Stored in Vertex Alpha.", sourceHeight, SourceMaskEnum);
-                        textureHeight = StyledTexture("Height Mask", "", sourceHeight, textureHeight);
-                        optionHeight = StyledMaskOptionEnum("Height Mask", "", sourceHeight, optionHeight, false);
-                        coordHeight = StyledTextureCoord("Height Mask", "", sourceHeight, coordHeight);
-                        actionHeight = StyledActionOptionEnum("Height Mask", "", sourceHeight, actionHeight, true);
-
-                        sourceMotion2 = StyledSourcePopup("Branch Mask", "Motion mask used for squash animations. Stored in UV0.Z as a packed mask.", sourceMotion2, SourceMaskEnum);
-                        textureMotion2 = StyledTexture("Branch Mask", "", sourceMotion2, textureMotion2);
-                        optionMotion2 = StyledMaskOptionEnum("Branch Mask", "", sourceMotion2, optionMotion2, false);
-                        coordMotion2 = StyledTextureCoord("Branch Mask", "", sourceMotion2, coordMotion2);
-                        actionMotion2 = StyledActionOptionEnum("Branch Mask", "", sourceMotion2, actionMotion2, true);
-
-                        sourceMotion3 = StyledSourcePopup("Flutter Mask", "Motion mask used for flutter animation. Stored in UV0.Z as a packed mask.", sourceMotion3, SourceMaskEnum);
-                        textureMotion3 = StyledTexture("Flutter Mask", "", sourceMotion3, textureMotion3);
-                        optionMotion3 = StyledMaskOptionEnum("Flutter Mask", "", sourceMotion3, optionMotion3, false);
-                        coordMotion3 = StyledTextureCoord("Flutter Mask", "", sourceMotion3, coordMotion3);
-                        actionMotion3 = StyledActionOptionEnum("Flutter Mask", "", sourceMotion3, actionMotion3, true);
+                        sourceMulti = StyledSourcePopup("Multi Mask", "Multi mask used for gradinet colors for leaves and subsurface/overlay mask for grass. The default value is set to height. Stored in Vertex Alpha.", sourceMulti, SourceMaskEnum);
+                        optionMulti = StyledMaskOptionEnum("Multi Mask", "", sourceMulti, optionMulti, false);
+                        textureMulti = StyledTexture("Multi Mask", "", sourceMulti, textureMulti);
+                        actionMulti = StyledActionOptionEnum("Multi Mask", "", sourceMulti, actionMulti, true);
 
                         GUILayout.Space(10);
 
-                        sourcePivots = StyledSourcePopup("Pivot Positions", "Pivots storing for grass when multiple grass blades are combined into a single mesh. Stored in UV4.XZY.", sourcePivots, SourcePivotsEnum);
-                        optionPivots = StyledPivotsOptionEnum("Pivot Positions", "", sourcePivots, optionPivots);
+                        sourceDetailCoord = StyledSourcePopup("Detail Coord or Pivots", "Detail UVs used for layer blending for bark. Pivots storing for grass when multiple grass blades are combined into a single mesh. Stored in UV0.ZW.", sourceDetailCoord, SourceCoordEnum);
+                        optionDetailCoord = StyledCoordOptionEnum("Detail Coord or Pivots", "", sourceDetailCoord, optionDetailCoord, true);
 
                         GUILayout.Space(10);
 
-                        if (EditorGUI.EndChangeCheck())
-                        {
-                            hasMeshModifications = true;
-                        }
-                    }
+                        sourceMotion1 = StyledSourcePopup("Motion Primary", "Motion mask used for bending animation. Stored in UV3.X.", sourceMotion1, SourceMaskEnum);
+                        optionMotion1 = StyledMaskOptionEnum("Motion Primary", "", sourceMotion1, optionMotion1, false);
+                        textureMotion1 = StyledTexture("Motion Primary", "", sourceMotion1, textureMotion1);
+                        actionMotion1 = StyledActionOptionEnum("Motion Primary", "", sourceMotion1, actionMotion1, true);
 
-                    if (outputMeshIndex == OutputMesh.Polygonal)
-                    {
-                        GUILayout.Space(10);
-                        StyledGUI.DrawWindowCategory("Mesh Settings");
-                        GUILayout.Space(10);
+                        sourceMotion2 = StyledSourcePopup("Motion Second", "Motion mask used for rolling, vertical and squash animations. Stored in UV3.Y.", sourceMotion2, SourceMaskEnum);
+                        optionMotion2 = StyledMaskOptionEnum("Motion Second", "", sourceMotion2, optionMotion2, false);
+                        textureMotion2 = StyledTexture("Motion Second", "", sourceMotion2, textureMotion2);
+                        actionMotion2 = StyledActionOptionEnum("Motion Second", "", sourceMotion2, actionMotion2, true);
 
-                        if (hasMeshModifications)
-                        {
-                            EditorGUILayout.HelpBox("The mesh settings have been overriden and they will not update when changing the preset or adding overrides!", MessageType.Info, true);
-                            GUILayout.Space(10);
-                        }
-
-                        EditorGUI.BeginChangeCheck();
-
-                        readWriteMode = StyledPopup("ReadWrite Mode", "Set meshes readable mode.", readWriteMode, ReadWriteModeEnum);
-
-                        sourceBounds = StyledSourcePopup("Bounds", "Mesh vertex bounds override.", sourceBounds, SourceBoundsEnum);
-                        optionBounds = StyledBoundsOptionEnum("Bounds", "", sourceBounds, optionBounds);
-
-                        sourceHeight = StyledSourcePopup("Height Mask", "Multi mask used for bending motion and gradient colors The default value is set to height. Stored in Vertex Alpha.", sourceHeight, SourceMaskEnum);
-                        textureHeight = StyledTexture("Height Mask", "", sourceHeight, textureHeight);
-                        optionHeight = StyledMaskOptionEnum("Height Mask", "", sourceHeight, optionHeight, false);
-                        coordHeight = StyledTextureCoord("H", "", sourceHeight, coordHeight);
-                        actionHeight = StyledActionOptionEnum("Height Mask", "", sourceHeight, actionHeight, true);
-
-                        sourceMotion3 = StyledSourcePopup("Flutter Mask", "Motion mask used for flutter animation. Stored in UV0.Z as a packed mask.", sourceMotion3, SourceMaskEnum);
-                        textureMotion3 = StyledTexture("Flutter Mask", "", sourceMotion3, textureMotion3);
-                        optionMotion3 = StyledMaskOptionEnum("Flutter Mask", "", sourceMotion3, optionMotion3, false);
-                        coordMotion3 = StyledTextureCoord("Flutter Mask", "", sourceMotion3, coordMotion3);
-                        actionMotion3 = StyledActionOptionEnum("Flutter Mask", "", sourceMotion3, actionMotion3, true);
+                        sourceMotion3 = StyledSourcePopup("Motion Details", "Motion mask used for flutter animation. Stored in UV3.Z.", sourceMotion3, SourceMaskEnum);
+                        optionMotion3 = StyledMaskOptionEnum("Motion Details", "", sourceMotion3, optionMotion3, false);
+                        textureMotion3 = StyledTexture("Motion Details", "", sourceMotion3, textureMotion3);
+                        actionMotion3 = StyledActionOptionEnum("Motion Details", "", sourceMotion3, actionMotion3, true);
 
                         if (EditorGUI.EndChangeCheck())
                         {
@@ -968,6 +858,8 @@ namespace TheVegetationEngine
 
                         EditorGUI.BeginChangeCheck();
 
+                        GUILayout.Space(10);
+
                         readWriteMode = StyledPopup("ReadWrite Mode", "Set meshes readable mode.", readWriteMode, ReadWriteModeEnum);
 
                         sourceBounds = StyledSourcePopup("Bounds", "Mesh vertex bounds override.", sourceBounds, SourceBoundsEnum);
@@ -979,28 +871,24 @@ namespace TheVegetationEngine
                         GUILayout.Space(10);
 
                         sourceVariation = StyledSourcePopup("Vertex Red", "", sourceVariation, SourceMaskEnum);
-                        textureVariation = StyledTexture("Vertex Red", "", sourceVariation, textureVariation);
                         optionVariation = StyledMaskOptionEnum("Vertex Red", "", sourceVariation, optionVariation, false);
-                        coordVariation = StyledTextureCoord("Vertex Red", "", sourceVariation, coordVariation);
+                        textureVariation = StyledTexture("Vertex Red", "", sourceVariation, textureVariation);
                         actionVariation = StyledActionOptionEnum("Vertex Red", "", sourceVariation, actionVariation, true);
 
                         sourceOcclusion = StyledSourcePopup("Vertex Green", "", sourceOcclusion, SourceMaskEnum);
-                        textureOcclusion = StyledTexture("Vertex Green", "", sourceOcclusion, textureOcclusion);
                         optionOcclusion = StyledMaskOptionEnum("Vertex Green", "", sourceOcclusion, optionOcclusion, false);
-                        coordOcclusion = StyledTextureCoord("Vertex Green", "", sourceOcclusion, coordOcclusion);
+                        textureOcclusion = StyledTexture("Vertex Green", "", sourceOcclusion, textureOcclusion);
                         actionOcclusion = StyledActionOptionEnum("Vertex Green", "", sourceOcclusion, actionOcclusion, true);
 
                         sourceDetail = StyledSourcePopup("Vertex Blue", "", sourceDetail, SourceMaskEnum);
-                        textureDetail = StyledTexture("Vertex Blue", "", sourceDetail, textureDetail);
                         optionDetail = StyledMaskOptionEnum("Vertex Blue", "", sourceDetail, optionDetail, false);
-                        coordDetail = StyledTextureCoord("Vertex Blue", "", sourceDetail, coordDetail);
+                        textureDetail = StyledTexture("Vertex Blue", "", sourceDetail, textureDetail);
                         actionDetail = StyledActionOptionEnum("Vertex Blue", "", sourceDetail, actionDetail, true);
 
-                        sourceHeight = StyledSourcePopup("Vertex Alpha", "", sourceHeight, SourceMaskEnum);
-                        textureHeight = StyledTexture("Vertex Blue", "", sourceHeight, textureHeight);
-                        optionHeight = StyledMaskOptionEnum("Vertex Alpha", "", sourceHeight, optionHeight, false);
-                        coordHeight = StyledTextureCoord("Vertex Alpha", "", sourceHeight, coordHeight);
-                        actionHeight = StyledActionOptionEnum("Vertex Alpha", "", sourceHeight, actionHeight, true);
+                        sourceMulti = StyledSourcePopup("Vertex Alpha", "", sourceMulti, SourceMaskEnum);
+                        optionMulti = StyledMaskOptionEnum("Vertex Alpha", "", sourceMulti, optionMulti, false);
+                        textureMulti = StyledTexture("Vertex Blue", "", sourceMulti, textureMulti);
+                        actionMulti = StyledActionOptionEnum("Vertex Alpha", "", sourceMulti, actionMulti, true);
 
                         if (EditorGUI.EndChangeCheck())
                         {
@@ -1022,6 +910,8 @@ namespace TheVegetationEngine
 
                         EditorGUI.BeginChangeCheck();
 
+                        GUILayout.Space(10);
+
                         readWriteMode = StyledPopup("ReadWrite Mode", "Set meshes readable mode.", readWriteMode, ReadWriteModeEnum);
 
                         sourceBounds = StyledSourcePopup("Bounds", "Mesh vertex bounds override.", sourceBounds, SourceBoundsEnum);
@@ -1033,28 +923,24 @@ namespace TheVegetationEngine
                         GUILayout.Space(10);
 
                         sourceVariation = StyledSourcePopup("Variation", "", sourceVariation, SourceMaskEnum);
-                        textureVariation = StyledTexture("Variation", "", sourceVariation, textureVariation);
                         optionVariation = StyledMaskOptionEnum("Variation", "", sourceVariation, optionVariation, false);
-                        coordVariation = StyledTextureCoord("Variation", "", sourceVariation, coordVariation);
+                        textureVariation = StyledTexture("Variation", "", sourceVariation, textureVariation);
                         actionVariation = StyledActionOptionEnum("Variation", "", sourceVariation, actionVariation, true);
 
                         sourceOcclusion = StyledSourcePopup("Occlusion", "", sourceOcclusion, SourceMaskEnum);
-                        textureOcclusion = StyledTexture("Occlusion", "", sourceOcclusion, textureOcclusion);
                         optionOcclusion = StyledMaskOptionEnum("Occlusion", "", sourceOcclusion, optionOcclusion, false);
-                        coordOcclusion = StyledTextureCoord("Occlusion", "", sourceOcclusion, coordOcclusion);
+                        textureOcclusion = StyledTexture("Occlusion", "", sourceOcclusion, textureOcclusion);
                         actionOcclusion = StyledActionOptionEnum("Occlusion", "", sourceOcclusion, actionOcclusion, true);
 
-                        sourceHeight = StyledSourcePopup("Height Mask", "Height mask used for bending animation.", sourceHeight, SourceMaskEnum);
-                        textureHeight = StyledTexture("Height Mask", "", sourceHeight, textureHeight);
-                        optionHeight = StyledMaskOptionEnum("Height Mask", "", sourceHeight, optionHeight, false);
-                        coordHeight = StyledTextureCoord("Height Mask", "", sourceHeight, coordHeight);
-                        actionHeight = StyledActionOptionEnum("Height Mask", "", sourceHeight, actionHeight, true);
+                        sourceMotion1 = StyledSourcePopup("Motion Primary", "", sourceMotion1, SourceMaskEnum);
+                        optionMotion1 = StyledMaskOptionEnum("Motion Primary", "", sourceMotion1, optionMotion1, false);
+                        textureMotion1 = StyledTexture("Motion Primary", "", sourceMotion1, textureMotion1);
+                        actionMotion1 = StyledActionOptionEnum("Motion Primary", "", sourceMotion1, actionMotion1, true);
 
-                        sourceMotion3 = StyledSourcePopup("Flutter Mask", "Motion mask used for flutter animation.", sourceMotion3, SourceMaskEnum);
-                        textureMotion3 = StyledTexture("Flutter Mask", "", sourceMotion3, textureMotion3);
-                        optionMotion3 = StyledMaskOptionEnum("Flutter Mask", "", sourceMotion3, optionMotion3, false);
-                        coordMotion3 = StyledTextureCoord("Flutter Mask", "", sourceMotion3, coordMotion3);
-                        actionMotion3 = StyledActionOptionEnum("Flutter Mask", "", sourceMotion3, actionMotion3, true);
+                        sourceMotion2 = StyledSourcePopup("Motion Detail", "", sourceMotion2, SourceMaskEnum);
+                        optionMotion2 = StyledMaskOptionEnum("Motion Detail", "", sourceMotion2, optionMotion2, false);
+                        textureMotion2 = StyledTexture("Motion Detail", "", sourceMotion2, textureMotion2);
+                        actionMotion2 = StyledActionOptionEnum("Motion Detail", "", sourceMotion2, actionMotion2, true);
 
                         if (EditorGUI.EndChangeCheck())
                         {
@@ -1102,7 +988,7 @@ namespace TheVegetationEngine
             }
             else
             {
-                if (presetIndex == 0 || outputValid == false || !isValid || EditorSettings.serializationMode != UnityEditor.SerializationMode.ForceText)
+                if (presetIndex == 0 || outputValid == false || !isValid)
                 {
                     GUI.enabled = false;
                 }
@@ -1218,7 +1104,7 @@ namespace TheVegetationEngine
 
             EditorGUI.BeginChangeCheck();
 
-            collectConvertedDataIndex = EditorGUILayout.Popup(new GUIContent("", "Choose if the converted assets are collected. The collect settings are found under the advanced settings."), collectConvertedDataIndex, new string[] { "Convert", "Convert and Collect" }, GUILayout.MaxWidth(GUI_SQUARE_BUTTON_WIDTH));
+            collectConvertedDataIndex = EditorGUILayout.Popup(new GUIContent("", "Choose if the converted assets are collected. The collect settings are found under the advanced settings."), collectConvertedDataIndex, new string[] { "Convert", "Convert and Collect" }, GUILayout.MaxWidth(SQUARE_BUTTON_WIDTH));
 
             if (collectConvertedDataIndex == 1)
             {
@@ -1246,11 +1132,11 @@ namespace TheVegetationEngine
             {
                 if (EditorGUIUtility.isProSkin)
                 {
-                    GUILayout.Label("<size=10><b><color=#f6d161>" + prefabData.prefabObject.name + "</color></b></size>", styleCenteredHelpBox, GUILayout.Height(GUI_SELECTION_HEIGHT));
+                    GUILayout.Label("<size=10><b><color=#f6d161>" + prefabData.prefabObject.name + "</color></b></size>", styleCenteredHelpBox, GUILayout.Height(GUI_MESH));
                 }
                 else
                 {
-                    GUILayout.Label("<size=10><b><color=#e16f00>" + prefabData.prefabObject.name + "</color></b></size>", styleCenteredHelpBox, GUILayout.Height(GUI_SELECTION_HEIGHT));
+                    GUILayout.Label("<size=10><b><color=#e16f00>" + prefabData.prefabObject.name + "</color></b></size>", styleCenteredHelpBox, GUILayout.Height(GUI_MESH));
                 }
             }
 
@@ -1258,17 +1144,17 @@ namespace TheVegetationEngine
             {
                 if (EditorGUIUtility.isProSkin)
                 {
-                    GUILayout.Label("<size=10><b><color=#87b8ff>" + prefabData.prefabObject.name + "</color></b></size>", styleCenteredHelpBox, GUILayout.Height(GUI_SELECTION_HEIGHT));
+                    GUILayout.Label("<size=10><b><color=#87b8ff>" + prefabData.prefabObject.name + "</color></b></size>", styleCenteredHelpBox, GUILayout.Height(GUI_MESH));
                 }
                 else
                 {
-                    GUILayout.Label("<size=10><b><color=#0b448b>" + prefabData.prefabObject.name + "</color></b></size>", styleCenteredHelpBox, GUILayout.Height(GUI_SELECTION_HEIGHT));
+                    GUILayout.Label("<size=10><b><color=#0b448b>" + prefabData.prefabObject.name + "</color></b></size>", styleCenteredHelpBox, GUILayout.Height(GUI_MESH));
                 }
             }
 
-            if (prefabData.prefabStatus == PrefabStatus.Unsupported || prefabData.prefabStatus == PrefabStatus.ConvertedMissingBackup)
+            if (prefabData.prefabStatus == PrefabStatus.Unsupported)
             {
-                GUILayout.Label("<size=10><b><color=#808080>" + prefabData.prefabObject.name + "</color></b></size>", styleCenteredHelpBox, GUILayout.Height(GUI_SELECTION_HEIGHT));
+                GUILayout.Label("<size=10><b><color=#808080>" + prefabData.prefabObject.name + "</color></b></size>", styleCenteredHelpBox, GUILayout.Height(GUI_MESH));
             }
 
             var lastRect = GUILayoutUtility.GetLastRect();
@@ -1284,14 +1170,6 @@ namespace TheVegetationEngine
 
                 GUI.Label(iconRect, EditorGUIUtility.IconContent("console.warnicon.sml"));
                 GUI.Label(iconRect, new GUIContent("", "SpeedTree, Tree Creator, Models or any other asset type prefabs cannot be converted directly, you will need to create a new regular prefab first!"));
-            }
-
-            if (prefabData.prefabStatus == PrefabStatus.ConvertedMissingBackup)
-            {
-                var iconRect = new Rect(lastRect.width - 18, lastRect.y + 2, 20, 20);
-
-                GUI.Label(iconRect, EditorGUIUtility.IconContent("console.erroricon.sml"));
-                GUI.Label(iconRect, new GUIContent("", "The prefab cannot be reverted or reconverted because the backup file is missing!"));
             }
         }
 
@@ -1345,7 +1223,7 @@ namespace TheVegetationEngine
 
             if (space)
             {
-                GUILayout.Space(GUI_SPACE_SMALL);
+                GUILayout.Space(SPACE_SMALL);
             }
 
             return option;
@@ -1372,7 +1250,7 @@ namespace TheVegetationEngine
 
             if (space)
             {
-                GUILayout.Space(GUI_SPACE_SMALL);
+                GUILayout.Space(SPACE_SMALL);
             }
 
             return option;
@@ -1391,17 +1269,7 @@ namespace TheVegetationEngine
             return texture;
         }
 
-        int StyledTextureCoord(string name, string tooltip, int sourceTexture, int option)
-        {
-            if (sourceTexture == 3)
-            {
-                option = StyledPopup(name + " Coord", tooltip, option, SourceCoordMeshEnum);
-            }
-
-            return option;
-        }
-
-        int StyledCoordOptionEnum(string name, string tooltip, int source, int option)
+        int StyledCoordOptionEnum(string name, string tooltip, int source, int option, bool space)
         {
             if (source == 1)
             {
@@ -1416,18 +1284,7 @@ namespace TheVegetationEngine
                 option = StyledPopup(name + " 3rd Party", tooltip, option, SourceCoord3rdPartyEnum);
             }
 
-            GUILayout.Space(GUI_SPACE_SMALL);
-
-            return option;
-        }
-
-        int StyledPivotsOptionEnum(string name, string tooltip, int source, int option)
-        {
-            if (source == 1)
-            {
-                option = StyledPopup(name + " Procedural", tooltip, option, SourcePivotsProceduralEnum);
-                GUILayout.Space(GUI_SPACE_SMALL);
-            }
+            GUILayout.Space(SPACE_SMALL);
 
             return option;
         }
@@ -1437,7 +1294,7 @@ namespace TheVegetationEngine
             if (source == 1)
             {
                 option = StyledPopup(name + " Procedural", tooltip, option, SourceNormalsProceduralEnum);
-                GUILayout.Space(GUI_SPACE_SMALL);
+                GUILayout.Space(SPACE_SMALL);
             }
 
             return option;
@@ -1448,7 +1305,7 @@ namespace TheVegetationEngine
             if (source == 1)
             {
                 option = StyledPopup(name + " Procedural", tooltip, option, SourceBoundsProceduralEnum);
-                GUILayout.Space(GUI_SPACE_SMALL);
+                GUILayout.Space(SPACE_SMALL);
             }
 
             return option;
@@ -1456,14 +1313,14 @@ namespace TheVegetationEngine
 
         bool StyledButton(string text)
         {
-            bool value = GUILayout.Button("<b>" + text + "</b>", styleCenteredHelpBox, GUILayout.Height(GUI_SELECTION_HEIGHT));
+            bool value = GUILayout.Button("<b>" + text + "</b>", styleCenteredHelpBox, GUILayout.Height(GUI_MESH));
 
             return value;
         }
 
         bool StyledMiniToggleButton(string text, string tooltip, int size, bool value)
         {
-            value = GUILayout.Toggle(value, new GUIContent("<size=" + size + ">" + text + "</size>", tooltip), styleMiniToggleButton, GUILayout.MaxWidth(GUI_SQUARE_BUTTON_WIDTH), GUILayout.MaxHeight(GUI_SQUARE_BUTTON_HEIGHT));
+            value = GUILayout.Toggle(value, new GUIContent("<size=" + size + ">" + text + "</size>", tooltip), styleMiniToggleButton, GUILayout.MaxWidth(SQUARE_BUTTON_WIDTH), GUILayout.MaxHeight(SQUARE_BUTTON_HEIGHT));
 
             return value;
         }
@@ -1477,17 +1334,16 @@ namespace TheVegetationEngine
             prefabName = prefabObject.name;
 
             string dataPath;
-            string savePath = "/" + prefabName + ".prefab";
 
             if (collectConvertedData)
             {
-                dataPath = projectDataFolder + PREFABS_DATA_PATH + savePath;
+                dataPath = projectDataFolder + "/" + prefabName + ".prefab";
             }
             else
             {
                 dataPath = AssetDatabase.GetAssetPath(prefabObject);
                 dataPath = Path.GetDirectoryName(dataPath);
-                dataPath = dataPath + savePath;
+                dataPath = dataPath + "/" + prefabName;
                 prefabDataFolder = dataPath;
             }
 
@@ -1577,7 +1433,7 @@ namespace TheVegetationEngine
                 {
                     if (File.Exists(dataPath))
                     {
-                        SavePrefab(prefabInstance, AssetDatabase.LoadAssetAtPath<GameObject>(dataPath), true);
+                        SavePrefab(prefabInstance, prefabObject, true);
                         EditorGUIUtility.PingObject(prefabObject);
                     }
                     else
@@ -1588,17 +1444,9 @@ namespace TheVegetationEngine
                 }
                 else
                 {
-                    if (File.Exists(dataPath))
-                    {
-                        SavePrefab(prefabInstance, AssetDatabase.LoadAssetAtPath<GameObject>(dataPath), true);
-                        EditorGUIUtility.PingObject(prefabObject);
-                    }
-                    else
-                    {
-                        SavePrefab(prefabInstance, prefabObject, true);
-                        AssetDatabase.MoveAsset(AssetDatabase.GetAssetPath(prefabObject), dataPath);
-                        EditorGUIUtility.PingObject(AssetDatabase.LoadAssetAtPath<GameObject>(dataPath));
-                    }
+                    SavePrefab(prefabInstance, prefabObject, true);
+                    AssetDatabase.MoveAsset(AssetDatabase.GetAssetPath(prefabObject), dataPath);
+                    EditorGUIUtility.PingObject(AssetDatabase.LoadAssetAtPath<GameObject>(dataPath));
                 }
             }
             else
@@ -1917,18 +1765,9 @@ namespace TheVegetationEngine
                 {
                     if (prefabType == PrefabAssetType.Regular || prefabType == PrefabAssetType.Variant)
                     {
-                        if (prefabAsset.GetComponent<TVEPrefab>() != null)
+                        if (prefabAsset.GetComponent<TVEPrefab>() != null && prefabAsset.GetComponent<TVEPrefab>().storedPrefabBackupGUID != "")
                         {
-                            var prefabBackupGO = GetPrefabBackupFile(prefabAsset);
-
-                            if (prefabBackupGO != null)
-                            {
-                                prefabData.prefabStatus = PrefabStatus.Converted;
-                            }
-                            else
-                            {
-                                prefabData.prefabStatus = PrefabStatus.ConvertedMissingBackup;
-                            }
+                            prefabData.prefabStatus = PrefabStatus.Converted;
                         }
                         else
                         {
@@ -2097,17 +1936,13 @@ namespace TheVegetationEngine
 
                     for (int j = 0; j < originalMaterials.Length; j++)
                     {
-                        var originalMaterial = originalMaterials[j];
+                        bool useProjectMaterial = false;
 
-                        if (IsValidMaterial(originalMaterial))
+                        string dataPath = "";
+                        string savePath = "/" + originalMaterials[j].name + " (" + outputSuffix + " Material).mat";
+
+                        if (IsValidMaterial(originalMaterials[j]))
                         {
-                            bool useProjectMaterial = false;
-
-                            var dataGUID = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(originalMaterial)).Substring(0, 2).ToUpper();
-
-                            string dataPath = "";
-                            string savePath = "/" + originalMaterial.name + " " + dataGUID + " (" + outputSuffix + " Material).mat";
-
                             if (collectConvertedData)
                             {
                                 if (shareCommonMaterials)
@@ -2152,13 +1987,13 @@ namespace TheVegetationEngine
                             else
                             {
                                 instanceMaterials[j] = new Material(shaderLeaf);
-                                instanceMaterials[j].name = originalMaterial.name + " " + dataGUID + " (" + outputSuffix + " Material)";
+                                instanceMaterials[j].name = originalMaterials[j].name + " (" + outputSuffix + " Material)";
                                 instanceMaterials[j].enableInstancing = true;
                             }
                         }
                         else
                         {
-                            instanceMaterials[j] = originalMaterial;
+                            instanceMaterials[j] = originalMaterials[j];
                         }
                     }
 
@@ -2213,19 +2048,13 @@ namespace TheVegetationEngine
 
             for (int i = 0; i < meshFiltersInPrefab.Count; i++)
             {
-                var mesh = meshesInPrefab[i];
-
-                if (mesh != null)
+                if (meshesInPrefab[i] != null)
                 {
-                    var meshSettings = TVEUtils.MarkMeshReadable(mesh);
+                    PreProcessMesh(meshesInPrefab[i]);
 
-                    var meshName = System.Text.RegularExpressions.Regex.Replace(mesh.name, "[^\\w\\._ ()]", "");
-
-                    var meshInstance = Instantiate(mesh);
-                    meshInstance.name = meshName + " " + i.ToString("X2") + " (" + outputSuffix + " Model)";
+                    var meshInstance = Instantiate(meshesInPrefab[i]);
+                    meshInstance.name = meshesInPrefab[i].name + " " + i.ToString("X2");
                     meshInstances.Add(meshInstance);
-
-                    TVEUtils.SetMeshReadable(mesh, meshSettings);
                 }
                 else
                 {
@@ -2287,19 +2116,11 @@ namespace TheVegetationEngine
 
             for (int i = 0; i < meshCollidersInPrefab.Count; i++)
             {
-                var mesh = collidersInPrefab[i];
-
-                if (mesh != null)
+                if (collidersInPrefab[i] != null)
                 {
-                    var meshSettings = TVEUtils.MarkMeshReadable(mesh);
-
-                    var meshName = System.Text.RegularExpressions.Regex.Replace(mesh.name, "[^\\w\\._ ()]", "");
-
-                    var colliderInstance = Instantiate(mesh);
-                    colliderInstance.name = meshName + " " + i.ToString("X2") + " (" + outputSuffix + " Model)";
+                    var colliderInstance = Instantiate(collidersInPrefab[i]);
+                    colliderInstance.name = collidersInPrefab[i].name + " " + i.ToString("X2");
                     colliderInstances.Add(colliderInstance);
-
-                    TVEUtils.SetMeshReadable(mesh, meshSettings);
                 }
                 else
                 {
@@ -2440,6 +2261,32 @@ namespace TheVegetationEngine
             maxBoundsInfo = new Vector4(maxR, maxH, maxS, 0.0f);
         }
 
+        void PreProcessMesh(Mesh mesh)
+        {
+            var meshPath = AssetDatabase.GetAssetPath(mesh);
+
+            //Workaround when the mesh is not readable (Unity Bug)
+            ModelImporter modelImporter = AssetImporter.GetAtPath(meshPath) as ModelImporter;
+
+            if (modelImporter != null)
+            {
+                modelImporter.isReadable = true;
+                modelImporter.keepQuads = false;
+                modelImporter.SaveAndReimport();
+            }
+
+            if (meshPath.EndsWith(".asset"))
+            {
+                //string filePath = Path.Combine(Directory.GetCurrentDirectory(), meshPath);
+                //filePath = filePath.Replace("/", "\\");
+                string filePath = meshPath;
+                string fileText = File.ReadAllText(filePath);
+                fileText = fileText.Replace("m_IsReadable: 0", "m_IsReadable: 1");
+                File.WriteAllText(filePath, fileText);
+                AssetDatabase.Refresh();
+            }
+        }
+
         bool IsValidGameObject(GameObject gameObject)
         {
             bool valid = true;
@@ -2492,11 +2339,6 @@ namespace TheVegetationEngine
                 {
                     if (meshInstances[i] != null)
                     {
-                        GetMeshConversionWithTextures(i);
-                        ConvertMeshOff(meshInstances[i], i);
-                        ConvertMeshNormals(meshInstances[i], i, sourceNormals, optionNormals);
-                        ConvertMeshBounds(meshInstances[i], sourceBounds, optionBounds);
-
                         SaveMesh(meshInstances[i]);
                         meshFiltersInPrefab[i].sharedMesh = convertedMesh;
                     }
@@ -2509,7 +2351,7 @@ namespace TheVegetationEngine
                     if (meshInstances[i] != null)
                     {
                         GetMeshConversionWithTextures(i);
-                        ConvertMeshDefault(meshInstances[i], i);
+                        ConvertMeshDefault(meshInstances[i]);
                         ConvertMeshNormals(meshInstances[i], i, sourceNormals, optionNormals);
                         ConvertMeshBounds(meshInstances[i], sourceBounds, optionBounds);
 
@@ -2525,7 +2367,7 @@ namespace TheVegetationEngine
                     if (meshInstances[i] != null)
                     {
                         GetMeshConversionWithTextures(i);
-                        ConvertMeshCustom(meshInstances[i], i);
+                        ConvertMeshCustom(meshInstances[i]);
                         ConvertMeshNormals(meshInstances[i], i, sourceNormals, optionNormals);
                         ConvertMeshBounds(meshInstances[i], sourceBounds, optionBounds);
 
@@ -2540,7 +2382,7 @@ namespace TheVegetationEngine
                 {
                     if (meshInstances[i] != null)
                     {
-                        ConvertMeshPolygonal(meshInstances[i], i);
+                        ConvertMeshPolygonal(meshInstances[i]);
                         ConvertMeshBounds(meshInstances[i], sourceBounds, optionBounds);
 
                         SaveMesh(meshInstances[i]);
@@ -2555,7 +2397,7 @@ namespace TheVegetationEngine
                     if (meshInstances[i] != null)
                     {
                         GetMeshConversionWithTextures(i);
-                        ConvertMeshDEEnvironment(meshInstances[i], i);
+                        ConvertMeshDEEnvironment(meshInstances[i]);
                         ConvertMeshNormals(meshInstances[i], i, sourceNormals, optionNormals);
                         ConvertMeshBounds(meshInstances[i], sourceBounds, optionBounds);
 
@@ -2566,139 +2408,112 @@ namespace TheVegetationEngine
             }
         }
 
-        void ConvertMeshOff(Mesh mesh, int index)
-        {
-            var vertexCount = mesh.vertexCount;
-
-            var colors = GetVertexColors(mesh);
-            var UV0 = GetCoordData(mesh, 0, 0);
-            var UV2 = GetCoordData(mesh, 0, 1);
-            var UV4 = GetCoordData(mesh, 0, 0);
-
-            var height = GetMaskData(mesh, index, 2, 4, 0, null, null, 0, 1.0f);
-            var detailMask = GetMaskData(mesh, index, sourceDetail, optionDetail, coordDetail, textureDetail, textureDetailList, actionDetail, 1f);
-            var detailCoord = GetCoordData(mesh, sourceDetailCoord, optionDetailCoord);
-
-            var pivots = GetPivotsData(mesh, sourcePivots, optionPivots);
-
-            for (int i = 0; i < vertexCount; i++)
-            {
-                colors[i] = new Color(1, 1, detailMask[i], height[i]);
-                UV0[i] = new Vector4(UV0[i].x, UV0[i].y, TVEUtils.MathVector2ToFloat(1f, 1f), TVEUtils.MathVector2ToFloat(maxBoundsInfo.y / 100f, maxBoundsInfo.x / 100f));
-                UV2[i] = new Vector4(UV2[i].x, UV2[i].y, detailCoord[i].x, detailCoord[i].y);
-                UV4[i] = pivots[i];
-            }
-
-            mesh.SetColors(colors);
-            mesh.SetUVs(0, UV0);
-            mesh.SetUVs(1, UV2);
-            mesh.SetUVs(3, UV4);
-        }
-
-        void ConvertMeshDefault(Mesh mesh, int index)
+        void ConvertMeshDefault(Mesh mesh)
         {
             var vertexCount = mesh.vertexCount;
 
             var colors = new Color[vertexCount];
+
             var UV0 = GetCoordData(mesh, 0, 0);
-            var UV2 = GetCoordData(mesh, 0, 1);
             var UV4 = GetCoordData(mesh, 0, 0);
 
-            List<float> height;
+            var multiMask = new List<float>(vertexCount);
 
-            if (sourceHeight == 0)
+            if (sourceMulti == 0)
             {
-                height = GetMaskData(mesh, index, 2, 4, 0, null, null, 0, 1.0f);
+                multiMask = GetMaskData(mesh, 2, 4, textureMulti, 0, 1.0f);
             }
             else
             {
-                height = GetMaskData(mesh, index, sourceHeight, optionHeight, coordHeight, textureHeight, textureHeightList, actionHeight, 1.0f);
+                multiMask = GetMaskData(mesh, sourceMulti, optionMulti, textureMulti, actionMulti, 1.0f);
             }
 
-            var occlusion = GetMaskData(mesh, index, sourceOcclusion, optionOcclusion, coordOcclusion, textureOcclusion, textureOcclusionList, actionOcclusion, 1.0f);
-            var variation = GetMaskData(mesh, index, sourceVariation, optionVariation, coordVariation, textureVariation, textureVariationList, actionVariation, 1.0f);
+            var occlusion = GetMaskData(mesh, sourceOcclusion, optionOcclusion, textureOcclusion, actionOcclusion, 1.0f);
+            var detailMask = GetMaskData(mesh, sourceDetail, optionDetail, textureDetail, actionDetail, 1.0f);
+            var variation = GetMaskData(mesh, sourceVariation, optionVariation, textureVariation, actionVariation, 1.0f);
 
-            var detailMask = GetMaskData(mesh, index, sourceDetail, optionDetail, coordDetail, textureDetail, textureDetailList, actionDetail, 1.0f);
-            var detailCoord = GetCoordData(mesh, sourceDetailCoord, optionDetailCoord);
+            var detailCoordOrPivots = GetCoordData(mesh, sourceDetailCoord, optionDetailCoord);
 
-            var motion2 = GetMaskData(mesh, index, sourceMotion2, optionMotion2, coordMotion2, textureMotion2, textureMotion2List, actionMotion2, 1.0f);
-            var motion3 = GetMaskData(mesh, index, sourceMotion3, optionMotion3, coordMotion3, textureMotion3, textureMotion3List, actionMotion3, 1.0f);
-
-            var pivots = GetPivotsData(mesh, sourcePivots, optionPivots);
+            var motion1 = GetMaskData(mesh, sourceMotion1, optionMotion1, textureMotion1, actionMotion1, 1.0f);
+            var motion2 = GetMaskData(mesh, sourceMotion2, optionMotion2, textureMotion2, actionMotion2, 1.0f);
+            var motion3 = GetMaskData(mesh, sourceMotion3, optionMotion3, textureMotion3, actionMotion3, 1.0f);
 
             for (int i = 0; i < vertexCount; i++)
             {
-                colors[i] = new Color(variation[i], occlusion[i], detailMask[i], height[i]);
-                UV0[i] = new Vector4(UV0[i].x, UV0[i].y, TVEUtils.MathVector2ToFloat(motion2[i], motion3[i]), TVEUtils.MathVector2ToFloat(maxBoundsInfo.y / 100f, maxBoundsInfo.x / 100f));
-                UV2[i] = new Vector4(UV2[i].x, UV2[i].y, detailCoord[i].x, detailCoord[i].y);
-                UV4[i] = pivots[i];
+                colors[i] = new Color(variation[i], occlusion[i], detailMask[i], multiMask[i]);
+                UV0[i] = new Vector4(UV0[i].x, UV0[i].y, detailCoordOrPivots[i].x, detailCoordOrPivots[i].y);
+                UV4[i] = new Vector4(motion1[i], motion2[i], motion3[i], 0);
             }
 
-
-            mesh.SetColors(colors);
+            mesh.colors = colors;
             mesh.SetUVs(0, UV0);
-            mesh.SetUVs(1, UV2);
             mesh.SetUVs(3, UV4);
         }
 
-        void ConvertMeshCustom(Mesh mesh, int index)
+        void ConvertMeshCustom(Mesh mesh)
         {
             var vertexCount = mesh.vertexCount;
 
             var colors = new Color[vertexCount];
 
-            var red = GetMaskData(mesh, index, sourceVariation, optionVariation, coordVariation, textureVariation, textureVariationList, actionVariation, 1.0f);
-            var green = GetMaskData(mesh, index, sourceOcclusion, optionOcclusion, coordOcclusion, textureOcclusion, textureOcclusionList, actionOcclusion, 1.0f);
-            var blue = GetMaskData(mesh, index, sourceDetail, optionDetail, coordDetail, textureDetail, textureDetailList, actionDetail, 1.0f);
-            var alpha = GetMaskData(mesh, index, sourceHeight, optionHeight, coordHeight, textureHeight, textureHeightList, actionHeight, 1.0f);
+            var red = GetMaskData(mesh, sourceVariation, optionVariation, textureVariation, actionVariation, 1.0f);
+            var green = GetMaskData(mesh, sourceOcclusion, optionOcclusion, textureOcclusion, actionOcclusion, 1.0f);
+            var blue = GetMaskData(mesh, sourceDetail, optionDetail, textureDetail, actionDetail, 1.0f);
+            var alpha = GetMaskData(mesh, sourceMulti, optionMulti, textureMulti, actionMulti, 1.0f);
 
             for (int i = 0; i < vertexCount; i++)
             {
                 colors[i] = new Color(red[i], green[i], blue[i], alpha[i]);
             }
 
-            mesh.SetColors(colors);
+            mesh.colors = colors;
         }
 
-        void ConvertMeshPolygonal(Mesh mesh, int index)
-        {
-            var vertexCount = mesh.vertexCount;
-
-            var colors = GetVertexColors(mesh);
-            var UV0 = GetCoordData(mesh, 0, 0);
-            var UV2 = GetCoordData(mesh, 0, 1);
-
-            var height = GetMaskData(mesh, index, sourceHeight, optionHeight, coordHeight, textureHeight, textureHeightList, actionHeight, 1.0f);
-            var motion3 = GetMaskData(mesh, index, sourceMotion3, optionMotion3, coordMotion3, textureMotion3, textureMotion3List, actionMotion3, 1.0f);
-
-            for (int i = 0; i < vertexCount; i++)
-            {
-                colors[i] = new Color(colors[i].r, colors[i].g, colors[i].b, height[i]);
-                UV0[i] = new Vector4(UV0[i].x, UV0[i].y, TVEUtils.MathVector2ToFloat(height[i], motion3[i]), TVEUtils.MathVector2ToFloat(maxBoundsInfo.y / 100f, maxBoundsInfo.x / 100f));
-            }
-
-            mesh.SetColors(colors);
-            mesh.SetUVs(0, UV0);
-            mesh.SetUVs(1, UV2);
-        }
-
-        void ConvertMeshDEEnvironment(Mesh mesh, int index)
+        void ConvertMeshPolygonal(Mesh mesh)
         {
             var vertexCount = mesh.vertexCount;
 
             var colors = new Color[vertexCount];
 
-            var occlusion = GetMaskData(mesh, index, sourceOcclusion, optionOcclusion, coordOcclusion, textureOcclusion, textureOcclusionList, actionOcclusion, 1.0f);
-            var variation = GetMaskData(mesh, index, sourceVariation, optionVariation, coordVariation, textureVariation, textureVariationList, actionVariation, 1.0f);
-            var height = GetMaskData(mesh, index, sourceHeight, optionHeight, coordHeight, textureHeight, textureHeightList, actionHeight, 1.0f);
-            var motion3 = GetMaskData(mesh, index, sourceMotion3, optionMotion3, coordMotion3, textureMotion3, textureMotion3List, actionMotion3, 1.0f);
+            if (mesh.colors == null || mesh.colors.Length == 0)
+            {
+                for (int i = 0; i < vertexCount; i++)
+                {
+                    colors[i] = Color.white;
+                }
+            }
+            else
+            {
+                colors = mesh.colors;
+            }
+
+            var alpha = GetMaskData(mesh, 2, 4, textureMulti, 0, 1.0f);
 
             for (int i = 0; i < vertexCount; i++)
             {
-                colors[i] = new Color(height[i], variation[i], motion3[i], occlusion[i]);
+                colors[i] = new Color(colors[i].r, colors[i].g, colors[i].b, alpha[i]);
             }
 
-            mesh.SetColors(colors);
+            mesh.colors = colors;
+        }
+
+        void ConvertMeshDEEnvironment(Mesh mesh)
+        {
+            var vertexCount = mesh.vertexCount;
+
+            var colors = new Color[vertexCount];
+
+            var occlusion = GetMaskData(mesh, sourceOcclusion, optionOcclusion, textureOcclusion, actionOcclusion, 1.0f);
+            var variation = GetMaskData(mesh, sourceVariation, optionVariation, textureVariation, actionVariation, 1.0f);
+            var motion1 = GetMaskData(mesh, sourceMotion1, optionMotion1, textureMotion1, actionMotion1, 1.0f);
+            var motion2 = GetMaskData(mesh, sourceMotion2, optionMotion2, textureMotion2, actionMotion2, 1.0f);
+
+            for (int i = 0; i < vertexCount; i++)
+            {
+                colors[i] = new Color(motion1[i], variation[i], motion2[i], occlusion[i]);
+            }
+
+            mesh.colors = colors;
         }
 
         void GetMeshConversionFromPreset()
@@ -2715,7 +2530,6 @@ namespace TheVegetationEngine
                     int optionIndex = 0;
                     string action = "";
                     int actionIndex = 0;
-                    int coordIndex = 0;
 
                     if (splitLine.Length > 1)
                     {
@@ -2792,72 +2606,35 @@ namespace TheVegetationEngine
                         {
                             sourceIndex = 1;
                         }
-
-                        if (source == "GET_PIVOTS_PROCEDURAL")
-                        {
-                            sourceIndex = 1;
-                        }
                     }
 
                     if (splitLine.Length > 3)
                     {
                         option = splitLine[3];
 
-                        if (splitLine[3] == "GET_RED")
-                        {
-                            optionIndex = 1;
-                        }
-                        else if (option == "GET_GREEN")
-                        {
-                            optionIndex = 2;
-                        }
-                        else if (option == "GET_BLUE")
-                        {
-                            optionIndex = 3;
-                        }
-                        else if (option == "GET_ALPHA")
-                        {
-                            optionIndex = 4;
-                        }
-                        else
-                        {
-                            optionIndex = int.Parse(option);
-                        }
-                    }
-
-                    if (splitLine.Length > 5)
-                    {
-                        if (splitLine[5] == "GET_COORD")
-                        {
-                            coordIndex = int.Parse(splitLine[6]);
-                        }
+                        optionIndex = int.Parse(option);
                     }
 
                     action = splitLine[splitLine.Length - 1];
 
-                    if (action == "ACTION_ONE_MINUS")
+                    if (action == "ACTION_INVERT")
                     {
                         actionIndex = 1;
                     }
 
-                    if (action == "ACTION_NEGATIVE")
+                    if (action == "ACTION_NEGATE")
                     {
                         actionIndex = 2;
                     }
 
-                    if (action == "ACTION_REMAP_01")
+                    if (action == "ACTION_REMAP01")
                     {
                         actionIndex = 3;
                     }
 
-                    if (action == "ACTION_POWER_2")
-                    {
-                        actionIndex = 4;
-                    }
-
                     if (action == "ACTION_MULTIPLY_BY_HEIGHT")
                     {
-                        actionIndex = 5;
+                        actionIndex = 4;
                     }
 
                     if (name == "SetVariation" || name == "SetRed")
@@ -2865,7 +2642,6 @@ namespace TheVegetationEngine
                         sourceVariation = sourceIndex;
                         optionVariation = optionIndex;
                         actionVariation = actionIndex;
-                        coordVariation = coordIndex;
                     }
 
                     if (name == "SetOcclusion" || name == "SetGreen")
@@ -2873,7 +2649,6 @@ namespace TheVegetationEngine
                         sourceOcclusion = sourceIndex;
                         optionOcclusion = optionIndex;
                         actionOcclusion = actionIndex;
-                        coordOcclusion = coordIndex;
                     }
 
                     if (name == "SetDetailMask" || name == "SetBlue")
@@ -2881,21 +2656,26 @@ namespace TheVegetationEngine
                         sourceDetail = sourceIndex;
                         optionDetail = optionIndex;
                         actionDetail = actionIndex;
-                        coordDetail = coordIndex;
                     }
 
-                    if (name == "SetDetailCoord")
+                    if (name == "SetMultiMask" || name == "SetAlpha")
+                    {
+                        sourceMulti = sourceIndex;
+                        optionMulti = optionIndex;
+                        actionMulti = actionIndex;
+                    }
+
+                    if (name == "SetDetailCoord" || name == "SetPivots")
                     {
                         sourceDetailCoord = sourceIndex;
                         optionDetailCoord = optionIndex;
                     }
 
-                    if (name == "SetHeight" || name == "SetAlpha")
+                    if (name == "SetMotion1")
                     {
-                        sourceHeight = sourceIndex;
-                        optionHeight = optionIndex;
-                        actionHeight = actionIndex;
-                        coordHeight = coordIndex;
+                        sourceMotion1 = sourceIndex;
+                        optionMotion1 = optionIndex;
+                        actionMotion1 = actionIndex;
                     }
 
                     if (name == "SetMotion2")
@@ -2903,7 +2683,6 @@ namespace TheVegetationEngine
                         sourceMotion2 = sourceIndex;
                         optionMotion2 = optionIndex;
                         actionMotion2 = actionIndex;
-                        coordMotion2 = coordIndex;
                     }
 
                     if (name == "SetMotion3")
@@ -2911,13 +2690,6 @@ namespace TheVegetationEngine
                         sourceMotion3 = sourceIndex;
                         optionMotion3 = optionIndex;
                         actionMotion3 = actionIndex;
-                        coordMotion3 = coordIndex;
-                    }
-
-                    if (name == "SetPivots")
-                    {
-                        sourcePivots = sourceIndex;
-                        optionPivots = optionIndex;
                     }
 
                     if (name == "SetNormals")
@@ -2940,7 +2712,7 @@ namespace TheVegetationEngine
             }
         }
 
-        void GetMeshConversionWithTextures(int index)
+        void GetMeshConversionWithTextures(int meshIndex)
         {
             for (int i = 0; i < presetLines.Count; i++)
             {
@@ -2951,7 +2723,7 @@ namespace TheVegetationEngine
                     string source = "";
 
                     string prop = "";
-                    List<Texture2D> textures = new List<Texture2D>();
+                    Texture2D texture = null;
 
                     if (splitLine.Length > 1)
                     {
@@ -2965,51 +2737,53 @@ namespace TheVegetationEngine
 
                         if (source == "GET_MASK_FROM_TEXTURE")
                         {
-                            for (int t = 0; t < materialArraysInPrefab[index].Length; t++)
+                            for (int t = 0; t < materialArraysInPrefab[meshIndex].Length; t++)
                             {
-                                if (materialArraysInPrefab[index] != null)
+                                if (materialArraysInPrefab[meshIndex] != null)
                                 {
-                                    var material = materialArraysInPrefab[index][t];
+                                    var material = materialArraysInPrefab[meshIndex][t];
 
                                     if (material != null && material.HasProperty(prop))
                                     {
-                                        textures.Add((Texture2D)material.GetTexture(prop));
-                                    }
-                                    else
-                                    {
-                                        textures.Add(null);
+                                        texture = (Texture2D)material.GetTexture(prop);
+                                        break;
                                     }
                                 }
                             }
 
                             if (name == "SetVariation" || name == "SetRed")
                             {
-                                textureVariationList = textures;
+                                textureVariation = texture;
                             }
 
                             if (name == "SetOcclusion" || name == "SetGreen")
                             {
-                                textureOcclusionList = textures;
+                                textureOcclusion = texture;
                             }
 
                             if (name == "SetDetailMask" || name == "SetBlue")
                             {
-                                textureDetailList = textures;
+                                textureDetail = texture;
                             }
 
                             if (name == "SetMultiMask" || name == "SetAlpha")
                             {
-                                textureHeightList = textures;
+                                textureMulti = texture;
+                            }
+
+                            if (name == "SetMotion1")
+                            {
+                                textureMotion1 = texture;
                             }
 
                             if (name == "SetMotion2")
                             {
-                                textureMotion2List = textures;
+                                textureMotion2 = texture;
                             }
 
                             if (name == "SetMotion3")
                             {
-                                textureMotion3List = textures;
+                                textureMotion3 = texture;
                             }
                         }
                     }
@@ -3020,8 +2794,8 @@ namespace TheVegetationEngine
         void SaveMesh(Mesh mesh)
         {
             string dataPath;
-
-            string savePath = "/" + mesh.name + ".asset";
+            string meshName = System.Text.RegularExpressions.Regex.Replace(mesh.name, "[^\\w\\._]", "");
+            string savePath = "/" + meshName + " (" + outputSuffix + " Mesh).asset";
 
             if (readWriteMode == 0)
             {
@@ -3052,41 +2826,13 @@ namespace TheVegetationEngine
                 AssetDatabase.Refresh();
             }
 
-            AssetDatabase.SetLabels(AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(dataPath), new string[] { outputSuffix + " Model" });
+            AssetDatabase.SetLabels(AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(dataPath), new string[] { outputSuffix + " Mesh" });
 
             convertedMesh = AssetDatabase.LoadAssetAtPath<Mesh>(dataPath);
-
-            //StreamReader reader = new StreamReader(dataPath);
-            //List<string> lines = new List<string>();
-
-            //while (!reader.EndOfStream)
-            //{
-            //    lines.Add(reader.ReadLine());
-            //}
-
-            //reader.Close();
-
-            //lines.Insert(3, "TVEData:");
-            //lines.Insert(4, "  tve_version: 650");
-            //lines.Insert(5, "  tve_type: " + outputMeshIndex);
-
-            //StreamWriter writerPost = new StreamWriter(dataPath);
-
-            //for (int i = 0; i < lines.Count; i++)
-            //{
-            //    writerPost.WriteLine(lines[i]);
-            //}
-
-            //writerPost.Close();
-
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-
-            //lines.Clear();
         }
 
         // Get Float data
-        List<float> GetMaskData(Mesh mesh, int index, int source, int option, int coord, Texture2D texture, List<Texture2D> textures, int action, float defaulValue)
+        List<float> GetMaskData(Mesh mesh, int source, int option, Texture2D texture, int action, float defaulValue)
         {
             var meshChannel = new List<float>();
 
@@ -3107,7 +2853,7 @@ namespace TheVegetationEngine
 
             else if (source == 3)
             {
-                meshChannel = GetMaskFromTextureData(mesh, index, option, coord, texture, textures);
+                meshChannel = GetMaskFromTextureData(mesh, option, texture);
             }
 
             else if (source == 4)
@@ -3537,7 +3283,7 @@ namespace TheVegetationEngine
             {
                 for (int i = 0; i < vertexCount; i++)
                 {
-                    var mask = Mathf.Clamp01(TVEUtils.MathRemap(Vector3.Distance(vertices[i], new Vector3(0, vertices[i].y, 0)), maxBoundsInfo.x * 0.1f, maxBoundsInfo.x, 0f, 1f));
+                    var mask = Mathf.Clamp01(MathRemap(Vector3.Distance(vertices[i], new Vector3(0, vertices[i].y, 0)), maxBoundsInfo.x * 0.1f, maxBoundsInfo.x, 0f, 1f));
 
                     meshChannel.Add(mask);
                 }
@@ -3547,15 +3293,15 @@ namespace TheVegetationEngine
             {
                 for (int i = 0; i < vertexCount; i++)
                 {
-                    var maskCyl = Mathf.Clamp01(TVEUtils.MathRemap(Vector3.Distance(vertices[i], new Vector3(0, vertices[i].y, 0)), maxBoundsInfo.x * 0.1f, maxBoundsInfo.x, 0f, 1f));
-                    var maskCap = Vector3.Magnitude(new Vector3(0, Mathf.Clamp01(TVEUtils.MathRemap(vertices[i].y / maxBoundsInfo.y, 0.8f, 1f, 0f, 1f)), 0));
-                    var maskBase = Mathf.Clamp01(TVEUtils.MathRemap(vertices[i].y / maxBoundsInfo.y, 0f, 0.1f, 0f, 1f));
+                    var maskCyl = Mathf.Clamp01(MathRemap(Vector3.Distance(vertices[i], new Vector3(0, vertices[i].y, 0)), maxBoundsInfo.x * 0.1f, maxBoundsInfo.x, 0f, 1f));
+                    var maskCap = Vector3.Magnitude(new Vector3(0, Mathf.Clamp01(MathRemap(vertices[i].y / maxBoundsInfo.y, 0.8f, 1f, 0f, 1f)), 0));
+                    var maskBase = Mathf.Clamp01(MathRemap(vertices[i].y / maxBoundsInfo.y, 0f, 0.1f, 0f, 1f));
                     var mask = Mathf.Clamp01(maskCyl + maskCap) * maskBase;
 
                     meshChannel.Add(mask);
                 }
             }
-            // Base To Top
+            // Bottom To Top
             else if (option == 8)
             {
                 for (int i = 0; i < vertexCount; i++)
@@ -3565,8 +3311,18 @@ namespace TheVegetationEngine
                     meshChannel.Add(mask);
                 }
             }
-            // Bottom Projection
+            // Top To Bottom
             else if (option == 9)
+            {
+                for (int i = 0; i < vertexCount; i++)
+                {
+                    var mask = Mathf.Clamp01(vertices[i].y / maxBoundsInfo.y);
+
+                    meshChannel.Add(mask);
+                }
+            }
+            // Bottom Projection
+            else if (option == 10)
             {
                 for (int i = 0; i < vertexCount; i++)
                 {
@@ -3576,7 +3332,7 @@ namespace TheVegetationEngine
                 }
             }
             // Top Projection
-            else if (option == 10)
+            else if (option == 11)
             {
                 for (int i = 0; i < vertexCount; i++)
                 {
@@ -3585,41 +3341,8 @@ namespace TheVegetationEngine
                     meshChannel.Add(mask);
                 }
             }
-            // Normalized in bounds height with black Offset at the bottom
-            else if (option == 11)
-            {
-                for (int i = 0; i < vertexCount; i++)
-                {
-                    var height = Mathf.Clamp01(vertices[i].y / maxBoundsInfo.y);
-                    var mask = Mathf.Clamp01((height - 0.2f) / (1 - 0.2f));
-
-                    meshChannel.Add(mask);
-                }
-            }
-            // Normalized in bounds height with black Offset at the bottom
+            // Height Exp
             else if (option == 12)
-            {
-                for (int i = 0; i < vertexCount; i++)
-                {
-                    var height = Mathf.Clamp01(vertices[i].y / maxBoundsInfo.y);
-                    var mask = Mathf.Clamp01((height - 0.4f) / (1 - 0.4f));
-
-                    meshChannel.Add(mask);
-                }
-            }
-            // Normalized in bounds height with black Offset at the bottom
-            else if (option == 13)
-            {
-                for (int i = 0; i < vertexCount; i++)
-                {
-                    var height = Mathf.Clamp01(vertices[i].y / maxBoundsInfo.y);
-                    var mask = Mathf.Clamp01((height - 0.6f) / (1 - 0.6f));
-
-                    meshChannel.Add(mask);
-                }
-            }
-            // Height Grass
-            else if (option == 14)
             {
                 for (int i = 0; i < vertexCount; i++)
                 {
@@ -3630,68 +3353,83 @@ namespace TheVegetationEngine
                     meshChannel.Add(mask);
                 }
             }
-            // Procedural Sphere
+            //Hemi Sphere
+            else if (option == 13)
+            {
+                for (int i = 0; i < vertexCount; i++)
+                {
+                    var height = Mathf.Clamp01(vertices[i].y / maxBoundsInfo.y);
+                    var sphere = Mathf.Clamp01(Vector3.Distance(vertices[i], Vector3.zero) / maxBoundsInfo.x);
+                    var mask = height * sphere;
+
+                    meshChannel.Add(mask);
+                }
+            }
+            //Hemi Cylinder
+            else if (option == 14)
+            {
+                for (int i = 0; i < vertexCount; i++)
+                {
+                    var height = Mathf.Clamp01(vertices[i].y / maxBoundsInfo.y);
+                    var cyl = Mathf.Clamp01(MathRemap(Vector3.Distance(vertices[i], new Vector3(0, vertices[i].y, 0)), maxBoundsInfo.x * 0.1f, maxBoundsInfo.x, 0f, 1f));
+                    var mask = height * cyl;
+
+                    meshChannel.Add(mask);
+                }
+            }
+            //Hemi Capsule
             else if (option == 15)
             {
                 for (int i = 0; i < vertexCount; i++)
                 {
-                    var sphere = Mathf.Clamp01(Vector3.Distance(vertices[i], Vector3.zero) / maxBoundsInfo.x);
-                    var mask = sphere * sphere;
+                    var height = Mathf.Clamp01(vertices[i].y / maxBoundsInfo.y);
+                    var maskCyl = Mathf.Clamp01(MathRemap(Vector3.Distance(vertices[i], new Vector3(0, vertices[i].y, 0)), maxBoundsInfo.x * 0.1f, maxBoundsInfo.x, 0f, 1f));
+                    var maskCap = Vector3.Magnitude(new Vector3(0, Mathf.Clamp01(MathRemap(vertices[i].y / maxBoundsInfo.y, 0.8f, 1f, 0f, 1f)), 0));
+                    var maskBase = Mathf.Clamp01(MathRemap(vertices[i].y / maxBoundsInfo.y, 0f, 0.1f, 0f, 1f));
+                    var mask = Mathf.Clamp01(maskCyl + maskCap) * maskBase * height;
 
                     meshChannel.Add(mask);
                 }
             }
-            // Procedural Cylinder no Cap
+            // Normalized in bounds height with black Offset at the bottom
             else if (option == 16)
             {
                 for (int i = 0; i < vertexCount; i++)
                 {
-                    var cylinder = Mathf.Clamp01(TVEUtils.MathRemap(Vector3.Distance(vertices[i], new Vector3(0, vertices[i].y, 0)), maxBoundsInfo.x * 0.1f, maxBoundsInfo.x, 0f, 1f));
-                    var mask = cylinder * cylinder;
+                    var height = Mathf.Clamp01(vertices[i].y / maxBoundsInfo.y);
+                    var mask = Mathf.Clamp01((height - 0.2f) / (1 - 0.2f));
 
                     meshChannel.Add(mask);
                 }
             }
-            // Procedural Capsule
+            // Normalized in bounds height with black Offset at the bottom
             else if (option == 17)
             {
                 for (int i = 0; i < vertexCount; i++)
                 {
-                    var maskCyl = Mathf.Clamp01(TVEUtils.MathRemap(Vector3.Distance(vertices[i], new Vector3(0, vertices[i].y, 0)), maxBoundsInfo.x * 0.1f, maxBoundsInfo.x, 0f, 1f));
-                    var maskCap = Vector3.Magnitude(new Vector3(0, Mathf.Clamp01(TVEUtils.MathRemap(vertices[i].y / maxBoundsInfo.y, 0.8f, 1f, 0f, 1f)), 0));
-                    var maskBase = Mathf.Clamp01(TVEUtils.MathRemap(vertices[i].y / maxBoundsInfo.y, 0f, 0.1f, 0f, 1f));
-                    var maskFinal = Mathf.Clamp01(maskCyl + maskCap) * maskBase;
-                    var mask = maskFinal * maskFinal;
+                    var height = Mathf.Clamp01(vertices[i].y / maxBoundsInfo.y);
+                    var mask = Mathf.Clamp01((height - 0.4f) / (1 - 0.4f));
 
                     meshChannel.Add(mask);
                 }
             }
-            // Normalized pos X
+            // Normalized in bounds height with black Offset at the bottom
             else if (option == 18)
             {
                 for (int i = 0; i < vertexCount; i++)
                 {
-                    var mask = vertices[i].x / maxBoundsInfo.x;
+                    var height = Mathf.Clamp01(vertices[i].y / maxBoundsInfo.y);
+                    var mask = Mathf.Clamp01((height - 0.6f) / (1 - 0.6f));
 
                     meshChannel.Add(mask);
                 }
             }
-            // Normalized pos Y
+            // Mesh normals Y in 0-1 space
             else if (option == 19)
             {
                 for (int i = 0; i < vertexCount; i++)
                 {
-                    var mask = vertices[i].y / maxBoundsInfo.y;
-
-                    meshChannel.Add(mask);
-                }
-            }
-            // Normalized pos Z
-            else if (option == 19)
-            {
-                for (int i = 0; i < vertexCount; i++)
-                {
-                    var mask = vertices[i].z / maxBoundsInfo.x;
+                    var mask = Mathf.Clamp01(normals[i].y * 0.5f + 0.5f);
 
                     meshChannel.Add(mask);
                 }
@@ -3712,25 +3450,18 @@ namespace TheVegetationEngine
             {
                 var UV3 = mesh.uv3;
 
-                if (UV3 != null && UV3.Length > 0)
+                for (int i = 0; i < vertexCount; i++)
                 {
-                    for (int i = 0; i < vertexCount; i++)
-                    {
-                        var pivotX = (Mathf.Repeat(UV3[i].x, 1.0f) * 2.0f) - 1.0f;
-                        var pivotZ = (Mathf.Repeat(32768.0f * UV3[i].x, 1.0f) * 2.0f) - 1.0f;
-                        var pivotY = Mathf.Sqrt(1.0f - Mathf.Clamp01(Vector2.Dot(new Vector2(pivotX, pivotZ), new Vector2(pivotX, pivotZ))));
+                    var pivotX = (Mathf.Repeat(UV3[i].x, 1.0f) * 2.0f) - 1.0f;
+                    var pivotZ = (Mathf.Repeat(32768.0f * UV3[i].x, 1.0f) * 2.0f) - 1.0f;
+                    var pivotY = Mathf.Sqrt(1.0f - Mathf.Clamp01(Vector2.Dot(new Vector2(pivotX, pivotZ), new Vector2(pivotX, pivotZ))));
 
-                        var pivot = new Vector3(pivotX * UV3[i].y, pivotY * UV3[i].y, pivotZ * UV3[i].y);
-                        var pos = vertices[i];
+                    var pivot = new Vector3(pivotX * UV3[i].y, pivotY * UV3[i].y, pivotZ * UV3[i].y);
+                    var pos = vertices[i];
 
-                        var mask = Vector3.Magnitude(pos - pivot) / (maxBoundsInfo.x * 1f);
+                    var mask = Vector3.Magnitude(pos - pivot) / (maxBoundsInfo.x * 1f);
 
-                        meshChannel.Add(mask);
-                    }
-                }
-                else
-                {
-                    Debug.Log("<b>[The Vegetation Engine]</b> " + "The current mesh does not use CTI masks! Please use a procedural mask for flutter!");
+                    meshChannel.Add(mask);
                 }
             }
             // CTI Leaves Variation
@@ -3738,33 +3469,26 @@ namespace TheVegetationEngine
             {
                 var UV3 = mesh.uv3;
 
-                if (UV3 != null && UV3.Length > 0)
+                for (int i = 0; i < vertexCount; i++)
                 {
-                    for (int i = 0; i < vertexCount; i++)
+                    var pivotX = (Mathf.Repeat(UV3[i].x, 1.0f) * 2.0f) - 1.0f;
+                    var pivotZ = (Mathf.Repeat(32768.0f * UV3[i].x, 1.0f) * 2.0f) - 1.0f;
+                    var pivotY = Mathf.Sqrt(1.0f - Mathf.Clamp01(Vector2.Dot(new Vector2(pivotX, pivotZ), new Vector2(pivotX, pivotZ))));
+
+                    var pivot = new Vector3(pivotX * UV3[i].y, pivotY * UV3[i].y, pivotZ * UV3[i].y);
+
+                    var variX = Mathf.Repeat(pivot.x * 33.3f, 1.0f);
+                    var variY = Mathf.Repeat(pivot.y * 33.3f, 1.0f);
+                    var variZ = Mathf.Repeat(pivot.z * 33.3f, 1.0f);
+
+                    var mask = variX + variY + variZ;
+
+                    if (UV3[i].x < 0.01f)
                     {
-                        var pivotX = (Mathf.Repeat(UV3[i].x, 1.0f) * 2.0f) - 1.0f;
-                        var pivotZ = (Mathf.Repeat(32768.0f * UV3[i].x, 1.0f) * 2.0f) - 1.0f;
-                        var pivotY = Mathf.Sqrt(1.0f - Mathf.Clamp01(Vector2.Dot(new Vector2(pivotX, pivotZ), new Vector2(pivotX, pivotZ))));
-
-                        var pivot = new Vector3(pivotX * UV3[i].y, pivotY * UV3[i].y, pivotZ * UV3[i].y);
-
-                        var variX = Mathf.Repeat(pivot.x * 33.3f, 1.0f);
-                        var variY = Mathf.Repeat(pivot.y * 33.3f, 1.0f);
-                        var variZ = Mathf.Repeat(pivot.z * 33.3f, 1.0f);
-
-                        var mask = variX + variY + variZ;
-
-                        if (UV3[i].x < 0.01f)
-                        {
-                            mask = 0.0f;
-                        }
-
-                        meshChannel.Add(mask);
+                        mask = 0.0f;
                     }
-                }
-                else
-                {
-                    Debug.Log("<b>[The Vegetation Engine]</b> " + "The current mesh does not use CTI masks! Please use a procedural mask for variation!");
+
+                    meshChannel.Add(mask);
                 }
             }
             // ST8 Leaves Mask
@@ -3832,170 +3556,76 @@ namespace TheVegetationEngine
                 }
             }
 
-            // Nicrom Leaves Mask
-            else if (option == 4)
-            {
-                var UV0 = new List<Vector4>();
-
-                mesh.GetUVs(0, UV0);
-
-                for (int i = 0; i < vertexCount; i++)
-                {
-                    var mask = 0;
-
-                    if (UV0[i].x > 1.5)
-                    {
-                        mask = 1;
-                    }
-
-                    meshChannel.Add(mask);
-                }
-            }
-
-            // Nicrom Detail Mask
-            else if (option == 5)
-            {
-                var UV0 = new List<Vector4>();
-
-                mesh.GetUVs(0, UV0);
-
-                for (int i = 0; i < vertexCount; i++)
-                {
-                    var mask = 0;
-
-                    if (UV0[i].y > 0)
-                    {
-                        mask = 1;
-                    }
-
-                    meshChannel.Add(1 - mask);
-                }
-            }
-
             return meshChannel;
         }
 
-        List<float> GetMaskFromTextureData(Mesh mesh, int index, int option, int coord, Texture2D userTexture, List<Texture2D> textures)
+        List<float> GetMaskFromTextureData(Mesh mesh, int option, Texture2D texture)
         {
             var vertexCount = mesh.vertexCount;
-            var subMeshMaterials = materialArraysInstances[index];
-            var subMeshIndices = new List<int>(subMeshMaterials.Length + 1);
-
-            for (int i = 0; i < subMeshMaterials.Length; i++)
-            {
-                var subMeshDescriptor = mesh.GetSubMesh(i);
-
-                subMeshIndices.Add(subMeshDescriptor.firstVertex);
-            }
-
-            subMeshIndices.Add(vertexCount);
-
             var meshChannel = new List<float>(vertexCount);
 
-            if (textures == null || textures.Count == 0)
-            {
-                textures = new List<Texture2D>(subMeshMaterials.Length);
-
-                if (userTexture != null)
-                {
-                    for (int i = 0; i < subMeshMaterials.Length; i++)
-                    {
-                        textures.Add(userTexture);
-                    }
-                }
-                else
-                {
-                    textures.Add(null);
-                }
-            }
-
-            for (int i = 0; i < vertexCount; i++)
-            {
-                meshChannel.Add(0);
-            }
-
-            for (int s = 0; s < subMeshIndices.Count - 1; s++)
-            {
-                var texture = textures[s];
-
-                if (texture != null)
-                {
-                    string texPath = AssetDatabase.GetAssetPath(texture);
-                    TextureImporter texImporter = AssetImporter.GetAtPath(texPath) as TextureImporter;
-
-                    texImporter.isReadable = true;
-                    texImporter.SaveAndReimport();
-                    AssetDatabase.Refresh();
-
-                    var meshCoord = GetCoordMeshData(mesh, coord);
-
-                    if (meshCoord.Count == 0)
-                    {
-                        for (int i = 0; i < vertexCount; i++)
-                        {
-                            meshCoord.Add(Vector4.zero);
-                        }
-                    }
-
-                    if (option == 0)
-                    {
-                        for (int i = subMeshIndices[s]; i < subMeshIndices[s + 1]; i++)
-                        {
-                            var pixel = texture.GetPixelBilinear(meshCoord[i].x, meshCoord[i].y);
-                            meshChannel[i] = pixel.r;
-                        }
-                    }
-                    else if (option == 1)
-                    {
-                        for (int i = subMeshIndices[s]; i < subMeshIndices[s + 1]; i++)
-                        {
-                            var pixel = texture.GetPixelBilinear(meshCoord[i].x, meshCoord[i].y);
-                            meshChannel[i] = pixel.g;
-                        }
-                    }
-                    else if (option == 2)
-                    {
-                        for (int i = subMeshIndices[s]; i < subMeshIndices[s + 1]; i++)
-                        {
-                            var pixel = texture.GetPixelBilinear(meshCoord[i].x, meshCoord[i].y);
-                            meshChannel[i] = pixel.b;
-                        }
-                    }
-                    else if (option == 3)
-                    {
-                        for (int i = subMeshIndices[s]; i < subMeshIndices[s + 1]; i++)
-                        {
-                            var pixel = texture.GetPixelBilinear(meshCoord[i].x, meshCoord[i].y);
-                            meshChannel[i] = pixel.a;
-                        }
-                    }
-
-                    texImporter.isReadable = false;
-                    texImporter.SaveAndReimport();
-                    AssetDatabase.Refresh();
-                }
-            }
-
-            return meshChannel;
-        }
-
-        List<Color> GetVertexColors(Mesh mesh)
-        {
-            var vertexCount = mesh.vertexCount;
-
-            var colors = new List<Color>(vertexCount);
-
-            mesh.GetColors(colors);
-
-            if (colors.Count == 0)
+            if (texture == null)
             {
                 for (int i = 0; i < vertexCount; i++)
                 {
-                    colors.Add(Color.white);
+                    meshChannel.Add(1);
                 }
             }
+            else
+            {
+                string texPath = AssetDatabase.GetAssetPath(texture);
+                TextureImporter texImporter = AssetImporter.GetAtPath(texPath) as TextureImporter;
 
-            return colors;
+                texImporter.isReadable = true;
+                texImporter.SaveAndReimport();
+                AssetDatabase.Refresh();
+
+                var meshCoord = new List<Vector2>(vertexCount);
+
+                mesh.GetUVs(0, meshCoord);
+
+                if (option == 0)
+                {
+                    for (int i = 0; i < vertexCount; i++)
+                    {
+                        var pixel = texture.GetPixelBilinear(meshCoord[i].x, meshCoord[i].y);
+                        meshChannel.Add(pixel.r);
+                    }
+                }
+
+                else if (option == 1)
+                {
+                    for (int i = 0; i < vertexCount; i++)
+                    {
+                        var pixel = texture.GetPixelBilinear(meshCoord[i].x, meshCoord[i].y);
+                        meshChannel.Add(pixel.g);
+                    }
+                }
+
+                else if (option == 2)
+                {
+                    for (int i = 0; i < vertexCount; i++)
+                    {
+                        var pixel = texture.GetPixelBilinear(meshCoord[i].x, meshCoord[i].y);
+                        meshChannel.Add(pixel.b);
+                    }
+                }
+
+                else if (option == 3)
+                {
+                    for (int i = 0; i < vertexCount; i++)
+                    {
+                        var pixel = texture.GetPixelBilinear(meshCoord[i].x, meshCoord[i].y);
+                        meshChannel.Add(pixel.a);
+                    }
+                }
+
+                texImporter.isReadable = false;
+                texImporter.SaveAndReimport();
+                AssetDatabase.Refresh();
+            }
+
+            return meshChannel;
         }
 
         List<Vector4> GetCoordData(Mesh mesh, int source, int option)
@@ -4027,12 +3657,6 @@ namespace TheVegetationEngine
                 {
                     meshCoord.Add(Vector4.zero);
                 }
-
-                //if (vertexCount != 0)
-                //{
-                //    Unwrapping.GenerateSecondaryUVSet(mesh);
-                //    mesh.GetUVs(1, meshCoord);
-                //}
             }
 
             return meshCoord;
@@ -4074,22 +3698,8 @@ namespace TheVegetationEngine
 
             var meshCoord = new List<Vector4>(vertexCount);
 
-            // Automatic (Get LightmapUV)
-            if (option == 0)
-            {
-                mesh.GetUVs(1, meshCoord);
-
-                if (meshCoord.Count == 0)
-                {
-                    if (vertexCount != 0)
-                    {
-                        Unwrapping.GenerateSecondaryUVSet(mesh);
-                        mesh.GetUVs(1, meshCoord);
-                    }
-                }
-            }
             // Planar XZ
-            else if (option == 1)
+            if (option == 0)
             {
                 for (int i = 0; i < vertexCount; i++)
                 {
@@ -4097,7 +3707,7 @@ namespace TheVegetationEngine
                 }
             }
             // Planar XY
-            else if (option == 2)
+            else if (option == 1)
             {
                 for (int i = 0; i < vertexCount; i++)
                 {
@@ -4105,12 +3715,17 @@ namespace TheVegetationEngine
                 }
             }
             // Planar ZY
-            else if (option == 3)
+            else if (option == 2)
             {
                 for (int i = 0; i < vertexCount; i++)
                 {
                     meshCoord.Add(new Vector4(vertices[i].z, vertices[i].y, 0, 0));
                 }
+            }
+            // Procedural Pivots XZ
+            else if (option == 3)
+            {
+                meshCoord = GenerateElementPivot(mesh);
             }
 
             return meshCoord;
@@ -4136,50 +3751,6 @@ namespace TheVegetationEngine
             return meshCoord;
         }
 
-        List<Vector4> GetPivotsData(Mesh mesh, int source, int option)
-        {
-            var vertexCount = mesh.vertexCount;
-
-            var meshPivots = new List<Vector4>(vertexCount);
-
-            if (source == 0)
-            {
-                for (int i = 0; i < vertexCount; i++)
-                {
-                    meshPivots.Add(Vector4.zero);
-                }
-            }
-            else if (source == 1)
-            {
-                meshPivots = GetPivotsProceduralData(mesh, option);
-            }
-
-            if (meshPivots.Count == 0)
-            {
-                for (int i = 0; i < vertexCount; i++)
-                {
-                    meshPivots.Add(Vector4.zero);
-                }
-            }
-
-            return meshPivots;
-        }
-
-        List<Vector4> GetPivotsProceduralData(Mesh mesh, int option)
-        {
-            var vertexCount = mesh.vertexCount;
-
-            var meshPivots = new List<Vector4>(vertexCount);
-
-            // Procedural Pivots XZ
-            if (option == 0)
-            {
-                meshPivots = GenerateElementPivot(mesh);
-            }
-
-            return meshPivots;
-        }
-
         List<Vector4> GenerateElementPivot(Mesh mesh)
         {
             var vertexCount = mesh.vertexCount;
@@ -4198,7 +3769,7 @@ namespace TheVegetationEngine
 
             for (int i = 0; i < vertexCount; i++)
             {
-                meshPivots.Add(Vector4.zero);
+                meshPivots.Add(Vector3.zero);
             }
 
             for (int i = 0; i < trianglesCount; i += 3)
@@ -4257,7 +3828,7 @@ namespace TheVegetationEngine
                 {
                     if (elementIndices[i] == e)
                     {
-                        meshPivots[i] = new Vector4(x / positions.Count, z / positions.Count, 0, 0);
+                        meshPivots[i] = new Vector3(x / positions.Count, z / positions.Count);
                     }
                 }
             }
@@ -4294,11 +3865,6 @@ namespace TheVegetationEngine
                 for (int s = 0; s < subMeshIndices.Count - 1; s++)
                 {
                     //Debug.Log(subMeshIndices[s] + "  " + subMeshIndices[s + 1] + "  " + subMeshMaterials[s].shader.name);
-
-                    if (subMeshMaterials[s] == null)
-                    {
-                        continue;
-                    }
 
                     if (subMeshMaterials[s].shader.name.Contains("Bark") || subMeshMaterials[s].shader.name.Contains("Prop"))
                     {
@@ -4405,6 +3971,56 @@ namespace TheVegetationEngine
             }
         }
 
+        //Encode Vector3 to 8bit per channel Float based on: https://developer.download.nvidia.com/cg/pack.html
+        List<float> EncodeVector3ToFloat(int vertexCount, List<float> source1, List<float> source2, List<float> source3)
+        {
+            var encoded = new List<float>();
+
+            for (int i = 0; i < vertexCount; i++)
+            {
+                var x = Mathf.RoundToInt(255.0f * Mathf.Clamp01(source1[i]));
+                var y = Mathf.RoundToInt(255.0f * Mathf.Clamp01(source2[i]));
+                var z = Mathf.RoundToInt(255.0f * Mathf.Clamp01(source3[i]));
+                //int w = 0;
+
+                int result = /*(w << 24) |*/ (z << 16) | (y << 8) | x;
+
+                encoded.Add(result);
+            }
+
+            return encoded;
+        }
+
+        List<float> EncodeVector3ToFloat(int vertexCount, List<Vector3> source)
+        {
+            var encoded = new List<float>();
+
+            for (int i = 0; i < vertexCount; i++)
+            {
+                var x = Mathf.RoundToInt(255.0f * Mathf.Clamp01(source[i].x));
+                var y = Mathf.RoundToInt(255.0f * Mathf.Clamp01(source[i].y));
+                var z = Mathf.RoundToInt(255.0f * Mathf.Clamp01(source[i].z));
+                //int w = 0;
+
+                int result = /*(w << 24) |*/ (z << 16) | (y << 8) | x;
+
+                encoded.Add(result);
+            }
+
+            return encoded;
+        }
+
+        float GetMeshArea(Mesh mesh)
+        {
+            float result = 0;
+
+            for (int p = mesh.vertices.Length - 1, q = 0; q < mesh.vertices.Length; p = q++)
+            {
+                result += Vector3.Cross(mesh.vertices[q], mesh.vertices[p]).magnitude;
+            }
+            return result * 0.5f;
+        }
+
         /// <summary>
         /// Mesh Actions
         /// </summary>
@@ -4424,10 +4040,6 @@ namespace TheVegetationEngine
                 source = MeshActionRemap01(source);
             }
             else if (action == 4)
-            {
-                source = MeshActionPower2(source);
-            }
-            else if (action == 5)
             {
                 source = MeshActionMultiplyByHeight(source, mesh);
             }
@@ -4488,16 +4100,6 @@ namespace TheVegetationEngine
             return source;
         }
 
-        List<float> MeshActionPower2(List<float> source)
-        {
-            for (int i = 0; i < source.Count; i++)
-            {
-                source[i] = Mathf.Pow(source[i], 2.0f);
-            }
-
-            return source;
-        }
-
         List<float> MeshActionMultiplyByHeight(List<float> source, Mesh mesh)
         {
             var vertices = mesh.vertices;
@@ -4510,6 +4112,11 @@ namespace TheVegetationEngine
             }
 
             return source;
+        }
+
+        float MathRemap(float value, float low1, float high1, float low2, float high2)
+        {
+            return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
         }
 
         /// <summary>
@@ -4636,10 +4243,8 @@ namespace TheVegetationEngine
             var importType = TextureImporterType.Default;
             var importSRGB = true;
 
-            int maskIndex = 0;
             int packChannel = 0;
-            int coordChannel = 0;
-            //int layerChannel = 0;
+            int maskIndex = 0;
             int action0Index = 0;
             int action1Index = 0;
             int action2Index = 0;
@@ -4674,12 +4279,6 @@ namespace TheVegetationEngine
                         if (type == "USE_CONVERTED_MATERIAL_AS_BASE")
                         {
                             material = new Material(instanceMaterial);
-                        }
-
-                        // Use the currently converted material
-                        if (type == "USE_CURRENT_MATERIAL_AS_BASE")
-                        {
-                            material = instanceMaterial;
                         }
 
                         // Reset material to original
@@ -4797,22 +4396,6 @@ namespace TheVegetationEngine
                                 instanceMaterial.shader = Shader.Find(shader);
                             }
                         }
-                        else if (type == "SET_SHADER_BY_LIGHTING")
-                        {
-                            var lighting = presetLines[i].Replace("Material SET_SHADER_BY_LIGHTING ", "");
-
-                            var newShaderName = material.shader.name;
-                            newShaderName = newShaderName.Replace("Vertex", "XXX");
-                            newShaderName = newShaderName.Replace("Simple", "XXX");
-                            newShaderName = newShaderName.Replace("Standard", "XXX");
-                            newShaderName = newShaderName.Replace("Subsurface", "XXX");
-                            newShaderName = newShaderName.Replace("XXX", lighting);
-
-                            if (Shader.Find(newShaderName) != null)
-                            {
-                                material.shader = Shader.Find(newShaderName);
-                            }
-                        }
                         else if (type == "SET_FLOAT")
                         {
                             instanceMaterial.SetFloat(set, float.Parse(x, CultureInfo.InvariantCulture));
@@ -4838,6 +4421,42 @@ namespace TheVegetationEngine
                             {
                                 GetOrCopyTexture(material, instanceMaterial, src, dst);
                             }
+
+                            //if (material.HasProperty(src))
+                            //{
+                            //    var srcTex = material.GetTexture(src);
+
+                            //    if (collectConvertedData)
+                            //    {
+                            //        if (collectOriginalTextures)
+                            //        {
+                            //            var srcPath = AssetDatabase.GetAssetPath(srcTex);
+                            //            var dataPath = projectDataFolder + ORIGINAL_DATA_PATH + "/" + Path.GetFileName(srcPath);
+
+                            //            if (File.Exists(dataPath))
+                            //            {
+                            //                srcTex = AssetDatabase.LoadAssetAtPath<Texture>(dataPath);
+                            //                instanceMaterial.SetTexture(dst, srcTex);
+                            //            }
+                            //            else
+                            //            {
+                            //                AssetDatabase.CopyAsset(srcPath, dataPath);
+                            //                AssetDatabase.Refresh();
+
+                            //                srcTex = AssetDatabase.LoadAssetAtPath<Texture>(dataPath);
+                            //                instanceMaterial.SetTexture(dst, srcTex);
+                            //            }
+                            //        }
+                            //        else
+                            //        {
+                            //            instanceMaterial.SetTexture(dst, srcTex);
+                            //        }
+                            //    }
+                            //    else
+                            //    {
+                            //        instanceMaterial.SetTexture(dst, srcTex);
+                            //    }
+                            //}
                         }
                         else if (type == "COPY_TEX_FIRST_VALID")
                         {
@@ -5045,16 +4664,18 @@ namespace TheVegetationEngine
                                 {
                                     maskIndex = 0;
                                 }
-                                else if (type == "SetGreen")
+
+                                if (type == "SetGreen")
                                 {
                                     maskIndex = 1;
                                 }
 
-                                else if (type == "SetBlue")
+                                if (type == "SetBlue")
                                 {
                                     maskIndex = 2;
                                 }
-                                else if (type == "SetAlpha")
+
+                                if (type == "SetAlpha")
                                 {
                                     maskIndex = 3;
                                 }
@@ -5068,53 +4689,39 @@ namespace TheVegetationEngine
                                 {
                                     packChannel = 0;
                                 }
-                                else if (pack == "GET_RED")
+
+                                if (pack == "GET_RED")
                                 {
                                     packChannel = 1;
                                 }
-                                else if (pack == "GET_GREEN")
+
+                                if (pack == "GET_GREEN")
                                 {
                                     packChannel = 2;
                                 }
-                                else if (pack == "GET_BLUE")
+
+                                if (pack == "GET_BLUE")
                                 {
                                     packChannel = 3;
                                 }
-                                else if (pack == "GET_ALPHA")
+
+                                if (pack == "GET_ALPHA")
                                 {
                                     packChannel = 4;
                                 }
-                                else if (pack == "GET_GRAY")
+
+                                if (pack == "GET_GRAY")
                                 {
                                     packChannel = 555;
                                 }
-                                else if (pack == "GET_GREY")
+
+                                if (pack == "GET_GREY")
                                 {
                                     packChannel = 555;
                                 }
-                                else
-                                {
-                                    packChannel = int.Parse(pack);
-                                }
                             }
 
-                            if (splitLine.Length > 4)
-                            {
-                                if (splitLine[4] == "GET_COORD")
-                                {
-                                    coordChannel = int.Parse(splitLine[5]);
-                                }
-                            }
-
-                            //if (splitLine.Length > 6)
-                            //{
-                            //    if (splitLine[6] == "GET_LAYER")
-                            //    {
-                            //        layerChannel = int.Parse(splitLine[7]);
-                            //    }
-                            //}
-
-                            if (presetLines[i].Contains("ACTION_ONE_MINUS"))
+                            if (presetLines[i].Contains("ACTION_INVERT"))
                             {
                                 action0Index = 1;
                             }
@@ -5160,8 +4767,6 @@ namespace TheVegetationEngine
                             }
 
                             maskChannels[maskIndex] = packChannel;
-                            maskCoords[maskIndex] = coordChannel;
-                            //maskLayers[maskIndex] = layerChannel;
                             maskActions0[maskIndex] = action0Index;
                             maskActions1[maskIndex] = action1Index;
                             maskActions2[maskIndex] = action2Index;
@@ -5233,26 +4838,30 @@ namespace TheVegetationEngine
 
         void SetMaterialPostSettings(Material material)
         {
-            if (sourcePivots > 0 && optionPivots == 0)
+            if (sourceDetailCoord > 0 && optionDetailCoord == 3)
             {
-                material.SetFloat("_VertexPivotMode", 1);
+                material.SetInt("_VertexPivotMode", 1);
             }
 
-            if (sourceVariation > 0 && (optionVariation == 2 || optionVariation == 3))
+            if (!material.shader.name.Contains("Objects"))
             {
-                material.SetFloat("_VertexVariationMode", 1);
-                material.SetFloat("_MotionVariation_20", 0);
+                if (sourceVariation > 0 && (optionVariation == 2 || optionVariation == 3))
+                {
+                    material.SetInt("_VertexVariationMode", 1);
+                }
             }
 
-            // Guess best values for squash motion
-            var scale = Mathf.Round((1.0f / maxBoundsInfo.y * 10.0f * 0.5f) * 10) / 10;
-
-            if (scale > 1)
+            // Leaves and branches are the same, disable rolling for bark
+            if (sourceMotion2 == sourceMotion3 && optionMotion2 == optionMotion3 && actionMotion2 == actionMotion3)
             {
-                scale = Mathf.FloorToInt(scale);
-            }
+                if (material.shader.name.Contains("Bark"))
+                {
+                    material.SetInt("_MotionValue_20", 0);
 
-            material.SetFloat("_MotionScale_20", scale);
+                    // Legacy property
+                    material.SetInt("_VertexRollingMode_20", 0);
+                }
+            }
 
             material.SetVector("_MaxBoundsInfo", maxBoundsInfo);
         }
@@ -5276,12 +4885,7 @@ namespace TheVegetationEngine
                 if (collectOriginalTextures)
                 {
                     var srcPath = AssetDatabase.GetAssetPath(srcTex);
-
-                    var dataName = Path.GetFileNameWithoutExtension(srcPath);
-                    var dataExt = Path.GetExtension(srcPath);
-                    var dataGUID = AssetDatabase.AssetPathToGUID(srcPath).Substring(0, 2).ToUpper();
-
-                    var dataPath = projectDataFolder + ORIGINAL_DATA_PATH + "/" + dataName + " " + dataGUID + dataExt;
+                    var dataPath = projectDataFolder + ORIGINAL_DATA_PATH + "/" + Path.GetFileName(srcPath);
 
                     if (File.Exists(dataPath))
                     {
@@ -5346,7 +4950,7 @@ namespace TheVegetationEngine
 
             convertedMaterial = AssetDatabase.LoadAssetAtPath<Material>(dataPath);
 
-            TVEUtils.SetMaterialSettings(convertedMaterial);
+            TVEMaterial.SetMaterialSettings(convertedMaterial);
         }
 
         bool IsValidMaterial(Material material)
@@ -5397,8 +5001,6 @@ namespace TheVegetationEngine
         void InitTextureStorage()
         {
             maskChannels = new int[4];
-            maskCoords = new int[4];
-            //maskLayers = new int[4];
             maskActions0 = new int[4];
             maskActions1 = new int[4];
             maskActions2 = new int[4];
@@ -5407,8 +5009,6 @@ namespace TheVegetationEngine
             for (int i = 0; i < 4; i++)
             {
                 maskChannels[i] = 0;
-                maskCoords[i] = 0;
-                //maskLayers[i] = 0;
                 maskActions0[i] = 0;
                 maskActions1[i] = 0;
                 maskActions2[i] = 0;
@@ -5419,10 +5019,9 @@ namespace TheVegetationEngine
         void PackTexture(Material materialInstance, string internalName, string texName, TextureImporterType importType, bool importSRGB)
         {
             string saveName = texName.Replace("_", "");
-            string materialName = materialInstance.name.Replace(" (" + outputSuffix + " Material)", "");
 
             string dataPath;
-            string savePath = "/" + materialName + " - " + saveName + " (" + outputSuffix + " Texture).png";
+            string savePath = "/" + materialInstance.name + " - " + saveName /*+ " " + id.ToString()*/ + " (" + outputSuffix + " Texture).png";
 
             if (collectConvertedData)
             {
@@ -5451,8 +5050,6 @@ namespace TheVegetationEngine
 
                 blitMaterial.SetTexture("_Packer_TexR", maskTextures[0]);
                 blitMaterial.SetInt("_Packer_ChannelR", maskChannels[0]);
-                blitMaterial.SetInt("_Packer_CoordR", maskCoords[0]);
-                //blitMaterial.SetInt("_Packer_LayerR", maskLayers[0]);
                 blitMaterial.SetInt("_Packer_Action0R", maskActions0[0]);
                 blitMaterial.SetInt("_Packer_Action1R", maskActions1[0]);
                 blitMaterial.SetInt("_Packer_Action2R", maskActions2[0]);
@@ -5470,8 +5067,6 @@ namespace TheVegetationEngine
 
                 blitMaterial.SetTexture("_Packer_TexG", maskTextures[1]);
                 blitMaterial.SetInt("_Packer_ChannelG", maskChannels[1]);
-                blitMaterial.SetInt("_Packer_CoordG", maskCoords[1]);
-                //blitMaterial.SetInt("_Packer_LayerG", maskLayers[1]);
                 blitMaterial.SetInt("_Packer_Action0G", maskActions0[1]);
                 blitMaterial.SetInt("_Packer_Action1G", maskActions1[1]);
                 blitMaterial.SetInt("_Packer_Action2G", maskActions2[1]);
@@ -5489,8 +5084,6 @@ namespace TheVegetationEngine
 
                 blitMaterial.SetTexture("_Packer_TexB", maskTextures[2]);
                 blitMaterial.SetInt("_Packer_ChannelB", maskChannels[2]);
-                blitMaterial.SetInt("_Packer_CoordB", maskCoords[2]);
-                //blitMaterial.SetInt("_Packer_LayerB", maskLayers[2]);
                 blitMaterial.SetInt("_Packer_Action0B", maskActions0[2]);
                 blitMaterial.SetInt("_Packer_Action1B", maskActions1[2]);
                 blitMaterial.SetInt("_Packer_Action2B", maskActions2[2]);
@@ -5508,8 +5101,6 @@ namespace TheVegetationEngine
 
                 blitMaterial.SetTexture("_Packer_TexA", maskTextures[3]);
                 blitMaterial.SetInt("_Packer_ChannelA", maskChannels[3]);
-                blitMaterial.SetInt("_Packer_CoordA", maskCoords[3]);
-                //blitMaterial.SetInt("_Packer_LayerA", maskLayers[3]);
                 blitMaterial.SetInt("_Packer_Action0A", maskActions0[3]);
                 blitMaterial.SetInt("_Packer_Action1A", maskActions1[3]);
                 blitMaterial.SetInt("_Packer_Action2A", maskActions2[3]);
@@ -5619,91 +5210,77 @@ namespace TheVegetationEngine
 
         int GetPackedInitSize(Texture tex1, Texture tex2, Texture tex3, Texture tex4)
         {
-            if (outputTextureIndex == OutputTexture.UsePreviewResolution)
+            int initSize = 32;
+
+            if (tex1 != null)
             {
-                return 256;
+                string texPath = AssetDatabase.GetAssetPath(tex1);
+                TextureImporter texImporter = AssetImporter.GetAtPath(texPath) as TextureImporter;
+
+                initSize = Mathf.Max(initSize, texImporter.maxTextureSize);
             }
-            else
+
+            if (tex2 != null)
             {
-                int initSize = 32;
+                string texPath = AssetDatabase.GetAssetPath(tex2);
+                TextureImporter texImporter = AssetImporter.GetAtPath(texPath) as TextureImporter;
 
-                if (tex1 != null)
-                {
-                    string texPath = AssetDatabase.GetAssetPath(tex1);
-                    TextureImporter texImporter = AssetImporter.GetAtPath(texPath) as TextureImporter;
-
-                    initSize = Mathf.Max(initSize, texImporter.maxTextureSize);
-                }
-
-                if (tex2 != null)
-                {
-                    string texPath = AssetDatabase.GetAssetPath(tex2);
-                    TextureImporter texImporter = AssetImporter.GetAtPath(texPath) as TextureImporter;
-
-                    initSize = Mathf.Max(initSize, texImporter.maxTextureSize);
-                }
-
-                if (tex3 != null)
-                {
-                    string texPath = AssetDatabase.GetAssetPath(tex3);
-                    TextureImporter texImporter = AssetImporter.GetAtPath(texPath) as TextureImporter;
-
-                    initSize = Mathf.Max(initSize, texImporter.maxTextureSize);
-                }
-
-                if (tex4 != null)
-                {
-                    string texPath = AssetDatabase.GetAssetPath(tex4);
-                    TextureImporter texImporter = AssetImporter.GetAtPath(texPath) as TextureImporter;
-
-                    initSize = Mathf.Max(initSize, texImporter.maxTextureSize);
-                }
-
-                return initSize;
+                initSize = Mathf.Max(initSize, texImporter.maxTextureSize);
             }
+
+            if (tex3 != null)
+            {
+                string texPath = AssetDatabase.GetAssetPath(tex3);
+                TextureImporter texImporter = AssetImporter.GetAtPath(texPath) as TextureImporter;
+
+                initSize = Mathf.Max(initSize, texImporter.maxTextureSize);
+            }
+
+            if (tex4 != null)
+            {
+                string texPath = AssetDatabase.GetAssetPath(tex4);
+                TextureImporter texImporter = AssetImporter.GetAtPath(texPath) as TextureImporter;
+
+                initSize = Mathf.Max(initSize, texImporter.maxTextureSize);
+            }
+
+            return initSize;
         }
 
         int GetPackedImportSize(int initTexImportSize, Vector2 pixelTexSize)
         {
-            if (outputTextureIndex == OutputTexture.UsePreviewResolution)
+            int pixelSize = (int)Mathf.Max(pixelTexSize.x, pixelTexSize.y);
+            int importSize = initTexImportSize;
+
+            if (pixelSize < importSize)
             {
-                return 256;
+                importSize = pixelSize;
             }
-            else
+
+            for (int i = 1; i < MaxTextureSizes.Length - 1; i++)
             {
-                int pixelSize = (int)Mathf.Max(pixelTexSize.x, pixelTexSize.y);
-                int importSize = initTexImportSize;
+                int a;
+                int b;
 
-                if (pixelSize < importSize)
+                if ((importSize > MaxTextureSizes[i]) && (importSize < MaxTextureSizes[i + 1]))
                 {
-                    importSize = pixelSize;
-                }
+                    a = Mathf.Abs(MaxTextureSizes[i] - importSize);
+                    b = Mathf.Abs(MaxTextureSizes[i + 1] - importSize);
 
-                for (int i = 1; i < MaxTextureSizes.Length - 1; i++)
-                {
-                    int a;
-                    int b;
-
-                    if ((importSize > MaxTextureSizes[i]) && (importSize < MaxTextureSizes[i + 1]))
+                    if (a < b)
                     {
-                        a = Mathf.Abs(MaxTextureSizes[i] - importSize);
-                        b = Mathf.Abs(MaxTextureSizes[i + 1] - importSize);
-
-                        if (a < b)
-                        {
-                            importSize = MaxTextureSizes[i];
-                        }
-                        else
-                        {
-                            importSize = MaxTextureSizes[i + 1];
-                        }
-
-                        break;
+                        importSize = MaxTextureSizes[i];
                     }
-                }
+                    else
+                    {
+                        importSize = MaxTextureSizes[i + 1];
+                    }
 
-                return importSize;
+                    break;
+                }
             }
+
+            return importSize;
         }
 
         Texture SavePackedTexture(string path, Vector2 size)
@@ -5750,6 +5327,7 @@ namespace TheVegetationEngine
             texImporter.sRGBTexture = importSRGB;
             texImporter.alphaSource = TextureImporterAlphaSource.FromInput;
 
+
             texImporter.SaveAndReimport();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -5762,40 +5340,34 @@ namespace TheVegetationEngine
 
         void PrepareSourceTexture(Texture texture, int channel)
         {
-            if (outputTextureIndex == OutputTexture.UseHighestResolution)
-            {
-                string texPath = AssetDatabase.GetAssetPath(texture);
-                TextureImporter texImporter = AssetImporter.GetAtPath(texPath) as TextureImporter;
+            string texPath = AssetDatabase.GetAssetPath(texture);
+            TextureImporter texImporter = AssetImporter.GetAtPath(texPath) as TextureImporter;
 
-                sourceTexCompressions[channel] = texImporter.textureCompression;
-                sourceimportSizes[channel] = texImporter.maxTextureSize;
+            sourceTexCompressions[channel] = texImporter.textureCompression;
+            sourceimportSizes[channel] = texImporter.maxTextureSize;
 
-                texImporter.ReadTextureSettings(sourceTexSettings[channel]);
+            texImporter.ReadTextureSettings(sourceTexSettings[channel]);
 
-                texImporter.textureType = TextureImporterType.Default;
-                texImporter.sRGBTexture = false;
-                texImporter.maxTextureSize = 8192;
-                texImporter.textureCompression = TextureImporterCompression.Uncompressed;
+            texImporter.textureType = TextureImporterType.Default;
+            texImporter.sRGBTexture = false;
+            texImporter.maxTextureSize = 8192;
+            texImporter.textureCompression = TextureImporterCompression.Uncompressed;
 
-                sourceTexImporters[channel] = texImporter;
+            sourceTexImporters[channel] = texImporter;
 
-                texImporter.SaveAndReimport();
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-            }
+            texImporter.SaveAndReimport();
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
 
         void ResetSourceTexture(int index)
         {
-            if (outputTextureIndex == OutputTexture.UseHighestResolution)
-            {
-                sourceTexImporters[index].textureCompression = sourceTexCompressions[index];
-                sourceTexImporters[index].maxTextureSize = sourceimportSizes[index];
-                sourceTexImporters[index].SetTextureSettings(sourceTexSettings[index]);
-                sourceTexImporters[index].SaveAndReimport();
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-            }
+            sourceTexImporters[index].textureCompression = sourceTexCompressions[index];
+            sourceTexImporters[index].maxTextureSize = sourceimportSizes[index];
+            sourceTexImporters[index].SetTextureSettings(sourceTexSettings[index]);
+            sourceTexImporters[index].SaveAndReimport();
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
 
         /// <summary>
@@ -5823,7 +5395,6 @@ namespace TheVegetationEngine
 
             // FindObjectsOfTypeAll not working properly for unloaded assets
             allPresetPaths = Directory.GetFiles(Application.dataPath, "*.tvepreset", SearchOption.AllDirectories);
-            allPresetPaths = allPresetPaths.OrderBy(f => new FileInfo(f).Name).ToArray();
 
             for (int i = 0; i < allPresetPaths.Length; i++)
             {
@@ -6041,9 +5612,9 @@ namespace TheVegetationEngine
                 {
                     string source = presetLines[i].Replace("OutputTransform ", "");
 
-                    if (source == "USE_ORIGINAL_TRANSFORMS")
+                    if (source == "KEEP_ORIGINAL_TRANSFORMS")
                     {
-                        outputTransformIndex = OutputTransform.UseOriginalTransforms;
+                        outputTransformIndex = OutputTransform.KeepOriginalTransforms;
                     }
                     else if (source == "TRANSFORM_TO_WORLD_SPACE")
                     {
@@ -6061,23 +5632,6 @@ namespace TheVegetationEngine
                     else if (source == "DEFAULT")
                     {
                         outputMaterialIndex = OutputMaterial.Default;
-                    }
-                }
-                else if (presetLines[i].StartsWith("OutputTexture"))
-                {
-                    string source = presetLines[i].Replace("OutputTexture ", "");
-
-                    if (source == "USE_CURRENT_RESOLUTION")
-                    {
-                        outputTextureIndex = OutputTexture.UseCurrentResolution;
-                    }
-                    else if (source == "USE_HIGHEST_RESOLUTION")
-                    {
-                        outputTextureIndex = OutputTexture.UseHighestResolution;
-                    }
-                    else if (source == "USE_PREVIEW_RESOLUTION")
-                    {
-                        outputTextureIndex = OutputTexture.UsePreviewResolution;
                     }
                 }
                 else if (presetLines[i].StartsWith("OutputSuffix"))

@@ -14,14 +14,26 @@ InfoWarning The BK Billboards are not supported and they will be disabled after 
 *                             PRESET                              *
 *******************************************************************
 
-Include Use Default Grass Masks
+Mesh SetVariation GET_MASK_PROCEDURAL 3
+Mesh SetOcclusion GET_MASK_PROCEDURAL 12
+Mesh SetDetailMask NONE
+Mesh SetMultiMask NONE
+
+Mesh SetDetailCoord GET_COORD_PROCEDURAL 3
+
+Mesh SetMotion1 GET_MASK_PROCEDURAL 12
+Mesh SetMotion2 GET_MASK_PROCEDURAL 12
+Mesh SetMotion3 GET_MASK_PROCEDURAL 12
+
+*******************************************************************
+
 Include Use Default Grass Settings
 
 *******************************************************************
 
 Material SET_FLOAT _RenderCull 0
 Material SET_FLOAT _RenderNormals 0
-Material SET_FLOAT _AlphaClipValue 0.25
+Material SET_FLOAT _AlphaCutoffValue 0.25
 
 Material COPY_TEX _MainTex _MainAlbedoTex
 Material COPY_ST_AS_VECTOR _MainTex _MainUVs

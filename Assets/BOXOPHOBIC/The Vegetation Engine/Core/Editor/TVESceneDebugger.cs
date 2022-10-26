@@ -28,8 +28,7 @@ namespace TheVegetationEngine
         {
         "Vertex Position", "Vertex Normals", "Vertex Tangents", "Vertex Tangents Sign", "Triangle Orientation",
         "Vertex Red (Variation)", "Vertex Green (Occlusion)", "Vertex Blue (Detail)", "Vertex Alpha (Height)",
-        "Motion Bending Mask", "Motion Branch Mask", "Motion Flutter Mask", 
-        "Texture UVs", "Lightmap UVs", "Baked Detail UVs", "Pivot Positions",
+        "Motion Primary Mask", "Motion Second Mask", "Motion Details Mask",
         };
 
         string[] DebugMapsOptions = new string[]
@@ -50,7 +49,7 @@ namespace TheVegetationEngine
 
         string[] DebugGlobalsOptions = new string[]
         {
-        "Global Noise",
+        "Global Noise (R)",
         "Colors Tint (RGB)", "Colors Influence (A)",
         "Extras Emissive (R)", "Extras Wetness (G)", "Extras Overlay (B)", "Extras Alpha (A)",
         "Motion Direction (RG)", "Motion Power (B)", "Motion Interaction (A)",
@@ -88,6 +87,7 @@ namespace TheVegetationEngine
 
         Color bannerColor;
         string bannerText;
+        string helpURL;
         static TVESceneDebugger window;
         Vector2 scrollPosition = Vector2.zero;
 
@@ -102,6 +102,7 @@ namespace TheVegetationEngine
         {
             bannerColor = new Color(0.890f, 0.745f, 0.309f);
             bannerText = "Scene Debugger";
+            helpURL = "https://docs.google.com/document/d/145JOVlJ1tE-WODW45YoJ6Ixg23mFc56EnB_8Tbwloz8/edit#heading=h.wu796fgkwgfr";
 
             debugShader = Shader.Find("Hidden/BOXOPHOBIC/The Vegetation Engine/Helpers/Debug");
 
@@ -131,10 +132,10 @@ namespace TheVegetationEngine
         {
             SetGUIStyles();
 
-            GUI_HALF_EDITOR_WIDTH = (this.position.width / 2.0f - 24) - 5;
+            GUI_HALF_EDITOR_WIDTH = this.position.width / 2.0f - 24;
             GUI_FULL_EDITOR_WIDTH = this.position.width - 40;
 
-            StyledGUI.DrawWindowBanner(bannerColor, bannerText);
+            StyledGUI.DrawWindowBanner(bannerColor, bannerText, helpURL);
 
             GUILayout.Space(-2);
 
@@ -145,13 +146,17 @@ namespace TheVegetationEngine
 
             scrollPosition = GUILayout.BeginScrollView(scrollPosition, false, false, GUILayout.Width(this.position.width - 28), GUILayout.Height(this.position.height - 120));
 
+            StyledGUI.DrawWindowCategory("Debug Settings");
+
+            GUILayout.Space(10);
+
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Debug Mode", GUILayout.Width(GUI_HALF_EDITOR_WIDTH));
+            GUILayout.Label("Debug Mode", GUILayout.Width(220));
             debugModeIndex = EditorGUILayout.Popup(debugModeIndex, DebugModeOptions, stylePopup);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Debug Type", GUILayout.Width(GUI_HALF_EDITOR_WIDTH));
+            GUILayout.Label("Debug Type", GUILayout.Width(220));
             debugTypeIndex = EditorGUILayout.Popup(debugTypeIndex, DebugTypeOptions, stylePopup);
             GUILayout.EndHorizontal();
 
@@ -186,7 +191,6 @@ namespace TheVegetationEngine
                 StyledGUI.DrawWindowCategory("Debug Legend");
                 GUILayout.Space(10);
 
-                StyledLegend("Vertex Lit Shaders", new Color(0.62f, 0.77f, 0.15f, 0.75f));
                 StyledLegend("Simple Lit Shaders", new Color(0.33f, 0.61f, 0.81f, 0.75f));
                 StyledLegend("Standard Lit Shaders", new Color(0.66f, 0.34f, 0.85f, 0.75f));
                 StyledLegend("Subsurface Lit Shaders", new Color(0.92f, 0.84f, 0.18f, 0.75f));
@@ -195,12 +199,12 @@ namespace TheVegetationEngine
             if (debugTypeIndex == 3)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Debug Maps", GUILayout.Width(GUI_HALF_EDITOR_WIDTH));
+                GUILayout.Label("Debug Maps", GUILayout.Width(220));
                 debugMapsIndex = EditorGUILayout.Popup(debugMapsIndex, DebugMapsOptions, stylePopup);
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Debug Remap", GUILayout.Width(GUI_HALF_EDITOR_WIDTH));
+                GUILayout.Label("Debug Remap", GUILayout.Width(220));
                 EditorGUILayout.MinMaxSlider(ref debugMin, ref debugMax, 0.0f, 1.0f);
                 GUILayout.EndHorizontal();
             }
@@ -208,7 +212,7 @@ namespace TheVegetationEngine
             if (debugTypeIndex == 4)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Debug Maps", GUILayout.Width(GUI_HALF_EDITOR_WIDTH));
+                GUILayout.Label("Debug Maps", GUILayout.Width(220));
                 debugMapsIndex = EditorGUILayout.Popup(debugMapsIndex, DebugResolutionOptions, stylePopup);
                 GUILayout.EndHorizontal();
 
@@ -226,20 +230,20 @@ namespace TheVegetationEngine
             if (debugTypeIndex == 5)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Debug Globals", GUILayout.Width(GUI_HALF_EDITOR_WIDTH));
+                GUILayout.Label("Debug Globals", GUILayout.Width(220));
                 debugGlobalsIndex = EditorGUILayout.Popup(debugGlobalsIndex, DebugGlobalsOptions, stylePopup);
                 GUILayout.EndHorizontal();
 
                 if (debugGlobalsIndex > 1)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label("Debug Layers", GUILayout.Width(GUI_HALF_EDITOR_WIDTH));
+                    GUILayout.Label("Debug Layers", GUILayout.Width(220));
                     debugLayersIndex = EditorGUILayout.Popup(debugLayersIndex, DebugLayersOptions, stylePopup);
                     GUILayout.EndHorizontal();
                 }
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Debug Remap", GUILayout.Width(GUI_HALF_EDITOR_WIDTH));
+                GUILayout.Label("Debug Remap", GUILayout.Width(220));
                 EditorGUILayout.MinMaxSlider(ref debugMin, ref debugMax, 0.0f, 1.0f);
                 GUILayout.EndHorizontal();
             }
@@ -247,17 +251,17 @@ namespace TheVegetationEngine
             if (debugTypeIndex == 6)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Debug Mesh", GUILayout.Width(GUI_HALF_EDITOR_WIDTH));
+                GUILayout.Label("Debug Mesh", GUILayout.Width(220));
                 debugMeshIndex = EditorGUILayout.Popup(debugMeshIndex, DebugMeshOptions, stylePopup);
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Debug Remap", GUILayout.Width(GUI_HALF_EDITOR_WIDTH));
+                GUILayout.Label("Debug Remap", GUILayout.Width(220));
                 EditorGUILayout.MinMaxSlider(ref debugMin, ref debugMax, 0.0f, 1.0f);
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Include All Scene Objects", GUILayout.Width(GUI_HALF_EDITOR_WIDTH));
+                GUILayout.Label("Include All Scene Objects", GUILayout.Width(220));
                 showAllMaterials = EditorGUILayout.Toggle(showAllMaterials);
                 GUILayout.EndHorizontal();
             }
@@ -265,7 +269,7 @@ namespace TheVegetationEngine
             if (debugTypeIndex == 7)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Debug Misc", GUILayout.Width(GUI_HALF_EDITOR_WIDTH));
+                GUILayout.Label("Debug Misc", GUILayout.Width(220));
                 debugMiscIndex = EditorGUILayout.Popup(debugMiscIndex, DebugMiscOptions, stylePopup);
                 GUILayout.EndHorizontal();
 

@@ -12,15 +12,15 @@ InfoOnline https://assetstore.unity.com/packages/3d/vegetation/coniferous-forest
 *******************************************************************
 
 Mesh SetVariation GET_MASK_PROCEDURAL 3
-Mesh SetOcclusion GET_MASK_PROCEDURAL 6
-Mesh SetDetailMask GET_MASK_FROM_CHANNEL 1 ACTION_ONE_MINUS
+Mesh SetOcclusion GET_MASK_PROCEDURAL 7
+Mesh SetDetailMask GET_MASK_FROM_CHANNEL 1 ACTION_INVERT
+Mesh SetMultiMask NONE
+
 Mesh SetDetailCoord GET_COORD_FROM_CHANNEL 0
 
-Mesh SetHeight GET_MASK_PROCEDURAL 4
-Mesh SetMotion2 GET_MASK_PROCEDURAL 16
+Mesh SetMotion1 GET_MASK_PROCEDURAL 4
+Mesh SetMotion2 GET_MASK_PROCEDURAL 7
 Mesh SetMotion3 GET_MASK_FROM_TEXTURE 3 _TransGlossAOWind
-
-Mesh SetPivots NONE
 
 *******************************************************************
 
@@ -102,7 +102,6 @@ if SHADER_NAME_CONTAINS Bark
 //Enable Betail shading
 Material SET_FLOAT _DetailMode 1
 Material SET_FLOAT _DetailBlendMode 1
-Material SET_FLOAT _DetailCoordMode 1
 Material SET_FLOAT _DetailMaskMode 1
 
 Material SET_FLOAT _DetailMaskValue 0
