@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -54,7 +55,7 @@ namespace StupidHumanGames
 			_currentState = state.Patrol;
 
 		}
-		
+
 		void Start()
 		{
 			homePosition = GetComponent<Transform>().position;
@@ -275,6 +276,7 @@ namespace StupidHumanGames
 		{
 			while (true)
 			{
+
 				yield return StartCoroutine(_currentState.ToString());
 			}
 		}
@@ -293,9 +295,7 @@ namespace StupidHumanGames
 					if (rootMotion)
 					{
 						float rnd = Random.Range(.5f, 1f);
-
 						SetAnimation(rnd, 1, 1);
-
 					}
 					else
 					{
@@ -303,11 +303,10 @@ namespace StupidHumanGames
 						SetAnimation(rnd, rnd, 1);
 					}
 				}
-				if (RandomBool(_randomIdleDelay) && idle)
+				if (RandomBool(300) && idle)
 				{
-					RandomIdleAnimations();
 					_currentState = state.Idle;
-					
+					yield break;
 				}
 				yield return null;
 			}
@@ -316,7 +315,7 @@ namespace StupidHumanGames
 		IEnumerator Chase()
 		{
 			if (OnCanChase()) SetAnimation(1, 1, 2);
-			while (OnCanChase() && !OutOfBounds() && !OnHitObstacle())
+			while (IsFacingObject() && OnCanChase() && !OutOfBounds() && !OnHitObstacle())
 			{
 				wayPoint = player.position;
 				if (RandomBool(200))
@@ -325,82 +324,28 @@ namespace StupidHumanGames
 				}
 				yield return null;
 			}
-			if (!IsFacingObject())
-				_currentState = state.Attack;
+			_currentState = state.Attack;
 		}
 		IEnumerator Attack()
 		{
-			if (OnCanAttack() && !OutOfBounds() && !OnHitObstacle())
+			while (OnCanAttack() && !OutOfBounds() && !OnHitObstacle())
 			{
-				float distance = Vector3.Distance(wayPoint, transform.position);
-
-				if (distance < attackRange)
+				SetAnimation(0, 0, 3);
+				RandomAttackAnimations();
+				_audioSource.PlayOneShot(attackSound, attackVolume);
+				yield return new WaitForSeconds(_attackDelay);
+				SetAnimation(1, 1, 1);
+				if (RandomBool(2))
 				{
-
-					var restrictedMaxRange = wayPoint + (transform.position - wayPoint).normalized * attackRange;
-					transform.position = new Vector3(restrictedMaxRange.x, transform.position.y, restrictedMaxRange.z);
-				}
-				if (canSwimOrFly)
-				{
-					SetAnimation(1, 1, 2);
-					if (OnIsFacing())
-					{
-
-						RandomAttackAnimations();
-						_audioSource.PlayOneShot(attackSound, attackVolume);
-						yield return new WaitForSeconds(_attackDelay);
-						SetAnimation(1, 1, 1);
-						if (RandomBool(2))
-						{
-							wayPoint = transform.position - transform.right * 100f;
-							yield return new WaitForSeconds(_afterAttackDelay);
-						}
-						else
-						{
-							wayPoint = transform.position + transform.right * 100f;
-							yield return new WaitForSeconds(_afterAttackDelay);
-						}
-					}
-					SetAnimation(1, 1, 1);
+					wayPoint = transform.position - transform.right * 100f;
+					yield return new WaitForSeconds(_afterAttackDelay);
 				}
 				else
 				{
-
-
-					SetAnimation(0, 0, 3);
-					if (OnIsFacing())
-					{
-
-						RandomAttackAnimations();
-
-
-						_audioSource.PlayOneShot(attackSound, attackVolume);
-
-						yield return new WaitForSeconds(_attackDelay);
-						SetAnimation(1, 2, 1);
-
-						if (RandomBool(2))
-						{
-							wayPoint = transform.position - transform.right * 100f;
-							yield return new WaitForSeconds(_afterAttackDelay);
-						}
-						else
-						{
-							wayPoint = transform.position + transform.right * 100f;
-							yield return new WaitForSeconds(_afterAttackDelay);
-						}
-					}
-					SetAnimation(1, 1, 1);
-
+					wayPoint = transform.position + transform.right * 100f;
+					yield return new WaitForSeconds(_afterAttackDelay);
 				}
-
-
-				yield break;
-			}
-			while (OnCanAttack())
-			{
-
-				wayPoint = player.position;
+				SetAnimation(1, 1, 1);
 				yield return null;
 			}
 			_currentState = state.Lost;
@@ -413,17 +358,19 @@ namespace StupidHumanGames
 				wayPoint = homePosition;
 				yield return null;
 			}
-			yield return new WaitForSeconds(2f);
 			_currentState = state.Patrol;
 		}
 		IEnumerator Idle()
 		{
-			//SetAnimation(0,1,0);
-			
-			yield return new WaitForSeconds(5);
-
-			_currentState = state.Patrol;
-			
+			SetAnimation(0, 1, 0);
+			RandomIdleAnimations();
+			while (OnCanPatrol())
+			{
+				yield return new WaitForSeconds(Random.Range(5f, 10f));
+				_currentState = state.Patrol;
+				yield break;
+			}
+			_currentState = state.Chase;
 		}
 		void SetAnimation(float blend, float moveSpeedMultiplier, float turnSpeedMultiplier)
 		{
@@ -472,7 +419,7 @@ namespace StupidHumanGames
 		{
 			Vector3 forward = transform.TransformDirection(Vector3.forward);
 			Vector3 toOther = transform.position - player.position;
-			if (Vector3.Dot(forward, toOther) < 0)
+			if (Vector3.Dot(forward, toOther) > 0)
 			{
 				return false; //behind
 			}
