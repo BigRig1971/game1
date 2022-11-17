@@ -581,7 +581,5 @@ namespace StupidHumanGames
             }
         }
 
-       
-
     }
 }

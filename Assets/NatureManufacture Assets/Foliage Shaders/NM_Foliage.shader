@@ -438,6 +438,11 @@
         
             // Graph Functions
             
+        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
+        {
+            Out = A + B;
+        }
+        
         void AddPragma_float(float3 A, out float3 Out){
         #pragma instancing_options procedural:setupVSPro
         Out = A;
@@ -457,6 +462,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -465,11 +480,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -677,11 +687,6 @@
         void Unity_Power_float(float A, float B, out float Out)
         {
             Out = pow(A, B);
-        }
-        
-        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
-        {
-            Out = A + B;
         }
         
         void Unity_Or_float(float A, float B, out float Out)
@@ -892,11 +897,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -935,6 +935,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -1060,6 +1073,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -1073,7 +1088,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -1106,9 +1121,11 @@
         {
             VertexDescription description = (VertexDescription)0;
             float _Property_f5eef27704664a71af5a93dc82276e89_Out_0 = _DISTANCEBLEND;
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -2060,6 +2077,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -2068,11 +2095,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -2485,11 +2507,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -2528,6 +2545,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -2653,6 +2683,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -2666,7 +2698,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -2746,9 +2778,11 @@
             Unity_Subtract_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Subtract_81ecbd23d0feb38a807db24a0fb691a8_Out_2);
             float3 _Add_bb734a75aee87e88a1a453671272601f_Out_2;
             Unity_Add_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Add_bb734a75aee87e88a1a453671272601f_Out_2);
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -3619,6 +3653,11 @@
         
             // Graph Functions
             
+        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
+        {
+            Out = A + B;
+        }
+        
         void AddPragma_float(float3 A, out float3 Out){
         #pragma instancing_options procedural:setupVSPro
         Out = A;
@@ -3638,6 +3677,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -3646,11 +3695,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -3858,11 +3902,6 @@
         void Unity_Power_float(float A, float B, out float Out)
         {
             Out = pow(A, B);
-        }
-        
-        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
-        {
-            Out = A + B;
         }
         
         void Unity_Or_float(float A, float B, out float Out)
@@ -4073,11 +4112,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -4116,6 +4150,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -4241,6 +4288,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -4254,7 +4303,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -4342,9 +4391,11 @@
         {
             VertexDescription description = (VertexDescription)0;
             float _Property_f5eef27704664a71af5a93dc82276e89_Out_0 = _DISTANCEBLEND;
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -4448,9 +4499,11 @@
             Unity_Subtract_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Subtract_81ecbd23d0feb38a807db24a0fb691a8_Out_2);
             float3 _Add_bb734a75aee87e88a1a453671272601f_Out_2;
             Unity_Add_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Add_bb734a75aee87e88a1a453671272601f_Out_2);
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -5332,6 +5385,11 @@
         
             // Graph Functions
             
+        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
+        {
+            Out = A + B;
+        }
+        
         void AddPragma_float(float3 A, out float3 Out){
         #pragma instancing_options procedural:setupVSPro
         Out = A;
@@ -5351,6 +5409,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -5359,11 +5427,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -5571,11 +5634,6 @@
         void Unity_Power_float(float A, float B, out float Out)
         {
             Out = pow(A, B);
-        }
-        
-        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
-        {
-            Out = A + B;
         }
         
         void Unity_Or_float(float A, float B, out float Out)
@@ -5786,11 +5844,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -5829,6 +5882,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -5954,6 +6020,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -5967,7 +6035,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -6055,9 +6123,11 @@
         {
             VertexDescription description = (VertexDescription)0;
             float _Property_f5eef27704664a71af5a93dc82276e89_Out_0 = _DISTANCEBLEND;
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -6161,9 +6231,11 @@
             Unity_Subtract_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Subtract_81ecbd23d0feb38a807db24a0fb691a8_Out_2);
             float3 _Add_bb734a75aee87e88a1a453671272601f_Out_2;
             Unity_Add_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Add_bb734a75aee87e88a1a453671272601f_Out_2);
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -7071,6 +7143,11 @@
         
             // Graph Functions
             
+        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
+        {
+            Out = A + B;
+        }
+        
         void AddPragma_float(float3 A, out float3 Out){
         #pragma instancing_options procedural:setupVSPro
         Out = A;
@@ -7090,6 +7167,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -7098,11 +7185,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -7310,11 +7392,6 @@
         void Unity_Power_float(float A, float B, out float Out)
         {
             Out = pow(A, B);
-        }
-        
-        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
-        {
-            Out = A + B;
         }
         
         void Unity_Or_float(float A, float B, out float Out)
@@ -7525,11 +7602,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -7568,6 +7640,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -7693,6 +7778,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -7706,7 +7793,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -7794,9 +7881,11 @@
         {
             VertexDescription description = (VertexDescription)0;
             float _Property_f5eef27704664a71af5a93dc82276e89_Out_0 = _DISTANCEBLEND;
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -7900,9 +7989,11 @@
             Unity_Subtract_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Subtract_81ecbd23d0feb38a807db24a0fb691a8_Out_2);
             float3 _Add_bb734a75aee87e88a1a453671272601f_Out_2;
             Unity_Add_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Add_bb734a75aee87e88a1a453671272601f_Out_2);
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -8777,6 +8868,11 @@
         
             // Graph Functions
             
+        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
+        {
+            Out = A + B;
+        }
+        
         void AddPragma_float(float3 A, out float3 Out){
         #pragma instancing_options procedural:setupVSPro
         Out = A;
@@ -8796,6 +8892,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -8804,11 +8910,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -9016,11 +9117,6 @@
         void Unity_Power_float(float A, float B, out float Out)
         {
             Out = pow(A, B);
-        }
-        
-        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
-        {
-            Out = A + B;
         }
         
         void Unity_Or_float(float A, float B, out float Out)
@@ -9231,11 +9327,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -9274,6 +9365,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -9399,6 +9503,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -9412,7 +9518,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -9455,9 +9561,11 @@
         {
             VertexDescription description = (VertexDescription)0;
             float _Property_f5eef27704664a71af5a93dc82276e89_Out_0 = _DISTANCEBLEND;
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -10344,6 +10452,11 @@
         
             // Graph Functions
             
+        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
+        {
+            Out = A + B;
+        }
+        
         void AddPragma_float(float3 A, out float3 Out){
         #pragma instancing_options procedural:setupVSPro
         Out = A;
@@ -10363,6 +10476,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -10371,11 +10494,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -10583,11 +10701,6 @@
         void Unity_Power_float(float A, float B, out float Out)
         {
             Out = pow(A, B);
-        }
-        
-        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
-        {
-            Out = A + B;
         }
         
         void Unity_Or_float(float A, float B, out float Out)
@@ -10798,11 +10911,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -10841,6 +10949,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -10966,6 +11087,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -10979,7 +11102,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -11067,9 +11190,11 @@
         {
             VertexDescription description = (VertexDescription)0;
             float _Property_f5eef27704664a71af5a93dc82276e89_Out_0 = _DISTANCEBLEND;
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -11173,9 +11298,11 @@
             Unity_Subtract_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Subtract_81ecbd23d0feb38a807db24a0fb691a8_Out_2);
             float3 _Add_bb734a75aee87e88a1a453671272601f_Out_2;
             Unity_Add_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Add_bb734a75aee87e88a1a453671272601f_Out_2);
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -12069,6 +12196,11 @@
         
             // Graph Functions
             
+        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
+        {
+            Out = A + B;
+        }
+        
         void AddPragma_float(float3 A, out float3 Out){
         #pragma instancing_options procedural:setupVSPro
         Out = A;
@@ -12088,6 +12220,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -12096,11 +12238,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -12308,11 +12445,6 @@
         void Unity_Power_float(float A, float B, out float Out)
         {
             Out = pow(A, B);
-        }
-        
-        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
-        {
-            Out = A + B;
         }
         
         void Unity_Or_float(float A, float B, out float Out)
@@ -12523,11 +12655,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -12566,6 +12693,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -12691,6 +12831,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -12704,7 +12846,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -12792,9 +12934,11 @@
         {
             VertexDescription description = (VertexDescription)0;
             float _Property_f5eef27704664a71af5a93dc82276e89_Out_0 = _DISTANCEBLEND;
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -12898,9 +13042,11 @@
             Unity_Subtract_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Subtract_81ecbd23d0feb38a807db24a0fb691a8_Out_2);
             float3 _Add_bb734a75aee87e88a1a453671272601f_Out_2;
             Unity_Add_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Add_bb734a75aee87e88a1a453671272601f_Out_2);
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -13815,6 +13961,11 @@
         
             // Graph Functions
             
+        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
+        {
+            Out = A + B;
+        }
+        
         void AddPragma_float(float3 A, out float3 Out){
         #pragma instancing_options procedural:setupVSPro
         Out = A;
@@ -13834,6 +13985,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -13842,11 +14003,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -14054,11 +14210,6 @@
         void Unity_Power_float(float A, float B, out float Out)
         {
             Out = pow(A, B);
-        }
-        
-        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
-        {
-            Out = A + B;
         }
         
         void Unity_Or_float(float A, float B, out float Out)
@@ -14269,11 +14420,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -14312,6 +14458,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -14437,6 +14596,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -14450,7 +14611,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -14538,9 +14699,11 @@
         {
             VertexDescription description = (VertexDescription)0;
             float _Property_f5eef27704664a71af5a93dc82276e89_Out_0 = _DISTANCEBLEND;
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -14645,9 +14808,11 @@
             Unity_Subtract_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Subtract_81ecbd23d0feb38a807db24a0fb691a8_Out_2);
             float3 _Add_bb734a75aee87e88a1a453671272601f_Out_2;
             Unity_Add_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Add_bb734a75aee87e88a1a453671272601f_Out_2);
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -15579,6 +15744,11 @@
         
             // Graph Functions
             
+        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
+        {
+            Out = A + B;
+        }
+        
         void AddPragma_float(float3 A, out float3 Out){
         #pragma instancing_options procedural:setupVSPro
         Out = A;
@@ -15598,6 +15768,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -15606,11 +15786,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -15818,11 +15993,6 @@
         void Unity_Power_float(float A, float B, out float Out)
         {
             Out = pow(A, B);
-        }
-        
-        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
-        {
-            Out = A + B;
         }
         
         void Unity_Or_float(float A, float B, out float Out)
@@ -16033,11 +16203,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -16076,6 +16241,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -16201,6 +16379,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -16214,7 +16394,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -16302,9 +16482,11 @@
         {
             VertexDescription description = (VertexDescription)0;
             float _Property_f5eef27704664a71af5a93dc82276e89_Out_0 = _DISTANCEBLEND;
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -16409,9 +16591,11 @@
             Unity_Subtract_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Subtract_81ecbd23d0feb38a807db24a0fb691a8_Out_2);
             float3 _Add_bb734a75aee87e88a1a453671272601f_Out_2;
             Unity_Add_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Add_bb734a75aee87e88a1a453671272601f_Out_2);
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -17295,6 +17479,11 @@
         
             // Graph Functions
             
+        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
+        {
+            Out = A + B;
+        }
+        
         void AddPragma_float(float3 A, out float3 Out){
         #pragma instancing_options procedural:setupVSPro
         Out = A;
@@ -17314,6 +17503,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -17322,11 +17521,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -17534,11 +17728,6 @@
         void Unity_Power_float(float A, float B, out float Out)
         {
             Out = pow(A, B);
-        }
-        
-        void Unity_Add_float3(float3 A, float3 B, out float3 Out)
-        {
-            Out = A + B;
         }
         
         void Unity_Or_float(float A, float B, out float Out)
@@ -17749,11 +17938,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -17792,6 +17976,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -17917,6 +18114,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -17930,7 +18129,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -18018,9 +18217,11 @@
         {
             VertexDescription description = (VertexDescription)0;
             float _Property_f5eef27704664a71af5a93dc82276e89_Out_0 = _DISTANCEBLEND;
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -18124,9 +18325,11 @@
             Unity_Subtract_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Subtract_81ecbd23d0feb38a807db24a0fb691a8_Out_2);
             float3 _Add_bb734a75aee87e88a1a453671272601f_Out_2;
             Unity_Add_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Add_bb734a75aee87e88a1a453671272601f_Out_2);
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -19023,6 +19226,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -19031,11 +19244,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -19448,11 +19656,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -19491,6 +19694,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -19616,6 +19832,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -19629,7 +19847,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -19701,9 +19919,11 @@
             Unity_Subtract_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Subtract_81ecbd23d0feb38a807db24a0fb691a8_Out_2);
             float3 _Add_bb734a75aee87e88a1a453671272601f_Out_2;
             Unity_Add_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Add_bb734a75aee87e88a1a453671272601f_Out_2);
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -20449,6 +20669,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -20457,11 +20687,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -20874,11 +21099,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -20917,6 +21137,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -21042,6 +21275,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -21055,7 +21290,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -21127,9 +21362,11 @@
             Unity_Subtract_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Subtract_81ecbd23d0feb38a807db24a0fb691a8_Out_2);
             float3 _Add_bb734a75aee87e88a1a453671272601f_Out_2;
             Unity_Add_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Add_bb734a75aee87e88a1a453671272601f_Out_2);
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -21890,6 +22127,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -21898,11 +22145,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -22315,11 +22557,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -22358,6 +22595,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -22483,6 +22733,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -22496,7 +22748,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -22568,9 +22820,11 @@
             Unity_Subtract_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Subtract_81ecbd23d0feb38a807db24a0fb691a8_Out_2);
             float3 _Add_bb734a75aee87e88a1a453671272601f_Out_2;
             Unity_Add_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Add_bb734a75aee87e88a1a453671272601f_Out_2);
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -23328,6 +23582,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -23336,11 +23600,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -23753,11 +24012,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -23796,6 +24050,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -23921,6 +24188,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -23934,7 +24203,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -24006,9 +24275,11 @@
             Unity_Subtract_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Subtract_81ecbd23d0feb38a807db24a0fb691a8_Out_2);
             float3 _Add_bb734a75aee87e88a1a453671272601f_Out_2;
             Unity_Add_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Add_bb734a75aee87e88a1a453671272601f_Out_2);
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;
@@ -24761,6 +25032,16 @@
         ObjectSpacePosition_1 = _AddPragmaCustomFunction_b2a053178906d0848480a1f463521a1b_Out_1;
         }
         
+        void Unity_Distance_float3(float3 A, float3 B, out float Out)
+        {
+            Out = distance(A, B);
+        }
+        
+        void Unity_Comparison_Less_float(float A, float B, out float Out)
+        {
+            Out = A < B ? 1 : 0;
+        }
+        
         void Unity_Comparison_Greater_float(float A, float B, out float Out)
         {
             Out = A > B ? 1 : 0;
@@ -24769,11 +25050,6 @@
         void Unity_Subtract_float(float A, float B, out float Out)
         {
             Out = A - B;
-        }
-        
-        void Unity_Comparison_Less_float(float A, float B, out float Out)
-        {
-            Out = A < B ? 1 : 0;
         }
         
         void Unity_And_float(float A, float B, out float Out)
@@ -25186,11 +25462,6 @@
             Out = dot(A, B);
         }
         
-        void Unity_Distance_float3(float3 A, float3 B, out float Out)
-        {
-            Out = distance(A, B);
-        }
-        
         void Unity_Absolute_float(float In, out float Out)
         {
             Out = abs(In);
@@ -25229,6 +25500,19 @@
         
         void SG_WindNM_8a787a0774620bd4da3252c12ec8d703_float(float Vector1_BCB03E1A, float3 Vector3_C30D997B, float Vector1_A2C4B4F4, float Vector1_7EE0F94A, float Boolean_527CB26E, float Vector1_DE1BF63A, float Vector1_DFDAE53E, float Vector1_B377580E, float Vector1_7F78DDD2, float3 Vector3_DE8CC74D, UnityTexture2D Texture2D_5BAC276D, UnityTexture2D Texture2D_A3874DB9, float4 Vector4_EBFF8CDE, float Vector1_B4470F9B, float Vector1_7F8FCEC4, float Vector1_2EC6D670, float Vector1_9365F438, float Vector1_F53C4B89, float Vector1_6803B355, float4x4 Matrix4_1d67f930f09e420899acb3590f11f884, float4 Vector4_9f3d873b419a4cc0bd1473a15dfd8c77, Bindings_WindNM_8a787a0774620bd4da3252c12ec8d703_float IN, out float3 vertex_1, out float3 normal_2, out float colorRed_3)
         {
+        float4 _Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0 = float4(0, 0, 0, 1);
+        float3 _Transform_baa1498fb45f41e09050a605f8666a01_Out_1;
+        {
+        // Converting Position from Object to AbsoluteWorld via world space
+        float3 world;
+        world = TransformObjectToWorld((_Vector4_85b32669cd9d4697aec00d6fdde867da_Out_0.xyz).xyz);
+        _Transform_baa1498fb45f41e09050a605f8666a01_Out_1 = GetAbsolutePositionWS(world);
+        }
+        float _Distance_02d522a588f846728f56cad2a8ae617d_Out_2;
+        Unity_Distance_float3(_Transform_baa1498fb45f41e09050a605f8666a01_Out_1, float3(0, 0, 0), _Distance_02d522a588f846728f56cad2a8ae617d_Out_2);
+        float _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2;
+        Unity_Comparison_Less_float(_Distance_02d522a588f846728f56cad2a8ae617d_Out_2, 0.001, _Comparison_64756810c97a4848a8c89a8d9b154573_Out_2);
+        float3 _Property_37498b56cee449b784c4e52a67dd85b4_Out_0 = Vector3_C30D997B;
         float4 _Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0 = float4(0, 0, 0, 1);
         float3 _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1;
         _Transform_4acbe76287b06c88a7e8fd7bf234e885_Out_1 = TransformObjectToWorld((_Vector4_d213eb2790b34988809a251ff9c74c6b_Out_0.xyz).xyz);
@@ -25354,6 +25638,8 @@
         Unity_Add_float3(_Add_d48375b91f961f89b468b522221fb6ee_Out_2, _Multiply_263bf1ad18be92869a30df6104e9c2b2_Out_2, _Add_0252c311e46e2f8ab679a079c578eb5c_Out_2);
         float3 _Transform_224c24cf5953f18a87e2088380250252_Out_1;
         _Transform_224c24cf5953f18a87e2088380250252_Out_1 = TransformWorldToObject(_Add_0252c311e46e2f8ab679a079c578eb5c_Out_2.xyz);
+        float3 _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
+        Unity_Branch_float3(_Comparison_64756810c97a4848a8c89a8d9b154573_Out_2, _Property_37498b56cee449b784c4e52a67dd85b4_Out_0, _Transform_224c24cf5953f18a87e2088380250252_Out_1, _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3);
         float3 _Property_c5f622c3918154808caa04a0cff875eb_Out_0 = Vector3_DE8CC74D;
         float _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1;
         Unity_Length_float3(_Property_c5f622c3918154808caa04a0cff875eb_Out_0, _Length_8fac716cbfa5b983ba3cf14312642ac5_Out_1);
@@ -25367,7 +25653,7 @@
         float _Split_79721e720d206c8d903b961b5e154cd6_G_2 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[1];
         float _Split_79721e720d206c8d903b961b5e154cd6_B_3 = _WindNMCalculate_74d44892d809b98cb94c0907243f2718_shiverStrength_3[2];
         float _Split_79721e720d206c8d903b961b5e154cd6_A_4 = 0;
-        vertex_1 = _Transform_224c24cf5953f18a87e2088380250252_Out_1;
+        vertex_1 = _Branch_850d415f531a4e59a45e8835fa4bc9c0_Out_3;
         normal_2 = _Branch_e504c7d39baa3084852f5cd5fd3d9d94_Out_3;
         colorRed_3 = _Split_79721e720d206c8d903b961b5e154cd6_R_1;
         }
@@ -25439,9 +25725,11 @@
             Unity_Subtract_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Subtract_81ecbd23d0feb38a807db24a0fb691a8_Out_2);
             float3 _Add_bb734a75aee87e88a1a453671272601f_Out_2;
             Unity_Add_float3(float3(1, 1, 1), _Property_602061aab7626587a302b9d3b4fff415_Out_0, _Add_bb734a75aee87e88a1a453671272601f_Out_2);
+            float3 _Add_912dec3250924501a3985725e143a073_Out_2;
+            Unity_Add_float3(IN.ObjectSpacePosition, float3(1E-07, 1E-07, 1E-07), _Add_912dec3250924501a3985725e143a073_Out_2);
             Bindings_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe;
             float3 _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1;
-            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(IN.ObjectSpacePosition, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
+            SG_NMFoliageVSProIndirect_7b92be50f852bc440961517e733427f8_float(_Add_912dec3250924501a3985725e143a073_Out_2, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe, _NMFoliageVSProIndirect_e59468a370ca588da0ada6a2d91200fe_ObjectSpacePosition_1);
             float _Property_bb76ee204c78d38a960964830cc0cfa0_Out_0 = _Drag;
             float _Property_03a6ef4f2a48db81915d76e6695d4f84_Out_0 = _HeightDrag;
             float _Property_3f9b430d02a24edb88604e67932c7c52_Out_0 = _AlphaDrag;

@@ -315,8 +315,9 @@ namespace StupidHumanGames
 		IEnumerator Chase()
 		{
 			if (OnCanChase()) SetAnimation(1, 1, 2);
-			while (IsFacingObject() && OnCanChase() && !OutOfBounds() && !OnHitObstacle())
+			while (IsFacingObject() && OnCanChase() && !OnHitObstacle())
 			{
+				
 				wayPoint = player.position;
 				if (RandomBool(200))
 				{
@@ -328,7 +329,9 @@ namespace StupidHumanGames
 		}
 		IEnumerator Attack()
 		{
-			while (OnCanAttack() && !OutOfBounds() && !OnHitObstacle())
+			
+
+			while (OnCanAttack() && IsFacingObject())
 			{
 				SetAnimation(0, 0, 3);
 				RandomAttackAnimations();
@@ -439,6 +442,7 @@ namespace StupidHumanGames
 			}
 			return canAttack;
 		}
+
 	}
 }
 

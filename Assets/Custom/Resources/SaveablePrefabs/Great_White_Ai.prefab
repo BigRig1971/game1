@@ -934,7 +934,7 @@ Transform:
   m_Children:
   - {fileID: 8597224257116749827}
   m_Father: {fileID: 0}
-  m_RootOrder: 16
+  m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &6708947247149174795
 AudioSource:
@@ -1101,10 +1101,10 @@ MonoBehaviour:
   _moveSpeed: 3
   obstacleRadius: 4.35
   attackCenter: {x: 0, y: 0, z: 0}
-  _attackDelay: 0.3
-  _afterAttackDelay: 0.5
-  attackRange: 2.7
-  sightRange: 16.4
+  _attackDelay: 0.5
+  _afterAttackDelay: 2
+  attackRange: 3
+  sightRange: 20
   maxRange: 100
   maxAltitude: 85
   minAltitude: 0

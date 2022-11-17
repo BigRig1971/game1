@@ -123,7 +123,7 @@ Transform:
   m_GameObject: {fileID: 5428675891731855103}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 488.8495, y: 99.708694, z: 619.86914}
-  m_LocalScale: {x: 1.7932452, y: 1.7932452, z: 1.7932452}
+  m_LocalScale: {x: 1.7461978, y: 1.7461978, z: 1.7461978}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2792771647965147239}
@@ -131,7 +131,7 @@ Transform:
   - {fileID: 7564354510659557059}
   - {fileID: 7219832246027509757}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!205 &452410499546061620
 LODGroup:
@@ -266,12 +266,6 @@ MonoBehaviour:
   isDamagable: 1
   health: 50
   deathDelay: 0
-  death:
-    m_PersistentCalls:
-      m_Calls: []
-  takeHit:
-    m_PersistentCalls:
-      m_Calls: []
   _listOfItems:
   - _item: {fileID: 11400000, guid: 1086e27366f3acd4d8514b605952723e, type: 2}
     _itemAmount: 10

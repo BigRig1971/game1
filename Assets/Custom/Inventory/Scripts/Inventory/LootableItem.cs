@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace StupidHumanGames
 {
-    public class LootableItem : MonoBehaviour
+    public class LootableItem : MonoBehaviour, DamageInterface
     {
        
       
@@ -31,8 +31,7 @@ namespace StupidHumanGames
         public bool isDamagable = false;
         [SerializeField] int health = 30;
         [SerializeField] float deathDelay = 5f;
-        public UnityEvent death;
-        public UnityEvent takeHit;
+      
         [System.Serializable]
         public class Item
         {
@@ -59,12 +58,7 @@ namespace StupidHumanGames
             RandomLootableItems();
             OnScaleObject();
             playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
-            if (death == null)
-                death = new UnityEvent();
-            if (takeHit == null)
-                takeHit = new UnityEvent();
-            // SitOnGround();
-            // AlignToGround();
+          
         }
 #if UNITY_EDITOR
 
@@ -104,22 +98,7 @@ namespace StupidHumanGames
             }
         }
 
-        public void TakeDamage(int amount)
-        {
-            if (!isDamagable) return;
-            takeHit.Invoke();
-            lootable = false;
-            if (_impactSound != null) _audioSource.PlayOneShot(_impactSound, _impactVolume);
-            if (spawnLoot) OnDropOnDamage();
-            health -= amount;
-            if (health <= 0)
-            {
-                death.Invoke();
-                isDamagable = false;
-                if (_deathSound != null) _audioSource.PlayOneShot(_deathSound, _deathVolume);
-                Invoke(nameof(LootItem), deathDelay);
-            }
-        }
+ 
         void OnDrawGizmos()
         {
             Gizmos.color = Color.yellow;
@@ -182,6 +161,21 @@ namespace StupidHumanGames
                 transform.localScale = scale;
             }
         }
-     
+
+        public void Damage(int damage)
+        {
+			if (!isDamagable) return;
+			
+			lootable = false;
+			if (_impactSound != null) _audioSource.PlayOneShot(_impactSound, _impactVolume);
+			if (spawnLoot) OnDropOnDamage();
+            health -= damage;
+			if (health <= 0)
+			{
+				isDamagable = false;
+				if (_deathSound != null) _audioSource.PlayOneShot(_deathSound, _deathVolume);
+				Invoke(nameof(LootItem), deathDelay);
+			}
+		}
     }
 }

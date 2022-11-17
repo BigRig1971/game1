@@ -57,24 +57,20 @@ namespace StupidHumanGames
 
         }
 
-        private void OnTriggerStay(Collider other)
+        private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Lootable") && canDoStuff)///
+            
+            if (other.TryGetComponent<DamageInterface>(out var damage) && canDoStuff)
             {
-                canDoStuff = false;
-                var lootable = other.gameObject.GetComponent<LootableItem>();
+				canDoStuff = false;
+				_animator.SetTrigger("Interrupt");
+				_animator.StopPlayback();
+				CameraShakerHandler.Shake(MyShake);
 
-                if (lootable != null)
-                {
-                    _animator.SetTrigger("Interrupt");
-                    _animator.StopPlayback();
-                    CameraShakerHandler.Shake(MyShake);
+				damage.Damage(damagePower);
+			}
 
-                    lootable.TakeDamage(damagePower);
-
-                }
-            }
-        }
+		}
         void Update()
         {
             if (groundHugging && hugTheGround)
@@ -148,5 +144,6 @@ namespace StupidHumanGames
             }
         }
 
+     
     }
 }
