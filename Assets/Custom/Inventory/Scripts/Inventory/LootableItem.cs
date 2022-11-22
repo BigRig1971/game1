@@ -2,15 +2,16 @@ using UnityEngine;
 using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
-
+using UnityEngine.UI;
+using System.Management.Instrumentation;
 
 namespace StupidHumanGames
 {
     public class LootableItem : MonoBehaviour, DamageInterface
     {
-       
-      
 
+
+        public StatBar healthBar;
         [SerializeField] List<Item> randomItems = new List<Item>();
         [SerializeField] bool randomSize = false;
         [SerializeField] AudioSource _audioSource;
@@ -54,8 +55,8 @@ namespace StupidHumanGames
         }
         private void Start()
         {
-         
-            RandomLootableItems();
+			
+			RandomLootableItems();
             OnScaleObject();
             playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
           
@@ -67,9 +68,10 @@ namespace StupidHumanGames
         
         public void LootableItems()
         {
-            if (!lootable && isDamagable) return;
-            
+			
+			if (!lootable && isDamagable) return;
 
+            
             foreach (Item loi in _listOfItems)
             {
                 int remaining = InventoryManager.AddItemToInventory(loi._item, loi._itemAmount);
@@ -107,8 +109,8 @@ namespace StupidHumanGames
         }
         void LootItem()
         {
-
-            lootable = true;
+			
+			lootable = true;
             isDamagable = false;
             if (spawnLoot) StartCoroutine(OnDropItems()); else LootableItems();
         }
@@ -176,6 +178,7 @@ namespace StupidHumanGames
 				if (_deathSound != null) _audioSource.PlayOneShot(_deathSound, _deathVolume);
 				Invoke(nameof(LootItem), deathDelay);
 			}
+            healthBar.SetCurrentHealth(health);
 		}
     }
 }

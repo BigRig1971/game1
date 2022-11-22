@@ -19,11 +19,23 @@ namespace StupidHumanGames
         {
             
             if (other.CompareTag("Lootable"))
-            {              
+            {
+                
                 lootableItem = other.gameObject.GetComponent<LootableItem>();
+               // Instantiate(lootableItem.healthBar);
                 droppedItemPickup = other.gameObject.GetComponent<ItemPickupable>();
                 if (lootableItem != null && !lootableItem.isDamagable) LootItem();
                 if (droppedItemPickup != null) PickupItem();
+            }
+        }
+        private void OnTriggerExit(Collider other)
+        {
+            if (other.CompareTag("Lootable"))
+            {
+                if(lootableItem.healthBar != null)
+                {
+                    Destroy(lootableItem.healthBar);
+                }
             }
         }
         void LootItem()

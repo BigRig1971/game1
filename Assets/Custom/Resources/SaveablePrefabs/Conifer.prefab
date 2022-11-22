@@ -123,7 +123,7 @@ Transform:
   m_GameObject: {fileID: 5428675891731855103}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 488.8495, y: 99.708694, z: 619.86914}
-  m_LocalScale: {x: 1.7461978, y: 1.7461978, z: 1.7461978}
+  m_LocalScale: {x: 1.7459872, y: 1.7459872, z: 1.7459872}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2792771647965147239}
@@ -131,7 +131,7 @@ Transform:
   - {fileID: 7564354510659557059}
   - {fileID: 7219832246027509757}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!205 &452410499546061620
 LODGroup:
@@ -250,6 +250,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cc15dfc05bdc1742b2cc362979d493f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  healthBar: {fileID: 7165688691803572878, guid: 8a59d4b7d0ccf8144b3ee5bec1e54605, type: 3}
   randomItems: []
   randomSize: 1
   _audioSource: {fileID: 4092055081127426504}
