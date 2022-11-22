@@ -934,7 +934,7 @@ Transform:
   m_Children:
   - {fileID: 8597224257116749827}
   m_Father: {fileID: 0}
-  m_RootOrder: 18
+  m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &6708947247149174795
 AudioSource:
@@ -1140,6 +1140,24 @@ MonoBehaviour:
   isDamagable: 1
   health: 20
   deathDelay: 2
+  death:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: StupidHumanGames.AiGeneric, Assembly-CSharp
+        m_MethodName: OnIsDead
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  takeHit:
+    m_PersistentCalls:
+      m_Calls: []
   _listOfItems:
   - _item: {fileID: 11400000, guid: fb2636d27ecb9b34b8f27f34b39040f4, type: 2}
     _itemAmount: 10
@@ -1172,14 +1190,14 @@ LODGroup:
   m_AnimateCrossFading: 1
   m_LastLODIsBillboard: 0
   m_LODs:
-  - screenRelativeHeight: 0.2030246
+  - screenRelativeHeight: 0.14788686
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 4539525497308257797}
-  - screenRelativeHeight: 0.10065932
+  - screenRelativeHeight: 0.14788686
     fadeTransitionWidth: 0
     renderers: []
-  - screenRelativeHeight: 0.021427596
+  - screenRelativeHeight: 0.14788686
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 0}

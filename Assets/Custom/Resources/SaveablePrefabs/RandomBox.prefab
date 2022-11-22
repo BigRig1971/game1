@@ -35,7 +35,7 @@ Transform:
   m_GameObject: {fileID: 374581637909007901}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.1935694, y: 1.1935694, z: 1.1935694}
+  m_LocalScale: {x: 1.0617784, y: 1.0617784, z: 1.0617784}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -143,6 +143,12 @@ MonoBehaviour:
   isDamagable: 0
   health: 30
   deathDelay: 5
+  death:
+    m_PersistentCalls:
+      m_Calls: []
+  takeHit:
+    m_PersistentCalls:
+      m_Calls: []
   _listOfItems: []
   _listOfDamageItems: []
 --- !u!54 &333397002

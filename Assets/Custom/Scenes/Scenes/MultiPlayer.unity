@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 8900000, guid: 619e305f5165a9946b7f72464e44ca4a, type: 3}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 19500.008, g: 12490.016, b: 10309.453, a: 1}
+  m_IndirectSpecularColor: {r: 7286.133, g: 5209.871, b: 5166.0312, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -550,9 +550,9 @@ Terrain:
   m_TreeBillboardDistance: 50
   m_TreeCrossFadeLength: 5
   m_TreeMaximumFullLODCount: 50
-  m_DetailObjectDistance: 100
+  m_DetailObjectDistance: 80
   m_DetailObjectDensity: 1
-  m_HeightmapPixelError: 30
+  m_HeightmapPixelError: 50
   m_SplatMapDistance: 200
   m_HeightmapMaximumLOD: 0
   m_ShadowCastingMode: 2
@@ -562,7 +562,7 @@ Terrain:
   m_StaticShadowCaster: 0
   m_ReflectionProbeUsage: 1
   m_MaterialTemplate: {fileID: 2100000, guid: 22ff8771d87ef27429e670136399094b, type: 2}
-  m_BakeLightProbesForTrees: 0
+  m_BakeLightProbesForTrees: 1
   m_PreserveTreePrototypeLayers: 0
   m_DeringLightProbesForTrees: 1
   m_ScaleInLightmap: 0.0064
@@ -669,43 +669,6 @@ MonoBehaviour:
   normaliseMin: 0
   normaliseMax: 0.51
   normaliseBlend: 1
---- !u!84 &91341305
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: GerstnerCascades
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 5
-  m_Width: 64
-  m_Height: 64
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 0
-  m_ColorFormat: 48
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 0
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 5
-  m_VolumeDepth: 16
-  m_ShadowSamplingMode: 2
 --- !u!4 &93492273 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4140670084722468269, guid: 110682f3b2e634b43927cbc761b62c16, type: 3}
@@ -1754,6 +1717,43 @@ PrefabInstance:
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 110682f3b2e634b43927cbc761b62c16, type: 3}
+--- !u!84 &216916765
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: GerstnerCascades
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 5
+  m_Width: 64
+  m_Height: 64
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 0
+  m_ColorFormat: 48
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 0
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 5
+  m_VolumeDepth: 16
+  m_ShadowSamplingMode: 2
 --- !u!1 &228297295
 GameObject:
   m_ObjectHideFlags: 0
@@ -42328,7 +42328,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5543878492267343193, guid: 110682f3b2e634b43927cbc761b62c16, type: 3}
       propertyPath: maxRange
-      value: 220
+      value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 5543878492267343193, guid: 110682f3b2e634b43927cbc761b62c16, type: 3}
       propertyPath: saveGame
@@ -42888,7 +42888,7 @@ MonoBehaviour:
   _radius: 20
   _subdivisions: 1
   _featherWaveStart: 0.1
-  _waveBuffers: {fileID: 91341305}
+  _waveBuffers: {fileID: 216916765}
 --- !u!4 &2035077245 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4140670084722468269, guid: 110682f3b2e634b43927cbc761b62c16, type: 3}
@@ -47091,7 +47091,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2078797882512227553, guid: dd58e6daf967f1942aa0d53dce52dd97, type: 3}
       propertyPath: m_FlareFalloff
-      value: 4.12
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2078797882512227553, guid: dd58e6daf967f1942aa0d53dce52dd97, type: 3}
       propertyPath: m_MinFilterSize
@@ -47099,26 +47099,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2078797882512227553, guid: dd58e6daf967f1942aa0d53dce52dd97, type: 3}
       propertyPath: m_SurfaceTint.b
-      value: 0.1462264
+      value: 0.18396229
       objectReference: {fileID: 0}
     - target: {fileID: 2078797882512227553, guid: dd58e6daf967f1942aa0d53dce52dd97, type: 3}
       propertyPath: m_SurfaceTint.g
-      value: 0.5361711
+      value: 0.55672246
       objectReference: {fileID: 0}
     - target: {fileID: 2078797882512227553, guid: dd58e6daf967f1942aa0d53dce52dd97, type: 3}
       propertyPath: m_SurfaceTint.r
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2078797882512227553, guid: dd58e6daf967f1942aa0d53dce52dd97, type: 3}
-      propertyPath: m_SurfaceTexture
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2078797882512227553, guid: dd58e6daf967f1942aa0d53dce52dd97, type: 3}
       propertyPath: m_AngularDiameter
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2078797882512227553, guid: dd58e6daf967f1942aa0d53dce52dd97, type: 3}
-      propertyPath: m_InteractsWithSky
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2078797882512227553, guid: dd58e6daf967f1942aa0d53dce52dd97, type: 3}
@@ -47154,10 +47146,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2154028247546641387, guid: dd58e6daf967f1942aa0d53dce52dd97, type: 3}
-      propertyPath: m_Cookie
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2154028247546641387, guid: dd58e6daf967f1942aa0d53dce52dd97, type: 3}
       propertyPath: m_Color.b
       value: 1
       objectReference: {fileID: 0}
@@ -47187,11 +47175,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2154028247546641387, guid: dd58e6daf967f1942aa0d53dce52dd97, type: 3}
       propertyPath: m_BounceIntensity
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2154028247546641387, guid: dd58e6daf967f1942aa0d53dce52dd97, type: 3}
       propertyPath: m_ColorTemperature
-      value: 5957
+      value: 6961
       objectReference: {fileID: 0}
     - target: {fileID: 2154028247546641387, guid: dd58e6daf967f1942aa0d53dce52dd97, type: 3}
       propertyPath: m_Shadows.m_NearPlane

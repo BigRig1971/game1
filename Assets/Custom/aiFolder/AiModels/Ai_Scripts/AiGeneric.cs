@@ -8,7 +8,6 @@ namespace StupidHumanGames
 {
 	public class AiGeneric : MonoBehaviour
 	{
-		Vector3 location;
 		[SerializeField] bool canTame = false;
 		AudioSource _audioSource;
 		Collider[] hitColliders;
@@ -59,7 +58,6 @@ namespace StupidHumanGames
 
 		void Start()
 		{
-			location = transform.position;
 			homePosition = GetComponent<Transform>().position;
 			player = FindObjectOfType<ThirdPersonController>().transform;
 			_audioSource = GetComponent<AudioSource>();
@@ -89,7 +87,8 @@ namespace StupidHumanGames
 		{
 			if (canSwimOrFly) SwimOrFly(); else MoveOnGround();
 
-			OnHitObstacle();			
+			OnHitObstacle();
+			OutOfBounds();
 		}
 #if UNITY_EDITOR
 
@@ -103,23 +102,18 @@ namespace StupidHumanGames
 		#region Movement
 		void SwimOrFly()
 		{
-			
 			var step = _moveSpeed * Time.deltaTime;
-			
-			var qto = Quaternion.LookRotation(wayPoint - location).normalized;
-			
+			var qto = Quaternion.LookRotation(wayPoint - transform.position).normalized;
 			transform.rotation = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * _turnSpeed);
 			transform.position = Vector3.MoveTowards(transform.position + transform.forward * .05f, wayPoint, step);
 		}
 		void MoveOnGround()
 		{
-			
 			var step = _moveSpeed * Time.deltaTime;
-			
 			OnYPosition();
 			//Vector3 newWay = new Vector3(wayPoint.x, transform.position.y, wayPoint.z);
 			// if (newWay == Vector3.zero) return;
-			var qto = Quaternion.LookRotation(wayPoint - location).normalized;
+			var qto = Quaternion.LookRotation(wayPoint - transform.position).normalized;
 			transform.rotation = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * _turnSpeed);
 
 			if (!rootMotion) transform.position = Vector3.MoveTowards(transform.position + transform.forward * .05f, wayPoint, step);
@@ -225,15 +219,15 @@ namespace StupidHumanGames
 		#region Conditions
 		bool OnCanPatrol()
 		{
-			if (patrol && !OutOfBounds() && !Physics.CheckSphere(transform.localPosition, sightRange, playerLayer) && !Physics.CheckSphere(transform.localPosition, attackRange, playerLayer)) return true; else return false;
+			if (patrol && !Physics.CheckSphere(transform.localPosition, sightRange, playerLayer) && !Physics.CheckSphere(transform.localPosition, attackRange, playerLayer)) return true; else return false;
 		}
 		bool OnCanChase()
 		{
-			if (chase && !OutOfBounds() && Physics.CheckSphere(transform.localPosition, sightRange, playerLayer) && !Physics.CheckSphere(transform.localPosition, attackRange, playerLayer)) return true; else return false;
+			if (chase && Physics.CheckSphere(transform.localPosition, sightRange, playerLayer) && !Physics.CheckSphere(transform.localPosition, attackRange, playerLayer)) return true; else return false;
 		}
 		bool OnCanAttack()
 		{
-			if (attack && !OutOfBounds() && Physics.CheckSphere(transform.localPosition, attackRange, playerLayer) && Physics.CheckSphere(transform.localPosition, sightRange, playerLayer)) return true; else return false;
+			if (attack && Physics.CheckSphere(transform.localPosition, attackRange, playerLayer) && Physics.CheckSphere(transform.localPosition, sightRange, playerLayer)) return true; else return false;
 		}
 
 		bool OutOfBounds()
@@ -244,7 +238,7 @@ namespace StupidHumanGames
 
 			if (distance > maxRange)
 			{
-				
+				wayPoint = homePosition;
 				_outOfBounds = true;
 
 				var restrictedMaxRange = homePosition + (transform.position - homePosition).normalized * maxRange;
@@ -256,7 +250,7 @@ namespace StupidHumanGames
 			}
 			if (transform.position.y > maxAltitude)
 			{
-				
+				wayPoint = homePosition;
 				_outOfBounds = true;
 
 				transform.position = new Vector3(transform.position.x, maxAltitude, transform.position.z);
@@ -266,7 +260,7 @@ namespace StupidHumanGames
 			}
 			if (transform.position.y < minAltitude)
 			{
-				
+				wayPoint = homePosition;
 				_outOfBounds = true;
 
 				transform.position = new Vector3(transform.position.x, minAltitude, transform.position.z);
@@ -292,7 +286,7 @@ namespace StupidHumanGames
 			if (OnCanPatrol()) SetAnimation(1, 1, 1); wayPointIsSet = false;
 			while (OnCanPatrol())
 			{
-				
+
 				GetRandomWaypoint();
 				float distance = Vector3.Distance(transform.position, wayPoint);
 				if (distance < 1f) wayPointIsSet = false;
@@ -314,11 +308,6 @@ namespace StupidHumanGames
 					_currentState = state.Idle;
 					yield break;
 				}
-				if (OutOfBounds())
-				{
-					_currentState = state.Lost;
-					yield break;
-				}
 				yield return null;
 			}
 			_currentState = state.Chase;
@@ -326,7 +315,7 @@ namespace StupidHumanGames
 		IEnumerator Chase()
 		{
 			if (OnCanChase()) SetAnimation(1, 1, 2);
-			while (IsFacingObject() && OnCanChase())
+			while (IsFacingObject() && OnCanChase() && !OnHitObstacle())
 			{
 				
 				wayPoint = player.position;
@@ -342,7 +331,7 @@ namespace StupidHumanGames
 		{
 			
 
-			while (OnCanAttack())
+			while (OnCanAttack() && IsFacingObject())
 			{
 				SetAnimation(0, 0, 3);
 				RandomAttackAnimations();
@@ -372,7 +361,6 @@ namespace StupidHumanGames
 				wayPoint = homePosition;
 				yield return null;
 			}
-			yield return new WaitForSeconds(2);
 			_currentState = state.Patrol;
 		}
 		IEnumerator Idle()
@@ -385,7 +373,7 @@ namespace StupidHumanGames
 				_currentState = state.Patrol;
 				yield break;
 			}
-			_currentState = state.Patrol;
+			_currentState = state.Chase;
 		}
 		void SetAnimation(float blend, float moveSpeedMultiplier, float turnSpeedMultiplier)
 		{
