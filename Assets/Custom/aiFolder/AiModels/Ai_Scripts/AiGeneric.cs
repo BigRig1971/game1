@@ -361,6 +361,7 @@ namespace StupidHumanGames
 				wayPoint = homePosition;
 				yield return null;
 			}
+			yield return new WaitForSeconds(2);
 			_currentState = state.Patrol;
 		}
 		IEnumerator Idle()
