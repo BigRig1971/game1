@@ -17,8 +17,6 @@ Material:
   - _DISABLE_SSR_TRANSPARENT
   - _MATERIAL_FEATURE_CLEAR_COAT
   - _MATERIAL_FEATURE_SUBSURFACE_SCATTERING
-  - _NORMALMAP
-  - _NORMALMAP_TANGENT_SPACE
   m_InvalidKeywords:
   - _AXF_BRDF_TYPE_SVBRDF
   - _EMISSION
@@ -100,7 +98,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseColorMap:
-        m_Texture: {fileID: 2800000, guid: 1c39eb21c45ad18478528a71de0e1ad0, type: 3}
+        m_Texture: {fileID: 2800000, guid: 68386a47d83cfea4692a89359f6ed809, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseColorMap0:
@@ -288,7 +286,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 1c39eb21c45ad18478528a71de0e1ad0, type: 3}
+        m_Texture: {fileID: 2800000, guid: 68386a47d83cfea4692a89359f6ed809, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MaskMap:
@@ -340,7 +338,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMapOS:
-        m_Texture: {fileID: 2800000, guid: 76037f871e3f3cf42953f289e012f5e0, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMapOS0:
@@ -591,7 +589,7 @@ Material:
     - _DetailAlbedoScale2: 1
     - _DetailAlbedoScale3: 1
     - _DetailNormalMapScale: 1
-    - _DetailNormalScale: 0.53
+    - _DetailNormalScale: 1.11
     - _DetailNormalScale0: 1
     - _DetailNormalScale1: 1
     - _DetailNormalScale2: 1
@@ -737,7 +735,7 @@ Material:
     - _MetallicRemapMin3: 0
     - _Mode: 0
     - _NormalMapKwToggle: 1
-    - _NormalMapSpace: 0
+    - _NormalMapSpace: 1
     - _NormalMapSpace0: 0
     - _NormalMapSpace1: 0
     - _NormalMapSpace2: 0
@@ -784,7 +782,7 @@ Material:
     - _SVBRDF_HeightMapMaxMM: 0
     - _SVBRDF_SpecularLobeMapScale: 1
     - _SensorId: 1
-    - _Smoothness: 0.22
+    - _Smoothness: 0.321
     - _Smoothness0: 0.5
     - _Smoothness1: 0.5
     - _Smoothness2: 0.5
@@ -892,7 +890,7 @@ Material:
     - WaterColorA: {r: 0.08490565, g: 0.04261914, b: 0.03484337, a: 0}
     - WaterColorB: {r: 0.001201498, g: 0.009433985, b: 0.009433985, a: 0}
     - _BASE_COLOR: {r: 1, g: 1, b: 1, a: 0}
-    - _BaseColor: {r: 0.6603774, g: 0.6378233, b: 0.6198825, a: 1}
+    - _BaseColor: {r: 0.764151, g: 0.764151, b: 0.764151, a: 1}
     - _BaseColor0: {r: 1, g: 1, b: 1, a: 1}
     - _BaseColor1: {r: 1, g: 1, b: 1, a: 1}
     - _BaseColor2: {r: 1, g: 1, b: 1, a: 1}
@@ -906,7 +904,7 @@ Material:
     - _CarPaint2_CTF0s: {r: 1, g: 1, b: 1, a: 1}
     - _CarPaint2_CTSpreads: {r: 1, g: 1, b: 1, a: 1}
     - _ClearcoatNormalMap_SO: {r: 1, g: 1, b: 0, a: 0}
-    - _Color: {r: 0.6603774, g: 0.6378232, b: 0.61988246, a: 1}
+    - _Color: {r: 0.764151, g: 0.764151, b: 0.764151, a: 1}
     - _DiffusionProfileAsset: {r: -1.405437e+32, g: 2.0030989e-26, b: 0.00000006313206, a: -4.4045647e-18}
     - _DiffusionProfileAsset0: {r: 0, g: 0, b: 0, a: 0}
     - _DiffusionProfileAsset1: {r: 0, g: 0, b: 0, a: 0}
