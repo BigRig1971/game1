@@ -8,9 +8,7 @@ namespace StupidHumanGames
 {
     public class LootableItem : MonoBehaviour, DamageInterface
     {
-       
-      
-
+        
         [SerializeField] List<Item> randomItems = new List<Item>();
         [SerializeField] bool randomSize = false;
         [SerializeField] AudioSource _audioSource;
@@ -18,8 +16,6 @@ namespace StupidHumanGames
         [SerializeField] Vector3 scale = Vector3.one;
         [SerializeField] float droppedLootScale = 1f;
         [SerializeField] float damageDropScale = 1f;    
-        [SerializeField] Vector3 playerPosition;
-
         [SerializeField] bool spawnLoot = false;
         [SerializeField] float spawnLootOffset = 10f;
         private bool lootable;
@@ -27,11 +23,9 @@ namespace StupidHumanGames
         [SerializeField, Range(0f, 1f)] float _impactVolume;
         [SerializeField] AudioClip _deathSound;
         [SerializeField, Range(0f, 1f)] float _deathVolume;
-
         public bool isDamagable = false;
         [SerializeField] int health = 30;
         [SerializeField] float deathDelay = 5f;
-      
         [System.Serializable]
         public class Item
         {
@@ -54,22 +48,17 @@ namespace StupidHumanGames
         }
         private void Start()
         {
-         
-            RandomLootableItems();
-            OnScaleObject();
-            playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
-          
+			
+			RandomLootableItems();
+            OnScaleObject();  
         }
 #if UNITY_EDITOR
 
 
 #endif
-        
         public void LootableItems()
         {
             if (!lootable && isDamagable) return;
-            
-
             foreach (Item loi in _listOfItems)
             {
                 int remaining = InventoryManager.AddItemToInventory(loi._item, loi._itemAmount);
@@ -97,8 +86,6 @@ namespace StupidHumanGames
                 _listOfItems.Add(randomItems[index]);
             }
         }
-
- 
         void OnDrawGizmos()
         {
             Gizmos.color = Color.yellow;
@@ -115,7 +102,6 @@ namespace StupidHumanGames
 
         IEnumerator OnDropItems()
         {
-
             transform.localScale = Vector3.zero;
             foreach (Item i in _listOfItems)
             {
@@ -176,6 +162,8 @@ namespace StupidHumanGames
 				if (_deathSound != null) _audioSource.PlayOneShot(_deathSound, _deathVolume);
 				Invoke(nameof(LootItem), deathDelay);
 			}
+            
 		}
+       
     }
 }

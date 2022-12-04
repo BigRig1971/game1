@@ -35,11 +35,11 @@ Transform:
   m_GameObject: {fileID: 9222980981543852366}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 437.33447, y: 99.23379, z: 635.04205}
-  m_LocalScale: {x: 1.173625, y: 1.173625, z: 1.173625}
+  m_LocalScale: {x: 1.1959178, y: 1.1959178, z: 1.1959178}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4835343655275695185
 MeshFilter:
@@ -100,7 +100,7 @@ CapsuleCollider:
   m_GameObject: {fileID: 9222980981543852366}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Enabled: 1
+  m_Enabled: 0
   m_Radius: 0.68
   m_Height: 0.79
   m_Direction: 1
@@ -123,7 +123,6 @@ MonoBehaviour:
   scale: {x: 1, y: 1, z: 1}
   droppedLootScale: 2
   damageDropScale: 2
-  playerPosition: {x: 0, y: 0, z: 0}
   spawnLoot: 0
   spawnLootOffset: 10
   _impactSound: {fileID: 0}

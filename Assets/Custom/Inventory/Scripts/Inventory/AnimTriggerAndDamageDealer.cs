@@ -9,6 +9,7 @@ namespace StupidHumanGames
 {
     public class AnimTriggerAndDamageDealer : MonoBehaviour
     {
+        
         [SerializeField] bool groundHugging = false;
         [SerializeField] Transform cameraRoot;
         [SerializeField] float cameraRootOffset;

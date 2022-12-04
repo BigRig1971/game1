@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 5010806264853274522}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 408.8109, y: 100.00001, z: 577.9745}
-  m_LocalScale: {x: 2.2243204, y: 2.2243204, z: 2.2243204}
+  m_LocalScale: {x: 1.6532724, y: 1.6532724, z: 1.6532724}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5420749964427733961}
@@ -55,7 +55,6 @@ MonoBehaviour:
   scale: {x: 1, y: 1, z: 1}
   droppedLootScale: 1
   damageDropScale: 1
-  playerPosition: {x: 0, y: 0, z: 0}
   spawnLoot: 0
   spawnLootOffset: 5
   _impactSound: {fileID: 8300000, guid: b15e2679af8cc55489cc7ef271a3769d, type: 3}
@@ -65,12 +64,6 @@ MonoBehaviour:
   isDamagable: 1
   health: 5
   deathDelay: 0
-  death:
-    m_PersistentCalls:
-      m_Calls: []
-  takeHit:
-    m_PersistentCalls:
-      m_Calls: []
   _listOfItems:
   - _item: {fileID: 11400000, guid: 52b75efa773e2cb4fb63b89e11f4e35b, type: 2}
     _itemAmount: 10

@@ -1130,7 +1130,6 @@ MonoBehaviour:
   scale: {x: 0.3, y: 0.3, z: 0.3}
   droppedLootScale: 1
   damageDropScale: 1
-  playerPosition: {x: 0, y: 0, z: 0}
   spawnLoot: 0
   spawnLootOffset: 2
   _impactSound: {fileID: 0}
@@ -1140,24 +1139,6 @@ MonoBehaviour:
   isDamagable: 1
   health: 20
   deathDelay: 2
-  death:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: StupidHumanGames.AiGeneric, Assembly-CSharp
-        m_MethodName: OnIsDead
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  takeHit:
-    m_PersistentCalls:
-      m_Calls: []
   _listOfItems:
   - _item: {fileID: 11400000, guid: fb2636d27ecb9b34b8f27f34b39040f4, type: 2}
     _itemAmount: 10

@@ -10,22 +10,26 @@ namespace StupidHumanGames
         Animator anim;
         LootableItem lootableItem;
         ItemPickupable droppedItemPickup;
+        GameObject statsBar;
 
         private void Start()
         {
             anim = GetComponent<Animator>();
+            
         }
         private void OnTriggerEnter(Collider other)
         {
             
-            if (other.CompareTag("Lootable"))
-            {              
+            if (other.CompareTag("Lootable"))            
+            {
                 lootableItem = other.gameObject.GetComponent<LootableItem>();
-                droppedItemPickup = other.gameObject.GetComponent<ItemPickupable>();
+               
+				droppedItemPickup = other.gameObject.GetComponent<ItemPickupable>();
                 if (lootableItem != null && !lootableItem.isDamagable) LootItem();
                 if (droppedItemPickup != null) PickupItem();
             }
         }
+       
         void LootItem()
         {
             lootableItem.LootableItems();
