@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace HeurekaGames
+namespace HeurekaGames.Utils
 {
     public static class Heureka_WindowStyler
     {

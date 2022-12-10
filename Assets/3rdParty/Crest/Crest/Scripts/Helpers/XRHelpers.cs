@@ -25,6 +25,9 @@ namespace Crest
 
     public static class XRHelpers
     {
+        // NOTE: This is the same value as Unity, but in the future it could be higher.
+        const int k_MaximumViews = 2;
+
 #if _XR_ENABLED
         readonly static List<XRDisplaySubsystem> _displayList = new List<XRDisplaySubsystem>();
 
@@ -62,10 +65,24 @@ namespace Crest
             }
         }
 
+        static Texture2DArray s_WhiteTexture = null;
+        public static Texture2DArray WhiteTexture
+        {
+            get
+            {
+                if (s_WhiteTexture == null)
+                {
+                    s_WhiteTexture = TextureArrayHelpers.CreateTexture2DArray(Texture2D.whiteTexture, k_MaximumViews);
+                    s_WhiteTexture.name = "Crest White Texture XR";
+                }
+                return s_WhiteTexture;
+            }
+        }
+
         public static RenderTextureDescriptor GetRenderTextureDescriptor(Camera camera)
         {
 #if _XR_ENABLED
-            if (IsRunning)
+            if (camera.stereoEnabled)
             {
                 return XRSettings.eyeTextureDesc;
             }
@@ -122,7 +139,7 @@ namespace Crest
             SubsystemManager.GetInstances(_displayList);
 #endif
 
-            if (!IsRunning || !IsSinglePass)
+            if (!camera.stereoEnabled || !IsSinglePass)
             {
                 return;
             }

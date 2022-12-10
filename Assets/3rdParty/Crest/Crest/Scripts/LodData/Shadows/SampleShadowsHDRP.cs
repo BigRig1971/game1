@@ -7,7 +7,6 @@
 namespace Crest
 {
     using UnityEngine;
-    using UnityEngine.Rendering;
     using UnityEngine.Rendering.HighDefinition;
 
     class SampleShadowsHDRP : CustomPass
@@ -28,44 +27,55 @@ namespace Crest
 
         static readonly int sp_CrestViewProjectionMatrix = Shader.PropertyToID("_CrestViewProjectionMatrix");
 
+        int _xrTargetEyeIndex = -1;
+
         protected override void Execute(CustomPassContext context)
         {
-            if (OceanRenderer.Instance == null || OceanRenderer.Instance._lodDataShadow == null) return;
+            var ocean = OceanRenderer.Instance;
+
+            if (ocean == null || ocean._lodDataShadow == null)
+            {
+                return;
+            }
 
             var camera = context.hdCamera.camera;
-            var renderContext = context.renderContext;
 
             // Custom passes execute for every camera. We only support one camera for now.
-            if (!ReferenceEquals(camera, OceanRenderer.Instance.ViewCamera)) return;
+            if (!ReferenceEquals(camera, ocean.ViewCamera)) return;
             // TODO: bail when not executing for main light or when no main light exists?
             // if (renderingData.lightData.mainLightIndex == -1) return;
-            var commandBuffer = OceanRenderer.Instance._lodDataShadow.BufCopyShadowMap;
-            if (commandBuffer == null) return;
 
-            // Target is not multi-eye so stop mult-eye rendering for this command buffer. Breaks registered shadow
-            // inputs without this.
-            if (XRGraphics.enabled)
+            camera.TryGetComponent<HDAdditionalCameraData>(out var cameraData);
+
+            if (cameraData != null && cameraData.xrRendering)
             {
-                renderContext.StopMultiEye(camera);
+                XRHelpers.UpdatePassIndex(ref _xrTargetEyeIndex);
+
+                // Skip the right eye as data is not stereo.
+                if (_xrTargetEyeIndex == 1)
+                {
+                    return;
+                }
             }
 
-            commandBuffer.SetGlobalMatrix(sp_CrestViewProjectionMatrix, s_Matrix);
-
-            renderContext.ExecuteCommandBuffer(commandBuffer);
-
-            // Even if we do not call StopMultiEye, it is necessary to call StartMultiEye otherwise one eye no longer
-            // renders.
-            if (XRGraphics.enabled)
+            // Disable for XR SPI otherwise input will not have correct world position.
+            if (cameraData != null && cameraData.xrRendering && XRHelpers.IsSinglePass)
             {
-                renderContext.StartMultiEye(camera);
+                context.cmd.DisableShaderKeyword("STEREO_INSTANCING_ON");
             }
-            else
+
+            // We cannot seem to override this matrix so a reference manually.
+            context.cmd.SetGlobalMatrix(sp_CrestViewProjectionMatrix, s_Matrix);
+            ocean._lodDataShadow.BuildCommandBuffer(ocean, context.cmd);
+
+            // Restore matrices otherwise remaining render will have incorrect matrices. Each pass is responsible for
+            // restoring matrices if required.
+            context.cmd.SetViewProjectionMatrices(camera.worldToCameraMatrix, camera.projectionMatrix);
+
+            // Restore XR SPI as we cannot rely on remaining pipeline to do it for us.
+            if (cameraData != null && cameraData.xrRendering && XRHelpers.IsSinglePass)
             {
-                // Restore matrices otherwise remaining render will have incorrect matrices. Each pass is responsible
-                // for restoring matrices if required.
-                commandBuffer.Clear();
-                commandBuffer.SetViewProjectionMatrices(camera.worldToCameraMatrix, camera.projectionMatrix);
-                renderContext.ExecuteCommandBuffer(commandBuffer);
+                context.cmd.EnableShaderKeyword("STEREO_INSTANCING_ON");
             }
         }
 

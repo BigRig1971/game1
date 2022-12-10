@@ -53,8 +53,8 @@ namespace Crest
     /// <summary>
     /// Base class for scripts that register input to the various LOD data types.
     /// </summary>
-    [ExecuteAlways]
-    public abstract partial class RegisterLodDataInputBase : MonoBehaviour, ILodDataInput
+    [ExecuteDuringEditMode]
+    public abstract partial class RegisterLodDataInputBase : CustomMonoBehaviour, ILodDataInput
     {
 #if UNITY_EDITOR
         [SerializeField, Tooltip("Check that the shader applied to this object matches the input type (so e.g. an Animated Waves input object has an Animated Waves input shader.")]
@@ -100,7 +100,7 @@ namespace Crest
         protected List<Material> _sharedMaterials = new List<Material>();
         SampleHeightHelper _sampleHelper = new SampleHeightHelper();
 
-        // If this is true, then the renderer should not be there as input source is from something else.
+        // If this is false, then the renderer should not be there as input source is from something else.
         protected virtual bool RendererRequired => true;
         protected virtual bool SupportsMultiPassShaders => false;
 
@@ -197,8 +197,7 @@ namespace Crest
     /// <summary>
     /// Registers input to a particular LOD data.
     /// </summary>
-    [ExecuteAlways]
-    public abstract class RegisterLodDataInput<LodDataType> : RegisterLodDataInputBase
+    public abstract partial class RegisterLodDataInput<LodDataType> : RegisterLodDataInputBase
         where LodDataType : LodDataMgr
     {
         protected const string k_displacementCorrectionTooltip = "Whether this input data should displace horizontally with waves. If false, data will not move from side to side with the waves. Adds a small performance overhead when disabled.";
@@ -220,6 +219,24 @@ namespace Crest
             }
             queue = int.MinValue;
             return false;
+        }
+
+        public static void RegisterInput(ILodDataInput input, int queueSortIndex, int subSortIndex)
+        {
+            var registrar = GetRegistrar(typeof(LodDataType));
+            registrar.Remove(input);
+
+            // Allow sorting within a queue. Callers can pass in things like sibling index to get deterministic sorting
+            int maxSubIndex = 1000;
+            int finalSortIndex = queueSortIndex * maxSubIndex + Mathf.Min(subSortIndex, maxSubIndex - 1);
+
+            registrar.Add(finalSortIndex, input);
+        }
+
+        public static void DeregisterInput(ILodDataInput input)
+        {
+            var registrar = GetRegistrar(typeof(LodDataType));
+            registrar.Remove(input);
         }
 
         protected virtual void OnEnable()
@@ -244,19 +261,13 @@ namespace Crest
             }
 
             GetQueue(out var q);
-
-            var registrar = GetRegistrar(typeof(LodDataType));
-            registrar.Add(q, this);
+            RegisterInput(this, q, transform.GetSiblingIndex());
             _registeredQueueValue = q;
         }
 
         protected virtual void OnDisable()
         {
-            var registrar = GetRegistrar(typeof(LodDataType));
-            if (registrar != null)
-            {
-                registrar.Remove(this);
-            }
+            DeregisterInput(this);
         }
 
         protected override void Update()
@@ -270,9 +281,7 @@ namespace Crest
                 {
                     if (q != _registeredQueueValue)
                     {
-                        var registrar = GetRegistrar(typeof(LodDataType));
-                        registrar.Remove(this);
-                        registrar.Add(q, this);
+                        RegisterInput(this, q, transform.GetSiblingIndex());
                         _registeredQueueValue = q;
                     }
                 }
@@ -297,7 +306,6 @@ namespace Crest
     {
     }
 
-    [ExecuteAlways]
     public abstract partial class RegisterLodDataInputWithSplineSupport<LodDataType, SplinePointCustomData>
         : RegisterLodDataInput<LodDataType>
         , ISplinePointCustomDataSetup
@@ -305,7 +313,7 @@ namespace Crest
         , IReceiveSplinePointOnDrawGizmosSelectedMessages
 #endif
         where LodDataType : LodDataMgr
-        where SplinePointCustomData : MonoBehaviour, ISplinePointCustomData
+        where SplinePointCustomData : CustomMonoBehaviour, ISplinePointCustomData
     {
         [Header("Spline settings")]
         [SerializeField, Predicated(typeof(Spline.Spline)), DecoratedField]
@@ -322,24 +330,32 @@ namespace Crest
         protected abstract string SplineShaderName { get; }
         protected abstract Vector2 DefaultCustomData { get; }
 
-        protected override bool RendererRequired => _spline == null;
+        protected override bool RendererRequired => !TryGetComponent<Spline.Spline>(out _);
 
         protected float _splinePointHeightMin;
         protected float _splinePointHeightMax;
 
         void Awake()
         {
-            if (TryGetComponent(out _spline))
-            {
-                var radius = _overrideSplineSettings ? _radius : _spline.Radius;
-                var subdivs = _overrideSplineSettings ? _subdivisions : _spline.Subdivisions;
-                ShapeGerstnerSplineHandling.GenerateMeshFromSpline<SplinePointCustomData>(_spline, transform, subdivs, radius, DefaultCustomData,
-                    ref _splineMesh, out _splinePointHeightMin, out _splinePointHeightMax);
+            CreateOrUpdateSplineMesh();
+        }
 
-                if (_splineMaterial == null)
-                {
-                    CreateSplineMaterial();
-                }
+        void CreateOrUpdateSplineMesh()
+        {
+            if (_spline == null && !TryGetComponent(out _spline))
+            {
+                _splineMesh = null;
+                return;
+            }
+
+            var radius = _overrideSplineSettings ? _radius : _spline.Radius;
+            var subdivs = _overrideSplineSettings ? _subdivisions : _spline.Subdivisions;
+            ShapeGerstnerSplineHandling.GenerateMeshFromSpline<SplinePointCustomData>(_spline, transform, subdivs,
+                radius, DefaultCustomData, ref _splineMesh, out _splinePointHeightMin, out _splinePointHeightMax);
+
+            if (_splineMaterial == null)
+            {
+                _splineMaterial = new Material(Shader.Find(SplineShaderName));
             }
         }
 
@@ -384,45 +400,21 @@ namespace Crest
         }
 
 #if UNITY_EDITOR
-        protected override void Update()
-        {
-            base.Update();
-
-            // Check for spline and rebuild spline mesh each frame in edit mode
-            if (!EditorApplication.isPlaying)
-            {
-                if (_spline == null)
-                {
-                    TryGetComponent(out _spline);
-                }
-
-                if (_spline != null)
-                {
-                    var radius = _overrideSplineSettings ? _radius : _spline.Radius;
-                    var subdivs = _overrideSplineSettings ? _subdivisions : _spline.Subdivisions;
-                    ShapeGerstnerSplineHandling.GenerateMeshFromSpline<SplinePointCustomData>(_spline, transform, subdivs, radius, DefaultCustomData,
-                        ref _splineMesh, out _splinePointHeightMin, out _splinePointHeightMax);
-
-                    if (_splineMaterial == null)
-                    {
-                        CreateSplineMaterial();
-                    }
-                }
-                else
-                {
-                    _splineMesh = null;
-                }
-            }
-        }
-
         protected new void OnDrawGizmosSelected()
         {
+            // Restrict this call as it is costly.
+            if (Selection.activeGameObject == gameObject)
+            {
+                CreateOrUpdateSplineMesh();
+            }
+
             Gizmos.color = GizmoColor;
             Gizmos.DrawWireMesh(_splineMesh, transform.position, transform.rotation, transform.lossyScale);
         }
 
         public void OnSplinePointDrawGizmosSelected(SplinePoint point)
         {
+            CreateOrUpdateSplineMesh();
             OnDrawGizmosSelected();
         }
 #endif // UNITY_EDITOR
@@ -501,7 +493,7 @@ namespace Crest
     }
 
     [CustomEditor(typeof(RegisterLodDataInputBase), true), CanEditMultipleObjects]
-    class RegisterLodDataInputBaseEditor : ValidatedEditor
+    class RegisterLodDataInputBaseEditor : CustomBaseEditor
     {
         public override void OnInspectorGUI()
         {
@@ -521,6 +513,22 @@ namespace Crest
         }
     }
 
+    public abstract partial class RegisterLodDataInput<LodDataType>
+    {
+        public override bool Validate(OceanRenderer ocean, ValidatedHelper.ShowMessage showMessage)
+        {
+            var isValid = base.Validate(ocean, showMessage);
+
+            // If we have a renderer then validate the layer.
+            if (RendererRequired && TryGetComponent<Renderer>(out _) && !_disableRenderer)
+            {
+                ValidatedHelper.ValidateRendererLayer(gameObject, showMessage, ocean);
+            }
+
+            return isValid;
+        }
+    }
+
     public abstract partial class RegisterLodDataInputWithSplineSupport<LodDataType, SplinePointCustomData>
     {
         protected override bool RendererOptional => true;
@@ -529,8 +537,7 @@ namespace Crest
         {
             bool isValid = base.Validate(ocean, showMessage);
 
-            // Is there a renderer? Check spline explicitly as the renderer may not be created (eg GO is inactive).
-            if (RendererRequired && !TryGetComponent<Renderer>(out _) && !TryGetComponent<Spline.Spline>(out _))
+            if (RendererRequired && !TryGetComponent<Renderer>(out _))
             {
                 showMessage
                 (

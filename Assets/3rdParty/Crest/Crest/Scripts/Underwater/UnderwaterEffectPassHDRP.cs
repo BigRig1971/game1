@@ -7,9 +7,13 @@
 namespace Crest
 {
     using UnityEngine;
-    using UnityEngine.Experimental.Rendering;
     using UnityEngine.Rendering;
     using UnityEngine.Rendering.HighDefinition;
+#if UNITY_2021_2_OR_NEWER
+    using UnityEngine.Rendering.RendererUtils;
+#else
+    using UnityEngine.Experimental.Rendering;
+#endif
 
     public class UnderwaterEffectPassHDRP : CustomPass
     {
@@ -27,14 +31,12 @@ namespace Crest
         MaterialPropertyBlock _depthValuesMaterialPropertyBlock;
 
         static GameObject s_GameObject;
-        static UnderwaterRenderer s_UnderwaterRenderer;
-
+        UnderwaterRenderer _renderer;
         static ShaderTagId[] s_ForwardShaderTags;
 
-        public static void Enable(UnderwaterRenderer underwaterRenderer)
+        public static void Enable()
         {
             CustomPassHelpers.CreateOrUpdate<UnderwaterEffectPassHDRP>(ref s_GameObject, k_Name, CustomPassInjectionPoint.BeforePostProcess);
-            s_UnderwaterRenderer = underwaterRenderer;
         }
 
         public static void Disable()
@@ -99,12 +101,6 @@ namespace Crest
 
         void SetUpVolumes()
         {
-            if (s_UnderwaterRenderer._mode != UnderwaterRenderer.Mode.VolumeFlyThrough)
-            {
-                CleanUpVolumes();
-                return;
-            }
-
             if (_depthTexture == null)
             {
                 _depthTexture = RTHandles.Alloc
@@ -141,18 +137,19 @@ namespace Crest
 
         protected override void Execute(CustomPassContext context)
         {
-            if (!s_UnderwaterRenderer.IsActive)
+            var camera = context.hdCamera.camera;
+            _renderer = UnderwaterRenderer.Get(camera);
+
+            if (!_renderer || !_renderer.IsActive)
             {
                 return;
             }
 
-            var camera = context.hdCamera.camera;
-
             // Only support main camera, scene camera and preview camera.
-            if (!ReferenceEquals(s_UnderwaterRenderer._camera, camera))
+            if (!ReferenceEquals(_renderer._camera, camera))
             {
 #if UNITY_EDITOR
-                if (!s_UnderwaterRenderer.IsActiveForEditorCamera(camera))
+                if (!UnderwaterRenderer.IsActiveForEditorCamera(camera, null))
 #endif
                 {
                     return;
@@ -171,29 +168,27 @@ namespace Crest
             }
 #endif
 
-            XRHelpers.Update(camera);
-            XRHelpers.UpdatePassIndex(ref UnderwaterRenderer.s_xrPassIndex);
-
             SetUpVolumes();
 
             UnderwaterRenderer.UpdatePostProcessMaterial(
-                s_UnderwaterRenderer._mode,
+                _renderer,
+                _renderer._mode,
                 camera,
                 _underwaterEffectMaterial,
                 _sphericalHarmonicsData,
-                s_UnderwaterRenderer._meniscus,
-                _firstRender || s_UnderwaterRenderer._copyOceanMaterialParamsEachFrame,
-                s_UnderwaterRenderer._debug._viewOceanMask,
-                s_UnderwaterRenderer._debug._viewStencil,
-                s_UnderwaterRenderer._filterOceanData,
-                ref s_UnderwaterRenderer._currentOceanMaterial,
-                s_UnderwaterRenderer.EnableShaderAPI
+                _renderer._meniscus,
+                _firstRender || _renderer._copyOceanMaterialParamsEachFrame,
+                _renderer._debug._viewOceanMask,
+                _renderer._debug._viewStencil,
+                _renderer._filterOceanData,
+                ref _renderer._currentOceanMaterial,
+                _renderer.EnableShaderAPI
             );
 
             var isMSAA = Helpers.IsMSAAEnabled(camera);
 
             // Create a separate stencil buffer context by copying the depth texture.
-            if (s_UnderwaterRenderer.UseStencilBufferOnEffect)
+            if (_renderer.UseStencilBufferOnEffect)
             {
                 if (isMSAA)
                 {
@@ -218,7 +213,7 @@ namespace Crest
             HDUtils.BlitCameraTexture(context.cmd, context.cameraColorBuffer, _colorTexture);
             context.propertyBlock.SetTexture(UnderwaterRenderer.ShaderIDs.s_CrestCameraColorTexture, _colorTexture);
 
-            if (s_UnderwaterRenderer.UseStencilBufferOnEffect)
+            if (_renderer.UseStencilBufferOnEffect)
             {
                 CoreUtils.SetRenderTarget(context.cmd, context.cameraColorBuffer, _depthTexture, ClearFlag.None);
             }
@@ -235,29 +230,29 @@ namespace Crest
                 }
             }
 
-            s_UnderwaterRenderer.ExecuteEffect(context.cmd, _underwaterEffectMaterial.material, context.propertyBlock);
+            _renderer.ExecuteEffect(context.cmd, _underwaterEffectMaterial.material, context.propertyBlock);
 
             // Render transparent objects (using layer mask) a second time after the underwater effect.
             // Taken and modified from:
             // https://github.com/Unity-Technologies/Graphics/blob/778ddac6207ade1689999b95380cd835b0669f2d/com.unity.render-pipelines.high-definition/Runtime/RenderPipeline/RenderPass/DrawRenderersCustomPass.cs#L200-L212
-            if (s_UnderwaterRenderer.EnableShaderAPI)
+            if (_renderer.EnableShaderAPI)
             {
                 var renderConfig = context.hdCamera.frameSettings.IsEnabled(FrameSettingsField.Shadowmask) ? HDUtils.GetBakedLightingWithShadowMaskRenderConfig() : HDUtils.GetBakedLightingRenderConfig();
-#pragma warning disable 0618
                 var result = new RendererListDesc(s_ForwardShaderTags, context.cullingResults, context.hdCamera.camera)
-#pragma warning restore 0618
                 {
                     rendererConfiguration = renderConfig,
                     renderQueueRange = GetRenderQueueRange(RenderQueueType.AllTransparent),
                     sortingCriteria = SortingCriteria.CommonTransparent,
                     excludeObjectMotionVectors = false,
-                    layerMask = s_UnderwaterRenderer._transparentObjectLayers,
+                    layerMask = _renderer._transparentObjectLayers,
                 };
 
                 context.cmd.EnableShaderKeyword("CREST_UNDERWATER_OBJECTS_PASS");
-#pragma warning disable 0618
+#if UNITY_2021_2_OR_NEWER
+                CoreUtils.DrawRendererList(context.renderContext, context.cmd, context.renderContext.CreateRendererList(result));
+#else
                 CoreUtils.DrawRendererList(context.renderContext, context.cmd, RendererList.Create(result));
-#pragma warning restore 0618
+#endif
                 context.cmd.DisableShaderKeyword("CREST_UNDERWATER_OBJECTS_PASS");
             }
 

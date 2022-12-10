@@ -16,10 +16,10 @@ namespace Crest
     /// Support script for Gerstner wave ocean shapes.
     /// Generates a number of batches of Gerstner waves.
     /// </summary>
-    [ExecuteAlways]
+    [ExecuteDuringEditMode(ExecuteDuringEditModeAttribute.Include.None)]
     [AddComponentMenu(Internal.Constants.MENU_PREFIX_SCRIPTS + "Shape Gerstner Batched")]
     [HelpURL(Internal.Constants.HELP_URL_BASE_USER + "wave-conditions.html" + Internal.Constants.HELP_URL_RP)]
-    public partial class ShapeGerstnerBatched : MonoBehaviour, ICollProvider, IFloatingOrigin
+    public partial class ShapeGerstnerBatched : CustomMonoBehaviour, ICollProvider, IFloatingOrigin
     {
         /// <summary>
         /// The version of this asset. Can be used to migrate across versions. This value should
@@ -358,20 +358,21 @@ namespace Crest
                 }
             }
 
-            var registered = RegisterLodDataInputBase.GetRegistrar(typeof(LodDataMgrAnimWaves));
-
 #if UNITY_EDITOR
             // Unregister after switching modes in the editor.
             if (_batches != null)
             {
                 foreach (var batch in _batches)
                 {
-                    registered.Remove(batch);
+                    RegisterLodDataInput<LodDataMgrAnimWaves>.DeregisterInput(batch);
                 }
             }
 #endif
 
             if (rend == null) return;
+
+            var queue = 0;
+            var subQueue = transform.GetSiblingIndex();
 
             _batches = new GerstnerBatch[LodDataMgr.MAX_LOD_COUNT];
             for (int i = 0; i < _batches.Length; i++)
@@ -385,7 +386,7 @@ namespace Crest
 
             foreach (var batch in _batches)
             {
-                registered.Add(0, batch);
+                RegisterLodDataInput<LodDataMgrAnimWaves>.RegisterInput(batch, queue, subQueue);
             }
         }
 
@@ -562,10 +563,9 @@ namespace Crest
 
             if (_batches != null)
             {
-                var registered = RegisterLodDataInputBase.GetRegistrar(typeof(LodDataMgrAnimWaves));
                 foreach (var batch in _batches)
                 {
-                    registered.Remove(batch);
+                    RegisterLodDataInput<LodDataMgrAnimWaves>.DeregisterInput(batch);
                 }
 
                 _batches = null;
@@ -847,7 +847,7 @@ namespace Crest
 
 #if UNITY_EDITOR
     [CustomEditor(typeof(ShapeGerstnerBatched)), CanEditMultipleObjects]
-    public class ShapeGerstnerBatchedEditor : ValidatedEditor
+    public class ShapeGerstnerBatchedEditor : CustomBaseEditor
     {
         public override void OnInspectorGUI()
         {
@@ -890,6 +890,11 @@ namespace Crest
                     "Either remove the <i>MeshRenderer</i> component or set the <i>Mode</i> option to <i>Geometry</i>.",
                     ValidatedHelper.MessageType.Warning, this
                 );
+            }
+
+            if (_mode == GerstnerMode.Geometry)
+            {
+                ValidatedHelper.ValidateRendererLayer(gameObject, showMessage, ocean);
             }
 
             if (_mode == GerstnerMode.Global && GetComponent<MeshRenderer>() != null)

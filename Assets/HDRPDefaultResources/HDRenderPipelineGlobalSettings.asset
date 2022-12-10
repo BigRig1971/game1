@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: HDRenderPipelineGlobalSettings
   m_EditorClassIdentifier: 
   m_DefaultVolumeProfile: {fileID: 11400000, guid: 9134cea27bf600e45a06af746a64c794, type: 2}
-  m_LookDevVolumeProfile: {fileID: 11400000, guid: 9134cea27bf600e45a06af746a64c794, type: 2}
+  m_LookDevVolumeProfile: {fileID: 11400000, guid: 11b7d4a9a7fc1d84ea3311ec18de4a90, type: 2}
   m_RenderingPathDefaultCameraFrameSettings:
     bitDatas:
-      data1: 72198260625768269
-      data2: 13763000478424072216
+      data1: 72198260625764205
+      data2: 13763000478155636760
     lodBias: 1
     lodBiasMode: 0
-    lodBiasQualityLevel: 0
+    lodBiasQualityLevel: 1
     maximumLODLevel: 0
     maximumLODLevelMode: 0
     maximumLODLevelQualityLevel: 0
@@ -60,7 +60,7 @@ MonoBehaviour:
     msaaMode: 1
     materialQuality: 0
   m_RenderPipelineResources: {fileID: 11400000, guid: 3ce144cff5783da45aa5d4fdc2da14b7, type: 2}
-  m_RenderPipelineRayTracingResources: {fileID: 0}
+  m_RenderPipelineRayTracingResources: {fileID: 11400000, guid: ba6e7f30e5cffc249a8bf7ee5756c196, type: 2}
   beforeTransparentCustomPostProcesses: []
   beforePostProcessCustomPostProcesses: []
   afterPostProcessBlursCustomPostProcesses: []
@@ -82,20 +82,25 @@ MonoBehaviour:
   decalLayerName5: Decal Layer 5
   decalLayerName6: Decal Layer 6
   decalLayerName7: Decal Layer 7
-  shaderVariantLogLevel: 0
   lensAttenuationMode: 0
   colorGradingSpace: 0
-  diffusionProfileSettingsList:
+  m_ObsoleteDiffusionProfileSettingsList:
   - {fileID: 11400000, guid: 26bdddf49760c61438938733f07fa2a2, type: 2}
-  rendererListCulling: 0
+  - {fileID: 11400000, guid: 78322c7f82657514ebe48203160e3f39, type: 2}
+  - {fileID: 11400000, guid: cb824b513c3aa274db0944d6fb82a86c, type: 2}
+  rendererListCulling: 1
   DLSSProjectId: 000000
   useDLSSCustomProjectId: 0
   supportProbeVolumes: 0
   supportRuntimeDebugDisplay: 0
+  autoRegisterDiffusionProfiles: 0
   apvScenesData:
     serializedBounds: []
     serializedHasVolumes: []
     serializedProfiles: []
     serializedBakeSettings: []
     serializedBakingSets: []
-  m_Version: 3
+    m_LightingScenario: Default
+  m_Version: 5
+  m_ShaderVariantLogLevel: 0
+  m_ExportShaderVariants: 1

@@ -9,9 +9,9 @@ namespace Crest
     /// <summary>
     /// Debug draw crosses in an area around the GameObject on the water surface.
     /// </summary>
+    [ExecuteDuringEditMode]
     [AddComponentMenu(Internal.Constants.MENU_PREFIX_DEBUG + "Visualise Collision Area")]
-    [ExecuteAlways]
-    public class VisualiseCollisionArea : MonoBehaviour
+    public class VisualiseCollisionArea : CustomMonoBehaviour
     {
         /// <summary>
         /// The version of this asset. Can be used to migrate across versions. This value should

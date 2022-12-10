@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HeurekaGames.Utils;
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -89,7 +90,7 @@ namespace HeurekaGames.AssetHunterPRO.BaseTreeviewImpl.AssetTreeView
                     UnityEngine.Object asset = UnityEditor.AssetDatabase.LoadMainAssetAtPath(RelativePath);
                     //#if UNITY_2017_1_OR_NEWER
                     if (asset != null)
-                        return this.assetSize = Profiler.GetRuntimeMemorySizeLong(asset) / 2;
+                        return this.assetSize = Profiler.GetRuntimeMemorySizeLong(asset);
                     else
                         return -1;
                 }

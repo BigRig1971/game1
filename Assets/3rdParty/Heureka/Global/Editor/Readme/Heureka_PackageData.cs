@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-namespace HeurekaGames
+namespace HeurekaGames.Utils
 {
     [System.Serializable]
     public class Heureka_PackageData : ScriptableObject

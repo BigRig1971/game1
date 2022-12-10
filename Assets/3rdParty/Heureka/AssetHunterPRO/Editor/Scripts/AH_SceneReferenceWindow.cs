@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using HeurekaGames.Utils;
 
 namespace HeurekaGames.AssetHunterPRO
 {
@@ -28,7 +29,7 @@ namespace HeurekaGames.AssetHunterPRO
         public static void Init()
         {
             m_window = AH_SceneReferenceWindow.GetWindow<AH_SceneReferenceWindow>(WINDOWNAME, true, typeof(AH_Window));
-            m_window.titleContent.image = AH_EditorData.Instance.SceneIcon.Icon;
+            m_window.titleContent.image = AH_EditorData.Icons.Scene;
             m_window.GetSceneInfo();
         }
 
@@ -67,7 +68,7 @@ namespace HeurekaGames.AssetHunterPRO
             Repaint();
 
             if (m_allEnabledScenesInBuildSettings.Count == 0)
-                Heureka_WindowStyler.DrawCenteredMessage(m_window, AH_EditorData.Instance.WindowHeaderIcon.Icon, 310f, 110f, "There are no enabled scenes in build settings");
+                Heureka_WindowStyler.DrawCenteredMessage(m_window, AH_EditorData.Icons.IconLargeWhite, 310f, 110f, "There are no enabled scenes in build settings");
 
             drawScenes("These scenes are added and enabled in build settings", m_allEnabledScenesInBuildSettings);
             drawScenes("These scenes are added to build settings but disabled", m_allDisabledScenesInBuildSettings);

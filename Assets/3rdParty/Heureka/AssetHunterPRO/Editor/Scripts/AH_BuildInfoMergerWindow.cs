@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using HeurekaGames.Utils;
 
 namespace HeurekaGames.AssetHunterPRO
 {
@@ -20,7 +21,7 @@ namespace HeurekaGames.AssetHunterPRO
         public static void Init()
         {
             m_window = GetWindow<AH_BuildInfoMergerWindow>("AH Merger", true, typeof(AH_Window));
-            m_window.titleContent.image = AH_EditorData.Instance.MergerIcon.Icon;
+            m_window.titleContent.image = AH_EditorData.Icons.Merge;
 
             m_window.buildInfoFolder = AH_SerializationHelper.GetBuildInfoFolder();
             m_window.updateBuildInfoFiles();

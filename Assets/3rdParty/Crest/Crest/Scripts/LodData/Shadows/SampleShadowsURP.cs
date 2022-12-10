@@ -38,13 +38,15 @@ namespace Crest
 
         public static void EnqueueSampleShadowPass(ScriptableRenderContext context, Camera camera)
         {
-            if (OceanRenderer.Instance == null || OceanRenderer.Instance._lodDataShadow == null)
+            var ocean = OceanRenderer.Instance;
+
+            if (ocean == null || ocean._lodDataShadow == null)
             {
                 return;
             }
 
             // Only sample shadows for the main camera.
-            if (!ReferenceEquals(OceanRenderer.Instance.ViewCamera, camera))
+            if (!ReferenceEquals(ocean.ViewCamera, camera))
             {
                 return;
             }
@@ -57,6 +59,13 @@ namespace Crest
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
+            var ocean = OceanRenderer.Instance;
+
+            if (ocean == null || ocean._lodDataShadow == null)
+            {
+                return;
+            }
+
             // TODO: This may not be the same as OceanRenderer._primaryLight. Not certain how to support overriding the
             // main light for shadows yet.
             var mainLightIndex = renderingData.lightData.mainLightIndex;
@@ -72,32 +81,30 @@ namespace Crest
                 return;
             }
 
-            var cmd = OceanRenderer.Instance._lodDataShadow.BufCopyShadowMap;
-            if (cmd == null) return;
-
             var camera = renderingData.cameraData.camera;
 
-            // Target is not multi-eye so stop mult-eye rendering for this command buffer. Breaks registered shadow
-            // inputs without this.
-            if (camera.stereoEnabled)
+            var buffer = CommandBufferPool.Get("Crest Shadow Data");
+
+            // Disable for XR SPI otherwise input will not have correct world position.
+            if (renderingData.cameraData.xrRendering && XRHelpers.IsSinglePass)
             {
-                context.StopMultiEye(camera);
+                buffer.DisableShaderKeyword("STEREO_INSTANCING_ON");
             }
 
-            context.ExecuteCommandBuffer(cmd);
+            ocean._lodDataShadow.BuildCommandBuffer(ocean, buffer);
 
-            if (camera.stereoEnabled)
+            // Restore matrices otherwise remaining render will have incorrect matrices. Each pass is responsible for
+            // restoring matrices if required.
+            buffer.SetViewProjectionMatrices(camera.worldToCameraMatrix, camera.projectionMatrix);
+
+            // Restore XR SPI as we cannot rely on remaining pipeline to do it for us.
+            if (renderingData.cameraData.xrRendering && XRHelpers.IsSinglePass)
             {
-                context.StartMultiEye(camera);
+                buffer.EnableShaderKeyword("STEREO_INSTANCING_ON");
             }
-            else
-            {
-                // Restore matrices otherwise remaining render will have incorrect matrices. Each pass is responsible
-                // for restoring matrices if required.
-                cmd.Clear();
-                cmd.SetViewProjectionMatrices(camera.worldToCameraMatrix, camera.projectionMatrix);
-                context.ExecuteCommandBuffer(cmd);
-            }
+
+            context.ExecuteCommandBuffer(buffer);
+            CommandBufferPool.Release(buffer);
         }
     }
 }

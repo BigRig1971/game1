@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEditor;
 
-namespace HeurekaGames
+namespace HeurekaGames.Utils
 {
     public static class Heureka_AddDefineSymbols
     {

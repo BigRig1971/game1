@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b27603d2be0e81488eb446378c435df, type: 3}
   m_Name: AHPRO_Readme
   m_EditorClassIdentifier: 
-  Icon: {fileID: 2800000, guid: 94411db6691648e4590eb22360ba6934, type: 3}
+  Icon: {fileID: 2800000, guid: 931681cc0eefb7e4985cecbad117a822, type: 3}
   PackageShowPrio: 100
   AssetName: Asset Hunter PRO
   Subheader: Project Cleaning Tool
@@ -67,7 +67,7 @@ MonoBehaviour:
     Link: https://prf.hn/click/camref:1011l4Izm/pubref:Package/destination:https%3A%2F%2Fassetstore.unity.com%2Fpackages%2Fslug%2F135296
   - ActiveLink: 1
     Name: Documentation
-    Link: https://docs.heurekagames.com/Documentation%20AHP.pdf
+    Link: https://kristianhj.gitbook.io/asset-hunter-pro/
   - ActiveLink: 1
     Name: Forum Thread
     Link: http://forum.unity3d.com/threads/released-asset-hunter-project-cleaning.274173/
@@ -390,3 +390,45 @@ MonoBehaviour:
       Patch: 7
     VersionChanges:
     - Added null checks in dependency graph
+  - VersionNum:
+      Major: 2
+      Minor: 2
+      Patch: 8
+    VersionChanges:
+    - Moved to UPM Package format
+  - VersionNum:
+      Major: 2
+      Minor: 2
+      Patch: 9
+    VersionChanges:
+    - Fixed issue with Upgrader being Editor Only
+  - VersionNum:
+      Major: 2
+      Minor: 2
+      Patch: 10
+    VersionChanges:
+    - Fixed issue with OnProcessScene being called when entering playmode
+  - VersionNum:
+      Major: 2
+      Minor: 2
+      Patch: 11
+    VersionChanges:
+    - Fixed issue with incorrect asset size
+  - VersionNum:
+      Major: 2
+      Minor: 2
+      Patch: 12
+    VersionChanges:
+    - Fix for BuildReport.Files being deprecated in 2022
+  - VersionNum:
+      Major: 2
+      Minor: 2
+      Patch: 13
+    VersionChanges:
+    - Improved icon loading
+  - VersionNum:
+      Major: 2
+      Minor: 2
+      Patch: 14
+    VersionChanges:
+    - Added 'News' button in main window

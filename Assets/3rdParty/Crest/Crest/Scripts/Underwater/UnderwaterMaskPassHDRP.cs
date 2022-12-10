@@ -29,12 +29,13 @@ namespace Crest
         Plane[] _cameraFrustumPlanes;
 
         static GameObject s_GameObject;
-        static UnderwaterRenderer s_UnderwaterRenderer;
+        UnderwaterRenderer _renderer;
 
-        public static void Enable(UnderwaterRenderer underwaterRenderer)
+        public static void Enable()
         {
             CustomPassHelpers.CreateOrUpdate<UnderwaterMaskPassHDRP>(ref s_GameObject, k_Name, CustomPassInjectionPoint.BeforeRendering);
-            s_UnderwaterRenderer = underwaterRenderer;
+            RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
+            RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
         }
 
         public static void Disable()
@@ -46,6 +47,21 @@ namespace Crest
             }
 
             UnderwaterRenderer.DisableOceanMaskKeywords();
+            RenderPipelineManager.beginCameraRendering -= OnBeginCameraRendering;
+        }
+
+        internal static void SetUp(UnderwaterRenderer renderer)
+        {
+            renderer._volumeMaterial = CoreUtils.CreateEngineMaterial(k_ShaderPathWaterVolumeGeometry);
+            renderer.SetUpFixMaskArtefactsShader();
+        }
+
+        internal static void CleanUp(UnderwaterRenderer renderer)
+        {
+            if (renderer._volumeMaterial != null)
+            {
+                CoreUtils.Destroy(renderer._volumeMaterial);
+            }
         }
 
         protected override void Setup(ScriptableRenderContext renderContext, CommandBuffer cmd)
@@ -91,40 +107,20 @@ namespace Crest
                 depthSlice: -1 // Bind all XR slices.
             );
 
-            if (s_UnderwaterRenderer != null)
-            {
-                s_UnderwaterRenderer._volumeMaterial = CoreUtils.CreateEngineMaterial(k_ShaderPathWaterVolumeGeometry);
-                SetUpVolumeTextures();
-                s_UnderwaterRenderer.SetUpFixMaskArtefactsShader();
-            }
+            SetUpVolumeTextures();
         }
+
         protected override void Cleanup()
         {
             CoreUtils.Destroy(_oceanMaskMaterial);
             _maskTexture.Release();
             _depthTexture.Release();
 
-            if (s_UnderwaterRenderer == null)
-            {
-                return;
-            }
-
             CleanUpVolumeTextures();
-
-            if (s_UnderwaterRenderer._volumeMaterial != null)
-            {
-                CoreUtils.Destroy(s_UnderwaterRenderer._volumeMaterial);
-            }
         }
 
         void SetUpVolumeTextures()
         {
-            if (s_UnderwaterRenderer._mode == UnderwaterRenderer.Mode.FullScreen)
-            {
-                CleanUpVolumeTextures();
-                return;
-            }
-
             if (_volumeFrontFaceRT == null)
             {
                 _volumeFrontFaceRT = RTHandles.Alloc
@@ -148,35 +144,27 @@ namespace Crest
                 );
             }
 
-            if (s_UnderwaterRenderer._mode == UnderwaterRenderer.Mode.Volume || s_UnderwaterRenderer._mode == UnderwaterRenderer.Mode.VolumeFlyThrough)
+            if (_volumeBackFaceRT == null)
             {
-                if (_volumeBackFaceRT == null)
-                {
-                    _volumeBackFaceRT = RTHandles.Alloc
-                    (
-                        scaleFactor: Vector2.one,
-                        slices: TextureXR.slices,
-                        dimension: TextureXR.dimension,
-                        depthBufferBits: DepthBits.Depth24,
-                        colorFormat: GraphicsFormat.R8_UNorm, // This appears to be used for depth.
-                        enableRandomWrite: false,
-                        useDynamicScale: true,
-                        name: "_CrestVolumeBackFaceTexture"
-                    );
+                _volumeBackFaceRT = RTHandles.Alloc
+                (
+                    scaleFactor: Vector2.one,
+                    slices: TextureXR.slices,
+                    dimension: TextureXR.dimension,
+                    depthBufferBits: DepthBits.Depth24,
+                    colorFormat: GraphicsFormat.R8_UNorm, // This appears to be used for depth.
+                    enableRandomWrite: false,
+                    useDynamicScale: true,
+                    name: "_CrestVolumeBackFaceTexture"
+                );
 
-                    _volumeBackFaceTarget = new RenderTargetIdentifier
-                    (
-                        _volumeBackFaceRT,
-                        mipLevel: 0,
-                        CubemapFace.Unknown,
-                        depthSlice: -1 // Bind all XR slices.
-                    );
-                }
-            }
-            else
-            {
-                _volumeBackFaceRT?.Release();
-                _volumeBackFaceRT = null;
+                _volumeBackFaceTarget = new RenderTargetIdentifier
+                (
+                    _volumeBackFaceRT,
+                    mipLevel: 0,
+                    CubemapFace.Unknown,
+                    depthSlice: -1 // Bind all XR slices.
+                );
             }
         }
 
@@ -188,36 +176,43 @@ namespace Crest
             _volumeBackFaceRT = null;
         }
 
-        protected override void Execute(CustomPassContext context)
+        static void OnBeginCameraRendering(ScriptableRenderContext context, Camera camera)
         {
-            // Null check can be removed once post-processing is removed.
-            if (s_UnderwaterRenderer != null && !s_UnderwaterRenderer.IsActive)
+            var renderer = UnderwaterRenderer.Get(camera);
+
+            if (renderer == null)
             {
                 UnderwaterRenderer.DisableOceanMaskKeywords();
                 return;
             }
 
-            var camera = context.hdCamera.camera;
-            var commandBuffer = context.cmd;
+            Helpers.SetGlobalKeyword(UnderwaterRenderer.k_KeywordVolume2D, renderer._mode == UnderwaterRenderer.Mode.Portal);
+            Helpers.SetGlobalKeyword(UnderwaterRenderer.k_KeywordVolumeHasBackFace, renderer._mode == UnderwaterRenderer.Mode.Volume
+                || renderer._mode == UnderwaterRenderer.Mode.VolumeFlyThrough);
+        }
 
-            // HDRP PP compatibility.
-            if (s_UnderwaterRenderer == null)
+        protected override void Execute(CustomPassContext context)
+        {
+            var camera = context.hdCamera.camera;
+            _renderer = UnderwaterRenderer.Get(camera);
+
+            if (UnderwaterPostProcessHDRP.Instance == null)
             {
+                if (!_renderer || !_renderer.IsActive)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                // HDRP PP compatibility.
                 if (!ReferenceEquals(camera, OceanRenderer.Instance.ViewCamera) || camera.cameraType != CameraType.Game)
                 {
                     return;
                 }
             }
-            // Only support main camera, scene camera and preview camera.
-            else if (!ReferenceEquals(s_UnderwaterRenderer._camera, camera))
-            {
-#if UNITY_EDITOR
-                if (!s_UnderwaterRenderer.IsActiveForEditorCamera(camera))
-#endif
-                {
-                    return;
-                }
-            }
+
+            var commandBuffer = context.cmd;
 
             if (!Helpers.MaskIncludesLayer(camera.cullingMask, OceanRenderer.Instance.Layer))
             {
@@ -231,45 +226,36 @@ namespace Crest
 
             // This property is either on the UnderwaterRenderer or UnderwaterPostProcessHDRP.
             var debugDisableOceanMask = false;
-            if (s_UnderwaterRenderer != null)
-            {
-                debugDisableOceanMask = s_UnderwaterRenderer._debug._disableOceanMask;
-            }
-            else if (UnderwaterPostProcessHDRP.Instance != null)
-            {
-                debugDisableOceanMask = UnderwaterPostProcessHDRP.Instance._disableOceanMask.value;
-            }
-
             var farPlaneMultiplier = 1.0f;
-            if (s_UnderwaterRenderer != null)
-            {
-                farPlaneMultiplier = s_UnderwaterRenderer._farPlaneMultiplier;
-            }
-            else if (UnderwaterPostProcessHDRP.Instance != null)
-            {
-                farPlaneMultiplier = UnderwaterPostProcessHDRP.Instance._farPlaneMultiplier.value;
-            }
+            var enableShaderAPI = false;
 
-            if (s_UnderwaterRenderer != null)
+            if (_renderer != null)
             {
-                s_UnderwaterRenderer.SetUpVolume(_oceanMaskMaterial);
+                debugDisableOceanMask = _renderer._debug._disableOceanMask;
+                farPlaneMultiplier = _renderer._farPlaneMultiplier;
+                enableShaderAPI = _renderer.EnableShaderAPI;
+
+                _renderer.SetUpVolume(_oceanMaskMaterial);
 
                 // Populate water volume before mask so we can use the stencil.
-                if (s_UnderwaterRenderer._mode != UnderwaterRenderer.Mode.FullScreen && s_UnderwaterRenderer._volumeGeometry != null)
+                if (_renderer._mode != UnderwaterRenderer.Mode.FullScreen && _renderer._volumeGeometry != null)
                 {
                     SetUpVolumeTextures();
-                    s_UnderwaterRenderer.PopulateVolume(commandBuffer, _volumeFrontFaceTarget, _volumeBackFaceTarget, null, _volumeFrontFaceRT.rtHandleProperties.currentViewportSize);
+                    _renderer.PopulateVolume(commandBuffer, _volumeFrontFaceTarget, _volumeBackFaceTarget, null, _volumeFrontFaceRT.rtHandleProperties.currentViewportSize);
                     // Copy only the stencil by copying everything and clearing depth.
-                    commandBuffer.CopyTexture(s_UnderwaterRenderer._mode == UnderwaterRenderer.Mode.Portal ? _volumeFrontFaceTarget : _volumeBackFaceTarget, _depthTarget);
+                    commandBuffer.CopyTexture(_renderer._mode == UnderwaterRenderer.Mode.Portal ? _volumeFrontFaceTarget : _volumeBackFaceTarget, _depthTarget);
                     Helpers.Blit(commandBuffer, _depthTarget, Helpers.UtilityMaterial, (int)Helpers.UtilityPass.ClearDepth);
                 }
 
-                s_UnderwaterRenderer.SetUpMask(commandBuffer, _maskTarget, _depthTarget);
+                _renderer.SetUpMask(commandBuffer, _maskTarget, _depthTarget);
                 // For dynamic scaling to work.
                 CoreUtils.SetViewport(commandBuffer, _maskTexture);
             }
             else
             {
+                debugDisableOceanMask = UnderwaterPostProcessHDRP.Instance._disableOceanMask.value;
+                farPlaneMultiplier = UnderwaterPostProcessHDRP.Instance._farPlaneMultiplier.value;
+
                 CoreUtils.SetRenderTarget(commandBuffer, _maskTexture, _depthTexture);
                 CoreUtils.ClearRenderTarget(commandBuffer, ClearFlag.All, Color.black);
                 commandBuffer.SetGlobalTexture(UnderwaterRenderer.ShaderIDs.s_CrestOceanMaskTexture, _maskTexture);
@@ -283,15 +269,15 @@ namespace Crest
                 _cameraFrustumPlanes,
                 _oceanMaskMaterial,
                 farPlaneMultiplier,
-                s_UnderwaterRenderer != null ? s_UnderwaterRenderer.EnableShaderAPI : false,
+                enableShaderAPI,
                 debugDisableOceanMask
             );
 
-            if (s_UnderwaterRenderer != null)
+            if (_renderer != null)
             {
                 var size = _maskTexture.GetScaledSize(_maskTexture.rtHandleProperties.currentViewportSize);
                 var descriptor = new RenderTextureDescriptor(size.x, size.y);
-                s_UnderwaterRenderer.FixMaskArtefacts(commandBuffer, descriptor, _maskTarget);
+                _renderer.FixMaskArtefacts(commandBuffer, descriptor, _maskTarget);
             }
         }
     }

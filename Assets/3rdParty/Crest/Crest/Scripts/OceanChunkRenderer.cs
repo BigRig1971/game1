@@ -14,9 +14,9 @@ namespace Crest
     /// <summary>
     /// Sets shader parameters for each geometry tile/chunk.
     /// </summary>
-    [ExecuteAlways]
+    [ExecuteDuringEditMode]
     [AddComponentMenu(Internal.Constants.MENU_PREFIX_INTERNAL + "Ocean Chunk Renderer")]
-    public class OceanChunkRenderer : MonoBehaviour
+    public class OceanChunkRenderer : CustomMonoBehaviour
     {
         /// <summary>
         /// The version of this asset. Can be used to migrate across versions. This value should
@@ -213,6 +213,7 @@ namespace Crest
             RenderPipelineManager.beginCameraRendering += BeginCameraRendering;
         }
 
+#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             if (_drawRenderBounds)
@@ -220,6 +221,7 @@ namespace Crest
                 Rend.bounds.GizmosDraw();
             }
         }
+#endif
     }
 
     public static class BoundsHelper
@@ -277,7 +279,7 @@ namespace Crest
 
 #if UNITY_EDITOR
     [CustomEditor(typeof(OceanChunkRenderer)), CanEditMultipleObjects]
-    public class OceanChunkRendererEditor : Editor
+    public class OceanChunkRendererEditor : CustomBaseEditor
     {
         Renderer renderer;
         public override void OnInspectorGUI()

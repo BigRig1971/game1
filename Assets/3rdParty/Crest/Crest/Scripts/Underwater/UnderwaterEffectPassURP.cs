@@ -15,7 +15,6 @@ namespace Crest
     {
         const string SHADER_UNDERWATER_EFFECT = "Hidden/Crest/Underwater/Underwater Effect URP";
         static readonly int sp_TemporaryColor = Shader.PropertyToID("_TemporaryColor");
-        static readonly int sp_CameraForward = Shader.PropertyToID("_CameraForward");
 
         readonly PropertyWrapperMaterial _underwaterEffectMaterial;
         RenderTargetIdentifier _colorTarget;
@@ -24,7 +23,7 @@ namespace Crest
         bool _firstRender = true;
         Camera _camera;
 
-        static UnderwaterEffectPassURP s_instance;
+        static int s_InstanceCount;
         static RenderObjectsWithoutFogPass s_ApplyFogToTransparentObjects;
         UnderwaterRenderer _underwaterRenderer;
 
@@ -35,47 +34,40 @@ namespace Crest
             _underwaterEffectMaterial.material.hideFlags = HideFlags.HideAndDontSave;
         }
 
-        internal static void CleanUp()
+        internal void CleanUp()
         {
-            CoreUtils.Destroy(s_instance._underwaterEffectMaterial.material);
-            s_instance = null;
+            CoreUtils.Destroy(_underwaterEffectMaterial.material);
         }
 
-        public static void Enable(UnderwaterRenderer underwaterRenderer)
+        public void Enable(UnderwaterRenderer underwaterRenderer)
         {
-            if (s_instance == null)
+            s_InstanceCount++;
+            _underwaterRenderer = underwaterRenderer;
+
+            if (s_ApplyFogToTransparentObjects == null)
             {
-                s_instance = new UnderwaterEffectPassURP();
                 s_ApplyFogToTransparentObjects = new RenderObjectsWithoutFogPass();
             }
-
-            s_instance._underwaterRenderer = underwaterRenderer;
 
             RenderPipelineManager.beginCameraRendering -= EnqueuePass;
             RenderPipelineManager.beginCameraRendering += EnqueuePass;
         }
 
-        public static void Disable()
+        public void Disable()
         {
-            RenderPipelineManager.beginCameraRendering -= EnqueuePass;
+            if (--s_InstanceCount <= 0)
+            {
+                RenderPipelineManager.beginCameraRendering -= EnqueuePass;
+            }
         }
 
         static void EnqueuePass(ScriptableRenderContext context, Camera camera)
         {
-            if (!s_instance._underwaterRenderer.IsActive)
+            var ur = UnderwaterRenderer.Get(camera);
+
+            if (!ur || !ur.IsActive)
             {
                 return;
-            }
-
-            // Only support main camera, scene camera and preview camera.
-            if (!ReferenceEquals(s_instance._underwaterRenderer._camera, camera))
-            {
-#if UNITY_EDITOR
-                if (!s_instance._underwaterRenderer.IsActiveForEditorCamera(camera))
-#endif
-                {
-                    return;
-                }
             }
 
             if (!Helpers.MaskIncludesLayer(camera.cullingMask, OceanRenderer.Instance.Layer))
@@ -85,18 +77,21 @@ namespace Crest
 
             // Enqueue the pass. This happens every frame.
             var renderer = camera.GetUniversalAdditionalCameraData().scriptableRenderer;
-            renderer.EnqueuePass(s_instance);
-            if (s_instance._underwaterRenderer.EnableShaderAPI)
+            renderer.EnqueuePass(ur._urpEffectPass);
+            if (ur.EnableShaderAPI)
             {
                 renderer.EnqueuePass(s_ApplyFogToTransparentObjects);
+                s_ApplyFogToTransparentObjects._underwaterRenderer = ur;
             }
         }
 
         // Called before Configure.
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
+#pragma warning disable 618
             _colorTarget = renderingData.cameraData.renderer.cameraColorTarget;
             _depthTarget = renderingData.cameraData.renderer.cameraDepthTarget;
+#pragma warning restore 618
             _camera = renderingData.cameraData.camera;
         }
 
@@ -143,6 +138,7 @@ namespace Crest
             CommandBuffer commandBuffer = CommandBufferPool.Get("Underwater Effect");
 
             UnderwaterRenderer.UpdatePostProcessMaterial(
+                _underwaterRenderer,
                 _underwaterRenderer._mode,
                 camera,
                 _underwaterEffectMaterial,
@@ -153,29 +149,14 @@ namespace Crest
                 _underwaterRenderer._debug._viewStencil,
                 _underwaterRenderer._filterOceanData,
                 ref _underwaterRenderer._currentOceanMaterial,
-                UnderwaterRenderer.Instance.EnableShaderAPI
+                _underwaterRenderer.EnableShaderAPI
             );
-
-            // Required for XR SPI as forward vector in matrix is incorrect.
-            _underwaterEffectMaterial.material.SetVector(sp_CameraForward, camera.transform.forward);
 
             // Create a separate stencil buffer context by copying the depth texture.
             if (_underwaterRenderer.UseStencilBufferOnEffect)
             {
-                if (Helpers.IsMSAAEnabled(camera) || camera.cameraType == CameraType.SceneView)
-                {
-                    commandBuffer.SetRenderTarget(_underwaterRenderer._depthStencilTarget);
-                    Helpers.Blit(commandBuffer, _underwaterRenderer._depthStencilTarget, Helpers.UtilityMaterial, (int)Helpers.UtilityPass.CopyDepth);
-                }
-                else
-                {
-                    // Copy depth then clear stencil. Things to note:
-                    // - Does not work with MSAA. Source is null.
-                    // - Does not work with scene camera due to possible Unity bug. Source is RenderTextureFormat.ARGB32 instead of RenderTextureFormat.Depth.
-                    commandBuffer.CopyTexture(_depthTarget, _underwaterRenderer._depthStencilTarget);
-                    commandBuffer.SetRenderTarget(_underwaterRenderer._depthStencilTarget);
-                    Helpers.Blit(commandBuffer, _underwaterRenderer._depthStencilTarget, Helpers.UtilityMaterial, (int)Helpers.UtilityPass.ClearStencil);
-                }
+                commandBuffer.SetRenderTarget(_underwaterRenderer._depthStencilTarget);
+                Helpers.Blit(commandBuffer, _underwaterRenderer._depthStencilTarget, Helpers.UtilityMaterial, (int)Helpers.UtilityPass.CopyDepth);
             }
 
             // Copy color buffer.
@@ -196,36 +177,16 @@ namespace Crest
             }
             else
             {
-                // Determined the following from testing. Likely a Unity bug. Also probably why we should use
-                // ConfigureTarget as recommended by Unity... but can only configure one target per ScriptableRenderPass.
-                if (Helpers.IsMSAAEnabled(camera))
+#if !UNITY_2022_1_OR_NEWER
+                if (!renderingData.cameraData.xrRendering && (renderingData.cameraData.isSceneViewCamera || Helpers.IsSSAOEnabled(camera)))
                 {
-                    if (renderingData.cameraData.xrRendering)
-                    {
-                        // XR MSAA needed depth target set.
-                        commandBuffer.SetRenderTarget(_colorTarget, _depthTarget);
-                    }
-                    else
-                    {
-                        // MSAA did not like depth target being set.
-                        commandBuffer.SetRenderTarget(_colorTarget);
-                    }
+                    commandBuffer.SetRenderTarget(_colorTarget);
+
                 }
                 else
-                {
-#if UNITY_EDITOR
-                    if (camera.cameraType == CameraType.SceneView)
-                    {
-                        // If executing before transparents, scene view needed this. Works for other events too.
-                        commandBuffer.SetRenderTarget(_colorTarget);
-                    }
-                    else
 #endif
-                    {
-                        // No MSAA needed depth target set. Setting depth is necessary for depth to be bound as a target
-                        // which is needed for volumes.
-                        commandBuffer.SetRenderTarget(_colorTarget,  _depthTarget);
-                    }
+                {
+                    commandBuffer.SetRenderTarget(_colorTarget, _depthTarget);
                 }
             }
 
@@ -248,6 +209,7 @@ namespace Crest
         class RenderObjectsWithoutFogPass : ScriptableRenderPass
         {
             FilteringSettings m_FilteringSettings;
+            internal UnderwaterRenderer _underwaterRenderer;
 
             static readonly List<ShaderTagId> m_ShaderTagIdList = new List<ShaderTagId>()
             {
@@ -272,7 +234,7 @@ namespace Crest
                     SortingCriteria.CommonTransparent
                 );
 
-                m_FilteringSettings.layerMask = s_instance._underwaterRenderer._transparentObjectLayers;
+                m_FilteringSettings.layerMask = _underwaterRenderer._transparentObjectLayers;
 
                 var buffer = CommandBufferPool.Get();
 

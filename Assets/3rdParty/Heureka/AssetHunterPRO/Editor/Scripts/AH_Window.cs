@@ -5,6 +5,7 @@ using UnityEditor.IMGUI.Controls;
 using HeurekaGames.AssetHunterPRO.BaseTreeviewImpl.AssetTreeView;
 using HeurekaGames.AssetHunterPRO.BaseTreeviewImpl;
 using System.Collections.Generic;
+using HeurekaGames.Utils;
 
 //Only avaliable in 2018
 #if UNITY_2018_1_OR_NEWER
@@ -16,7 +17,7 @@ namespace HeurekaGames.AssetHunterPRO
     public class AH_Window : EditorWindow
     {
         public const int WINDOWMENUITEMPRIO = 11;
-        public const string VERSION = "2.2.7";
+        public static string VERSION = "1.0.0";
         private static AH_Window m_window;
 
         [NonSerialized] bool m_Initialized;
@@ -46,6 +47,7 @@ namespace HeurekaGames.AssetHunterPRO
         //UI Rect
         Vector2 uiStartPos = new Vector2(10, 50);
         public static float ButtonMaxHeight = 18;
+        public static readonly Heureka_ResourceLoader.HeurekaPackage myPackage = Heureka_ResourceLoader.HeurekaPackage.AHP;
 
         //Add menu named "Asset Hunter" to the window menu  
         [UnityEditor.MenuItem("Tools/Asset Hunter PRO/Asset Hunter PRO _%h", priority = WINDOWMENUITEMPRIO)]
@@ -92,6 +94,7 @@ namespace HeurekaGames.AssetHunterPRO
         private void OnEnable()
         {
             AH_SerializationHelper.NewBuildInfoCreated += onBuildInfoCreated;
+            VERSION = Heureka_Utils.GetVersionNumber<AH_Window>();
         }
 
         private void OnDisable()
@@ -113,15 +116,15 @@ namespace HeurekaGames.AssetHunterPRO
             InitIfNeeded();
             doHeader();
 
-            if (buildInfoManager == null || !buildInfoManager.HasSelection)
+            if (buildInfoManager != null && buildInfoManager.IsProjectClean())// && ((AH_MultiColumnHeader)m_TreeView.multiColumnHeader).ShowMode == AH_MultiColumnHeader.AssetShowMode.Unused)
             {
-                doNoBuildInfoLoaded();
+                Heureka_WindowStyler.DrawCenteredImage(m_window, AH_EditorData.Icons.Achievement);
                 return;
             }
 
-            if (buildInfoManager.IsProjectClean() && ((AH_MultiColumnHeader)m_TreeView.multiColumnHeader).ShowMode == AH_MultiColumnHeader.AssetShowMode.Unused)
+            if (buildInfoManager == null || !buildInfoManager.HasSelection)
             {
-                Heureka_WindowStyler.DrawCenteredImage(m_window, AH_EditorData.Instance.AchievementIcon.Icon);
+                doNoBuildInfoLoaded();
                 return;
             }
 
@@ -270,25 +273,25 @@ namespace HeurekaGames.AssetHunterPRO
 
         private void initializeGUIContent()
         {
-            titleContent = new GUIContent("Asset Hunter", AH_EditorData.Instance.WindowPaneIcon.Icon);
+            titleContent = Heureka_ResourceLoader.GetContentWithTitle(myPackage, Heureka_ResourceLoader.IconNames.TabIconAHP, "Asset Hunter");
 
-            guiContentLoadBuildInfo = new GUIContent("Load", AH_EditorData.Instance.LoadLogIcon.Icon, "Load info from a previous build");
-            guiContentSettings = new GUIContent("Settings", AH_EditorData.Instance.Settings.Icon, "Open settings");
-            guiContentGenerateReferenceGraph = new GUIContent("Dependencies", AH_EditorData.Instance.RefFromIcon.Icon, "See asset dependency graph");
-            guiContentDuplicates = new GUIContent("Duplicates", AH_EditorData.Instance.DuplicateIcon.Icon, "Find duplicate assets");
+            guiContentLoadBuildInfo = Heureka_ResourceLoader.GetContent(myPackage, AH_EditorData.IconNames.LoadLog, "Load", "Load info from a previous build");
+            guiContentSettings = Heureka_ResourceLoader.GetContent(myPackage, AH_EditorData.IconNames.Settings, "Settings", "Open settings");
+            guiContentGenerateReferenceGraph = Heureka_ResourceLoader.GetContent(myPackage, AH_EditorData.IconNames.ReferenceGraph, "Dependencies", "See asset dependency graph");
+            guiContentDuplicates = Heureka_ResourceLoader.GetContent(myPackage, AH_EditorData.IconNames.Duplicate, "Duplicates", "Find duplicate assets");
 
             //Only avaliable in 2018
 #if UNITY_2018_1_OR_NEWER
-            guiContentBuildReport = new GUIContent("Report", AH_EditorData.Instance.ReportIcon.Icon, "Build report overview (Build size information)");
+            guiContentBuildReport = Heureka_ResourceLoader.GetContent(myPackage, AH_EditorData.IconNames.Report, "Report", "Build report overview (Build size information)");
 #endif
-            guiContentReadme = new GUIContent("Info", AH_EditorData.Instance.HelpIcon.Icon, "Open the readme file for all installed Heureka Games products");
-            guiContentDeleteAll = new GUIContent("Clean ALL", AH_EditorData.Instance.DeleteIcon.Icon, "Delete ALL unused assets in project ({0}) Remember to manually exclude relevant assets in the settings window");
-            guiContentRefresh = new GUIContent(AH_EditorData.Instance.RefreshIcon.Icon, "Refresh data");
+            guiContentReadme = Heureka_ResourceLoader.GetContent(myPackage, AH_EditorData.IconNames.Help, "Info", "Open the readme file for all installed Heureka Games products");
+            guiContentDeleteAll = Heureka_ResourceLoader.GetContent(myPackage, AH_EditorData.IconNames.Delete, "Clean ALL", "Delete ALL unused assets in project. Remember to manually exclude relevant assets in the settings window"); //new GUIContent("Clean ALL", AH_EditorData.Instance.DeleteIcon.Icon, "Delete ALL unused assets in project ({0}) Remember to manually exclude relevant assets in the settings window");
+            guiContentRefresh = Heureka_ResourceLoader.GetContentWithTooltip(myPackage, AH_EditorData.IconNames.Refresh, "Refresh data"); //new GUIContent(AH_EditorData.Instance.RefreshIcon.Icon, "Refresh data");
         }
 
         private void doNoBuildInfoLoaded()
         {
-            Heureka_WindowStyler.DrawCenteredMessage(m_window, AH_EditorData.Instance.WindowHeaderIcon.Icon, 380f, 110f, "Buildinfo not yet loaded" + Environment.NewLine + "Load existing / create new build");
+            Heureka_WindowStyler.DrawCenteredMessage(m_window, AH_EditorData.Icons.IconLargeWhite, 380f, 110f, "Buildinfo not yet loaded" + Environment.NewLine + "Load existing / create new build");
         }
 
         private void doHeader()
@@ -356,8 +359,11 @@ namespace HeurekaGames.AssetHunterPRO
             if (doSelectionButton(guiContentReadme))
             {
                 Heureka_PackageDataManagerEditor.SelectReadme();
-                if (AH_EditorData.Instance.Documentation != null)
-                    AssetDatabase.OpenAsset(AH_EditorData.Instance.Documentation);
+            }
+
+            if (doPromotionButton())
+            {
+                Application.OpenURL(Heureka_EditorData.Links.FromAHPToSmartBuilder);
             }
 
             EditorGUILayout.EndHorizontal();
@@ -418,6 +424,36 @@ namespace HeurekaGames.AssetHunterPRO
             GUILayout.EndArea();
         }
 
+        private bool doPromotionButton()
+        {
+            if (AH_SettingsManager.Instance.HideNewsButton)
+                return false;
+
+            GUIStyle buttonStyle = null;
+            GUIContent btnContent;
+            if (AH_SettingsManager.Instance.HideButtonText)
+            {
+                btnContent = new GUIContent(AH_EditorData.Contents.News);
+                btnContent.text = null;
+
+                buttonStyle = new GUIStyle(GUI.skin.button)
+                {
+                    padding = new RectOffset(0, 0, 0, 0)
+                };
+
+            }
+            else
+            {
+                btnContent = AH_EditorData.Contents.News;
+
+                buttonStyle = GUI.skin.button;
+            }
+
+            var btnSize = AH_SettingsManager.Instance.HideButtonText ? ButtonMaxHeight * 2f : ButtonMaxHeight;
+
+            return GUILayout.Button(btnContent, buttonStyle, GUILayout.MaxHeight(btnSize));
+        }
+        
         private bool doSelectionButton(GUIContent content)
         {
             GUIContent btnContent = new GUIContent(content);

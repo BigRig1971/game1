@@ -11,8 +11,8 @@ namespace Crest.Examples
     using UnityEngine.Experimental.Rendering;
     using UnityEngine.Rendering;
 
-    [ExecuteAlways]
-    public class MaskFill : MonoBehaviour
+    [ExecuteDuringEditMode]
+    public class MaskFill : CustomMonoBehaviour
     {
         [SerializeField]
         [Tooltip("Masked meshes that need filling. Can provide non masked meshes to build a fill mask for open meshes as it uses the back faces.")]

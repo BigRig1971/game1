@@ -222,12 +222,4 @@ public class BoatAlignNormal : FloatingObjectBase
             _rb.AddTorque(torqueLength * _boyancyTorque, ForceMode.Acceleration);
         }
     }
-    public void OnEnableControl()
-    {
-        _playerControlled = true;
-    }
-    public void OnDisableControl()
-    {
-        _playerControlled &= false;
-    }
 }

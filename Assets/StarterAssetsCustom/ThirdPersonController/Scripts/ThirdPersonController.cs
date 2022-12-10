@@ -179,36 +179,27 @@ namespace StupidHumanGames
         private void Update()
         {
             OnGravity();
-            
-           
-
-            if (_input._inventory)
-            {
-                _input._inventory = false;
-                cursorState = !cursorState;
-                if (cursorState)
-                {
-                    OnCursorVisable();
-                }
-                else
-                {
-                    OnCursorHide();
-                }
-            }
         }
-        void OnCursorVisable()
+        public void OnInventory()
         {
-            InventoryManager.OpenInventory();
-        }
-        void OnCursorHide()
-        {
-            InventoryManager.CloseInventory();
-        }
-
-
+			cursorState = !cursorState;
+			if (cursorState)
+			{
+				InventoryManager.OpenInventory();
+			}
+			else
+			{
+				InventoryManager.CloseInventory();
+			}
+		}
+		public void OnRoll(InputValue value)
+		{
+            if (InventoryManager.IsOpen()) return;
+            if (OnIsSwimming()) return;
+			_animator.SetBool(_animIDRoll, value.isPressed);
+		}
         private void LateUpdate()
         {
-
             if (!InventoryManager.IsOpen()) CameraRotation();
         }
         private void AssignAnimationIDs()
@@ -270,17 +261,6 @@ namespace StupidHumanGames
             {
                 GroundedCheck();
                 JumpAndGravity();
-
-                if (_input._roll && !InventoryManager.IsOpen() && _canMove)
-                {
-                    if (_hasAnimator)
-                    {
-                        _animator.SetBool(_animIDRoll, true);
-                        _input._roll = false;
-                    }
-                }
-                if (Input.GetKeyDown(KeyCode.J)) _animator.SetTrigger("RandomIdle");
-              
                 if(groundHugging) OnYPosition();
                 float targetSpeed = _input._sprint ? SprintSpeed : MoveSpeed;
                 if (_input._move == Vector2.zero) targetSpeed = 0.0f;

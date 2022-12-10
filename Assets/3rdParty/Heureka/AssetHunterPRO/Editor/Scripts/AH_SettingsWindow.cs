@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using HeurekaGames.Utils;
+using UnityEditor;
 using UnityEngine;
 
 namespace HeurekaGames.AssetHunterPRO
@@ -21,7 +22,7 @@ namespace HeurekaGames.AssetHunterPRO
             bool firstInit = (m_window == null);
 
             m_window = AH_SettingsWindow.GetWindow<AH_SettingsWindow>(WINDOWNAME, true);
-            m_window.titleContent.image = AH_EditorData.Instance.Settings.Icon;
+            m_window.titleContent.image = AH_EditorData.Icons.Settings;
 
             AH_Window[] mainWindows = Resources.FindObjectsOfTypeAll<AH_Window>();
             if (attemptDock && mainWindows.Length != 0 && firstInit)

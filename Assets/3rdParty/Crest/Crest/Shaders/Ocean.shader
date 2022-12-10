@@ -21541,6 +21541,7 @@ Shader "Hidden/Crest/Obsolete/Ocean"
         #pragma multi_compile _ SHADOWS_SHADOWMASK
         #pragma multi_compile DECALS_OFF DECALS_3RT DECALS_4RT
         #pragma multi_compile SHADOW_LOW SHADOW_MEDIUM SHADOW_HIGH
+        #pragma multi_compile AREA_SHADOW_MEDIUM AREA_SHADOW_HIGH
         #pragma multi_compile SCREEN_SPACE_SHADOWS_OFF SCREEN_SPACE_SHADOWS_ON
         #pragma multi_compile USE_FPTL_LIGHTLIST USE_CLUSTERED_LIGHTLIST
         #pragma shader_feature_local _REFRACTION_OFF _REFRACTION_PLANE _REFRACTION_SPHERE _REFRACTION_THIN

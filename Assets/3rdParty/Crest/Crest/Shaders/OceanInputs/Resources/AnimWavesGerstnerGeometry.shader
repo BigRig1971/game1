@@ -27,14 +27,15 @@ Shader "Crest/Inputs/Animated Waves/Gerstner Geometry"
 
     SubShader
     {
-        // Additive blend everywhere
-        Blend One One
         ZWrite Off
         ZTest Always
         Cull Off
 
         Pass
         {
+            // Additive blend everywhere
+            Blend One One
+
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -51,8 +52,8 @@ Shader "Crest/Inputs/Animated Waves/Gerstner Geometry"
                 float4 vertex : POSITION;
                 float2 axis : TEXCOORD0;
                 float invNormDistToShoreline : TEXCOORD1;
-				float weight : TEXCOORD2;
-	};
+                float weight : TEXCOORD2;
+            };
 
             struct v2f
             {
@@ -95,7 +96,7 @@ Shader "Crest/Inputs/Animated Waves/Gerstner Geometry"
                 o.worldPosScaled = worldPos / waveBufferSize;
 
                 o.invNormDistToShoreline_weight.x = v.invNormDistToShoreline;
-				o.invNormDistToShoreline_weight.y = v.weight * _Weight;
+                o.invNormDistToShoreline_weight.y = v.weight * _Weight;
 
                 // Rotate forward axis around y-axis into world space
                 o.axis = dot( v.axis, _AxisX ) * unity_ObjectToWorld._m00_m20 + dot( v.axis, float2(-_AxisX.y, _AxisX.x) ) * unity_ObjectToWorld._m02_m22;
@@ -154,6 +155,74 @@ Shader "Crest/Inputs/Animated Waves/Gerstner Geometry"
                 }
 
                 return wt * disp_variance;
+            }
+            ENDCG
+        }
+
+        Pass
+        {
+            // Multiply
+            Blend Zero SrcColor
+
+            CGPROGRAM
+            #pragma vertex Vertex
+            #pragma fragment Fragment
+
+            // #pragma enable_d3d11_debug_symbols
+
+            #include "UnityCG.cginc"
+
+            #include "../../OceanGlobals.hlsl"
+            #include "../../OceanInputsDriven.hlsl"
+            #include "../../OceanHelpersNew.hlsl"
+
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float invNormDistToShoreline : TEXCOORD1;
+                float weight : TEXCOORD2;
+            };
+
+            struct Varyings
+            {
+                float4 positionCS : SV_POSITION;
+                float2 invNormDistToShoreline_weight : TEXCOORD4;
+            };
+
+            CBUFFER_START(GerstnerPerMaterial)
+            half _FeatherWaveStart;
+            float _RespectShallowWaterAttenuation;
+            CBUFFER_END
+
+            CBUFFER_START(CrestPerOceanInput)
+            int _WaveBufferSliceIndex;
+            float _AverageWavelength;
+            float _AttenuationInShallows;
+            float _Weight;
+            float2 _AxisX;
+            half _MaximumAttenuationDepth;
+            CBUFFER_END
+
+            Varyings Vertex(Attributes input)
+            {
+                Varyings output;
+
+                output.positionCS = UnityObjectToClipPos(input.positionOS.xyz);
+
+                output.invNormDistToShoreline_weight.x = input.invNormDistToShoreline;
+                output.invNormDistToShoreline_weight.y = input.weight * _Weight;
+
+                return output;
+            }
+
+            float4 Fragment(Varyings input) : SV_Target
+            {
+                float weight = input.invNormDistToShoreline_weight.y;
+
+                // Feather at front/back.
+                weight *= min(input.invNormDistToShoreline_weight.x / _FeatherWaveStart, 1.0);
+
+                return 1.0 - weight;
             }
             ENDCG
         }

@@ -59,8 +59,6 @@ namespace Crest
 
         Material _currentOceanMaterial;
 
-        static int s_xrPassIndex = -1;
-
         public static UnderwaterPostProcessHDRP Instance { get; private set; }
 
         public bool IsActive()
@@ -132,10 +130,6 @@ namespace Crest
             // Used for cleanup
             _camera = camera.camera;
 
-            // TODO: Put somewhere else?
-            XRHelpers.Update(_camera);
-            XRHelpers.UpdatePassIndex(ref s_xrPassIndex);
-
             if (OceanRenderer.Instance == null)
             {
                 HDUtils.BlitCameraTexture(commandBuffer, source, destination);
@@ -151,9 +145,10 @@ namespace Crest
 
             // Call this every frame to ensure it is active just in case the user switches. All it does is set the
             // custom pass to active.
-            UnderwaterMaskPassHDRP.Enable(null);
+            UnderwaterMaskPassHDRP.Enable();
 
             UnderwaterRenderer.UpdatePostProcessMaterial(
+                null,
                 UnderwaterRenderer.Mode.FullScreen,
                 camera.camera,
                 _underwaterPostProcessMaterialWrapper,

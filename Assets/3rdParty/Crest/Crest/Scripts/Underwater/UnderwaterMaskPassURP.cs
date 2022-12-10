@@ -16,64 +16,53 @@ namespace Crest
 
         readonly PropertyWrapperMaterial _oceanMaskMaterial;
 
-        static UnderwaterMaskPassURP s_instance;
+        static int s_InstanceCount;
         UnderwaterRenderer _underwaterRenderer;
 
         public UnderwaterMaskPassURP()
         {
             // Will always execute and matrices will be ready.
+#if UNITY_2021_3_OR_NEWER
             renderPassEvent = RenderPassEvent.BeforeRenderingPrePasses;
+#else
+            renderPassEvent = RenderPassEvent.BeforeRenderingPrepasses;
+#endif
             _oceanMaskMaterial = new PropertyWrapperMaterial(k_ShaderPathOceanMask);
             _oceanMaskMaterial.material.hideFlags = HideFlags.HideAndDontSave;
         }
 
-        internal static void CleanUp()
+        internal void CleanUp()
         {
-            CoreUtils.Destroy(s_instance._oceanMaskMaterial.material);
-            s_instance = null;
+            CoreUtils.Destroy(_oceanMaskMaterial.material);
         }
 
-        public static void Enable(UnderwaterRenderer underwaterRenderer)
+        public void Enable(UnderwaterRenderer underwaterRenderer)
         {
-            if (s_instance == null)
-            {
-                s_instance = new UnderwaterMaskPassURP();
-            }
-
-            UnderwaterRenderer.Instance.OnEnableMask();
-
-            s_instance._underwaterRenderer = underwaterRenderer;
+            s_InstanceCount++;
+            _underwaterRenderer = underwaterRenderer;
+            _underwaterRenderer.OnEnableMask();
 
             RenderPipelineManager.beginCameraRendering -= EnqueuePass;
             RenderPipelineManager.beginCameraRendering += EnqueuePass;
         }
 
-        public static void Disable()
+        public void Disable()
         {
-            if (UnderwaterRenderer.Instance != null)
-            {
-                UnderwaterRenderer.Instance.OnDisableMask();
-            }
+            _underwaterRenderer.OnDisableMask();
 
-            RenderPipelineManager.beginCameraRendering -= EnqueuePass;
+            if (--s_InstanceCount <= 0)
+            {
+                RenderPipelineManager.beginCameraRendering -= EnqueuePass;
+            }
         }
 
         static void EnqueuePass(ScriptableRenderContext context, Camera camera)
         {
-            if (!s_instance._underwaterRenderer.IsActive)
+            var ur = UnderwaterRenderer.Get(camera);
+
+            if (!ur || !ur.IsActive)
             {
                 return;
-            }
-
-            // Only support main camera, scene camera and preview camera.
-            if (!ReferenceEquals(s_instance._underwaterRenderer._camera, camera))
-            {
-#if UNITY_EDITOR
-                if (!s_instance._underwaterRenderer.IsActiveForEditorCamera(camera))
-#endif
-                {
-                    return;
-                }
             }
 
             if (!Helpers.MaskIncludesLayer(camera.cullingMask, OceanRenderer.Instance.Layer))
@@ -82,7 +71,7 @@ namespace Crest
             }
 
             // Enqueue the pass. This happens every frame.
-            camera.GetUniversalAdditionalCameraData().scriptableRenderer.EnqueuePass(s_instance);
+            camera.GetUniversalAdditionalCameraData().scriptableRenderer.EnqueuePass(ur._urpMaskPass);
         }
 
         // Called before Configure.
@@ -101,7 +90,9 @@ namespace Crest
         // Called before Execute.
         public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
         {
-            ConfigureTarget(UnderwaterRenderer.Instance._maskTarget, UnderwaterRenderer.Instance._depthTarget);
+#pragma warning disable 618
+            ConfigureTarget(_underwaterRenderer._maskTarget, _underwaterRenderer._depthTarget);
+#pragma warning restore 618
             ConfigureClear(ClearFlag.All, Color.black);
         }
 
@@ -136,11 +127,11 @@ namespace Crest
                 _underwaterRenderer._debug._disableOceanMask
             );
 
-            UnderwaterRenderer.Instance.FixMaskArtefacts
+            _underwaterRenderer.FixMaskArtefacts
             (
                 commandBuffer,
                 renderingData.cameraData.cameraTargetDescriptor,
-                UnderwaterRenderer.Instance._maskTarget
+                _underwaterRenderer._maskTarget
             );
 
             context.ExecuteCommandBuffer(commandBuffer);

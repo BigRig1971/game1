@@ -9,8 +9,9 @@ namespace Crest
     /// <summary>
     /// Debug draw a line trace from this gameobjects position, in this gameobjects forward direction.
     /// </summary>
+    [ExecuteDuringEditMode]
     [AddComponentMenu(Internal.Constants.MENU_PREFIX_DEBUG + "Visualise Ray Trace")]
-    public class VisualiseRayTrace : MonoBehaviour
+    public class VisualiseRayTrace : CustomMonoBehaviour
     {
         /// <summary>
         /// The version of this asset. Can be used to migrate across versions. This value should

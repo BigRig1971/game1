@@ -15,8 +15,7 @@ void ApplyIndirectLightingMultiplier
 	// Allows control of baked lighting through volume framework.
 #if !defined(SHADERGRAPH_PREVIEW)
 	// We could create a BuiltinData struct which would have rendering layers on it, but it seems more complicated.
-	uint renderingLayers = _EnableLightLayers ? asuint(unity_RenderingLayer.x) : DEFAULT_LIGHT_LAYERS;
-	io_ambientLight *= GetIndirectDiffuseMultiplier(renderingLayers);
+	io_ambientLight *= GetIndirectDiffuseMultiplier(GetMeshRenderingLightLayer());
 #endif
 }
 #endif // CREST_HDRP

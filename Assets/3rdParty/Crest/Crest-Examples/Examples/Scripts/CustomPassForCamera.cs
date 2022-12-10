@@ -16,7 +16,7 @@ namespace Crest.Examples
     using UnityEngine.Rendering.Universal;
 #endif
 
-    [ExecuteAlways]
+    [ExecuteDuringEditMode]
     public abstract class CustomPassForCameraBase : MonoBehaviour
     {
         // Use int to support other RPs. We could use a custom enum to map to each RP in the future.
@@ -191,8 +191,10 @@ namespace Crest.Examples
                     _manager.Execute(buffer, cameraData.camera, cameraData.cameraTargetDescriptor);
                 }
 
+#pragma warning disable 618
                 // We have to restore the render target as not every pass will do so.
                 buffer.SetRenderTarget(renderer.cameraColorTarget, renderer.cameraDepthTarget);
+#pragma warning restore 618
 
                 context.ExecuteCommandBuffer(buffer);
                 CommandBufferPool.Release(buffer);

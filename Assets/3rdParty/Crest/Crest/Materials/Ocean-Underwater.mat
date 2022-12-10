@@ -67,15 +67,21 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - CREST_ALBEDO: 0
     - CREST_CAUSTICS: 1
     - CREST_FLOW: 0
     - CREST_FOAM: 1
+    - CREST_GENERATED_SHADER: 1
+    - Vector1_89268251: 10
     - _AddPrecomputedVelocity: 0
     - _AlphaCutoffEnable: 1
     - _AlphaDstBlend: 10
     - _AlphaSrcBlend: 1
     - _AlphaToMask: 0
     - _AlphaToMaskInspectorValue: 0
+    - _BelowHorizonFeatherWidth: 0.675
+    - _BelowHorizonOcclusion: 0.138
+    - _BelowHorizonThreshold: -0.44
     - _BlendMode: 0
     - _CausticsDepthOfField: 6
     - _CausticsDistortionScale: 25
@@ -106,13 +112,14 @@ Material:
     - _NormalsScale: 30
     - _NormalsStrength: 0.387
     - _NormalsStrengthOverall: 1
+    - _ObsoleteMessage: 0
     - _Occlusion: 1
     - _OpaqueCullMode: 2
     - _RayTracing: 0
     - _ReceivesSSR: 1
     - _ReceivesSSRTransparent: 1
     - _RefractionModel: 0
-    - _RefractionStrength: 0.36
+    - _RefractionStrength: 0.2
     - _RefractiveIndexOfWater: 1.33
     - _RenderQueueType: 4
     - _RequireSplitLighting: 0
@@ -133,10 +140,10 @@ Material:
     - _StencilRefGBuffer: 10
     - _StencilRefMV: 40
     - _StencilWriteMask: 6
-    - _StencilWriteMaskDepth: 8
+    - _StencilWriteMaskDepth: 9
     - _StencilWriteMaskDistortionVec: 4
-    - _StencilWriteMaskGBuffer: 14
-    - _StencilWriteMaskMV: 40
+    - _StencilWriteMaskGBuffer: 15
+    - _StencilWriteMaskMV: 41
     - _SupportDecals: 1
     - _SurfaceType: 1
     - _TransparentBackfaceEnable: 0
@@ -152,14 +159,15 @@ Material:
     - _ZTestTransparent: 4
     - _ZWrite: 1
     m_Colors:
-    - _DepthFogDensity: {r: 0.1, g: 0.1, b: 0.1, a: 0}
+    - _DepthFogDensity: {r: 0.5, g: 0.36, b: 0.36, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: 1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
-    - _FoamBubbleColor: {r: 0, g: 1, b: 0.8862745, a: 0}
-    - _SSSTint: {r: 0.07450979, g: 0.42745098, b: 0.39215687, a: 0}
-    - _ScatterColourBase: {r: 0, g: 0.06666665, b: 0.13333327, a: 0}
-    - _ScatterColourShadow: {r: 0, g: 0.03921569, b: 0.078431346, a: 0}
-    - _ScatterColourShallow: {r: 0, g: 0.13333327, b: 0.07450979, a: 0}
+    - _FoamBubbleColor: {r: 0, g: 1, b: 0.8865156, a: 0}
+    - _SSSTint: {r: 0.0763862, g: 0.426, b: 0.39074484, a: 0}
+    - _ScatterColourBase: {r: 0, g: 0.06525975, b: 0.13333334, a: 0}
+    - _ScatterColourShadow: {r: 0, g: 0.039, b: 0.078, a: 0}
+    - _ScatterColourShallow: {r: 0, g: 0.13333334, b: 0.07585253, a: 1}
+    - _Specular: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &4168787807348109742
 MonoBehaviour:
@@ -173,7 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da692e001514ec24dbc4cca1949ff7e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 12
+  version: 13
   hdPluginSubTargetMaterialVersions:
     m_Keys: []
     m_Values: 

@@ -1,6 +1,7 @@
 ﻿//Only avaliable in 2018
 #if UNITY_2018_1_OR_NEWER
 
+using HeurekaGames.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -41,7 +42,7 @@ namespace HeurekaGames.AssetHunterPRO
             if(!alreadyExist)
             { 
                 m_window = GetWindow<AH_BuildReportWindow>("AH Report", true, typeof(AH_Window));
-                m_window.titleContent.image = AH_EditorData.Instance.ReportIcon.Icon;
+                m_window.titleContent.image = AH_EditorData.Icons.Report;
 
                 m_window.buildInfoManager = AH_Window.GetBuildInfoManager();
                 m_window.buildInfoManager.OnBuildInfoSelectionChanged += m_window.OnBuildInfoSelectionChanged;
@@ -71,12 +72,12 @@ namespace HeurekaGames.AssetHunterPRO
 
             if (buildInfoManager == null || buildInfoManager.HasSelection == false)
             {
-                Heureka_WindowStyler.DrawCenteredMessage(m_window, AH_EditorData.Instance.WindowHeaderIcon.Icon, 310f, 110f, "No buildinfo currently loaded in main window");
+                Heureka_WindowStyler.DrawCenteredMessage(m_window, AH_EditorData.Icons.IconLargeWhite, 310f, 110f, "No buildinfo currently loaded in main window");
                 return;
             }
             else if (buildInfoManager.IsMergedReport())
             {
-                Heureka_WindowStyler.DrawCenteredMessage(m_window, AH_EditorData.Instance.WindowHeaderIcon.Icon, 366f, 110f, "Buildreport window does not work with merged buildreports");
+                Heureka_WindowStyler.DrawCenteredMessage(m_window, AH_EditorData.Icons.IconLargeWhite, 366f, 110f, "Buildreport window does not work with merged buildreports");
                 return;
             }
 
@@ -126,7 +127,7 @@ namespace HeurekaGames.AssetHunterPRO
             {
                 if (buildSize <= 0)
                 {
-                    Heureka_WindowStyler.DrawCenteredMessage(m_window, AH_EditorData.Instance.WindowHeaderIcon.Icon, 462f, 120f, "The selected buildinfo lacks information. It was probably created with older version. Create new with this version");
+                    Heureka_WindowStyler.DrawCenteredMessage(m_window, AH_EditorData.Icons.IconLargeWhite, 462f, 120f, "The selected buildinfo lacks information. It was probably created with older version. Create new with this version");
                     return;
                 }
 

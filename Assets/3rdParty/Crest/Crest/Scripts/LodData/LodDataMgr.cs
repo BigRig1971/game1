@@ -213,7 +213,7 @@ namespace Crest
             float Filter(ILodDataInput data, out int isTransition);
         }
 
-        protected void SubmitDraws(int lodIdx, CommandBuffer buf)
+        protected virtual void SubmitDraws(int lodIdx, CommandBuffer buf)
         {
             var lt = OceanRenderer.Instance._lodTransform;
             lt._renderData[lodIdx].Current.Validate(0, SimName);
@@ -285,6 +285,8 @@ namespace Crest
                 x.Release();
                 Helpers.Destroy(x);
             });
+
+            Helpers.Destroy(_defaultSettings);
         }
     }
 }

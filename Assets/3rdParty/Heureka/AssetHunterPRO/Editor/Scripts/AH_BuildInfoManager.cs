@@ -96,7 +96,7 @@ namespace HeurekaGames.AssetHunterPRO
                 if (OnBuildInfoSelectionChanged != null)
                     OnBuildInfoSelectionChanged();
             }
-            else
+            else if(!projectIsClean)
             {
                 EditorUtility.DisplayDialog(
                     "JSON Parse error",

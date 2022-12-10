@@ -15,10 +15,10 @@ namespace Crest.Spline
     /// <summary>
     /// Simple spline object. Spline points are child GameObjects.
     /// </summary>
-    [ExecuteAlways]
+    [ExecuteDuringEditMode]
     [AddComponentMenu(Internal.Constants.MENU_PREFIX_SPLINE + "Spline")]
     [HelpURL(Internal.Constants.HELP_URL_BASE_USER + "wave-conditions.html" + Internal.Constants.HELP_URL_RP + "#wave-splines")]
-    public partial class Spline : MonoBehaviour, ISplinePointCustomDataSetup
+    public partial class Spline : CustomMonoBehaviour, ISplinePointCustomDataSetup
     {
         /// <summary>
         /// The version of this asset. Can be used to migrate across versions. This value should
@@ -181,7 +181,7 @@ namespace Crest.Spline
     }
 
     [CustomEditor(typeof(Spline))]
-    public class SplineEditor : ValidatedEditor
+    public class SplineEditor : CustomBaseEditor
     {
         public override void OnInspectorGUI()
         {

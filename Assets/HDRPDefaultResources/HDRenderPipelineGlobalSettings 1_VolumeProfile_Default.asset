@@ -12,4 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
   m_Name: HDRenderPipelineGlobalSettings 1_VolumeProfile_Default
   m_EditorClassIdentifier: 
-  components: []
+  components:
+  - {fileID: 4557130640494828948}
+--- !u!114 &4557130640494828948
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a7ff42a8c5be6646ad3975f3a54c1eb, type: 3}
+  m_Name: DiffusionProfileList
+  m_EditorClassIdentifier: 
+  active: 1
+  diffusionProfiles:
+    m_OverrideState: 1
+    m_Value:
+    - {fileID: 11400000, guid: 2d31128e8db0c1643872f253a85dc22e, type: 2}
+    - {fileID: 11400000, guid: 26bdddf49760c61438938733f07fa2a2, type: 2}
+    - {fileID: 11400000, guid: 78322c7f82657514ebe48203160e3f39, type: 2}
+    - {fileID: 11400000, guid: cb824b513c3aa274db0944d6fb82a86c, type: 2}
+    - {fileID: 11400000, guid: 13713b45b71602b4aa14178bc2aaf1c4, type: 2}
+    - {fileID: 11400000, guid: 2f995df9a3ad4e6499669b35a6ff3a2b, type: 2}
+    - {fileID: 11400000, guid: da8c49ed7c914a14a9030580f704c8db, type: 2}

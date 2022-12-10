@@ -5,6 +5,7 @@ using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using HeurekaGames.AssetHunterPRO.BaseTreeviewImpl.DependencyGraph;
 using UnityEditorInternal;
+using HeurekaGames.Utils;
 
 namespace HeurekaGames.AssetHunterPRO
 {
@@ -134,7 +135,7 @@ namespace HeurekaGames.AssetHunterPRO
                 //If window has no cached data
                 if (!dependencyGraphManager.HasCache())
                 {
-                    Heureka_WindowStyler.DrawCenteredMessage(window, AH_EditorData.Instance.RefFromWhiteIcon.Icon, 240f, 110f, "No Graph" + Environment.NewLine + "Build Graph");
+                    Heureka_WindowStyler.DrawCenteredMessage(window, AH_EditorData.Icons.RefFromWhite, 240f, 110f, "No Graph" + Environment.NewLine + "Build Graph");
                     EditorGUILayout.BeginVertical();
                     GUILayout.FlexibleSpace();
                     Color origClr = GUI.backgroundColor;
@@ -174,7 +175,7 @@ namespace HeurekaGames.AssetHunterPRO
                     {
                         using (new EditorGUILayout.HorizontalScope("box", GUILayout.ExpandWidth(true)))
                         {
-                            GUILayout.Label(AH_EditorData.Instance.RefFromIcon.Icon, GUILayout.Width(32), GUILayout.Height(32));
+                            GUILayout.Label(AH_EditorData.Icons.RefFrom, GUILayout.Width(32), GUILayout.Height(32));
                             using (new EditorGUILayout.VerticalScope(GUILayout.Height(32)))
                             {
                                 GUILayout.FlexibleSpace();
@@ -187,7 +188,7 @@ namespace HeurekaGames.AssetHunterPRO
 
                         using (new EditorGUILayout.HorizontalScope("box", GUILayout.ExpandWidth(true)))
                         {
-                            GUILayout.Label(AH_EditorData.Instance.RefToIcon.Icon, GUILayout.Width(32), GUILayout.Height(32));
+                            GUILayout.Label(AH_EditorData.Icons.RefTo, GUILayout.Width(32), GUILayout.Height(32));
                             using (new EditorGUILayout.VerticalScope(GUILayout.Height(32)))
                             {
                                 GUILayout.FlexibleSpace();
@@ -205,7 +206,7 @@ namespace HeurekaGames.AssetHunterPRO
                 }
                 else
                 {
-                    Heureka_WindowStyler.DrawCenteredMessage(window, AH_EditorData.Instance.RefFromWhiteIcon.Icon, 240f, 110f, "No selection" + Environment.NewLine + "Select asset in project view");
+                    Heureka_WindowStyler.DrawCenteredMessage(window, AH_EditorData.Icons.RefFromWhite, 240f, 110f, "No selection" + Environment.NewLine + "Select asset in project view");
                 }
             }
             doFooter();
@@ -294,8 +295,8 @@ namespace HeurekaGames.AssetHunterPRO
 
         private void initializeGUIContent()
         {
-            titleContent = new GUIContent(WINDOWNAME, AH_EditorData.Instance.RefFromIcon.Icon);
-            guiContentRefresh = new GUIContent(AH_EditorData.Instance.RefreshIcon.Icon, "Refresh data");
+            titleContent = Heureka_ResourceLoader.GetContentWithTitle(AH_Window.myPackage, AH_EditorData.IconNames.RefFrom, WINDOWNAME);
+            guiContentRefresh = Heureka_ResourceLoader.GetContentWithTitle(AH_Window.myPackage, AH_EditorData.IconNames.Refresh, "Refresh data");
         }
 
         private void doFooter()

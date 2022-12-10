@@ -26,6 +26,7 @@ Shader "Hidden/Crest/Underwater/Underwater Effect HDRP"
 
 	// Low appears good enough as it has filtering which is necessary when close to a shadow.
 	#define SHADOW_LOW
+	#define AREA_SHADOW_LOW
 
 	// In shared SG code we target the forward pass to avoid shader compilation errors.
 	#define SHADERPASS SHADERPASS_FORWARD

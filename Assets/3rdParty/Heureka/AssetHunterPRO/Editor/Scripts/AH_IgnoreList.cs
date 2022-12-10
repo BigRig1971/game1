@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using HeurekaGames;
+using HeurekaGames.Utils;
 
 namespace HeurekaGames.AssetHunterPRO
 {

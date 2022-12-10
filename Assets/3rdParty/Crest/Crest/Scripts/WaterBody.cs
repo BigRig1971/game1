@@ -15,10 +15,10 @@ namespace Crest
     /// Demarcates an AABB area where water is present in the world. If present, ocean tiles will be
     /// culled if they don't overlap any WaterBody.
     /// </summary>
-    [ExecuteAlways]
+    [ExecuteDuringEditMode]
     [AddComponentMenu(Internal.Constants.MENU_PREFIX_SCRIPTS + "Water Body")]
     [HelpURL(Internal.Constants.HELP_URL_BASE_USER + "water-bodies.html")]
-    public partial class WaterBody : MonoBehaviour
+    public partial class WaterBody : CustomMonoBehaviour
     {
         /// <summary>
         /// The version of this asset. Can be used to migrate across versions. This value should
@@ -92,7 +92,7 @@ namespace Crest
 
             if (_clipInput != null)
             {
-                RegisterLodDataInputBase.GetRegistrar(typeof(LodDataMgrClipSurface)).Remove(_clipInput);
+                RegisterLodDataInput<LodDataMgrClipSurface>.DeregisterInput(_clipInput);
 
                 _clipInput = null;
             }
@@ -122,12 +122,11 @@ namespace Crest
                 {
                     _clipInput = new ClipInput(this);
 
-                    var registrar = RegisterLodDataInputBase.GetRegistrar(typeof(LodDataMgrClipSurface));
-                    registrar.Add(0, _clipInput);
+                    RegisterLodDataInput<LodDataMgrClipSurface>.RegisterInput(_clipInput, 0, transform.GetSiblingIndex());
                 }
                 else
                 {
-                    RegisterLodDataInputBase.GetRegistrar(typeof(LodDataMgrClipSurface)).Remove(_clipInput);
+                    RegisterLodDataInput<LodDataMgrClipSurface>.DeregisterInput(_clipInput);
 
                     _clipInput = null;
                 }
@@ -199,6 +198,8 @@ namespace Crest
     {
         public bool Validate(OceanRenderer ocean, ValidatedHelper.ShowMessage showMessage)
         {
+            var isValid = true;
+
             // This will also return disabled objects. Safe to use in this case.
             if (Resources.FindObjectsOfTypeAll<OceanRenderer>().Length == 0)
             {
@@ -209,7 +210,7 @@ namespace Crest
                     ValidatedHelper.MessageType.Error, this
                 );
 
-                return false;
+                isValid = false;
             }
 
             if (Mathf.Abs(transform.lossyScale.x) < 2f && Mathf.Abs(transform.lossyScale.z) < 2f)
@@ -221,24 +222,13 @@ namespace Crest
                     ValidatedHelper.MessageType.Error, this
                 );
 
-                return false;
+                isValid = false;
             }
 
-            if (transform.eulerAngles.magnitude > 0.0001f)
-            {
-                showMessage
-                (
-                    $"There must be no rotation on the water body GameObject, and no rotation on any parent. Currently the rotation Euler angles are {transform.eulerAngles}.",
-                    "Reset the rotations on this GameObject and all parents to 0.",
-                    ValidatedHelper.MessageType.Error, this
-                );
-            }
+            isValid = isValid && ValidatedHelper.ValidateNoRotation(this, transform, showMessage);
 
-            return true;
+            return isValid;
         }
     }
-
-    [CustomEditor(typeof(WaterBody), true), CanEditMultipleObjects]
-    class WaterBodyEditor : ValidatedEditor { }
 #endif
 }

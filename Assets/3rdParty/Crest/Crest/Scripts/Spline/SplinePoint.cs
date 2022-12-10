@@ -15,9 +15,8 @@ namespace Crest.Spline
     /// <summary>
     /// Spline point, intended to be child of Spline object
     /// </summary>
-    [ExecuteAlways]
     [AddComponentMenu(Internal.Constants.MENU_PREFIX_SPLINE + "Spline Point")]
-    public class SplinePoint : MonoBehaviour
+    public class SplinePoint : CustomMonoBehaviour
     {
         /// <summary>
         /// The version of this asset. Can be used to migrate across versions. This value should
@@ -47,7 +46,13 @@ namespace Crest.Spline
 
         void OnDrawGizmosSelected()
         {
-            if (transform.parent.TryGetComponent(out IReceiveSplinePointOnDrawGizmosSelectedMessages receiver))
+            // Reduces spam. May have edge cases where spline will not update but that is fine for now.
+            if (gameObject != Selection.activeGameObject)
+            {
+                return;
+            }
+
+            foreach (var receiver in transform.parent.GetComponents<IReceiveSplinePointOnDrawGizmosSelectedMessages>())
             {
                 receiver.OnSplinePointDrawGizmosSelected(this);
             }
@@ -62,7 +67,7 @@ namespace Crest.Spline
     }
 
     [CustomEditor(typeof(SplinePoint))]
-    public class SplinePointEditor : Editor
+    public class SplinePointEditor : CustomBaseEditor
     {
         public override void OnInspectorGUI()
         {

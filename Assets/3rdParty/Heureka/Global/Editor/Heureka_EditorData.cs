@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace HeurekaGames
+namespace HeurekaGames.Utils
 {
     public class Heureka_EditorData : ScriptableObject
     {
@@ -43,6 +43,20 @@ namespace HeurekaGames
         }
 
         public GUIStyle HeadlineStyle;
+        public static class Links
+        {
+            private const string AffiliateID = "1011l4Izm";
+            private const string SlugSmartBuilder = "206777";
+            private const string SlugAssetHunter = "135296";
+            private const string SlugAssetFinder = "97772";
+
+            public static string FromAHPToSmartBuilder => GenerateLink("AHPNews", SlugSmartBuilder);
+
+            private static string GenerateLink(string pubref, string slug)
+            {
+                return $"https://prf.hn/click/camref:{AffiliateID}/pubref:{pubref}/destination:https%3A%2F%2Fassetstore.unity.com%2Fpackages%2Fslug%2F{slug}";
+            }
+        }
     }
 
     [System.Serializable]

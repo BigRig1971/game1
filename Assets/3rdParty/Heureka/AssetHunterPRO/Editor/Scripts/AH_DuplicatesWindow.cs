@@ -1,4 +1,5 @@
 ﻿
+using HeurekaGames.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -53,7 +54,7 @@ namespace HeurekaGames.AssetHunterPRO
                 //If window has no cached data
                 if (!duplicateDataManager.HasCache)
                 {
-                    Heureka_WindowStyler.DrawCenteredMessage(window, AH_EditorData.Instance.DuplicateWhiteIcon.Icon, 240f, 110f, "No data" + Environment.NewLine + "Find duplicates");
+                    Heureka_WindowStyler.DrawCenteredMessage(window, AH_EditorData.Icons.DuplicateIconWhite, 240f, 110f, "No data" + Environment.NewLine + "Find duplicates");
                     EditorGUILayout.BeginVertical();
                     GUILayout.FlexibleSpace();
                     Color origClr = GUI.backgroundColor;
@@ -71,7 +72,7 @@ namespace HeurekaGames.AssetHunterPRO
                 {
                     if (!duplicateDataManager.HasDuplicates())
                     { 
-                        Heureka_WindowStyler.DrawCenteredMessage(window, AH_EditorData.Instance.DuplicateWhiteIcon.Icon, 240f, 110f, "Hurray" + Environment.NewLine + "No duplicates assets" + Environment.NewLine + "in project :)");
+                        Heureka_WindowStyler.DrawCenteredMessage(window, AH_EditorData.Icons.DuplicateIconWhite, 240f, 110f, "Hurray" + Environment.NewLine + "No duplicates assets" + Environment.NewLine + "in project :)");
                         GUILayout.FlexibleSpace();
                     }
                     else
@@ -113,8 +114,8 @@ namespace HeurekaGames.AssetHunterPRO
 
         private void initializeGUIContent()
         {
-            titleContent = new GUIContent(WINDOWNAME, AH_EditorData.Instance.DuplicateIcon.Icon);
-            guiContentRefresh = new GUIContent(AH_EditorData.Instance.RefreshIcon.Icon, "Refresh data");
+            titleContent = Heureka_ResourceLoader.GetContentWithTitle(AH_Window.myPackage, AH_EditorData.IconNames.Duplicate, WINDOWNAME);
+            guiContentRefresh = Heureka_ResourceLoader.GetContentWithTooltip(AH_Window.myPackage, AH_EditorData.IconNames.Refresh, "Refresh data");
 
             buttonSelectContent = new GUIContent() { };
 

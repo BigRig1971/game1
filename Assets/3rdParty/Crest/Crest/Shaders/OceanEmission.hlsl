@@ -229,7 +229,7 @@ half3 OceanEmission
 #if _CAUSTICS_ON
 		// Refractions don't work correctly in single pass. Use same code from underwater instead for now.
 #if defined(UNITY_SINGLE_PASS_STEREO) || defined(UNITY_STEREO_INSTANCING_ENABLED)
-		float3 scenePos = (((i_view) / dot(i_view, unity_CameraToWorld._m02_m12_m22)) * i_sceneZ) + _WorldSpaceCameraPos;
+		float3 scenePos = _WorldSpaceCameraPos - i_view * i_sceneZ / dot(UNITY_MATRIX_I_V._13_23_33, i_view);
 #else
 		float3 scenePos = ComputeWorldSpacePosition(uvBackgroundRefract, rawDepth, UNITY_MATRIX_I_VP);
 #endif

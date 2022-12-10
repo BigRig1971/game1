@@ -149,15 +149,19 @@ namespace HeurekaGames.AssetHunterPRO
         internal void ProcessBuildReport(BuildReport report)
         {
             TotalSize = report.summary.totalSize;
+#if UNITY_2022_1_OR_NEWER
             foreach (var file in report.GetFiles())
+#else
+    foreach (var file in report.files)
+#endif
             {
                 BuildReportInfoList.Add(new AH_BuildReportFileInfo(file));
             }
         }
 #endif
 
-        //Stores in XML friendly format and saves
-        internal void FinalizeReport(BuildTarget target)
+                //Stores in XML friendly format and saves
+                internal void FinalizeReport(BuildTarget target)
         {
             addBuildtargetAssets(target);
             FinalizeReport();

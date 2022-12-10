@@ -4,6 +4,11 @@
 
 using System.Collections.Generic;
 using UnityEditor;
+#if CREST_UNITY_ADDRESSABLES
+using UnityEditor.AddressableAssets.Settings;
+using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.Settings.GroupSchemas;
+#endif
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEditor.Rendering;
@@ -22,7 +27,7 @@ namespace Crest
     ///   stripping (eg _CAUSTICS_ON). We determine this by checking the keywords used in the ocean material.
     /// - the meniscus keyword (CREST_MENISCUS) which is set on the underwater renderer.
     /// </summary>
-    class BuildProcessor : IPreprocessShaders, IProcessSceneWithReport, IPostprocessBuildWithReport
+    class BuildProcessor : IPreprocessShaders, IProcessSceneWithReport, IPreprocessBuildWithReport, IPostprocessBuildWithReport
     {
         public int callbackOrder => 0;
         readonly List<Material> _oceanMaterials = new List<Material>();
@@ -48,6 +53,16 @@ namespace Crest
             "_SHADOWS_SOFT",
         };
 
+        bool IsWaterMaterial(Material material)
+        {
+            return material != null && material.shader != null && IsWaterShader(material.shader.name);
+        }
+
+        bool IsWaterShader(string name)
+        {
+            return name == "Crest/Ocean" || name == "Crest/Ocean URP" || name == "Crest/Framework";
+        }
+
         bool IsUnderwaterShader(string shaderName)
         {
             // According to the docs it's possible to change RP at runtime, so I guess all relevant
@@ -62,6 +77,35 @@ namespace Crest
         int shaderVarientStrippedCount = 0;
 #endif
 
+        public void OnPreprocessBuild(BuildReport report)
+        {
+            // Full coverage (Resources only).
+            foreach (var material in Resources.LoadAll("", typeof(Material)).Cast<Material>())
+            {
+                if (IsWaterMaterial(material) && !_oceanMaterials.Contains(material))
+                {
+                    _oceanMaterials.Add(material);
+                }
+            }
+
+#if CREST_UNITY_ADDRESSABLES
+            // Full coverage (Addressables only).
+            List<AddressableAssetEntry> assets = new List<AddressableAssetEntry>();
+            AddressableAssetSettingsDefaultObject.Settings?.GetAllAssets(assets, includeSubObjects: true);
+            foreach (var asset in assets)
+            {
+                if (asset.parentGroup.GetSchema<BundledAssetGroupSchema>()?.IncludeInBuild == true)
+                {
+                    var material = asset.MainAsset as Material;
+                    if (IsWaterMaterial(material) && !_oceanMaterials.Contains(material))
+                    {
+                        _oceanMaterials.Add(material);
+                    }
+                }
+            }
+#endif
+        }
+
         public void OnProcessScene(Scene scene, BuildReport report)
         {
             // OnProcessScene is called on scene start too. Limit to building.
@@ -71,22 +115,17 @@ namespace Crest
             }
 
             // Resources.FindObjectsOfTypeAll will get all materials that are used for this scene.
+            // This can retrieve stuff excluded from the build as it gets everything in memory.
             foreach (var material in Resources.FindObjectsOfTypeAll<Material>())
             {
-                if (material.shader.name != "Crest/Ocean" && material.shader.name != "Crest/Ocean URP" && material.shader.name != "Crest/Framework")
+                if (IsWaterMaterial(material) && !_oceanMaterials.Contains(material))
                 {
-                    continue;
+                    _oceanMaterials.Add(material);
                 }
-
-                if (_oceanMaterials.Contains(material))
-                {
-                    continue;
-                }
-
-                _oceanMaterials.Add(material);
             }
 
-            // Finds them in scenes and prefabs. Instances found is higher than expected.
+            // Finds them in scenes and prefabs.
+            // This can retrieve stuff excluded from the build as it gets everything in memory.
             foreach (var underwaterRenderer in Resources.FindObjectsOfTypeAll<UnderwaterRenderer>())
             {
                 if (!_underwaterRenderers.Contains(underwaterRenderer))
@@ -145,10 +184,14 @@ namespace Crest
                 // way to get a list of keywords without trying to extract them from shader property names. Lastly,
                 // shader_feature will be returned only if they are enabled.
                 var skipped = data[i].shaderKeywordSet.GetShaderKeywords()
-                    // Ignore Unity keywords.
-                    .Where(x => ShaderKeyword.GetKeywordType(shader, x) == ShaderKeywordType.UserDefined)
+                    // Ignore Unity keywords (I do not think this actually does anything but I feel better with it here).
+                    .Where(x => ShaderKeyword.IsKeywordLocal(x) || ShaderKeyword.GetGlobalKeywordType(x) == ShaderKeywordType.UserDefined)
                     // Ignore keywords from our list above.
+#if UNITY_2021_2_OR_NEWER
+                    .Where(x => !s_ShaderKeywordsToIgnoreStripping.Contains(x.name));
+#else
                     .Where(x => !s_ShaderKeywordsToIgnoreStripping.Contains(ShaderKeyword.GetKeywordName(shader, x)));
+#endif
                 shaderKeywords.UnionWith(skipped);
             }
 
@@ -156,8 +199,12 @@ namespace Crest
             var usedShaderKeywords = new HashSet<ShaderKeyword>();
             foreach (var shaderKeyword in shaderKeywords)
             {
+#if UNITY_2021_2_OR_NEWER
+                var shaderKeywordName = shaderKeyword.name;
+#else
                 // GetKeywordName will work for both global and local keywords.
                 var shaderKeywordName = ShaderKeyword.GetKeywordName(shader, shaderKeyword);
+#endif
 
                 // Mensicus is set on the UnderwaterRenderer component.
                 if (shaderKeywordName.Contains("CREST_MENISCUS"))
@@ -189,7 +236,12 @@ namespace Crest
             var unusedShaderKeyowrds = new HashSet<ShaderKeyword>();
             foreach (var shaderKeyword in shaderKeywords)
             {
+#if UNITY_2021_2_OR_NEWER
+                var shaderKeywordName = shaderKeyword.name;
+#else
+                // GetKeywordName will work for both global and local keywords.
                 var shaderKeywordName = ShaderKeyword.GetKeywordName(shader, shaderKeyword);
+#endif
 
                 // Mensicus is set on the UnderwaterRenderer component.
                 if (shaderKeywordName.Contains("CREST_MENISCUS"))

@@ -19,6 +19,8 @@ void CrestNodeWaterVolume_float
 {
 	o_clip = i_clip;
 
+	// This keyword works for all RPs despite BIRP having prefixes in serialised data.
+#if _ALPHATEST_ON
 #if CREST_WATER_VOLUME
 	float2 positionNDC = i_positionNDC;
 
@@ -54,4 +56,5 @@ void CrestNodeWaterVolume_float
 	}
 #endif // CREST_WATER_VOLUME_2D
 #endif // CREST_WATER_VOLUME
+#endif // _ALPHATEST_ON
 }

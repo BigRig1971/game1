@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-namespace HeurekaGames
+namespace HeurekaGames.Utils
 {
     public class Heureka_PackageDataPromo : Heureka_PackageData
     {

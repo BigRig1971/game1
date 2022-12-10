@@ -11,9 +11,9 @@ using UnityEngine.SceneManagement;
 
 namespace Crest
 {
-    [ExecuteAlways]
+    [ExecuteDuringEditMode]
     [AddComponentMenu(Internal.Constants.MENU_PREFIX_DEBUG + "Ocean Debug GUI")]
-    public class OceanDebugGUI : MonoBehaviour
+    public class OceanDebugGUI : CustomMonoBehaviour
     {
         /// <summary>
         /// The version of this asset. Can be used to migrate across versions. This value should

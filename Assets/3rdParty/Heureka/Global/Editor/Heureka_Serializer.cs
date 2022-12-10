@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using PackageInfo = UnityEditor.PackageManager.PackageInfo;
+using UnityEditor;
 
-namespace HeurekaGames
+namespace HeurekaGames.Utils
 {
     public class Heureka_Serializer
     {
@@ -37,6 +39,36 @@ namespace HeurekaGames
             {
                 this.Items = items;
             }
+        }
+    }
+    public static class Heureka_Utils
+    {
+        public static PackageInfo GetPackageInfo<T>()
+        {
+            var assembly = typeof(T).Assembly;
+            return PackageInfo.FindForAssembly(assembly);
+        }
+
+        public static string GetVersionNumber<T>()
+        {
+            return GetPackageInfo<T>().version;
+        }
+
+        public static PackageInfo GetPackageInfoFromObject(UnityEngine.Object asset)
+        {
+            return PackageInfo.FindForAssetPath(AssetDatabase.GetAssetPath(asset));
+        }
+
+        public static string GetAssetStoreSearchLink(IEnumerable<string> tags)
+        {
+            string tracker = @"https://prf.hn/click/camref:1011l4Izm/pubref:SBSearch/destination:";
+            string search = string.Join(" ", tags);
+            return tracker + @"https://assetstore.unity.com/?category=3d%5C2d&q=" + search + @"&orderBy=1";
+        }
+
+        public static bool IsUnityVersionGreaterThan(int major)
+        {
+            return System.Int32.Parse(Application.unityVersion.Split('.')[0]) > major;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Crest
     /// uncommon or custom lighting will require a custom solution (use this for reference).
     /// </summary>
     [AddComponentMenu(Internal.Constants.MENU_PREFIX_EXAMPLE + "Underwater Environmental Lighting")]
-    public class UnderwaterEnvironmentalLighting : MonoBehaviour
+    public class UnderwaterEnvironmentalLighting : CustomMonoBehaviour
     {
         /// <summary>
         /// The version of this asset. Can be used to migrate across versions. This value should
@@ -156,7 +156,7 @@ namespace Crest
 
 #if UNITY_EDITOR
     [CustomEditor(typeof(UnderwaterEnvironmentalLighting))]
-    public class UnderwaterEnvironmentalLightingEditor : Editor
+    public class UnderwaterEnvironmentalLightingEditor : CustomBaseEditor
     {
         public override void OnInspectorGUI()
         {

@@ -7,7 +7,7 @@ using System.IO;
 using System.Reflection;
 using System;
 
-namespace HeurekaGames
+namespace HeurekaGames.Utils
 {
     [CustomEditor(typeof(Heureka_PackageDataManager))]
     [InitializeOnLoad]

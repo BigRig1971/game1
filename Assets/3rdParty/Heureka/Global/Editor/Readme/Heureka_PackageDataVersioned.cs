@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace HeurekaGames
+namespace HeurekaGames.Utils
 {
     public class Heureka_PackageDataVersioned : Heureka_PackageData
     {
@@ -29,6 +29,11 @@ namespace HeurekaGames
             {
                 item.FoldOut = false;
             }
+        }
+
+        public void Delete(PackageVersion target)
+        {
+            VersionData.Remove(target);
         }
     }
 
@@ -95,13 +100,17 @@ namespace HeurekaGames
             VersionChanges.RemoveAt(list.index);
         }
 
-        public void OnGUI()
+        public void OnGUI(ref bool shouldDelete)
         {
             if (!initialized || reorderableList == null)
                 initialize();
 
             GUILayout.Space(10);
             FoldOut = EditorGUILayout.Foldout(FoldOut, VersionNum.GetVersionString());
+
+            if (GUILayout.Button("Delete Version", GUILayout.Width(btnWidth)))
+                shouldDelete = true;
+
             if (FoldOut)
             {
                 EditorGUILayout.BeginHorizontal();

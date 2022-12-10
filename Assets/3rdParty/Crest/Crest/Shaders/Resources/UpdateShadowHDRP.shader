@@ -22,6 +22,7 @@ Shader "Hidden/Crest/Simulation/Update Shadow HDRP"
 			// Ultra low uses Gather to filter which should be same cost as not filtering. See algorithms per keyword:
 			// Runtime/Lighting/Shadow/HDShadowAlgorithms.hlsl
 			#define SHADOW_ULTRA_LOW
+			#define AREA_SHADOW_LOW
 
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
@@ -51,20 +52,6 @@ Shader "Hidden/Crest/Simulation/Update Shadow HDRP"
 			{
 				// TODO: Work out shadow fade.
 				return 0.0;
-			}
-
-			Varyings Vert(Attributes input)
-			{
-				Varyings output;
-
-				// Use a custom matrix which is the value of unity_MatrixVP from the frame debugger.
-				output.positionCS = mul(_CrestViewProjectionMatrix, float4(input.positionOS, 1.0));
-
-				// world pos from [0,1] quad
-				output.positionWS.xyz = float3(input.positionOS.x - 0.5, 0.0, input.positionOS.y - 0.5) * _Scale * 4.0 + _CenterPos;
-				output.positionWS.y = _OceanCenterPosWorld.y;
-
-				return output;
 			}
 			ENDHLSL
 		}

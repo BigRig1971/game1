@@ -1,15 +1,14 @@
 ﻿using System;
 using UnityEditor;
 using UnityEngine;
+using HeurekaGames.Utils;
 
 namespace HeurekaGames.AssetHunterPRO
 {
     public class AH_EditorData : ScriptableObject
     {
-        public delegate void EditorDataRefreshDelegate();
-        public static event EditorDataRefreshDelegate OnEditorDataRefresh;
-
         private static AH_EditorData m_instance;
+
         public static AH_EditorData Instance
         {
             get
@@ -21,6 +20,46 @@ namespace HeurekaGames.AssetHunterPRO
 
                 return m_instance;
             }
+        }
+
+        public static class IconNames
+        {
+            public static readonly string MainWhite = "icon_w";
+            public static readonly string DuplicateWhite = "duplicate_w";
+            public static readonly string ReferenceGraphWhite = "referenceGraph_w";
+            public static readonly string RefFromWhite = "d_refFrom";
+            public static readonly string RefFrom = "refFrom";
+            public static readonly string RefTo = "refTo";
+            public static readonly string ReferenceGraph = "referenceGraph";
+            public static readonly string LoadLog = "loadLog";
+            public static readonly string Duplicate = "duplicate";
+            public static readonly string Settings ="settings";
+            public static readonly string Report = "report";
+            public static readonly string Merge = "merge";
+            public static readonly string Achievement = "achievement";
+            public static readonly string Help = "help";
+            public static readonly string Delete = "delete";
+            public static readonly string Refresh = "refresh";
+            public static readonly string Scene = "scene";
+        }
+
+        public static class Icons
+        {
+            public static readonly Texture IconLargeWhite = Heureka_ResourceLoader.GetIcon(Heureka_ResourceLoader.HeurekaPackage.AHP, IconNames.MainWhite);
+            public static readonly Texture DuplicateIconWhite = Heureka_ResourceLoader.GetIcon(Heureka_ResourceLoader.HeurekaPackage.AHP, IconNames.DuplicateWhite);
+            public static readonly Texture RefFromWhite = Heureka_ResourceLoader.GetIcon(Heureka_ResourceLoader.HeurekaPackage.AHP, IconNames.RefFromWhite);
+            public static readonly Texture Settings = Heureka_ResourceLoader.GetIcon(Heureka_ResourceLoader.HeurekaPackage.AHP, IconNames.Settings);
+            public static readonly Texture Merge = Heureka_ResourceLoader.GetIcon(Heureka_ResourceLoader.HeurekaPackage.AHP, IconNames.Merge);
+            public static readonly Texture Achievement = Heureka_ResourceLoader.GetIcon(Heureka_ResourceLoader.HeurekaPackage.AHP, IconNames.Achievement);
+            public static readonly Texture Report = Heureka_ResourceLoader.GetIcon(Heureka_ResourceLoader.HeurekaPackage.AHP, IconNames.Report);
+            public static readonly Texture RefFrom = Heureka_ResourceLoader.GetIcon(Heureka_ResourceLoader.HeurekaPackage.AHP, IconNames.RefFrom);
+            public static readonly Texture RefTo = Heureka_ResourceLoader.GetIcon(Heureka_ResourceLoader.HeurekaPackage.AHP, IconNames.RefTo);
+            public static readonly Texture Scene = Heureka_ResourceLoader.GetIcon(Heureka_ResourceLoader.HeurekaPackage.AHP, IconNames.Scene);
+        }
+
+        internal static class Contents
+        {
+            public static GUIContent News = Heureka_ResourceLoader.GetContent(Heureka_ResourceLoader.HeurekaPackage.SHARED, "Heureka_Icon", "News", "See new tool from Heureka Games");
         }
 
         private static AH_EditorData loadData()
@@ -35,30 +74,5 @@ namespace HeurekaGames.AssetHunterPRO
             Debug.LogError("Failed to find config data");
             return null;
         }
-
-        internal void RefreshData()
-        {
-            if (OnEditorDataRefresh != null)
-                OnEditorDataRefresh();
-        }
-
-        public UnityEditor.DefaultAsset Documentation;
-        [SerializeField] public ConfigurableIcon WindowPaneIcon = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon WindowHeaderIcon = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon SceneIcon = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon Settings = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon LoadLogIcon = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon GenerateIcon = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon RefreshIcon = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon MergerIcon = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon HelpIcon = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon AchievementIcon = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon ReportIcon = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon DeleteIcon = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon RefToIcon = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon RefFromIcon = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon RefFromWhiteIcon = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon DuplicateIcon = new ConfigurableIcon();
-        [SerializeField] public ConfigurableIcon DuplicateWhiteIcon = new ConfigurableIcon();
     }
 }

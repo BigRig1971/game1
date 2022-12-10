@@ -1,4 +1,5 @@
 ﻿
+#if !UNITY_CLOUD_BUILD
 namespace HeurekaGames.AssetHunterPRO
 {
     using System.Linq;
@@ -6,7 +7,6 @@ namespace HeurekaGames.AssetHunterPRO
 #if UNITY_EDITOR
     using UnityEditor;
 #endif
-#if UNITY_2018_1_OR_NEWER
     using UnityEditor.Build.Reporting;
     using UnityEditor.Build;
 
@@ -14,6 +14,10 @@ namespace HeurekaGames.AssetHunterPRO
     {
         public void OnProcessScene(UnityEngine.SceneManagement.Scene scene, BuildReport report)
         {
+            //This was called on "Editor Play", so ignore
+            if (report == null)
+                return;
+
             //For some reason I have to do both recursive, and non-recursive version
             string[] dependencies = AssetDatabase.GetDependencies(scene.path, true);
             dependencies.ToList().AddRange(AssetDatabase.GetDependencies(scene.path, false));
@@ -43,36 +47,10 @@ namespace HeurekaGames.AssetHunterPRO
 
         private void addBuildReportInfo(BuildReport report)
         {
-            if(buildInfo != null)
+            if (buildInfo != null)
                 buildInfo.ProcessBuildReport(report);
         }
 
-#elif UNITY_5_6_OR_NEWER
-    using UnityEditor.Build;
-
-    class AH_BuildProcessor : IProcessScene, IPreprocessBuild, IPostprocessBuild
-    {
-        public void OnPreprocessBuild(BuildTarget target, string path)
-        {
-            initBuildReport(target, path);
-        }
-
-        public void OnProcessScene(UnityEngine.SceneManagement.Scene scene)
-        {
-            Debug.Log("AH: Processing scene: " + scene.name);
-            string[] dependencies = AssetDatabase.GetDependencies(scene.path, true);
-            {             
-                foreach (string dependency in dependencies)
-                    processUsedAsset(scene.path, dependency);
-            }
-        }
-
-        public void OnPostprocessBuild(BuildTarget target, string path)
-        {
-            finalizeBuildReport(target);
-        }
-#endif
-        //#if UNITY_5_6_OR_NEWER
         static AH_SerializedBuildInfo buildInfo;
 
         private bool isProcessing;
@@ -115,3 +93,4 @@ namespace HeurekaGames.AssetHunterPRO
         public int callbackOrder { get { return 0; } }
     }
 }
+#endif

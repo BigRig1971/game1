@@ -54,6 +54,12 @@ namespace Crest
 
         public static void DebugLog(string message, string fixDescription, MessageType type, Object @object = null, ValidationFixFunc action = null)
         {
+            // Never log info validation to console.
+            if (type == MessageType.Info)
+            {
+                return;
+            }
+
             message = $"Crest Validation: {message} {fixDescription} Click this message to highlight the problem object.";
 
             switch (type)
@@ -76,11 +82,7 @@ namespace Crest
         internal static void FixAttachComponent<ComponentType>(SerializedObject componentOrGameObject)
             where ComponentType : Component
         {
-            // We will either get the component or the GameObject it is attached to.
-            var gameObject = componentOrGameObject.targetObject is GameObject
-                ? componentOrGameObject.targetObject as GameObject
-                : (componentOrGameObject.targetObject as Component).gameObject;
-            Undo.AddComponent<ComponentType>(gameObject);
+            Undo.AddComponent<ComponentType>(EditorHelpers.EditorHelpers.GetGameObject(componentOrGameObject));
         }
 
         internal static void FixSetMaterialOptionEnabled(SerializedObject material, string keyword, string floatParam, bool enabled)
@@ -101,9 +103,7 @@ namespace Crest
         static void FixRemoveRenderer(SerializedObject componentOrGameObject)
         {
             // We will either get the component or the GameObject it is attached to.
-            var gameObject = componentOrGameObject.targetObject is GameObject
-                ? componentOrGameObject.targetObject as GameObject
-                : (componentOrGameObject.targetObject as Component).gameObject;
+            var gameObject = EditorHelpers.EditorHelpers.GetGameObject(componentOrGameObject);
             var renderer = gameObject.GetComponent<MeshRenderer>();
             Undo.DestroyObjectImmediate(renderer);
             EditorUtility.SetDirty(gameObject);
@@ -117,6 +117,63 @@ namespace Crest
         public static void FixAddMissingBurstPackage(SerializedObject componentOrGameObject)
         {
             PackageManagerHelpers.AddMissingPackage("com.unity.burst");
+        }
+
+        public static bool ValidateNoScale(Object @object, Transform transform, ShowMessage showMessage)
+        {
+            if (transform.lossyScale != Vector3.one)
+            {
+                showMessage
+                (
+                    $"There must be no scale on the <i>{@object.GetType().Name}</i> Transform or any of its parents." +
+                    $"The current scale is <i>{transform.lossyScale}</i>.",
+                    "Reset the scale on this Transform and all parents to one.",
+                    MessageType.Error, @object
+                );
+
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool ValidateNoRotation(Object @object, Transform transform, ShowMessage showMessage)
+        {
+            if (transform.eulerAngles.magnitude > 0.0001f)
+            {
+                showMessage
+                (
+                    $"There must be no rotation on the <i>{@object.GetType().Name}</i> Transform or any of its parents." +
+                    $"The current rotation is <i>{transform.eulerAngles}.</i>",
+                    "Reset the rotation on this Transform and all parents to zero.",
+                    MessageType.Error, @object
+                );
+
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool ValidateRendererLayer(GameObject gameObject, ShowMessage showMessage, OceanRenderer ocean)
+        {
+            if (ocean != null && gameObject.layer != ocean.Layer)
+            {
+                var layerName = LayerMask.LayerToName(ocean.Layer);
+                showMessage
+                (
+                    $"The layer is not the same as the <i>OceanRenderer.Layer ({layerName})</i> which can cause problems if the <i>{layerName}</i> layer is excluded from any culling masks.",
+                    $"Set layer to <i>{layerName}</i>.",
+                    MessageType.Warning, gameObject, x =>
+                    {
+                        Undo.RecordObject(gameObject, $"Change Layer to {layerName}");
+                        gameObject.layer = ocean.Layer;
+                    }
+                );
+            }
+
+            // Is valid as not outright invalid but could be.
+            return true;
         }
 
         public static bool ValidateRenderer<T>(GameObject gameObject, ShowMessage showMessage, string shaderPrefix) where T : Renderer
@@ -221,6 +278,11 @@ namespace Crest
 
         public void ShowValidationMessages()
         {
+            if (!(this.target is IValidated))
+            {
+                return;
+            }
+
             IValidated target = (IValidated)this.target;
 
             // Enable rich text in help boxes. Store original so we can revert since this might be a "hack".

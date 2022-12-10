@@ -4,6 +4,7 @@
 
 namespace Crest
 {
+    using System.Collections.Generic;
     using System.Reflection;
     using UnityEngine;
     using UnityEngine.Rendering;
@@ -21,6 +22,11 @@ namespace Crest
     {
         public static BindingFlags s_AnyMethod = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |
             BindingFlags.Static;
+
+        public static T GetCustomAttribute<T>(System.Type type) where T : System.Attribute
+        {
+            return (T)System.Attribute.GetCustomAttribute(type, typeof(T));
+        }
 
         static WaitForEndOfFrame s_WaitForEndOfFrame = new WaitForEndOfFrame();
         public static WaitForEndOfFrame WaitForEndOfFrame => s_WaitForEndOfFrame;
@@ -47,6 +53,18 @@ namespace Crest
             CopyDepth,
             ClearDepth,
             ClearStencil,
+        }
+
+        /// <summary>
+        /// Uses PrefabUtility.InstantiatePrefab in editor and GameObject.Instantiate in standalone.
+        /// </summary>
+        public static GameObject InstantiatePrefab(GameObject prefab)
+        {
+#if UNITY_EDITOR
+            return (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(prefab);
+#else
+            return GameObject.Instantiate(prefab);
+#endif
         }
 
 #if UNITY_EDITOR
@@ -239,7 +257,8 @@ namespace Crest
         }
 
         /// <summary>
-        /// Blit using full screen triangle.
+        /// Blit using full screen triangle. Supports more features than CommandBuffer.Blit like the RenderPipeline tag
+        /// in sub-shaders.
         /// </summary>
         public static void Blit(CommandBuffer buffer, RenderTargetIdentifier target, Material material, int pass, MaterialPropertyBlock properties = null)
         {
@@ -279,6 +298,68 @@ namespace Crest
                 material.SetInt(nameID, value);
             }
         }
+
+#if CREST_URP
+        readonly static List<bool> s_RenderFeatureActiveStates = new List<bool>();
+        readonly static FieldInfo s_RenderDataListField = typeof(UniversalRenderPipelineAsset)
+                        .GetField("m_RendererDataList", BindingFlags.NonPublic | BindingFlags.Instance);
+        readonly static FieldInfo s_DefaultRendererIndex = typeof(UniversalRenderPipelineAsset)
+                        .GetField("m_DefaultRendererIndex", BindingFlags.NonPublic | BindingFlags.Instance);
+        readonly static FieldInfo s_RendererIndex = typeof(UniversalAdditionalCameraData)
+                        .GetField("m_RendererIndex", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        internal static int GetRendererIndex(Camera camera)
+        {
+            var rendererIndex = (int)s_RendererIndex.GetValue(camera.GetUniversalAdditionalCameraData());
+
+            if (rendererIndex < 0)
+            {
+                rendererIndex = (int)s_DefaultRendererIndex.GetValue(UniversalRenderPipeline.asset);
+            }
+
+            return rendererIndex;
+        }
+
+        internal static bool IsSSAOEnabled(Camera camera)
+        {
+            // Get this every time as it could change.
+            var renderers = (ScriptableRendererData[])s_RenderDataListField.GetValue(UniversalRenderPipeline.asset);
+            var rendererIndex = GetRendererIndex(camera);
+
+            foreach (var feature in renderers[rendererIndex].rendererFeatures)
+            {
+                if (feature.GetType().Name == "ScreenSpaceAmbientOcclusion")
+                {
+                    return feature.isActive;
+                }
+            }
+
+            return false;
+        }
+
+        internal static void RenderCameraWithoutCustomPasses(Camera camera)
+        {
+            // Get this every time as it could change.
+            var renderers = (ScriptableRendererData[])s_RenderDataListField.GetValue(UniversalRenderPipeline.asset);
+            var rendererIndex = GetRendererIndex(camera);
+
+            foreach (var feature in renderers[rendererIndex].rendererFeatures)
+            {
+                s_RenderFeatureActiveStates.Add(feature.isActive);
+                feature.SetActive(false);
+            }
+
+            camera.Render();
+
+            var index = 0;
+            foreach (var feature in renderers[rendererIndex].rendererFeatures)
+            {
+                feature.SetActive(s_RenderFeatureActiveStates[index++]);
+            }
+
+            s_RenderFeatureActiveStates.Clear();
+        }
+#endif
     }
 
     static class Extensions

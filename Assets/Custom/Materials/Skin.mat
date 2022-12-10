@@ -13,10 +13,11 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _DETAIL_MAP
-  - _DISABLE_DECALS
   - _DISABLE_SSR_TRANSPARENT
   - _MATERIAL_FEATURE_CLEAR_COAT
   - _MATERIAL_FEATURE_SUBSURFACE_SCATTERING
+  - _NORMALMAP
+  - _NORMALMAP_TANGENT_SPACE
   m_InvalidKeywords:
   - _AXF_BRDF_TYPE_SVBRDF
   - _EMISSION
@@ -28,13 +29,12 @@ Material:
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2000
+  m_CustomRenderQueue: 2225
   stringTagMap:
     MotionVector: User
   disabledShaderPasses:
   - TransparentBackface
   - TransparentDepthPostpass
-  - RayTracingPrepass
   - TransparentDepthPrepass
   - MOTIONVECTORS
   m_LockedProperties: 
@@ -589,7 +589,7 @@ Material:
     - _DetailAlbedoScale2: 1
     - _DetailAlbedoScale3: 1
     - _DetailNormalMapScale: 1
-    - _DetailNormalScale: 1.11
+    - _DetailNormalScale: 1.08
     - _DetailNormalScale0: 1
     - _DetailNormalScale1: 1
     - _DetailNormalScale2: 1
@@ -718,7 +718,7 @@ Material:
     - _METALNESS: 0
     - _MappingMode: 0
     - _MaterialID: 0
-    - _Metallic: 0
+    - _Metallic: 0.314
     - _Metallic0: 0
     - _Metallic1: 0
     - _Metallic2: 0
@@ -735,12 +735,12 @@ Material:
     - _MetallicRemapMin3: 0
     - _Mode: 0
     - _NormalMapKwToggle: 1
-    - _NormalMapSpace: 1
+    - _NormalMapSpace: 0
     - _NormalMapSpace0: 0
     - _NormalMapSpace1: 0
     - _NormalMapSpace2: 0
     - _NormalMapSpace3: 0
-    - _NormalScale: 0.63
+    - _NormalScale: 0
     - _NormalScale0: 1
     - _NormalScale1: 1
     - _NormalScale2: 1
@@ -760,7 +760,7 @@ Material:
     - _PPDPrimitiveWidth: 1
     - _Parallax: 0.02
     - _PlanarSpace: 0
-    - _RayTracing: 0
+    - _RayTracing: 1
     - _RayTracingTexFilteringScale: 0.07
     - _ReceivesSSR: 1
     - _ReceivesSSRTransparent: 0
@@ -782,7 +782,7 @@ Material:
     - _SVBRDF_HeightMapMaxMM: 0
     - _SVBRDF_SpecularLobeMapScale: 1
     - _SensorId: 1
-    - _Smoothness: 0.321
+    - _Smoothness: 0.211
     - _Smoothness0: 0.5
     - _Smoothness1: 0.5
     - _Smoothness2: 0.5
@@ -810,17 +810,17 @@ Material:
     - _StencilRefGBuffer: 14
     - _StencilRefMV: 40
     - _StencilWriteMask: 6
-    - _StencilWriteMaskDepth: 8
+    - _StencilWriteMaskDepth: 9
     - _StencilWriteMaskDistortionVec: 4
-    - _StencilWriteMaskGBuffer: 14
-    - _StencilWriteMaskMV: 40
+    - _StencilWriteMaskGBuffer: 15
+    - _StencilWriteMaskMV: 41
     - _SubsurfaceMask: 1
     - _SubsurfaceMask0: 1
     - _SubsurfaceMask1: 1
     - _SubsurfaceMask2: 1
     - _SubsurfaceMask3: 1
     - _SubsurfaceScale: 1
-    - _SupportDecals: 0
+    - _SupportDecals: 1
     - _SurfaceType: 0
     - _TessellationBackFaceCullEpsilon: -0.25
     - _TessellationFactor: 4
@@ -890,7 +890,7 @@ Material:
     - WaterColorA: {r: 0.08490565, g: 0.04261914, b: 0.03484337, a: 0}
     - WaterColorB: {r: 0.001201498, g: 0.009433985, b: 0.009433985, a: 0}
     - _BASE_COLOR: {r: 1, g: 1, b: 1, a: 0}
-    - _BaseColor: {r: 0.764151, g: 0.764151, b: 0.764151, a: 1}
+    - _BaseColor: {r: 0.7264151, g: 0.7264151, b: 0.7264151, a: 1}
     - _BaseColor0: {r: 1, g: 1, b: 1, a: 1}
     - _BaseColor1: {r: 1, g: 1, b: 1, a: 1}
     - _BaseColor2: {r: 1, g: 1, b: 1, a: 1}
@@ -904,7 +904,7 @@ Material:
     - _CarPaint2_CTF0s: {r: 1, g: 1, b: 1, a: 1}
     - _CarPaint2_CTSpreads: {r: 1, g: 1, b: 1, a: 1}
     - _ClearcoatNormalMap_SO: {r: 1, g: 1, b: 0, a: 0}
-    - _Color: {r: 0.764151, g: 0.764151, b: 0.764151, a: 1}
+    - _Color: {r: 0.7264151, g: 0.7264151, b: 0.7264151, a: 1}
     - _DiffusionProfileAsset: {r: -1.405437e+32, g: 2.0030989e-26, b: 0.00000006313206, a: -4.4045647e-18}
     - _DiffusionProfileAsset0: {r: 0, g: 0, b: 0, a: 0}
     - _DiffusionProfileAsset1: {r: 0, g: 0, b: 0, a: 0}

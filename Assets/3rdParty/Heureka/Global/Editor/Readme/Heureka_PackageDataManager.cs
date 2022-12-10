@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace HeurekaGames
+namespace HeurekaGames.Utils
 {
     public class Heureka_PackageDataManager : ScriptableObject
     {

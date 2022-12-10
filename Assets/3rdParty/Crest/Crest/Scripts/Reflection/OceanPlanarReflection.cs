@@ -81,7 +81,7 @@ namespace Crest
     /// Attach to a camera to generate a reflection texture which can be sampled in the ocean shader.
     /// </summary>
     [AddComponentMenu(Internal.Constants.MENU_PREFIX_SCRIPTS + "Ocean Planar Reflections")]
-    public class OceanPlanarReflection : MonoBehaviour
+    public class OceanPlanarReflection : CustomMonoBehaviour
     {
         /// <summary>
         /// The version of this asset. Can be used to migrate across versions. This value should
@@ -132,10 +132,12 @@ namespace Crest
 
         private void OnEnable()
         {
+#if !UNITY_2022_2_OR_NEWER
             if (!RenderPipelineHelper.IsHighDefinition)
             {
                 RenderPipelineManager.beginCameraRendering += BeginCameraRendering;
             }
+#endif
         }
 
         private void Start()
@@ -167,11 +169,15 @@ namespace Crest
 #endif
         }
 
+#if UNITY_2022_2_OR_NEWER
+        void LateUpdate()
+        {
+#else
         public void BeginCameraRendering(ScriptableRenderContext context, Camera camera)
         {
             if (camera != _camViewpoint)
                 return;
-
+#endif
 
             if (!RequestRefresh(Time.renderedFrameCount))
                 return; // Skip if not need to refresh on this frame
@@ -232,9 +238,17 @@ namespace Crest
             ForceDistanceCulling(_farClipPlane);
 
 #if CREST_URP
-            UniversalRenderPipeline.RenderSingleCamera(context, _camReflections);
+#if UNITY_2022_2_OR_NEWER
+            UnityEngine.Rendering.RenderPipeline.SubmitRenderRequest(_camReflections, new UniversalRenderPipeline.SingleCameraRequest()
+            {
+                destination = _reflectionTexture,
+                mipLevel = 0,
+                slice = 0,
+                face = CubemapFace.Unknown,
+            });
 #else
-            // TODO: BIRP code here. HDRP uses the HDRP planar reflection feature.
+            UniversalRenderPipeline.RenderSingleCamera(context, _camReflections);
+#endif
 #endif
 
             GL.invertCulling = oldCulling;
@@ -420,7 +434,9 @@ namespace Crest
                 _camReflections = null;
             }
 
+#if !UNITY_2022_2_OR_NEWER
             RenderPipelineManager.beginCameraRendering -= BeginCameraRendering;
+#endif
         }
     }
 }
