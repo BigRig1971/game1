@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1063685555775678326}
   - component: {fileID: 867740816601150840}
-  - component: {fileID: 5737826633824268361}
   - component: {fileID: 8547058542299140764}
   m_Layer: 14
   m_Name: Fern
@@ -35,7 +34,7 @@ Transform:
   - {fileID: 1063856890926895068}
   - {fileID: 1071230609065457336}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!205 &867740816601150840
 LODGroup:
@@ -64,22 +63,6 @@ LODGroup:
     renderers:
     - renderer: {fileID: 1045325109379713424}
   m_Enabled: 1
---- !u!114 &5737826633824268361
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1067475167801613174}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 089e7123bacb77a429df24ec08d2d672, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  styledBanner: 0
-  storedPrefabBackupGUID: 15f4ffe4e57e4da19d66679b550735a8
-  storedPreset: Vegetation Assets/The Vegetation Engine/Demo Fern
-  storedOverrides: []
 --- !u!114 &8547058542299140764
 MonoBehaviour:
   m_ObjectHideFlags: 0

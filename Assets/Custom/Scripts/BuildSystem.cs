@@ -23,15 +23,12 @@ namespace StupidHumanGames
 		public ItemSO currentBuildItem;
 		public bool isBuilt = false;
 		bool canCancel = false;
-
-
 		private void Awake()
 		{
 			buildItems = Resources.LoadAll<ItemSO>("");
 		}
 		private void Start()
 		{
-
 			cam = Camera.main;
 		}
 		public void OnPickup()
@@ -39,20 +36,17 @@ namespace StupidHumanGames
 			if (!InventoryManager.IsOpen()) return;
 			removeFromField();
 		}
-		
+		public void OnAttack()
+		{
+			if (!InventoryManager.IsOpen()) return;
+			BuildTheFucker();
+			pauseBuilding = false;
+		}
 		private void Update()
 		{
 			if (InventoryManager.IsOpen())
 			{
 				canCancel = true;
-			}
-
-			if (InventoryManager.IsOpen() && tpc._input._attack)
-			{
-
-				BuildTheFucker();
-				pauseBuilding = false;
-				tpc._input._attack = false;
 			}
 			if (!InventoryManager.IsOpen())
 			{
@@ -60,7 +54,6 @@ namespace StupidHumanGames
 				{
 					canCancel = false;
 					CancelBuild();
-
 				}
 			}
 			if (Input.GetKeyDown(KeyCode.Y))
@@ -90,23 +83,14 @@ namespace StupidHumanGames
 					if (Mathf.Abs(mouseX) >= stickTolerance || Mathf.Abs(mouseY) >= stickTolerance)//check if mouseX or mouseY is greater than stickTolerance
 					{
 						pauseBuilding = false;//if it is, then unpause building, and call the raycast again
-
 					}
-
 				}
 				else//if building system isn't paused then call the raycast
 				{
 					DoBuildRay();
 				}
 			}
-			//if (isBuilding)  //testing camera movement
-			{
-				//float step = speed * Time.deltaTime;
-
-			}
-
 		}
-
 		public void removeFromField()
 		{
 			Ray ray = cam.ScreenPointToRay(Input.mousePosition);
@@ -133,10 +117,7 @@ namespace StupidHumanGames
 		public void NewBuild(GameObject _go)
 		{
 			isBuilt = false;
-			//float step = speed * Time.deltaTime;
-			//transform.position = Vector3.MoveTowards(transform.position.y, target.position, step);
 			CancelBuild();
-			//camPivot.transform.localPosition = new Vector3(camPivot.transform.localPosition.x + camPosX, camPivot.transform.localPosition.y + camPosY, camPivot.transform.localPosition.z + camPosZ);
 			previewGameObject = Instantiate(_go, Vector3.zero, Quaternion.identity);
 			previewScript = previewGameObject.GetComponent<Preview>();
 			isBuilding = true;
@@ -168,28 +149,14 @@ namespace StupidHumanGames
 										   //method whereever it snaps to a snap point
 		{
 			pauseBuilding = _value;
-			//Debug.Log(_value);
 		}
-
 		private void DoBuildRay()//actually positions your previewGameobject in the world
 		{
 			Ray ray = cam.ScreenPointToRay(Mouse.current.position.ReadValue());//raycast stuff
 			RaycastHit hit;
 			if (Physics.Raycast(ray, out hit, buildDistance, layer))//notice the layer
 			{
-				/*Since I am using unity primitives in this example I have to postion the previewGameobject in a special way, 
-				 because of how unity positions things in the scene. If you brought something over from blender, and you have the 
-				 anchor points setup correctly(located on bottom of model). You can use the line commented out below,
-				 as opposed to the other lines*/
-
-				//If your using unity primitives use these 3 lines
-				//float y = hit.point.y + (previewGameObject.transform.localScale.y / 2f);
-				//Vector3 pos = new Vector3(hit.point.x, y, hit.point.z);
-				// previewGameObject.transform.position = pos;
-
-				//if your using something from blender and anchor points are setup correctly use this line
 				previewGameObject.transform.position = hit.point;
-
 			}
 		}
 	}

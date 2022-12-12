@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using StupidHumanGames;
+using static Kalagaan.VertExmotionSensorBase.Parameter;
 
 
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
@@ -123,13 +124,25 @@ namespace StupidHumanGames
         private int _animIDSwim;
         private int _animIDSwimSpeed;
         private int _animIDRoll;
+		// inputs
+		public Vector2 _move;
+		public Vector2 _look;
+		public bool _jump;
+		public bool _sprint;
+		public bool _roll;
+		public bool _interact;
+		public bool _inventory;
+		public bool _cursor;
+		public bool _attack;
+		public bool _build;
+		public bool _pickup;
 
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
-        private PlayerInput _playerInput;
+		private PlayerInput _playerInput;
 #endif
         public Animator _animator;
         private CharacterController _controller;
-        public StarterAssetsInputs _input;
+        //public StarterAssetsInputs _input;
         private GameObject _mainCamera;
 
         private const float _threshold = 0.01f;
@@ -163,7 +176,7 @@ namespace StupidHumanGames
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();
-            _input = GetComponent<StarterAssetsInputs>();
+           // _input = GetComponent<StarterAssetsInputs>();
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
             _playerInput = GetComponent<PlayerInput>();
 #else
@@ -180,7 +193,29 @@ namespace StupidHumanGames
         {
             OnGravity();
         }
-        public void OnInventory()
+		public void OnMove(InputValue value)
+		{
+			_move = (value.Get<Vector2>());
+
+		}
+		public void OnLook(InputValue value)
+		{
+			_look = (value.Get<Vector2>());
+
+		}
+		public void OnPickup(InputValue value)
+		{
+			_pickup = (value.isPressed);
+		}
+        public void OnJump(InputValue value)
+        {
+            _jump = (value.isPressed);  
+        }
+		public void OnSprint(InputValue value)
+		{
+			_sprint = (value.isPressed);
+		}
+		public void OnInventory()
         {
 			cursorState = !cursorState;
 			if (cursorState)
@@ -196,9 +231,14 @@ namespace StupidHumanGames
 		{
             if (InventoryManager.IsOpen()) return;
             if (OnIsSwimming()) return;
+			transform.rotation = Quaternion.Euler(currentRotation.eulerAngles.x, _cinemachineTargetYaw, currentRotation.eulerAngles.z);
 			_animator.SetBool(_animIDRoll, value.isPressed);
 		}
-        private void LateUpdate()
+		public void OnAttack(InputValue value)
+		{
+			_attack = (value.isPressed);
+		}
+		private void LateUpdate()
         {
             if (!InventoryManager.IsOpen()) CameraRotation();
         }
@@ -241,11 +281,11 @@ namespace StupidHumanGames
         }
         private void CameraRotation()
         {
-            if (_input._look.sqrMagnitude >= _threshold && !LockCameraPosition && !InventoryManager.IsOpen())
+            if (_look.sqrMagnitude >= _threshold && !LockCameraPosition && !InventoryManager.IsOpen())
             {
                 float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1f : Time.deltaTime;
-                _cinemachineTargetYaw += _input._look.x * deltaTimeMultiplier;
-                _cinemachineTargetPitch += _input._look.y * deltaTimeMultiplier;
+                _cinemachineTargetYaw += _look.x * deltaTimeMultiplier;
+                _cinemachineTargetPitch += _look.y * deltaTimeMultiplier;
             }
             _cinemachineTargetYaw = ClampAngle(_cinemachineTargetYaw, float.MinValue, float.MaxValue);
             _cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
@@ -262,11 +302,11 @@ namespace StupidHumanGames
                 GroundedCheck();
                 JumpAndGravity();
                 if(groundHugging) OnYPosition();
-                float targetSpeed = _input._sprint ? SprintSpeed : MoveSpeed;
-                if (_input._move == Vector2.zero) targetSpeed = 0.0f;
+                float targetSpeed = _sprint ? SprintSpeed : MoveSpeed;
+                if (_move == Vector2.zero) targetSpeed = 0.0f;
                 float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
                 float speedOffset = 0.1f;
-                float inputMagnitude = _input.analogMovement ? _input._move.magnitude : 1f;
+                float inputMagnitude = false ? _move.magnitude : 1f;
                 if (currentHorizontalSpeed < targetSpeed - speedOffset ||
                     currentHorizontalSpeed > targetSpeed + speedOffset)
                 {
@@ -280,8 +320,8 @@ namespace StupidHumanGames
                 }
                 _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
                 if (_animationBlend < 0.01f) _animationBlend = 0f;
-                Vector3 inputDirection = new Vector3(_input._move.x, 0.0f, _input._move.y).normalized;
-                if (_input._move != Vector2.zero && !InventoryManager.IsOpen() && _canMove)
+                Vector3 inputDirection = new Vector3(_move.x, 0.0f, _move.y).normalized;
+                if (_move != Vector2.zero && !InventoryManager.IsOpen() && _canMove)
                 {
                     _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
                                       _mainCamera.transform.eulerAngles.y;
@@ -346,8 +386,8 @@ namespace StupidHumanGames
         }
         void OnSwim(float gravity)
         {
-            float targetSpeed = _input._sprint ? SprintSpeed : MoveSpeed;
-            if (_input._move == Vector2.zero) targetSpeed = 0.0f;
+            float targetSpeed = _sprint ? SprintSpeed : MoveSpeed;
+            if (_move == Vector2.zero) targetSpeed = 0.0f;
             float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
             float speedOffset = 0.1f;
             if (currentHorizontalSpeed < targetSpeed - speedOffset ||
@@ -361,8 +401,8 @@ namespace StupidHumanGames
             }
             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
             if (_animationBlend < 0.01f) _animationBlend = 0f;
-            Vector3 inputDirection = new Vector3(_input._move.x, 0.0f, _input._move.y).normalized;
-            if (_input._move != Vector2.zero && _canMove && !InventoryManager.IsOpen())
+            Vector3 inputDirection = new Vector3(_move.x, 0.0f, _move.y).normalized;
+            if (_move != Vector2.zero && _canMove && !InventoryManager.IsOpen())
             {
 
                 _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
@@ -382,7 +422,7 @@ namespace StupidHumanGames
             }
 
 
-            float inputMagnitude = _input.analogMovement ? _input._move.magnitude : 1f;
+            float inputMagnitude = false ? _move.magnitude : 1f;
             if (_hasAnimator)
             {
                 _animator.SetFloat(_animIDSpeed, _animationBlend);
@@ -413,7 +453,7 @@ namespace StupidHumanGames
                 {
                     _verticalVelocity = -2f;
                 }
-                if (_input._jump && _jumpTimeoutDelta <= 0.0f) // Jump
+                if (_jump && _jumpTimeoutDelta <= 0.0f) // Jump
                 {
                     
                     StartCoroutine(JumpDelay());  // the square root of H * -2 * G = how much velocity needed to reach desired height
@@ -443,7 +483,7 @@ namespace StupidHumanGames
 
                     }
                 }
-                _input._jump = false;  // if we are not grounded, do not jump
+                _jump = false;  // if we are not grounded, do not jump
             }
         }
         private IEnumerator JumpDelay()

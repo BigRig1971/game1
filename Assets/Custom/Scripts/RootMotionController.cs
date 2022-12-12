@@ -75,6 +75,7 @@ public class RootMotionController : MonoBehaviour
 		_look = (value.Get<Vector2>());
 		
 	}
+
 	private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
 	{
 		if (lfAngle < -360f) lfAngle += 360f;

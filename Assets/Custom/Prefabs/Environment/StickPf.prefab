@@ -28,12 +28,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7397612320337340326}
   m_LocalRotation: {x: 0.3553782, y: -0.046402477, z: -0.017662222, w: 0.933403}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0, y: 0.235, z: 0.21}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 41.436, y: -7.602, z: -5.047}
 --- !u!33 &6507017633357755065
 MeshFilter:
@@ -93,12 +93,21 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7397612320337340326}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  m_Radius: 0.2
-  m_Height: 1.64
+  serializedVersion: 2
+  m_Radius: 0.08
+  m_Height: 1.38
   m_Direction: 0
-  m_Center: {x: 0, y: 0, z: 0.03}
+  m_Center: {x: -0.03, y: -0.03, z: 0.09}
 --- !u!114 &7667643243335390169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -111,9 +120,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cc15dfc05bdc1742b2cc362979d493f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  randomItems: []
+  randomSize: 0
   _audioSource: {fileID: 0}
   scale: {x: 1, y: 1, z: 1}
-  playerPosition: {x: 0, y: 0, z: 0}
+  droppedLootScale: 1
+  damageDropScale: 1
   spawnLoot: 0
   spawnLootOffset: 2
   _impactSound: {fileID: 0}
@@ -123,12 +135,7 @@ MonoBehaviour:
   isDamagable: 0
   health: 0
   deathDelay: 0
-  death:
-    m_PersistentCalls:
-      m_Calls: []
-  takeHit:
-    m_PersistentCalls:
-      m_Calls: []
   _listOfItems:
   - _item: {fileID: 11400000, guid: 1086e27366f3acd4d8514b605952723e, type: 2}
     _itemAmount: 1
+  _listOfDamageItems: []

@@ -214,30 +214,16 @@ namespace StupidHumanGames
         }
         private IEnumerator BuildItem()
         {
-            _buildSystem.tpc._input._build = false;
             _buildSystem.NewBuild(currentItem.buildPreview);
-            while (!_buildSystem.tpc._input._attack)
+            while(true)
             {
                 if (_buildSystem.isBuilt)
                 {
                     InventoryManager.RemoveItemFromInventory(currentItem, 1);
                     _buildSystem.isBuilt = false;
                 }
-
-                if (_buildSystem.tpc._input._pickup)
-                {
-                    _buildSystem.CancelBuild();
-                    _buildSystem.tpc._input._pickup = false;
-                }
-                /*	if (InventoryManager.IsOpen() && _buildSystem.tpc._input._attack)
-                    {
-                        _buildSystem.BuildTheFucker();
-                    _buildSystem.tpc._input._attack = false;
-                    }*/
-
                 yield return null;
             }
-
         }
     }
 }
