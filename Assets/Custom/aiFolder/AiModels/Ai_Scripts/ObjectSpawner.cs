@@ -66,7 +66,7 @@ namespace StupidHumanGames
             foreach (SaveableObject obj in myItems)
             {
                 GameObject go = obj.gameObject;
-                //Debug.Log(go.name + " " + _prefab.name);
+                if (_prefab == null) yield break;
                 if (go != null && go.name == _prefab.name)
                 {
                     list.Add(go);

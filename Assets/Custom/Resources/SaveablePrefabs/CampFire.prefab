@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 803517543}
   - component: {fileID: 803517542}
   m_Layer: 12
-  m_Name: SpotLight
+  m_Name: Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -42,12 +42,12 @@ Light:
   m_GameObject: {fileID: 803517540}
   m_Enabled: 1
   serializedVersion: 10
-  m_Type: 0
+  m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 0.315508, b: 0, a: 1}
-  m_Intensity: 40000
+  m_Intensity: 3183.0989
   m_Range: 100
-  m_SpotAngle: 160
+  m_SpotAngle: 179
   m_InnerSpotAngle: 1
   m_CookieSize: 10
   m_Shadows:
@@ -88,7 +88,7 @@ Light:
   m_LightShadowCasterMode: 2
   m_AreaSize: {x: 0.5, y: 0.5}
   m_BounceIntensity: 10
-  m_ColorTemperature: 7025
+  m_ColorTemperature: 3077
   m_UseColorTemperature: 1
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 100}
   m_UseBoundingSphereOverride: 0
@@ -107,10 +107,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a68c43fe1f2a47cfa234b5eeaa98012, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Intensity: 40000
+  m_Intensity: 3183.0989
   m_EnableSpotReflector: 1
   m_LuxAtDistance: 1
-  m_InnerSpotPercent: 70
+  m_InnerSpotPercent: 89.1
   m_SpotIESCutoffPercent: 100
   m_LightDimmer: 1
   m_VolumetricDimmer: 16
@@ -250,10 +250,10 @@ Transform:
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 3918836336074176679}
   - {fileID: 252193319348626958}
+  - {fileID: 3918836336074176679}
   m_Father: {fileID: 0}
-  m_RootOrder: 17
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &3685654110381915278
 AudioSource:
@@ -1269,6 +1269,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 19800000, guid: dd28171942867da4eb88c862b2e46ad7, type: 3}
+      propertyPath: InitialModule.maxNumParticles
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 19800000, guid: dd28171942867da4eb88c862b2e46ad7, type: 3}
       propertyPath: InitialModule.startSize.scalar
       value: 1
       objectReference: {fileID: 0}
@@ -1278,7 +1282,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 19800000, guid: dd28171942867da4eb88c862b2e46ad7, type: 3}
       propertyPath: InitialModule.startLifetime.scalar
-      value: 0.2
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 19900000, guid: dd28171942867da4eb88c862b2e46ad7, type: 3}
       propertyPath: m_Materials.Array.size

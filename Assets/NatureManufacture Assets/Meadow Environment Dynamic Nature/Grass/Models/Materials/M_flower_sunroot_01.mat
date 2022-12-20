@@ -136,7 +136,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AORemapMax: 0.5982063
+    - _AORemapMax: 1
     - _AORemapMin: 0
     - _ATDistance: 1
     - _AddPrecomputedVelocity: 0
@@ -155,9 +155,9 @@ Material:
     - _Anisotropy: 0
     - _BlendMode: 0
     - _CoatMask: 0
-    - _ColorNoiseSpread: 2
+    - _ColorNoiseSpread: 3
     - _ConservativeDepthOffsetEnable: 0
-    - _CullFarDistance: 15
+    - _CullFarDistance: 5
     - _CullFarStart: 47
     - _CullMode: 0
     - _CullModeForward: 0
@@ -214,7 +214,7 @@ Material:
     - _HeightPoMAmplitude: 2
     - _HeightTessAmplitude: 2
     - _HeightTessCenter: 0.5
-    - _InitialBend: 1
+    - _InitialBend: 0.5
     - _InvTilingScale: 1
     - _Ior: 1
     - _IridescenceMask: 1
@@ -257,7 +257,7 @@ Material:
     - _StencilWriteMaskDistortionVec: 4
     - _StencilWriteMaskGBuffer: 15
     - _StencilWriteMaskMV: 41
-    - _Stiffness: 1.01
+    - _Stiffness: 1
     - _SubsurfaceMask: 1
     - _SupportDBuffer: 1
     - _SupportDecals: 1
@@ -295,11 +295,11 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DiffusionProfileAsset: {r: 5.4629544e+10, g: 1.0282388e+32, b: -5.388665e+13, a: 1.6297446e+27}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
-    - _DryColor: {r: 0.4030718, g: 0.4811321, b: 0.24737448, a: 0}
+    - _DryColor: {r: 0.7924528, g: 0.740121, b: 0.63919544, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _EmissiveColor: {r: 0, g: 0, b: 0, a: 1}
     - _EmissiveColorLDR: {r: 0, g: 0, b: 0, a: 1}
-    - _HealthyColor: {r: 0.4030718, g: 0.4811321, b: 0.24737448, a: 0}
+    - _HealthyColor: {r: 0.9433962, g: 0.8324422, b: 0.734247, a: 0}
     - _InvPrimScale: {r: 1, g: 1, b: 0, a: 0}
     - _IridescenceThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
     - _NewNormal: {r: 0, g: 0, b: 0, a: 0}

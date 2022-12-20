@@ -122,8 +122,8 @@ namespace StupidHumanGames
 		{
 			Vector3 position = transform.position;
 			RaycastHit hit;
-			if (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + transform.up.y, transform.position.z),
-				-transform.up, out hit, 20, groundLayer))
+			if (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + .2f, transform.position.z),
+				-transform.up, out hit, 2, groundLayer))
 			{
 				if (groundHugging)
 				{
