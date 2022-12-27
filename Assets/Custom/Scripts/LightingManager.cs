@@ -18,7 +18,7 @@ namespace StupidHumanGames
         public class DayAmbientSounds
         {
             public AudioSource _dayAmbientAudio;
-            [Range(0f, 1f)] public float _dayVolume;
+            public float _dayVolume = .3f;
         }
         [Range(1, 100)] public int DayTimeMultiplier = 1;
         [Range(1, 100)] public int NightTimeMultiplier = 1;
@@ -29,7 +29,7 @@ namespace StupidHumanGames
         public class NightAmbientSounds
         {
             public AudioSource _nightAmbientAudio;
-            [Range(0f, 1f)] public float _nightVolume;
+            public float _nightVolume = .3f;
         }
         public NightAmbientSounds[] _nightAmbience;
         public float NightStartTime = 18f;
@@ -37,21 +37,12 @@ namespace StupidHumanGames
         bool Daytime = true;
         float test;
         bool startTheTime = false;
-        private void Awake()
-        {
-            // _currentState = State.Day;
-
-        }
+ 
         private void Start()
         {
-
             PlayAllSounds();
-            PauseDaySounds();
-            PauseNightSounds();
-
             StartCoroutine(CurrentState());
         }
-
         private void Update()
         {
             if (Preset == null)
@@ -67,11 +58,22 @@ namespace StupidHumanGames
             else
             {
                 UpdateLighting(TimeOfDay / 24f);
-
             }
             if (Daytime && TimeOfDay > NightStartTime && TimeOfDay < NightStartTime + 1f) Daytime = false;
             if (!Daytime && TimeOfDay > DayStartTime && TimeOfDay < DayStartTime + 1f) Daytime = true;
-        }
+			DayOrNight();
+		}
+        void DayOrNight()
+        {
+			if (TimeOfDay > DayStartTime && TimeOfDay < NightStartTime)
+			{
+                Daytime = true;
+			}
+			else
+			{
+                Daytime = false;
+			}
+		}
         private void UpdateLighting(float timePercent)
         {
             //Set ambient and fog
@@ -124,29 +126,20 @@ namespace StupidHumanGames
                 sound._nightAmbientAudio.Play();
                 sound._nightAmbientAudio.volume = sound._nightVolume;
             }
+            PauseDaySounds();
+            PauseNightSounds();    
         }
-        public void CanStartSounds()
+      
+        void PlayDaySounds()
         {
-            canPlaySound = true;
-
-        }
-        public void CanStopSounds()
-        {
-            canPlaySound = false;
-
-        }
-        void UnPauseDaySounds()
-        {
-
             foreach (var sound in _dayAmbience)
             {
                 sound._dayAmbientAudio?.UnPause();
                 sound._dayAmbientAudio.volume = sound._dayVolume;
             }
         }
-        void UnPauseNightSounds()
+        void PlayNightSounds()
         {
-
             foreach (var sound in _nightAmbience)
             {
                 sound._nightAmbientAudio.UnPause();
@@ -171,10 +164,7 @@ namespace StupidHumanGames
         {
             TimeMultiplier = NightTimeMultiplier;
             PauseDaySounds();
-            if (canPlaySound)
-            {
-                UnPauseNightSounds();
-            }
+            PlayNightSounds();
             while (!Daytime)
             {
                 yield return null;
@@ -185,10 +175,7 @@ namespace StupidHumanGames
         {
             TimeMultiplier = DayTimeMultiplier;
             PauseNightSounds();
-            if (canPlaySound)
-            {
-                UnPauseDaySounds();
-            }
+            PlayDaySounds();
             while (Daytime)
             {
                 yield return null;
@@ -197,7 +184,6 @@ namespace StupidHumanGames
         }
         IEnumerator CurrentState()
         {
-
             yield return new WaitForSeconds(1f);
             TimeOfDay = (DirectionalLight.transform.localRotation.eulerAngles.x + 90) / 360 * 24;
             startTheTime = true;
@@ -206,6 +192,5 @@ namespace StupidHumanGames
                 yield return StartCoroutine(_currentState.ToString());
             }
         }
-
     }
 }

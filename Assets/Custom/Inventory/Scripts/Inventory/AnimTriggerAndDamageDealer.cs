@@ -14,11 +14,10 @@ namespace StupidHumanGames
 		[SerializeField] Transform cameraRoot;
 		[SerializeField] float cameraRootOffset;
 		[SerializeField] AudioSource _audioSource;
-		[SerializeField] GameObject[] _itemsToDisable;
+		[SerializeField] float _globalCooldown = .5f;
 		Rigidbody rb;
 		public Vector3 colliderSize = Vector3.one;
 		public Vector3 colliderCenter = Vector3.zero;
-		public KeyCode _keyCode = KeyCode.Mouse0;
 		public int damagePower = 5;
 		public string _animTriggerName;
 		public string _animIntName;
@@ -64,21 +63,13 @@ namespace StupidHumanGames
 		{
 			if (other.TryGetComponent<DamageInterface>(out var damage))
 			{
-
 				if (!canHit) return;
 				canHit = false;
 				var _animName = _animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
-
-			
-				//_animator.SetTrigger("Interrupt");
-
 				CameraShakerHandler.Shake(MyShake);
 				damage.Damage(damagePower);
-				//StartCoroutine(PauseAnimator());
-
 			}
 		}
-
 		void GetKey()
 		{
 			if (canSwing) return;
@@ -87,7 +78,6 @@ namespace StupidHumanGames
 				if (Input.GetKeyDown(ability._key))
 				{
 					StartCoroutine(Attacking(ability));
-
 				}
 			}
 		}
@@ -113,10 +103,6 @@ namespace StupidHumanGames
 				cameraRoot.position = new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset * -1, cameraRoot.position.z);
 				_tpc.transform.rotation = Quaternion.Euler(0f, _tpc.transform.rotation.eulerAngles.y, 0f);
 				_tpc._canMove = true;
-			}
-			foreach (GameObject go in _itemsToDisable)
-			{
-				go.SetActive(!toggle);
 			}
 		}
 		void Update()
@@ -145,14 +131,10 @@ namespace StupidHumanGames
 		}
 		IEnumerator PauseAnimator()
 		{
-			
 			_animator.SetFloat("ChopSpeed", -.2f);
 			yield return new WaitForSeconds(.5f);
-			
 			_animator.SetFloat("ChopSpeed", 1f);
 			_animator.SetTrigger("Interrupt");
-		
-		
 		}
 	}
 }

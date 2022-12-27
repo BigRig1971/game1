@@ -29,8 +29,8 @@ namespace StupidHumanGames
                 if (droppedItemPickup != null) PickupItem();
             }
         }
-       
-        void LootItem()
+	
+		void LootItem()
         {
             lootableItem.LootableItems();
             if (lootSound != null) _audioSource.PlayOneShot(lootSound, lootSoundVolume);

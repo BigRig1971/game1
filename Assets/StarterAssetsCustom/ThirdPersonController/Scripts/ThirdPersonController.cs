@@ -579,14 +579,6 @@ namespace StupidHumanGames
                 yield return StartCoroutine(_currentState.ToString());
             }
         }
-        public void OnEnableMount()
-        {
-            isMounted = true;
-        }
-        public void OnDisableMount()
-        {
-            isMounted = false;
-        }
         public void OnYPosition()
         {
             Vector3 position = transform.position;
@@ -596,8 +588,6 @@ namespace StupidHumanGames
             {
                 targetRot = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
                 currentRotation = transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime / 0.15f);
-               // position.y = Terrain.activeTerrain.SampleHeight(transform.position) + .01f;
-                //transform.position = position;
             }
         }
 

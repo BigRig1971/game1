@@ -59,7 +59,7 @@ MonoBehaviour:
     probeVolumeBlendingMemoryBudget: 128
     supportProbeVolumeStreaming: 0
     probeVolumeSHBands: 1
-    supportRayTracing: 1
+    supportRayTracing: 0
     supportedRayTracingMode: 2
     lightLoopSettings:
       cookieAtlasSize: 2048
@@ -146,7 +146,7 @@ MonoBehaviour:
       maxPercentage: 100
       minPercentage: 80
       dynResType: 1
-      upsampleFilter: 5
+      upsampleFilter: 4
       forceResolution: 0
       forcedPercentage: 50
       lowResTransparencyMinimumThreshold: 0

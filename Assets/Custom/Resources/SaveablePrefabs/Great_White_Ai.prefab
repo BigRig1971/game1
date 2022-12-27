@@ -934,7 +934,7 @@ Transform:
   m_Children:
   - {fileID: 8597224257116749827}
   m_Father: {fileID: 0}
-  m_RootOrder: 17
+  m_RootOrder: 19
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &6708947247149174795
 AudioSource:
@@ -1130,17 +1130,17 @@ MonoBehaviour:
   scale: {x: 0.3, y: 0.3, z: 0.3}
   droppedLootScale: 1
   damageDropScale: 1
-  spawnLoot: 0
-  spawnLootOffset: 2
-  _impactSound: {fileID: 0}
-  _impactVolume: 0
+  spawnLoot: 1
+  spawnLootOffset: 0
+  _impactSound: {fileID: 8300000, guid: ac448d649b17f844c80706b8e9d579b1, type: 3}
+  _impactVolume: 0.505
   _deathSound: {fileID: 0}
   _deathVolume: 0
   isDamagable: 1
   health: 20
   deathDelay: 2
   _listOfItems:
-  - _item: {fileID: 11400000, guid: fb2636d27ecb9b34b8f27f34b39040f4, type: 2}
+  - _item: {fileID: 11400000, guid: 1086e27366f3acd4d8514b605952723e, type: 2}
     _itemAmount: 10
   _listOfDamageItems: []
 --- !u!114 &-7783862932340831166
@@ -1171,17 +1171,10 @@ LODGroup:
   m_AnimateCrossFading: 1
   m_LastLODIsBillboard: 0
   m_LODs:
-  - screenRelativeHeight: 0.14788686
+  - screenRelativeHeight: 0.075610325
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 4539525497308257797}
-  - screenRelativeHeight: 0.14788686
-    fadeTransitionWidth: 0
-    renderers: []
-  - screenRelativeHeight: 0.14788686
-    fadeTransitionWidth: 0
-    renderers:
-    - renderer: {fileID: 0}
   m_Enabled: 1
 --- !u!1 &8163201677267358095
 GameObject:

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1416046247742999248}
   - component: {fileID: 6189689249056131967}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: SnapPoint (3)
   m_TagString: SnapPointWall
   m_Icon: {fileID: 0}
@@ -40,9 +40,17 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 331739596729481893}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2046251112938094403
@@ -55,7 +63,7 @@ GameObject:
   m_Component:
   - component: {fileID: 817934822376656694}
   - component: {fileID: 5555502949391290009}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: SnapPoint
   m_TagString: SnapPointWall
   m_Icon: {fileID: 0}
@@ -85,9 +93,17 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2046251112938094403}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2779346234581961502
@@ -137,9 +153,17 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2779346234581961502}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Size: {x: 4, y: 0.2, z: 4}
   m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!114 &-1425221514754937204
@@ -181,7 +205,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7655830770226722360}
   - component: {fileID: 3206007240040052631}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: SnapPoint (2)
   m_TagString: SnapPointWall
   m_Icon: {fileID: 0}
@@ -211,9 +235,17 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9007942994717607501}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &9155091476406106743
@@ -226,7 +258,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7507842362453166594}
   - component: {fileID: 3346677846554839981}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: SnapPoint (1)
   m_TagString: SnapPointWall
   m_Icon: {fileID: 0}
@@ -256,9 +288,17 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9155091476406106743}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &2438219819103864665
@@ -266,7 +306,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 6514835523492375823}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: ba3731d6a4bce0d4db9f9dc77ca79cca, type: 3}
@@ -330,11 +370,17 @@ PrefabInstance:
       value: Object
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: ba3731d6a4bce0d4db9f9dc77ca79cca, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ba3731d6a4bce0d4db9f9dc77ca79cca, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ba3731d6a4bce0d4db9f9dc77ca79cca, type: 3}
 --- !u!4 &2764354186987282610 stripped
 Transform:

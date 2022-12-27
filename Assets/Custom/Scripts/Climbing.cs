@@ -33,7 +33,7 @@ namespace StupidHumanGames
                         hit.transform.gameObject.AddComponent<UnityEngine.MeshRenderer>();
                     }
                         _anim.SetBool("Climb", true);
-                    _tpc.isMounted = true;
+                   // _tpc.isMounted = true;
                    
 
 
@@ -42,7 +42,7 @@ namespace StupidHumanGames
                 {
                   
                     _anim.SetBool("Climb", false);
-                    _tpc.isMounted = false;
+                   // _tpc.isMounted = false;
                 }
 
             }
@@ -73,7 +73,7 @@ namespace StupidHumanGames
                     Debug.Log("Did not Hit");
 
                     _anim.SetBool("Climb", false);
-                    _tpc.isMounted = false;
+                   // _tpc.isMounted = false;
                 }
                // t.position = new Vector3(t.position.x, transform.position.y, t.position.z);
                // transform.position = t.position - transform.forward;

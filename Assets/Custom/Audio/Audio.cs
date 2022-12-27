@@ -8,6 +8,11 @@ public class Audio : MonoBehaviour
 
     private void Start()
     {
-      if(audioSource!=null)  audioSource.Play();
-    }
+        if (audioSource != null) Invoke(nameof(PlayAudio), Random.Range(0f, .5f));
+
+	}
+    void PlayAudio()
+    {
+		audioSource.Play();
+	}
 }

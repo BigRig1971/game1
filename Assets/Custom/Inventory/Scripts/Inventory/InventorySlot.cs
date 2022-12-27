@@ -36,8 +36,8 @@ namespace StupidHumanGames
         // Start is called before the first frame update
         void Start()
         {
-           
-            _tpc = GameObject.FindObjectOfType<ThirdPersonController>();
+			_equipSlots = FindObjectsOfType<EquipSlot>();
+			_tpc = GameObject.FindObjectOfType<ThirdPersonController>();
             _buildSystem = GameObject.FindObjectOfType<BuildSystem>();
             if (!tooltipPrefab)
                 tooltipPrefab = Resources.Load("Tooltip") as GameObject;
@@ -46,7 +46,6 @@ namespace StupidHumanGames
         // Update is called once per frame
         void Update()
         {
-            _equipSlots = FindObjectsOfType<EquipSlot>();
             if (currentItemAmount <= 0)
             {
                 currentItem = null;

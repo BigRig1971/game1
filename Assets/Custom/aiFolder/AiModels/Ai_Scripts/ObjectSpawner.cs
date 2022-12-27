@@ -22,7 +22,6 @@ namespace StupidHumanGames
         [SerializeField, Range(0f, 200)] float maxTerrainHeight = 200f;
         [SerializeField, Range(0f, 60)] float slopeLimit = 5f;
         [Header("")]
-        public float scale = 1f;
         public LayerMask avoidableObjects;
         public LayerMask ground;
         public float delay = .1f, currentDelay = .1f;
@@ -103,7 +102,6 @@ namespace StupidHumanGames
             if (m_internalTimer == 0f)
             {
                 q = Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(q.x, 360f), q.z));
-                float rndScale = UnityEngine.Random.Range(.8f, 1.2f);
                 RaycastHit hit;
                 Vector3 _position = transform.position + GetOffset();
                 if (Physics.Raycast(new Vector3(_position.x, _position.y + transform.up.y * 3, _position.z),
@@ -127,9 +125,6 @@ namespace StupidHumanGames
                 }
 
                 if (Physics.CheckSphere(_position, minSeparation, avoidableObjects)) return;
-
-                _prefab.transform.localScale = new Vector3(scale * rndScale, scale * rndScale, scale * rndScale);
-
                if(save)
                 {
                     if (!canSpawn) return;

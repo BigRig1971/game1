@@ -117,7 +117,7 @@ namespace StupidHumanGames
 					_player.transform.SetParent(_saddlePoint);
 					_player.transform.localPosition = _saddlePoint.localPosition;
 					_player.transform.localRotation = _saddlePoint.localRotation;
-					_tpc.OnEnableMount();
+					_tpc.isMounted = true;
 				}
 				else
 				{
@@ -126,7 +126,7 @@ namespace StupidHumanGames
 					_camRootPlayer.localPosition = _prevCamRoot;
 					if (_animator != null) _animator.SetBool(_animation, false);
 					_player.transform.position = _dismountPoint.position;
-					_tpc.OnDisableMount();
+					_tpc.isMounted = false;
 					_player.transform.rotation = Quaternion.Euler(0f, _player.rotation.eulerAngles.y, 0f);
 					_player.transform.SetParent(null);
 				}
