@@ -11,14 +11,14 @@ namespace StupidHumanGames
 		[SerializeField] bool canTame = false;
 		AudioSource _audioSource;
 		Collider[] hitColliders;
-		[SerializeField] Vector3 wayPoint, homePosition;
+		Vector3 wayPoint, homePosition;
 		Quaternion targetRot;
 		float posY;
 		float _previousTurnSpeed, _previousSpeed, _wayPointDistance, _blendMultiplier = 1f;
 		bool wayPointIsSet = false;
 		[SerializeField] Transform player;
 		Vector3 sizeOfObject = Vector3.one;
-		[Range(.1f, 50f)] public float scale = 1f;
+		[SerializeField] float scale = 1f;
 
 		public enum state { Patrol, Chase, Attack, Lost, Idle };
 
@@ -37,25 +37,21 @@ namespace StupidHumanGames
 		[SerializeField] float _groundHuggingTweak = .01f;
 		[SerializeField] bool patrol = true, chase = true, attack = true, idle = true, die = true;
 		[SerializeField] LayerMask groundLayer, playerLayer, obstacleLayer;
-		[SerializeField, Range(0f, 10)] float _turnSpeed = 3f, _moveSpeed = 3f;
-		[SerializeField, Range(0f, 10)] float obstacleRadius = 1f;
+		[SerializeField] float _turnSpeed = 3f, _moveSpeed = 3f;
+		[SerializeField] float obstacleRadius = 1f;
 		[SerializeField] Vector3 attackCenter = Vector3.zero;
 		[SerializeField] float _attackDelay = .1f, _afterAttackDelay = 1f;
-		[SerializeField, Range(0f, 50)] float attackRange = 2f;
-		[SerializeField, Range(0f, 100)] float sightRange = 5f;
-		[SerializeField, Range(0f, 600)] float maxRange = 20f, maxAltitude = 200f, minAltitude = 0f;
+		[SerializeField] float attackRange = 2f;
+		[SerializeField] float sightRange = 5f;
+		[SerializeField] float maxRange = 20f, maxAltitude = 200f, minAltitude = 0f;
 		[SerializeField] state _currentState;
 		[SerializeField] SkinnedMeshRenderer meshReference;
-		[SerializeField, Range(0f, 10f)] int rndAttackCount = 3;
-		[SerializeField, Range(0f, 10f)] int rndIdleCount = 3;
-
-
+		[SerializeField] int rndAttackCount = 3;
+		[SerializeField] int rndIdleCount = 3;
 		private void Awake()
 		{
 			_currentState = state.Patrol;
-
 		}
-
 		void Start()
 		{
 			homePosition = GetComponent<Transform>().position;
@@ -80,7 +76,6 @@ namespace StupidHumanGames
 			{
 				if (_animator != null) _animator.applyRootMotion = false;
 			}
-
 			StartCoroutine(State());
 		}
 		private void Update()
@@ -111,8 +106,6 @@ namespace StupidHumanGames
 		{
 			var step = _moveSpeed * Time.deltaTime;
 			OnYPosition();
-			//Vector3 newWay = new Vector3(wayPoint.x, transform.position.y, wayPoint.z);
-			// if (newWay == Vector3.zero) return;
 			var qto = Quaternion.LookRotation(wayPoint - transform.position).normalized;
 			transform.rotation = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * _turnSpeed);
 
@@ -199,7 +192,6 @@ namespace StupidHumanGames
 		}
 		void RandomIdleAnimations()
 		{
-
 			int rnd = Random.Range(0, rndIdleCount);
 			if (_animator != null) _animator.SetInteger("IdleInt", rnd);
 			if (_animator != null) _animator.SetTrigger("IdleTrigger");
@@ -210,9 +202,6 @@ namespace StupidHumanGames
 			int rnd = Random.Range(0, rndAttackCount);
 			if (_animator != null) _animator.SetInteger("AttackInt", rnd);
 			if (_animator != null) _animator.SetTrigger("AttackTrigger");
-			// _attackDelay = _animator.GetCurrentAnimatorStateInfo(rnd).length;
-			// _attackDelay = _animator.GetCurrentAnimatorClipInfo(rnd).Length *2;
-
 			return;
 		}
 		#endregion
@@ -229,13 +218,10 @@ namespace StupidHumanGames
 		{
 			if (attack && Physics.CheckSphere(transform.localPosition, attackRange, playerLayer) && Physics.CheckSphere(transform.localPosition, sightRange, playerLayer)) return true; else return false;
 		}
-
 		bool OutOfBounds()
 		{
 			bool _outOfBounds = false;
-
 			float distance = Vector3.Distance(homePosition, transform.position);
-
 			if (distance > maxRange)
 			{
 				wayPoint = homePosition;
@@ -244,10 +230,6 @@ namespace StupidHumanGames
 				var restrictedMaxRange = homePosition + (transform.position - homePosition).normalized * maxRange;
 				transform.position = new Vector3(restrictedMaxRange.x, transform.position.y, restrictedMaxRange.z);
 			}
-			else
-			{
-
-			}
 			if (transform.position.y > maxAltitude)
 			{
 				wayPoint = homePosition;
@@ -255,19 +237,13 @@ namespace StupidHumanGames
 
 				transform.position = new Vector3(transform.position.x, maxAltitude, transform.position.z);
 			}
-			else
-			{
-			}
 			if (transform.position.y < minAltitude)
 			{
 				wayPoint = homePosition;
 				_outOfBounds = true;
 
 				transform.position = new Vector3(transform.position.x, minAltitude, transform.position.z);
-			}
-			else
-			{
-			}
+			}		
 			return _outOfBounds;
 		}
 		#endregion
@@ -282,11 +258,9 @@ namespace StupidHumanGames
 		}
 		IEnumerator Patrol()
 		{
-
 			if (OnCanPatrol()) SetAnimation(1, 1, 1); wayPointIsSet = false;
-			while (OnCanPatrol())
+			while (OnCanPatrol() && !OutOfBounds())
 			{
-
 				GetRandomWaypoint();
 				float distance = Vector3.Distance(transform.position, wayPoint);
 				if (distance < 1f) wayPointIsSet = false;
@@ -305,6 +279,7 @@ namespace StupidHumanGames
 				}
 				if (RandomBool(300) && idle)
 				{
+					yield return new WaitForEndOfFrame();
 					_currentState = state.Idle;
 					yield break;
 				}
@@ -315,9 +290,12 @@ namespace StupidHumanGames
 		IEnumerator Chase()
 		{
 			if (OnCanChase()) SetAnimation(1, 1, 2);
-			while (IsFacingObject() && OnCanChase() && !OnHitObstacle())
+			while (OnCanChase() && !OnHitObstacle())
 			{
-				
+				if (OutOfBounds())
+				{
+					SetAnimation(0, 1, 0);
+				}
 				wayPoint = player.position;
 				if (RandomBool(200))
 				{
@@ -329,8 +307,6 @@ namespace StupidHumanGames
 		}
 		IEnumerator Attack()
 		{
-			
-
 			while (OnCanAttack() && IsFacingObject())
 			{
 				SetAnimation(0, 0, 3);
@@ -370,16 +346,14 @@ namespace StupidHumanGames
 			RandomIdleAnimations();
 			while (OnCanPatrol())
 			{
-				yield return new WaitForSeconds(Random.Range(5f, 10f));
+				yield return new WaitForSeconds(Random.Range(3f, 7f));
 				_currentState = state.Patrol;
 				yield break;
-			}
-			_currentState = state.Chase;
+			}			
 		}
 		void SetAnimation(float blend, float moveSpeedMultiplier, float turnSpeedMultiplier)
 		{
 			_animator.SetFloat("Blend", 1 * blend);
-
 			_moveSpeed = _previousSpeed * moveSpeedMultiplier;
 			_animator.SetFloat("BlendMultiplier", _moveSpeed);
 			_turnSpeed = _previousTurnSpeed * turnSpeedMultiplier;

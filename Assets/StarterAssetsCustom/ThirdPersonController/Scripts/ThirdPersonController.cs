@@ -2,6 +2,7 @@
 using System.Collections;
 using StupidHumanGames;
 using static Kalagaan.VertExmotionSensorBase.Parameter;
+using System;
 
 
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
@@ -50,7 +51,9 @@ namespace StupidHumanGames
         [Range(0, 1)] public float rollVolume = 0.5f;
         public AudioClip JumpingAudioClip;
         public AudioClip LandingAudioClip;
-        public AudioClip[] FootstepAudioClips;
+        public AudioClip SplashAudioClip;
+
+		public AudioClip[] FootstepAudioClips;
         [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
 
         [Space(10)]
@@ -99,6 +102,7 @@ namespace StupidHumanGames
         // state stuff
         private bool headAboveWater = true;
         private bool buttAboveWater = true;
+        private bool feetAboveWater = true;
         // cinemachine
         private float _cinemachineTargetYaw;
         private float _cinemachineTargetPitch;
@@ -525,10 +529,21 @@ namespace StupidHumanGames
         {
             if (FootstepAudioClips.Length > 0)
             {
-                var index = Random.Range(0, FootstepAudioClips.Length);
-                if (OnfootStep.animatorClipInfo.weight > .8f) _audioSource.PlayOneShot(FootstepAudioClips[index], FootstepAudioVolume);
+                if (feetAboveWater)
+                {
+                    var index = UnityEngine.Random.Range(0, FootstepAudioClips.Length);
+                    if (OnfootStep.animatorClipInfo.weight > .8f) _audioSource.PlayOneShot(FootstepAudioClips[index], FootstepAudioVolume);
+                }
+                else
+                {
+					if (OnfootStep.animatorClipInfo.weight > .8f) _audioSource.PlayOneShot(SplashAudioClip, FootstepAudioVolume);
+				}
+				
 
-            }
+
+
+
+			}
         }
         public void OnPlayerRoll()
         {
@@ -557,6 +572,14 @@ namespace StupidHumanGames
         public void OnButtBelowWater()
         {
             buttAboveWater = false;
+        }
+        public void OnFeetAboveWater()
+        {
+            feetAboveWater = true;
+        }
+        public void OnFeetBelowWater()
+        {
+            feetAboveWater = false;
         }
         bool OnIsSwimming()
         {

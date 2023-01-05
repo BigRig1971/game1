@@ -1065,8 +1065,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canTame: 0
-  wayPoint: {x: 0, y: 0, z: 0}
-  homePosition: {x: 499.09482, y: 120, z: 573.6}
   player: {fileID: 0}
   scale: 0.5
   _animator: {fileID: 0}
@@ -1105,8 +1103,8 @@ MonoBehaviour:
   _afterAttackDelay: 2
   attackRange: 3
   sightRange: 20
-  maxRange: 100
-  maxAltitude: 85
+  maxRange: 50
+  maxAltitude: 96
   minAltitude: 0
   _currentState: 0
   meshReference: {fileID: 4539525497308257797}
