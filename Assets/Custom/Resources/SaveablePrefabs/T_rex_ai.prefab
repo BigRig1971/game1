@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: -7083761861180929582}
   - component: {fileID: 5163239045022149559}
   - component: {fileID: 1824816471124414536}
-  - component: {fileID: -8149719989498359244}
+  - component: {fileID: 274224561681404412}
   m_Layer: 0
   m_Name: T_rex_ai
   m_TagString: Untagged
@@ -352,8 +352,8 @@ MonoBehaviour:
   - _item: {fileID: 11400000, guid: 1086e27366f3acd4d8514b605952723e, type: 2}
     _itemAmount: 10
   _listOfDamageItems: []
---- !u!135 &-8149719989498359244
-SphereCollider:
+--- !u!136 &274224561681404412
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -367,12 +367,14 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 5.83
-  m_Center: {x: 0, y: 3.57, z: 0}
+  serializedVersion: 2
+  m_Radius: 1.31
+  m_Height: 9.91
+  m_Direction: 2
+  m_Center: {x: 0, y: 3.58, z: 0}
 --- !u!1 &7658770512310735053
 GameObject:
   m_ObjectHideFlags: 0

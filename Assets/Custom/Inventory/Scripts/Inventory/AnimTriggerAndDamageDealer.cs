@@ -15,6 +15,7 @@ namespace StupidHumanGames
 		[SerializeField] float cameraRootOffset;
 		[SerializeField] AudioSource _audioSource;
 		[SerializeField] float _globalCooldown = .5f;
+		[SerializeField] GameObject[] clothesToRemove;
 		Rigidbody rb;
 		public Vector3 colliderSize = Vector3.one;
 		public Vector3 colliderCenter = Vector3.zero;
@@ -65,50 +66,61 @@ namespace StupidHumanGames
 			{
 				if (!canHit) return;
 				canHit = false;
-				var _animName = _animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
+				//var _animName = _animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
 				CameraShakerHandler.Shake(MyShake);
 				damage.Damage(damagePower);
+				_animator.SetTrigger("Interrupt");
 			}
 		}
 		void GetKey()
 		{
-			if (canSwing) return;
 			foreach (var ability in abilities)
 			{
 				if (Input.GetKeyDown(ability._key))
 				{
+					BoolAction();
+					if (canSwing) return;
 					StartCoroutine(Attacking(ability));
+					
 				}
 			}
 		}
-		void PerformAbility(Ability ability)
+		void TriggerAction(Ability ability)
 		{
-			if (groundHugging && hugTheGround)
-			{
-				_tpc.OnYPosition();
-			}
-			toggle = !toggle;
+			
 			if (_animIntName != null) _animator.SetInteger(_animIntName, ability._int);
 			if (_animTriggerName != null) _animator.SetTrigger(_animTriggerName);
-			if (_animBoolName != null) _animator.SetBool(_animBoolName, toggle);
-			if (toggle && groundHugging)
+		}
+		void BoolAction()
+		{
+			if (!groundHugging) return;
+			toggle = !toggle;
+			if (toggle)
 			{
-				hugTheGround = true;
+				
+				if (_animBoolName != null) _animator.SetBool(_animBoolName, true);
 				cameraRoot.position = new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset, cameraRoot.position.z);
 				_tpc._canMove = false;
+				foreach (GameObject go in clothesToRemove)
+				{
+					go.GetComponentInChildren<SkinnedMeshRenderer>().enabled = false;
+				}
 			}
 			else
 			{
-				hugTheGround = false;
+				if (_animBoolName != null) _animator.SetBool(_animBoolName, false);
 				cameraRoot.position = new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset * -1, cameraRoot.position.z);
 				_tpc.transform.rotation = Quaternion.Euler(0f, _tpc.transform.rotation.eulerAngles.y, 0f);
 				_tpc._canMove = true;
+				foreach (GameObject go in clothesToRemove)
+				{
+					go.GetComponentInChildren <SkinnedMeshRenderer>().enabled = true;
+				}
 			}
 		}
 		void Update()
 		{
 			GetKey();
-
 		}
 		void OnDrawGizmos()
 		{
@@ -119,7 +131,7 @@ namespace StupidHumanGames
 		IEnumerator Attacking(Ability ability)
 		{
 			canSwing = true;
-			PerformAbility(ability);
+			TriggerAction(ability);
 			if (InventoryManager.IsOpen()) yield break;
 			yield return new WaitForSeconds(ability.delayCollider);
 			canHit = true;

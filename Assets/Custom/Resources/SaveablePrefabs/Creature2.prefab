@@ -3227,7 +3227,7 @@ GameObject:
   - component: {fileID: 5575371853057884394}
   - component: {fileID: 7761719329181467555}
   - component: {fileID: 459219533338091184}
-  - component: {fileID: 3770903458938643140}
+  - component: {fileID: -7733259491766192166}
   m_Layer: 0
   m_Name: Creature2
   m_TagString: Untagged
@@ -3250,7 +3250,7 @@ Transform:
   - {fileID: 6853432030433160468}
   - {fileID: 6893911470748472372}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &3029898407694677317
 Animator:
@@ -3323,7 +3323,7 @@ MonoBehaviour:
   attackCenter: {x: 0, y: 0, z: 0}
   _attackDelay: 1
   _afterAttackDelay: 0.3
-  attackRange: 2.17
+  attackRange: 2.45
   sightRange: 6.92
   maxRange: 21
   maxAltitude: 101
@@ -3473,8 +3473,8 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!135 &3770903458938643140
-SphereCollider:
+--- !u!136 &-7733259491766192166
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -3488,12 +3488,14 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 1.65
-  m_Center: {x: 0, y: 1.26, z: 0}
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 3.59
+  m_Direction: 2
+  m_Center: {x: 0, y: 1.84, z: 0.68}
 --- !u!1 &8643156288379876127
 GameObject:
   m_ObjectHideFlags: 0

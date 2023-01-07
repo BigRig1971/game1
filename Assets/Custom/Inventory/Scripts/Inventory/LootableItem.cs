@@ -71,7 +71,12 @@ namespace StupidHumanGames
                 {
                     if (!isDamagable)
                     {
-                        if (transform.parent != null) Destroy(transform.parent.gameObject, .3f);
+                        if (transform.parent != null)
+                        {
+                            Destroy(transform.parent.gameObject, .3f);
+                            return;
+                        }
+
                         Destroy(transform.gameObject, .3f);
                     }
                 }
@@ -118,6 +123,7 @@ namespace StupidHumanGames
                     yield return new WaitForSeconds(.05f);
                 }
             }
+            
             if (transform.parent != null) Destroy(transform.parent.gameObject); else Destroy(transform.gameObject);
         }
         void OnDropOnDamage()

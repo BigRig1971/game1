@@ -307,6 +307,7 @@ namespace StupidHumanGames
 		{
 			while (OnCanAttack() && IsFacingObject())
 			{
+				wayPoint = player.position;
 				SetAnimation(0, 0, 3);
 				RandomAttackAnimations();
 				_audioSource.PlayOneShot(attackSound, attackVolume);
