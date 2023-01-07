@@ -24,7 +24,7 @@ namespace StupidHumanGames
         [Header("")]
         public LayerMask avoidableObjects;
         public LayerMask ground;
-        public float delay = .1f, currentDelay = .1f;
+        public float delay = .1f;
         public int maximum = 15;
         public float maxRange = 3f;
         public float minSeparation = 3f;
@@ -33,7 +33,6 @@ namespace StupidHumanGames
         bool canSpawn = false;
         float slopeAngle;
         GameObject delete;
-        bool delayStarted = false;
         [SerializeField] List<GameObject> list = new List<GameObject>();
         [SerializeField] List<GameObject> deleteThese = new List<GameObject>();
         private float m_internalTimer = 5f;
@@ -43,16 +42,9 @@ namespace StupidHumanGames
         void Start()
         {
             StartCoroutine(GetAlreadySpawned());
-            currentDelay = .1f;
+
         }
-        void StartDelay()
-        {
-            if (!delayStarted)
-            {
-                delayStarted = true;
-                currentDelay = delay;
-            }
-        }
+       
         public void OnRemoveObject()
         {
             list.Remove(_object);
@@ -94,7 +86,6 @@ namespace StupidHumanGames
         {
             if (list.Count >= maximum)
             {
-                StartDelay();
                 return;
             }
             m_internalTimer -= Time.deltaTime;
@@ -138,7 +129,7 @@ namespace StupidHumanGames
                     list.Add(obj);
                 }
 
-                m_internalTimer = currentDelay;
+                m_internalTimer = delay;
             }
         }
         void LateUpdate()

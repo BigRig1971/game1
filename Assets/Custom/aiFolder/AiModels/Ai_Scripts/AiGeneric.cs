@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditorInternal.VersionControl;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -47,6 +48,8 @@ namespace StupidHumanGames
 		[SerializeField] SkinnedMeshRenderer meshReference;
 		[SerializeField] int rndAttackCount = 3;
 		[SerializeField] int rndIdleCount = 3;
+		[SerializeField] float m_internalTimer = 1f;
+		[SerializeField] float resetDelay = 1f;
 		private void Awake()
 		{
 			_currentState = state.Patrol;
@@ -163,7 +166,6 @@ namespace StupidHumanGames
 		{
 			if (wayPointIsSet) { return; }
 			wayPointIsSet = true;
-			StartCoroutine(OnResetWayPoint());
 			float randomX = Random.Range(-_wayPointDistance, _wayPointDistance);
 			if (canSwimOrFly)
 			{
@@ -176,6 +178,21 @@ namespace StupidHumanGames
 				wayPoint.y = Terrain.activeTerrain.SampleHeight(wayPoint);
 			}
 		}
+		void ResetWayPoint()
+		{
+			
+			float distance = Vector3.Distance(transform.position, wayPoint);
+			if (distance < 1f) wayPointIsSet = false;
+			m_internalTimer -= Time.deltaTime;
+			m_internalTimer = Mathf.Max(m_internalTimer, 0f);
+			if (m_internalTimer == 0f)
+			{				
+				wayPointIsSet = false;
+				m_internalTimer = distance / 3f;
+				
+			}
+		}
+
 		bool RandomBool(int rn)
 		{
 			int rnd = Random.Range(0, rn);
@@ -256,12 +273,14 @@ namespace StupidHumanGames
 		}
 		IEnumerator Patrol()
 		{
-			if (OnCanPatrol()) SetAnimation(1, 1, 1); wayPointIsSet = false;
+			wayPointIsSet = false;
+			if (OnCanPatrol()) SetAnimation(1, 1, 1);
 			while (OnCanPatrol() && !OutOfBounds())
 			{
 				GetRandomWaypoint();
-				float distance = Vector3.Distance(transform.position, wayPoint);
-				if (distance < 1f) wayPointIsSet = false;
+				ResetWayPoint();
+				
+				
 				if (RandomBool(200))
 				{
 					if (rootMotion)
@@ -348,11 +367,9 @@ namespace StupidHumanGames
 		{
 			SetAnimation(0, 1, 0);
 			RandomIdleAnimations();
-			while (OnCanPatrol() && !IsFacingObject())
-			{
-				yield return null;
-			}
-			_currentState = state.Chase;
+			yield return new WaitForSeconds(Random.Range(3, 6));
+			_currentState = state.Patrol;
+			yield break;
 			
 		}
 		void SetAnimation(float blend, float moveSpeedMultiplier, float turnSpeedMultiplier)
@@ -362,12 +379,7 @@ namespace StupidHumanGames
 			_animator.SetFloat("BlendMultiplier", _moveSpeed);
 			_turnSpeed = _previousTurnSpeed * turnSpeedMultiplier;
 		}
-		IEnumerator OnResetWayPoint()
-		{
-			float distance = Vector3.Distance(transform.position, wayPoint);
-			yield return new WaitForSeconds(distance / 3);
-			wayPointIsSet = false;
-		}
+		
 		#endregion
 		#region Gizmos
 		private void OnDrawGizmos()
