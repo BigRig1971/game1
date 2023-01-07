@@ -27,7 +27,6 @@ namespace StupidHumanGames
 		[SerializeField] float randomSoundvolume;
 		[SerializeField] AudioClip attackSound;
 		[SerializeField] float attackVolume;
-		[SerializeField] int _randomIdleDelay = 1000;
 		[SerializeField] AudioClip idleSound;
 		[SerializeField] float idleVolume;
 		[SerializeField] AudioClip[] FootstepAudioClips;
@@ -195,7 +194,6 @@ namespace StupidHumanGames
 			int rnd = Random.Range(0, rndIdleCount);
 			if (_animator != null) _animator.SetInteger("IdleInt", rnd);
 			if (_animator != null) _animator.SetTrigger("IdleTrigger");
-			return;
 		}
 		void RandomAttackAnimations()
 		{
@@ -313,6 +311,12 @@ namespace StupidHumanGames
 				RandomAttackAnimations();
 				_audioSource.PlayOneShot(attackSound, attackVolume);
 				yield return new WaitForSeconds(_attackDelay);
+				
+
+				if (!canSwimOrFly)
+				{
+					yield break;
+				}
 				SetAnimation(1, 1, 1);
 				if (RandomBool(2))
 				{
@@ -324,7 +328,6 @@ namespace StupidHumanGames
 					wayPoint = transform.position + transform.right * 100f;
 					yield return new WaitForSeconds(_afterAttackDelay);
 				}
-				SetAnimation(1, 1, 1);
 				yield return null;
 			}
 			_currentState = state.Lost;
@@ -337,19 +340,19 @@ namespace StupidHumanGames
 				wayPoint = homePosition;
 				yield return null;
 			}
-			yield return new WaitForSeconds(2);
+			yield return new WaitForSeconds(.5f);
 			_currentState = state.Patrol;
 		}
 		IEnumerator Idle()
 		{
 			SetAnimation(0, 1, 0);
 			RandomIdleAnimations();
-			while (OnCanPatrol())
+			while (OnCanPatrol() && !IsFacingObject())
 			{
-				yield return new WaitForSeconds(Random.Range(3f, 7f));
-				_currentState = state.Patrol;
-				yield break;
-			}			
+				yield return null;
+			}
+			_currentState = state.Chase;
+			
 		}
 		void SetAnimation(float blend, float moveSpeedMultiplier, float turnSpeedMultiplier)
 		{

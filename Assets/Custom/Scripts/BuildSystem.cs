@@ -8,6 +8,8 @@ namespace StupidHumanGames
 {
 	public class BuildSystem : MonoBehaviour
 	{
+		[SerializeField] AudioSource _audioSource;
+		[SerializeField] AudioClip _buildSound;
 		public ThirdPersonController tpc;
 		[SerializeField] Camera cam;//camera used for raycast
 		public LayerMask layer;//the layer that the raycast will hit on
@@ -140,7 +142,7 @@ namespace StupidHumanGames
 				previewScript = null;
 				isBuilding = false;
 				isBuilt = true;
-
+				_audioSource.PlayOneShot(_buildSound, 1);
 				//AudioManager.instance.Play("Hammer");
 			}
 		}
