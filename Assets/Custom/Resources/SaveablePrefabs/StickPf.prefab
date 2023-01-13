@@ -20,7 +20,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 20
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &7917972023084776732
 Transform:
@@ -31,8 +31,8 @@ Transform:
   m_GameObject: {fileID: 7397612320337340326}
   m_LocalRotation: {x: 0.35537896, y: -0.04640036, z: -0.017666237, w: 0.9334028}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 4.0778975, y: 4.0778975, z: 4.0778975}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 15
@@ -102,7 +102,6 @@ MonoBehaviour:
   randomItems: []
   randomSize: 1
   _audioSource: {fileID: 0}
-  scale: {x: 1, y: 1, z: 1}
   droppedLootScale: 1
   damageDropScale: 1
   spawnLoot: 0

@@ -13,7 +13,6 @@ namespace StupidHumanGames
         [SerializeField] bool randomSize = false;
         [SerializeField] AudioSource _audioSource;
         Quaternion targetRot;
-        [SerializeField] Vector3 scale = Vector3.one;
         [SerializeField] float droppedLootScale = 1f;
         [SerializeField] float damageDropScale = 1f;    
         [SerializeField] bool spawnLoot = false;
@@ -50,7 +49,7 @@ namespace StupidHumanGames
         {
 			
 			RandomLootableItems();
-            OnScaleObject();  
+            OnRandomScale(); 
         }
 #if UNITY_EDITOR
 
@@ -142,15 +141,11 @@ namespace StupidHumanGames
                 Destroy(drop.gameObject, 120f);
             }
         }
-        void OnScaleObject()
+        void OnRandomScale()
         {
             if (randomSize)
             {
-                transform.localScale = new Vector3(scale.x * Random.Range(1f, 2f), scale.y * Random.Range(1f, 2f), scale.z * Random.Range(1f, 2f));
-            }
-            else
-            {
-                transform.localScale = scale;
+                transform.localScale = new Vector3(transform.localScale.x * Random.Range(1f, 2f), transform.localScale.y * Random.Range(1f, 2f), transform.localScale.z * Random.Range(1f, 2f));
             }
         }
 

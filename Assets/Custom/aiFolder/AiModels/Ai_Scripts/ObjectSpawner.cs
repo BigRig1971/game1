@@ -33,6 +33,7 @@ namespace StupidHumanGames
         bool canSpawn = false;
         float slopeAngle;
         GameObject delete;
+        bool delayStarted = false;
         [SerializeField] List<GameObject> list = new List<GameObject>();
         [SerializeField] List<GameObject> deleteThese = new List<GameObject>();
         private float m_internalTimer = 5f;
@@ -42,9 +43,8 @@ namespace StupidHumanGames
         void Start()
         {
             StartCoroutine(GetAlreadySpawned());
-
         }
-       
+        
         public void OnRemoveObject()
         {
             list.Remove(_object);
@@ -86,6 +86,7 @@ namespace StupidHumanGames
         {
             if (list.Count >= maximum)
             {
+               
                 return;
             }
             m_internalTimer -= Time.deltaTime;
@@ -95,8 +96,8 @@ namespace StupidHumanGames
                 q = Quaternion.Euler(new Vector3(0, UnityEngine.Random.Range(q.x, 360f), q.z));
                 RaycastHit hit;
                 Vector3 _position = transform.position + GetOffset();
-                if (Physics.Raycast(new Vector3(_position.x, _position.y + transform.up.y * 3, _position.z),
-            -transform.up, out hit, 200, ground))
+                if (Physics.Raycast(new Vector3(_position.x, _position.y + transform.up.y * 10, _position.z),
+            -transform.up, out hit, 500, ground))
                 {
                     slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
                 }

@@ -3244,13 +3244,13 @@ Transform:
   m_GameObject: {fileID: 8622036983199577477}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 414.1095, y: 100.0183, z: 592.05804}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.6757409, y: 0.6757409, z: 0.6757409}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6853432030433160468}
   - {fileID: 6893911470748472372}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 19
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &3029898407694677317
 Animator:
@@ -3286,7 +3286,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canTame: 0
   player: {fileID: 0}
-  scale: 0.5
+  scale: 1
+  randomScale: 1
+  minScale: 0.42
+  maxScale: 0.7
+  meshSize: 2.524679
   _animator: {fileID: 0}
   randomSound: []
   randomSoundvolume: 0
@@ -3319,17 +3323,15 @@ MonoBehaviour:
     m_Bits: 20480
   _turnSpeed: 5
   _moveSpeed: 2
-  obstacleRadius: 2.48
-  attackCenter: {x: 0, y: 0, z: 0}
   _attackDelay: 1
   _afterAttackDelay: 0.3
-  attackRange: 2.45
-  sightRange: 6.92
-  maxRange: 21
+  _attackRange: 1.02
+  _obstacleRange: 1.41
+  _sightRange: 5
+  _maxRange: 10
   maxAltitude: 101
   minAltitude: 98
   _currentState: 0
-  meshReference: {fileID: 0}
   rndAttackCount: 3
   rndIdleCount: 1
 --- !u!114 &5575371853057884394
@@ -3361,7 +3363,6 @@ MonoBehaviour:
   randomItems: []
   randomSize: 0
   _audioSource: {fileID: 459219533338091184}
-  scale: {x: 0.5, y: 0.5, z: 0.5}
   droppedLootScale: 1
   damageDropScale: 1
   spawnLoot: 0

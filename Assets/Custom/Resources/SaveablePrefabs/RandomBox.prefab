@@ -24,7 +24,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 18
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1042891929689461927
 Transform:
@@ -139,7 +139,6 @@ MonoBehaviour:
     _itemAmount: 2
   randomSize: 0
   _audioSource: {fileID: 333397010}
-  scale: {x: 1, y: 1, z: 1}
   droppedLootScale: 2
   damageDropScale: 2
   spawnLoot: 0

@@ -18,11 +18,12 @@ namespace StupidHumanGames
 		float _previousTurnSpeed, _previousSpeed, _wayPointDistance, _blendMultiplier = 1f;
 		bool wayPointIsSet = false;
 		[SerializeField] Transform player;
-		Vector3 sizeOfObject = Vector3.one;
-		[SerializeField] float scale = 1f;
-
 		public enum state { Patrol, Chase, Attack, Lost, Idle };
-
+		[SerializeField] float scale = 1f;
+		[SerializeField] bool randomScale;
+		[SerializeField] float minScale = 1f;
+		[SerializeField] float maxScale = 1f;
+		[SerializeField] float meshSize;
 		[SerializeField] Animator _animator;
 		[SerializeField] AudioClip[] randomSound;
 		[SerializeField] float randomSoundvolume;
@@ -38,25 +39,29 @@ namespace StupidHumanGames
 		[SerializeField] bool patrol = true, chase = true, attack = true, idle = true, die = true;
 		[SerializeField] LayerMask groundLayer, playerLayer, obstacleLayer;
 		[SerializeField] float _turnSpeed = 3f, _moveSpeed = 3f;
-		[SerializeField] float obstacleRadius = 1f;
-		[SerializeField] Vector3 attackCenter = Vector3.zero;
 		[SerializeField] float _attackDelay = .1f, _afterAttackDelay = 1f;
-		[SerializeField] float attackRange = 2f;
-		[SerializeField] float sightRange = 5f;
-		[SerializeField] float maxRange = 20f, maxAltitude = 200f, minAltitude = 0f;
+		[SerializeField] float _attackRange = 2f;
+		[SerializeField] float _obstacleRange = 3f;
+		[SerializeField] float _sightRange = 5f;
+		[SerializeField] float _maxRange = 10f;
+		float attackRange;
+		float obstacleRange;
+		float sightRange;
+		float maxRange;
+		[SerializeField] float maxAltitude = 200f, minAltitude = 0f;
 		[SerializeField] state _currentState;
-		[SerializeField] SkinnedMeshRenderer meshReference;
 		[SerializeField] int rndAttackCount = 3;
 		[SerializeField] int rndIdleCount = 3;
-		[SerializeField] float m_internalTimer = 1f;
-		[SerializeField] float resetDelay = 1f;
+		float m_internalTimer = 1f;
 		private void Awake()
 		{
+			
 			_currentState = state.Patrol;
 		}
 		void Start()
 		{
-			homePosition = GetComponent<Transform>().position;
+			SetScale();
+			
 			player = FindObjectOfType<ThirdPersonController>().transform;
 			_audioSource = GetComponent<AudioSource>();
 			_previousSpeed = _moveSpeed;
@@ -67,9 +72,6 @@ namespace StupidHumanGames
 			if (_animator != null) _animator.SetFloat("BlendMultiplier", _blendMultiplier);
 			_wayPointDistance = 10f;
 
-			sightRange = attackRange + sightRange;
-			sizeOfObject = new Vector3(scale, scale, scale) * Random.Range(.9f, 1.1f);
-			transform.localScale = sizeOfObject;
 			if (rootMotion)
 			{
 				if (_animator != null) _animator.applyRootMotion = true;
@@ -87,13 +89,49 @@ namespace StupidHumanGames
 			OnHitObstacle();
 			OutOfBounds();
 		}
+		
+		void SetScale()
+		{
+			homePosition = GetComponent<Transform>().position;
+			if (!randomScale)
+			{
+				transform.localScale = Vector3.one * scale;
+			}
+			else
+			{
+				transform.localScale = Vector3.one * (Random.Range(minScale, maxScale));
+			}
+		
+			meshSize = GetComponentInChildren<SkinnedMeshRenderer>().bounds.size.magnitude / 2;
+
+			attackRange = _attackRange * meshSize;
+			obstacleRange = _obstacleRange * meshSize;	
+			sightRange= _sightRange * meshSize;
+			maxRange = _maxRange * meshSize;
+		}
+		private void OnDrawGizmos()
+		{
+			Gizmos.color = Color.blue;
+			Gizmos.DrawSphere(new Vector3(transform.position.x, maxAltitude, transform.position.z), .2f);
+			Gizmos.DrawSphere(new Vector3(transform.position.x, minAltitude, transform.position.z), .2f);
+			Gizmos.color = Color.green;
+			Gizmos.DrawWireSphere(wayPoint, .5f);
+			Gizmos.color = Color.red;
+			// Gizmos.matrix = transform.localToWorldMatrix;
+			Gizmos.color = Color.blue;
+			Gizmos.DrawWireSphere(transform.position, obstacleRange);
+			Gizmos.color = Color.red;
+			Gizmos.DrawWireSphere(transform.position, attackRange);
+			Gizmos.color = Color.yellow;
+			Gizmos.DrawWireSphere(transform.position, sightRange);
+			Gizmos.color = Color.cyan;
+			Gizmos.DrawWireSphere(homePosition, maxRange);
+		}
 #if UNITY_EDITOR
 
 		private void OnValidate()
 		{
-			homePosition = transform.position;
-			sizeOfObject = new Vector3(scale, scale, scale);
-			transform.localScale = sizeOfObject;
+			SetScale();
 		}
 #endif
 		#region Movement
@@ -129,10 +167,10 @@ namespace StupidHumanGames
 				transform.position = position;
 			}
 		}
-		bool OnHitObstacle()
+		/*bool OnHitObstacle()
 		{
 			bool _hit = false;
-			hitColliders = Physics.OverlapSphere(transform.position + transform.up, obstacleRadius, obstacleLayer);
+			hitColliders = Physics.OverlapSphere(transform.position + transform.up, obstacleRange, obstacleLayer);
 			foreach (Collider col in hitColliders)
 			{
 				_hit = true;
@@ -140,12 +178,39 @@ namespace StupidHumanGames
 				{
 					if (col.transform.position.y <= OnGround(transform.position).y)
 					{
-
 						wayPoint = homePosition;
 					}
 				}
 				else
 				{
+					Vector3 delta = (col.ClosestPoint(transform.position) - transform.position).normalized;
+					Vector3 cross = Vector3.Cross(delta, transform.forward);
+					if (cross.y > 0f && cross.y < .5f) wayPoint = transform.position + transform.forward * 10 + transform.right * 10; //left
+					if (cross.y < 0f && cross.y > -.5f) wayPoint = transform.position + transform.forward * 10 - transform.right * 10; //right
+				}
+			}
+			return _hit;
+		}*/
+		bool OnHitObstacle()
+		{
+			bool _hit = false;
+			hitColliders = Physics.OverlapSphere(transform.position + transform.up, obstacleRange, obstacleLayer);
+			foreach (Collider col in hitColliders)
+			{
+				_hit = true;
+				if (canSwimOrFly)
+				{
+					if (col.transform.position.y <= OnGround(transform.position).y)
+					{
+						transform.position += new Vector3(0, .1f, 0);
+						wayPoint = transform.position + transform.forward * 10 + transform.up * 10; //up
+						
+					}
+
+				}
+				else
+				{
+					
 					Vector3 delta = (col.ClosestPoint(transform.position) - transform.position).normalized;
 					Vector3 cross = Vector3.Cross(delta, transform.forward);
 					if (cross.y > 0f && cross.y < .5f) wayPoint = transform.position + transform.forward * 10 + transform.right * 10; //left
@@ -162,6 +227,7 @@ namespace StupidHumanGames
 		}
 		#endregion
 		#region RNG
+
 		void GetRandomWaypoint()
 		{
 			if (wayPointIsSet) { return; }
@@ -180,16 +246,16 @@ namespace StupidHumanGames
 		}
 		void ResetWayPoint()
 		{
-			
+
 			float distance = Vector3.Distance(transform.position, wayPoint);
 			if (distance < 1f) wayPointIsSet = false;
 			m_internalTimer -= Time.deltaTime;
 			m_internalTimer = Mathf.Max(m_internalTimer, 0f);
 			if (m_internalTimer == 0f)
-			{				
+			{
 				wayPointIsSet = false;
 				m_internalTimer = distance / 3f;
-				
+
 			}
 		}
 
@@ -247,7 +313,7 @@ namespace StupidHumanGames
 			}
 			if (transform.position.y > maxAltitude)
 			{
-				wayPoint = homePosition;
+				wayPoint = homePosition;			
 				_outOfBounds = true;
 
 				transform.position = new Vector3(transform.position.x, maxAltitude, transform.position.z);
@@ -258,7 +324,7 @@ namespace StupidHumanGames
 				_outOfBounds = true;
 
 				transform.position = new Vector3(transform.position.x, minAltitude, transform.position.z);
-			}		
+			}
 			return _outOfBounds;
 		}
 		#endregion
@@ -273,14 +339,13 @@ namespace StupidHumanGames
 		}
 		IEnumerator Patrol()
 		{
+			yield return new WaitForSeconds(2f);
 			wayPointIsSet = false;
 			if (OnCanPatrol()) SetAnimation(1, 1, 1);
 			while (OnCanPatrol() && !OutOfBounds())
 			{
 				GetRandomWaypoint();
 				ResetWayPoint();
-				
-				
 				if (RandomBool(200))
 				{
 					if (rootMotion)
@@ -306,6 +371,7 @@ namespace StupidHumanGames
 		}
 		IEnumerator Chase()
 		{
+			
 			if (OnCanChase()) SetAnimation(1, 1, 2);
 			while (OnCanChase() && !OnHitObstacle())
 			{
@@ -322,6 +388,7 @@ namespace StupidHumanGames
 			}
 			_currentState = state.Attack;
 		}
+
 		IEnumerator Attack()
 		{
 			while (OnCanAttack() && IsFacingObject())
@@ -331,13 +398,13 @@ namespace StupidHumanGames
 				RandomAttackAnimations();
 				_audioSource.PlayOneShot(attackSound, attackVolume);
 				yield return new WaitForSeconds(_attackDelay);
-				
+
 
 				if (!canSwimOrFly)
 				{
 					yield break;
 				}
-				SetAnimation(1, 1, 1);
+				SetAnimation(1, 1, 3);
 				if (RandomBool(2))
 				{
 					wayPoint = transform.position - transform.right * 100f;
@@ -350,17 +417,18 @@ namespace StupidHumanGames
 				}
 				yield return null;
 			}
-			_currentState = state.Lost;
+			
+			_currentState = state.Patrol;
 		}
 		IEnumerator Lost()
 		{
+			
 			SetAnimation(1, 1, 1);
 			while (OutOfBounds())
 			{
 				wayPoint = homePosition;
 				yield return null;
-			}
-			yield return new WaitForSeconds(.5f);
+			}			
 			_currentState = state.Patrol;
 		}
 		IEnumerator Idle()
@@ -370,7 +438,7 @@ namespace StupidHumanGames
 			yield return new WaitForSeconds(Random.Range(3, 6));
 			_currentState = state.Patrol;
 			yield break;
-			
+
 		}
 		void SetAnimation(float blend, float moveSpeedMultiplier, float turnSpeedMultiplier)
 		{
@@ -379,27 +447,9 @@ namespace StupidHumanGames
 			_animator.SetFloat("BlendMultiplier", _moveSpeed);
 			_turnSpeed = _previousTurnSpeed * turnSpeedMultiplier;
 		}
-		
+
 		#endregion
 		#region Gizmos
-		private void OnDrawGizmos()
-		{
-			Gizmos.color = Color.blue;
-			Gizmos.DrawSphere(new Vector3(transform.position.x, maxAltitude, transform.position.z), .2f);
-			Gizmos.DrawSphere(new Vector3(transform.position.x, minAltitude, transform.position.z), .2f);
-			Gizmos.color = Color.green;
-			Gizmos.DrawWireSphere(wayPoint, .5f);
-			Gizmos.color = Color.red;
-			// Gizmos.matrix = transform.localToWorldMatrix;
-			Gizmos.color = Color.blue;
-			Gizmos.DrawWireSphere(transform.position, obstacleRadius);
-			Gizmos.color = Color.red;
-			Gizmos.DrawWireSphere(transform.position, attackRange);
-			Gizmos.color = Color.yellow;
-			Gizmos.DrawWireSphere(transform.position, attackRange + sightRange);
-			Gizmos.color = Color.cyan;
-			Gizmos.DrawWireSphere(homePosition, maxRange);
-		}
 		#endregion
 		private void OnFootstep(AnimationEvent OnfootStep)
 		{

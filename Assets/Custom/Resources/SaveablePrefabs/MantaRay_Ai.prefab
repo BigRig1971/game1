@@ -30,12 +30,12 @@ Transform:
   m_GameObject: {fileID: 6518981239945531061}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 2563.4307, y: 201.796, z: 2485.2134}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 2.7651117, y: 2.7651117, z: 2.7651117}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 318213778809023676}
   m_Father: {fileID: 0}
-  m_RootOrder: 16
+  m_RootOrder: 18
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8020849671179712681
 MonoBehaviour:
@@ -50,16 +50,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canTame: 0
-  wayPoint: {x: 0, y: 0, z: 0}
-  homePosition: {x: 2563.4307, y: 201.796, z: 2485.2134}
   player: {fileID: 0}
   scale: 2
+  randomScale: 1
+  minScale: 2
+  maxScale: 3
+  meshSize: 5.216226
   _animator: {fileID: 0}
   randomSound: []
   randomSoundvolume: 0
   attackSound: {fileID: 8300000, guid: ef75b19c901bc82439f9467862f32d1d, type: 3}
   attackVolume: 1
-  _randomIdleDelay: 1000
   idleSound: {fileID: 0}
   idleVolume: 0
   FootstepAudioClips: []
@@ -83,18 +84,16 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1025
   _turnSpeed: 2
-  _moveSpeed: 2
-  obstacleRadius: 1.91
-  attackCenter: {x: 0, y: 0, z: 0}
+  _moveSpeed: 1
   _attackDelay: 0.3
   _afterAttackDelay: 1.5
-  attackRange: 0.9
-  sightRange: 3.9
-  maxRange: 30
+  _attackRange: 0.34
+  _obstacleRange: 0.51
+  _sightRange: 1
+  _maxRange: 5
   maxAltitude: 93
   minAltitude: 0
   _currentState: 0
-  meshReference: {fileID: 6306698922901831578}
   rndAttackCount: 1
   rndIdleCount: 1
 --- !u!82 &3634373536421230527

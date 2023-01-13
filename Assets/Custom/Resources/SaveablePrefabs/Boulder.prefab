@@ -19,7 +19,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 20
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2724364332608585072
 Transform:
@@ -101,7 +101,6 @@ MonoBehaviour:
   randomItems: []
   randomSize: 1
   _audioSource: {fileID: 2902439110162201260}
-  scale: {x: 2, y: 2, z: 2}
   droppedLootScale: 0.5
   damageDropScale: 0.5
   spawnLoot: 1
@@ -115,7 +114,7 @@ MonoBehaviour:
   deathDelay: 0
   _listOfItems:
   - _item: {fileID: 11400000, guid: b900c80633e7c6c4aac478d101780d98, type: 2}
-    _itemAmount: 5
+    _itemAmount: 3
   _listOfDamageItems:
   - _item: {fileID: 11400000, guid: 5798043884458524da5b651b1519cf74, type: 2}
     _itemAmount: 1
@@ -253,7 +252,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 20
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6976108485862896712
 Transform:
@@ -264,12 +263,12 @@ Transform:
   m_GameObject: {fileID: 3441133930247373763}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 483.66055, y: 99.95949, z: 632.11993}
-  m_LocalScale: {x: 0.8904189, y: 0.8904189, z: 0.8904189}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2724364332608585072}
   m_Father: {fileID: 0}
-  m_RootOrder: 18
+  m_RootOrder: 19
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2879337121207502700
 MonoBehaviour:

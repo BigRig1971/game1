@@ -19,7 +19,7 @@ GameObject:
   m_TagString: Lootable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &5010806264853274523
 Transform:
@@ -52,7 +52,6 @@ MonoBehaviour:
   randomItems: []
   randomSize: 0
   _audioSource: {fileID: 5841132577319575997}
-  scale: {x: 1, y: 1, z: 1}
   droppedLootScale: 1
   damageDropScale: 1
   spawnLoot: 0
@@ -247,6 +246,22 @@ PrefabInstance:
     - target: {fileID: 100000, guid: ab62159611683b747bdb81618f0d20d0, type: 3}
       propertyPath: m_Name
       value: grey_willow_04
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: ab62159611683b747bdb81618f0d20d0, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 100002, guid: ab62159611683b747bdb81618f0d20d0, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 100004, guid: ab62159611683b747bdb81618f0d20d0, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 100006, guid: ab62159611683b747bdb81618f0d20d0, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: ab62159611683b747bdb81618f0d20d0, type: 3}
       propertyPath: m_RootOrder
