@@ -509,6 +509,69 @@ Transform:
   m_Father: {fileID: 6853432030433160468}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1754357248612241361
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2203375809835060209}
+  - component: {fileID: 6733675007400388847}
+  m_Layer: 0
+  m_Name: Stinger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2203375809835060209
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1754357248612241361}
+  m_LocalRotation: {x: -0.00000007450579, y: 2.486899e-14, z: 2.5757167e-14, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8414028283379897501}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6733675007400388847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1754357248612241361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7797b6b83c12f94458790e015358aff3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _audioSource: {fileID: 0}
+  colliderSize: {x: 0.005, y: 0.005, z: 0.005}
+  colliderCenter: {x: 0, y: 0, z: 0}
+  _animTriggerName: AttackTrigger
+  _animIntName: AttackInt
+  _animator: {fileID: 3029898407694677317}
+  abilities:
+  - _attackInt: 0
+    delayCollider: 0.5
+    _attackPower: 10
+    attackAudio: {fileID: 0}
+  - _attackInt: 1
+    delayCollider: 0
+    _attackPower: 0
+    attackAudio: {fileID: 0}
+  - _attackInt: 2
+    delayCollider: 0
+    _attackPower: 0
+    attackAudio: {fileID: 0}
 --- !u!1 &1757310018504494428
 GameObject:
   m_ObjectHideFlags: 0
@@ -3244,13 +3307,13 @@ Transform:
   m_GameObject: {fileID: 8622036983199577477}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 414.1095, y: 100.0183, z: 592.05804}
-  m_LocalScale: {x: 0.6757409, y: 0.6757409, z: 0.6757409}
+  m_LocalScale: {x: 0.65455055, y: 0.65455055, z: 0.65455055}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6853432030433160468}
   - {fileID: 6893911470748472372}
   m_Father: {fileID: 0}
-  m_RootOrder: 19
+  m_RootOrder: 18
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &3029898407694677317
 Animator:
@@ -3284,13 +3347,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2cf9d97e2f2bdf49bf617bf5e386cd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackAnimTrigger: {fileID: 0}
   canTame: 0
   player: {fileID: 0}
   scale: 1
   randomScale: 1
   minScale: 0.42
   maxScale: 0.7
-  meshSize: 2.524679
+  meshSize: 2.4455082
   _animator: {fileID: 0}
   randomSound: []
   randomSoundvolume: 0
@@ -3954,7 +4018,8 @@ Transform:
   m_LocalPosition: {x: -0, y: 0.005271508, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 2203375809835060209}
   m_Father: {fileID: 2000266596062850132}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

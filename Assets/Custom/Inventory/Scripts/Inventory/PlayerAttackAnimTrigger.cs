@@ -6,9 +6,10 @@ using UnityEngine.InputSystem;
 using System;
 using UnityEngine.InputSystem.Utilities;
 
+
 namespace StupidHumanGames
 {
-	public class AnimTriggerAndDamageDealer : MonoBehaviour
+	public class PlayerAttackAnimTrigger : MonoBehaviour
 	{
 		[SerializeField] bool groundHugging = false;
 		[SerializeField] Transform cameraRoot;
@@ -16,10 +17,9 @@ namespace StupidHumanGames
 		[SerializeField] AudioSource _audioSource;
 		[SerializeField] float _globalCooldown = .5f;
 		[SerializeField] GameObject[] clothesToRemove;
-		Rigidbody rb;
 		public Vector3 colliderSize = Vector3.one;
 		public Vector3 colliderCenter = Vector3.zero;
-		public int damagePower = 5;
+		int damagePower = 5;
 		public string _animTriggerName;
 		public string _animIntName;
 		public string _animBoolName;
@@ -40,21 +40,14 @@ namespace StupidHumanGames
 			public KeyCode _key;
 			public int _int;
 			public float delayCollider = .3f;
+			public int attackPower = 5;
 		}
 		public List<Ability> abilities;
 		private void Start()
 		{
 			_tpc = GameObject.FindObjectOfType<ThirdPersonController>();
 			previousCamOffset = cameraRoot.transform.position.y;
-			if (TryGetComponent<Rigidbody>(out rb))
-			{
-				rb = GetComponent<Rigidbody>();
-			}
-			else
-			{
-				rb = gameObject.AddComponent<Rigidbody>() as Rigidbody;
-				rb.isKinematic = true;
-			}
+
 			BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
 			boxCollider.size = colliderSize;
 			boxCollider.center = (Vector3.zero + colliderCenter);
@@ -80,6 +73,7 @@ namespace StupidHumanGames
 				{
 					BoolAction();
 					if (canSwing) return;
+					damagePower = ability.attackPower;
 					StartCoroutine(Attacking(ability));
 					
 				}
@@ -97,7 +91,6 @@ namespace StupidHumanGames
 			toggle = !toggle;
 			if (toggle)
 			{
-				
 				if (_animBoolName != null) _animator.SetBool(_animBoolName, true);
 				cameraRoot.position = new Vector3(cameraRoot.position.x, cameraRoot.position.y + cameraRootOffset, cameraRoot.position.z);
 				_tpc._canMove = false;

@@ -9,6 +9,7 @@ namespace StupidHumanGames
 {
 	public class AiGeneric : MonoBehaviour
 	{
+		[SerializeField] EnemyAttackAnimTrigger attackAnimTrigger;
 		[SerializeField] bool canTame = false;
 		AudioSource _audioSource;
 		Collider[] hitColliders;
@@ -167,30 +168,7 @@ namespace StupidHumanGames
 				transform.position = position;
 			}
 		}
-		/*bool OnHitObstacle()
-		{
-			bool _hit = false;
-			hitColliders = Physics.OverlapSphere(transform.position + transform.up, obstacleRange, obstacleLayer);
-			foreach (Collider col in hitColliders)
-			{
-				_hit = true;
-				if (canSwimOrFly)
-				{
-					if (col.transform.position.y <= OnGround(transform.position).y)
-					{
-						wayPoint = homePosition;
-					}
-				}
-				else
-				{
-					Vector3 delta = (col.ClosestPoint(transform.position) - transform.position).normalized;
-					Vector3 cross = Vector3.Cross(delta, transform.forward);
-					if (cross.y > 0f && cross.y < .5f) wayPoint = transform.position + transform.forward * 10 + transform.right * 10; //left
-					if (cross.y < 0f && cross.y > -.5f) wayPoint = transform.position + transform.forward * 10 - transform.right * 10; //right
-				}
-			}
-			return _hit;
-		}*/
+	
 		bool OnHitObstacle()
 		{
 			bool _hit = false;
@@ -278,12 +256,17 @@ namespace StupidHumanGames
 			if (_animator != null) _animator.SetInteger("IdleInt", rnd);
 			if (_animator != null) _animator.SetTrigger("IdleTrigger");
 		}
-		void RandomAttackAnimations()
+	/*	void RandomAttackAnimations()
 		{
 			int rnd = Random.Range(0, rndAttackCount);
 			if (_animator != null) _animator.SetInteger("AttackInt", rnd);
 			if (_animator != null) _animator.SetTrigger("AttackTrigger");
 			return;
+		}*/
+		void RandomAttackAnimations()
+		{
+			int rnd = Random.Range(0, rndAttackCount);
+			attackAnimTrigger.OnAttack(rnd);
 		}
 		#endregion
 		#region Conditions
@@ -396,7 +379,7 @@ namespace StupidHumanGames
 				wayPoint = player.position;
 				SetAnimation(0, 0, 3);
 				RandomAttackAnimations();
-				_audioSource.PlayOneShot(attackSound, attackVolume);
+				_audioSource?.PlayOneShot(attackSound, attackVolume);
 				yield return new WaitForSeconds(_attackDelay);
 
 

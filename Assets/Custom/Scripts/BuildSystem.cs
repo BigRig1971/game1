@@ -10,6 +10,7 @@ namespace StupidHumanGames
 	{
 		[SerializeField] AudioSource _audioSource;
 		[SerializeField] AudioClip _buildSound;
+		[SerializeField] AudioClip _destroySound;
 		public ThirdPersonController tpc;
 		[SerializeField] Camera cam;//camera used for raycast
 		public LayerMask layer;//the layer that the raycast will hit on
@@ -95,6 +96,7 @@ namespace StupidHumanGames
 		}
 		public void removeFromField()
 		{
+			_audioSource.PlayOneShot(_destroySound, 1);
 			Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 			RaycastHit hit;
 			if (!Physics.Raycast(ray, out hit, 100, removeLayer)) return;

@@ -10,8 +10,6 @@ namespace StupidHumanGames
         Animator anim;
         LootableItem lootableItem;
         ItemPickupable droppedItemPickup;
-        GameObject statsBar;
-
         private void Start()
         {
             anim = GetComponent<Animator>();
