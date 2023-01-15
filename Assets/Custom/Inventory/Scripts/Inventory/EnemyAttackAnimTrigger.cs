@@ -39,9 +39,8 @@ namespace StupidHumanGames
 		}
 		private void OnTriggerEnter(Collider other)
 		{
-			if (other.TryGetComponent<DamageInterface>(out var damage))
+			if (other.TryGetComponent<DamageInterface>(out var damage) && canHit)
 			{
-				if (!canHit) return;
 				canHit = false;
 				damage.Damage(damagePower);
 				_animator.SetTrigger("Interrupt");
@@ -82,13 +81,6 @@ namespace StupidHumanGames
 			yield return new WaitForSeconds(.5f);
 			canHit = false;
 			canAttack = false;
-		}
-		IEnumerator PauseAnimator()
-		{
-			_animator.SetFloat("ChopSpeed", -.2f);
-			yield return new WaitForSeconds(.5f);
-			_animator.SetFloat("ChopSpeed", 1f);
-			_animator.SetTrigger("Interrupt");
 		}
 	}
 }

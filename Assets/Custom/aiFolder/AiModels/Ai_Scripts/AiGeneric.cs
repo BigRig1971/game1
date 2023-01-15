@@ -28,8 +28,6 @@ namespace StupidHumanGames
 		[SerializeField] Animator _animator;
 		[SerializeField] AudioClip[] randomSound;
 		[SerializeField] float randomSoundvolume;
-		[SerializeField] AudioClip attackSound;
-		[SerializeField] float attackVolume;
 		[SerializeField] AudioClip idleSound;
 		[SerializeField] float idleVolume;
 		[SerializeField] AudioClip[] FootstepAudioClips;
@@ -256,13 +254,6 @@ namespace StupidHumanGames
 			if (_animator != null) _animator.SetInteger("IdleInt", rnd);
 			if (_animator != null) _animator.SetTrigger("IdleTrigger");
 		}
-	/*	void RandomAttackAnimations()
-		{
-			int rnd = Random.Range(0, rndAttackCount);
-			if (_animator != null) _animator.SetInteger("AttackInt", rnd);
-			if (_animator != null) _animator.SetTrigger("AttackTrigger");
-			return;
-		}*/
 		void RandomAttackAnimations()
 		{
 			int rnd = Random.Range(0, rndAttackCount);
@@ -379,7 +370,6 @@ namespace StupidHumanGames
 				wayPoint = player.position;
 				SetAnimation(0, 0, 3);
 				RandomAttackAnimations();
-				_audioSource?.PlayOneShot(attackSound, attackVolume);
 				yield return new WaitForSeconds(_attackDelay);
 
 

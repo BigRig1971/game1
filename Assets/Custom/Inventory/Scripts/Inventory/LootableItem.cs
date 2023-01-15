@@ -2,13 +2,12 @@ using UnityEngine;
 using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Linq;
 
 namespace StupidHumanGames
 {
     public class LootableItem : MonoBehaviour, DamageInterface
     {
-        
         [SerializeField] List<Item> randomItems = new List<Item>();
         [SerializeField] bool randomSize = false;
         [SerializeField] AudioSource _audioSource;
@@ -18,7 +17,14 @@ namespace StupidHumanGames
         [SerializeField] bool spawnLoot = false;
         [SerializeField] float spawnLootOffset = 10f;
         private bool lootable;
-        [SerializeField] AudioClip _impactSound;
+        [System.Serializable]
+        public class ImpactSound
+        {
+            public AudioClip impactSound;
+            public float impactVolume;
+        }
+        [SerializeField] List<ImpactSound> _listOfImpactSounds = new List<ImpactSound>();
+        AudioClip _impactSound;
         [SerializeField, Range(0f, 1f)] float _impactVolume;
         [SerializeField] AudioClip _deathSound;
         [SerializeField, Range(0f, 1f)] float _deathVolume;
@@ -31,7 +37,6 @@ namespace StupidHumanGames
             public ItemSO _item;
             public int _itemAmount = 1;
         }
-        //public Item[] _listOfItems;
         public List<Item> _listOfItems = new List<Item>();  
         [System.Serializable]
         public class DamageItem
@@ -47,7 +52,6 @@ namespace StupidHumanGames
         }
         private void Start()
         {
-			
 			RandomLootableItems();
             OnRandomScale(); 
         }
@@ -83,11 +87,19 @@ namespace StupidHumanGames
         }
         public void RandomLootableItems()
         {
-
             if (randomItems.Count > 0)
             {
                 var index = Random.Range(0, randomItems.Count);
                 _listOfItems.Add(randomItems[index]);
+            }
+        }
+        public void RandomImpactSounds()
+        {
+            if(_listOfImpactSounds.Count > 0)
+            {
+                var index = Random.Range(0, _listOfImpactSounds.Count);
+                _impactSound = _listOfImpactSounds[index].impactSound;
+                _impactVolume = _listOfImpactSounds[index].impactVolume;
             }
         }
         void OnDrawGizmos()
@@ -98,12 +110,10 @@ namespace StupidHumanGames
         }
         void LootItem()
         {
-
             lootable = true;
             isDamagable = false;
             if (spawnLoot) StartCoroutine(OnDropItems()); else LootableItems();
         }
-
         IEnumerator OnDropItems()
         {
             transform.localScale = Vector3.zero;
@@ -122,7 +132,6 @@ namespace StupidHumanGames
                     yield return new WaitForSeconds(.05f);
                 }
             }
-            
             if (transform.parent != null) Destroy(transform.parent.gameObject); else Destroy(transform.gameObject);
         }
         void OnDropOnDamage()
@@ -133,7 +142,6 @@ namespace StupidHumanGames
                 Vector3 force = new Vector3(Random.Range(-3f, 3f), spawnLootOffset, Random.Range(-3f, 3f));
                 var drop = (Instantiate(_listOfDamageItems[index]._item.spawnPrefab, transform.position + (force / 4f), Quaternion.Euler(new Vector3(Random.Range(0f, 360f), Random.Range(0f, 360f), Random.Range(0f, 360f)))) as GameObject);
                 drop.transform.localScale = new Vector3(drop.transform.localScale.x * damageDropScale * Random.Range(1f, 1.5f), drop.transform.localScale.y * damageDropScale * Random.Range(1f, 1.5f), drop.transform.localScale.z * damageDropScale * Random.Range(1f, 1.5f));
-                
                 if (!drop.GetComponent<MeshCollider>()) drop.AddComponent<MeshCollider>();
                 drop.GetComponent<MeshCollider>().convex = true;
                 drop.AddComponent<Rigidbody>();
@@ -148,23 +156,20 @@ namespace StupidHumanGames
                 transform.localScale = new Vector3(transform.localScale.x * Random.Range(1f, 2f), transform.localScale.y * Random.Range(1f, 2f), transform.localScale.z * Random.Range(1f, 2f));
             }
         }
-
         public void Damage(int damage)
         {
+            RandomImpactSounds();
 			if (!isDamagable) return;
-			
 			lootable = false;
-			if (_impactSound != null) _audioSource.PlayOneShot(_impactSound, _impactVolume);
+			if (_impactSound != null) _audioSource?.PlayOneShot(_impactSound, _impactVolume);
 			if (spawnLoot) OnDropOnDamage();
             health -= damage;
 			if (health <= 0)
 			{
 				isDamagable = false;
-				if (_deathSound != null) _audioSource.PlayOneShot(_deathSound, _deathVolume);
+				if (_deathSound != null) _audioSource?.PlayOneShot(_deathSound, _deathVolume);
 				Invoke(nameof(LootItem), deathDelay);
 			}
-            
 		}
-       
     }
 }

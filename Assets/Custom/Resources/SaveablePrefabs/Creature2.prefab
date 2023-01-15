@@ -553,7 +553,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7797b6b83c12f94458790e015358aff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _audioSource: {fileID: 0}
+  _audioSource: {fileID: 459219533338091184}
   colliderSize: {x: 0.005, y: 0.005, z: 0.005}
   colliderCenter: {x: 0, y: 0, z: 0}
   _animTriggerName: AttackTrigger
@@ -561,9 +561,9 @@ MonoBehaviour:
   _animator: {fileID: 3029898407694677317}
   abilities:
   - _attackInt: 0
-    delayCollider: 0.5
+    delayCollider: 0.3
     _attackPower: 10
-    attackAudio: {fileID: 0}
+    attackAudio: {fileID: 8300000, guid: 54bebee4260921d45805f4449cf5ce7d, type: 3}
   - _attackInt: 1
     delayCollider: 0
     _attackPower: 0
@@ -3307,7 +3307,7 @@ Transform:
   m_GameObject: {fileID: 8622036983199577477}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 414.1095, y: 100.0183, z: 592.05804}
-  m_LocalScale: {x: 0.65455055, y: 0.65455055, z: 0.65455055}
+  m_LocalScale: {x: 0.42905384, y: 0.42905384, z: 0.42905384}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6853432030433160468}
@@ -3347,19 +3347,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2cf9d97e2f2bdf49bf617bf5e386cd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackAnimTrigger: {fileID: 0}
+  attackAnimTrigger: {fileID: 6733675007400388847}
   canTame: 0
   player: {fileID: 0}
   scale: 1
   randomScale: 1
   minScale: 0.42
   maxScale: 0.7
-  meshSize: 2.4455082
+  meshSize: 1.6030155
   _animator: {fileID: 0}
   randomSound: []
   randomSoundvolume: 0
-  attackSound: {fileID: 0}
-  attackVolume: 0.5
   idleSound: {fileID: 0}
   idleVolume: 0
   FootstepAudioClips:
@@ -3431,7 +3429,7 @@ MonoBehaviour:
   damageDropScale: 1
   spawnLoot: 0
   spawnLootOffset: 10
-  _impactSound: {fileID: 8300000, guid: d37b2c591f7e89d4e8e806938df598cb, type: 3}
+  _listOfImpactSounds: []
   _impactVolume: 1
   _deathSound: {fileID: 0}
   _deathVolume: 0

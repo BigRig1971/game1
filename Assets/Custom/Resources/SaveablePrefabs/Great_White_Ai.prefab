@@ -929,7 +929,7 @@ Transform:
   m_GameObject: {fileID: 8126112846575446432}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 499.09482, y: 120, z: 573.6}
-  m_LocalScale: {x: 0.40362823, y: 0.40362823, z: 0.40362823}
+  m_LocalScale: {x: 0.5593287, y: 0.5593287, z: 0.5593287}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8597224257116749827}
@@ -1071,12 +1071,10 @@ MonoBehaviour:
   randomScale: 1
   minScale: 0.3
   maxScale: 0.6
-  meshSize: 4.020777
+  meshSize: 5.5718007
   _animator: {fileID: 0}
   randomSound: []
   randomSoundvolume: 0
-  attackSound: {fileID: 8300000, guid: f8eee352d09a1de43b341d21b96adb36, type: 3}
-  attackVolume: 1
   idleSound: {fileID: 0}
   idleVolume: 0
   FootstepAudioClips: []
@@ -1131,7 +1129,7 @@ MonoBehaviour:
   damageDropScale: 1
   spawnLoot: 1
   spawnLootOffset: 0
-  _impactSound: {fileID: 8300000, guid: ac448d649b17f844c80706b8e9d579b1, type: 3}
+  _listOfImpactSounds: []
   _impactVolume: 0.505
   _deathSound: {fileID: 0}
   _deathVolume: 0

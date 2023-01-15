@@ -57,6 +57,7 @@ namespace StupidHumanGames
 		{
 			if (other.TryGetComponent<DamageInterface>(out var damage))
 			{
+				if (other.CompareTag("Player")) return;
 				if (!canHit) return;
 				canHit = false;
 				//var _animName = _animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
