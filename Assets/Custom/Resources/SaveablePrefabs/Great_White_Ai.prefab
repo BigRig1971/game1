@@ -1,5 +1,69 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &974068399
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 974068400}
+  - component: {fileID: 974068401}
+  m_Layer: 16
+  m_Name: Attack
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &974068400
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 974068399}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.83, z: 7.6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8126112846575446439}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &974068401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 974068399}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7797b6b83c12f94458790e015358aff3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _audioSource: {fileID: 6708947247149174795}
+  playerMask:
+    serializedVersion: 2
+    m_Bits: 8192
+  colliderSize: 1.83
+  colliderCenter: {x: 0, y: 0, z: 0}
+  _animTriggerName: AttackTrigger
+  _animIntName: AttackInt
+  animLength: 0
+  afterAnimDelay: 0
+  _animator: {fileID: 1871553602470365072}
+  abilities:
+  - _attackInt: 0
+    _animLength: 1
+    _animMultiplier: 1
+    _soundDelay: 0.1
+    _hitTime: 0.5
+    _afterAnimDelay: 1
+    _attackPower: 10
+    attackAudio: {fileID: 8300000, guid: ef75b19c901bc82439f9467862f32d1d, type: 3}
 --- !u!1 &188728691555290727
 GameObject:
   m_ObjectHideFlags: 0
@@ -913,6 +977,8 @@ GameObject:
   - component: {fileID: 5489243114963825017}
   - component: {fileID: -7783862932340831166}
   - component: {fileID: -7422796524765440052}
+  - component: {fileID: 35548131045645933}
+  - component: {fileID: 2880472302803540033}
   m_Layer: 16
   m_Name: Great_White_Ai
   m_TagString: Lootable
@@ -929,12 +995,13 @@ Transform:
   m_GameObject: {fileID: 8126112846575446432}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 499.09482, y: 120, z: 573.6}
-  m_LocalScale: {x: 0.5593287, y: 0.5593287, z: 0.5593287}
+  m_LocalScale: {x: 0.4351558, y: 0.4351558, z: 0.4351558}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8597224257116749827}
+  - {fileID: 974068400}
   m_Father: {fileID: 0}
-  m_RootOrder: 18
+  m_RootOrder: 19
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &6708947247149174795
 AudioSource:
@@ -1064,15 +1131,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2cf9d97e2f2bdf49bf617bf5e386cd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackAnimTrigger: {fileID: 0}
+  attackAnimTrigger: {fileID: 35548131045645933}
   canTame: 0
-  player: {fileID: 0}
+  playerAttackPoint: {fileID: 0}
   scale: 1
   randomScale: 1
   minScale: 0.3
   maxScale: 0.6
-  meshSize: 5.5718007
-  _animator: {fileID: 0}
+  meshSize: 4.334842
+  _animator: {fileID: 1871553602470365072}
   randomSound: []
   randomSoundvolume: 0
   idleSound: {fileID: 0}
@@ -1099,12 +1166,10 @@ MonoBehaviour:
     m_Bits: 17408
   _turnSpeed: 2
   _moveSpeed: 3
-  _attackDelay: 0.5
-  _afterAttackDelay: 1
-  _attackRange: 0.63
-  _obstacleRange: 0.53
-  _sightRange: 2
-  _maxRange: 5
+  _attackRange: 0.8
+  _obstacleRange: 0.71
+  _sightRange: 4
+  _maxRange: 11
   maxAltitude: 96
   minAltitude: 0
   _currentState: 0
@@ -1124,14 +1189,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   randomItems: []
   randomSize: 0
-  _audioSource: {fileID: 0}
+  _audioSource: {fileID: 6708947247149174795}
   droppedLootScale: 1
   damageDropScale: 1
   spawnLoot: 1
   spawnLootOffset: 0
-  _listOfImpactSounds: []
-  _impactVolume: 0.505
-  _deathSound: {fileID: 0}
+  _listOfImpactSounds:
+  - impactSound: {fileID: 8300000, guid: ac448d649b17f844c80706b8e9d579b1, type: 3}
+    impactVolume: 1
+  _deathSound: {fileID: 8300000, guid: ac448d649b17f844c80706b8e9d579b1, type: 3}
   _deathVolume: 0
   isDamagable: 1
   health: 20
@@ -1173,6 +1239,61 @@ LODGroup:
     renderers:
     - renderer: {fileID: 4539525497308257797}
   m_Enabled: 1
+--- !u!114 &35548131045645933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8126112846575446432}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7797b6b83c12f94458790e015358aff3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _audioSource: {fileID: 6708947247149174795}
+  playerMask:
+    serializedVersion: 2
+    m_Bits: 8192
+  colliderSize: 1.04
+  colliderCenter: {x: 0, y: 0, z: 4.63}
+  _animTriggerName: AttackTrigger
+  _animIntName: AttackInt
+  animLength: 0
+  afterAnimDelay: 0
+  _animator: {fileID: 1871553602470365072}
+  abilities:
+  - _attackInt: 0
+    _animLength: 1
+    _animMultiplier: 1
+    _soundDelay: 0.1
+    _hitTime: 0.5
+    _afterAnimDelay: 1
+    _attackPower: 10
+    attackAudio: {fileID: 8300000, guid: ef75b19c901bc82439f9467862f32d1d, type: 3}
+--- !u!136 &2880472302803540033
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8126112846575446432}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1.19
+  m_Height: 11.77
+  m_Direction: 2
+  m_Center: {x: 0, y: 0, z: -1.89}
 --- !u!1 &8163201677267358095
 GameObject:
   m_ObjectHideFlags: 0

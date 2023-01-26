@@ -25,9 +25,9 @@ namespace StupidHumanGames
         }
         [SerializeField] List<ImpactSound> _listOfImpactSounds = new List<ImpactSound>();
         AudioClip _impactSound;
-        [SerializeField, Range(0f, 1f)] float _impactVolume;
+        float _impactVolume;
         [SerializeField] AudioClip _deathSound;
-        [SerializeField, Range(0f, 1f)] float _deathVolume;
+        [SerializeField] float _deathVolume;
         public bool isDamagable = false;
         [SerializeField] int health = 30;
         [SerializeField] float deathDelay = 5f;
@@ -76,11 +76,11 @@ namespace StupidHumanGames
                     {
                         if (transform.parent != null)
                         {
-                            Destroy(transform.parent.gameObject, .3f);
+                            Destroy(transform.parent.gameObject);
                             return;
                         }
 
-                        Destroy(transform.gameObject, .3f);
+                        Destroy(transform.gameObject);
                     }
                 }
             }
@@ -158,6 +158,7 @@ namespace StupidHumanGames
         }
         public void Damage(int damage)
         {
+            if(damage <=0) return;  
             RandomImpactSounds();
 			if (!isDamagable) return;
 			lootable = false;

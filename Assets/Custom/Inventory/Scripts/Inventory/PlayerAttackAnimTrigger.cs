@@ -11,14 +11,14 @@ namespace StupidHumanGames
 {
 	public class PlayerAttackAnimTrigger : MonoBehaviour
 	{
+		[SerializeField] LayerMask mask;
 		[SerializeField] bool groundHugging = false;
 		[SerializeField] Transform cameraRoot;
 		[SerializeField] float cameraRootOffset;
 		[SerializeField] AudioSource _audioSource;
 		[SerializeField] float _globalCooldown = .5f;
 		[SerializeField] GameObject[] clothesToRemove;
-		public Vector3 colliderSize = Vector3.one;
-		public Vector3 colliderCenter = Vector3.zero;
+		[SerializeField] float colSize = .2f;
 		int damagePower = 5;
 		public string _animTriggerName;
 		public string _animIntName;
@@ -33,7 +33,6 @@ namespace StupidHumanGames
 		[SerializeField, Range(0f, 1f)] float swingVolume = 1;
 		bool toggle = false;
 		float previousCamOffset;
-		bool hugTheGround = false;
 		[System.Serializable]
 		public class Ability
 		{
@@ -47,23 +46,27 @@ namespace StupidHumanGames
 		{
 			_tpc = GameObject.FindObjectOfType<ThirdPersonController>();
 			previousCamOffset = cameraRoot.transform.position.y;
-
-			BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
-			boxCollider.size = colliderSize;
-			boxCollider.center = (Vector3.zero + colliderCenter);
-			boxCollider.isTrigger = true;
 		}
-		private void OnTriggerEnter(Collider other)
+		private void FixedUpdate()
 		{
-			if (other.TryGetComponent<DamageInterface>(out var damage))
+			GetKey();
+			HitColliders();
+		}
+		void HitColliders()
+		{
+			Collider[] hitColliders = Physics.OverlapSphere(transform.position, colSize, mask);
+			foreach (var other in hitColliders)
 			{
-				if (other.CompareTag("Player")) return;
-				if (!canHit) return;
-				canHit = false;
-				//var _animName = _animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
-				CameraShakerHandler.Shake(MyShake);
-				damage.Damage(damagePower);
-				_animator.SetTrigger("Interrupt");
+				if (other.TryGetComponent<DamageInterface>(out var damage))
+				{
+					if (other.CompareTag("Player")) return;
+					if (!canHit) return;
+					canHit = false;
+					//var _animName = _animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
+					CameraShakerHandler.Shake(MyShake);
+					damage.Damage(damagePower);
+					_animator.SetTrigger("Interrupt");
+				}
 			}
 		}
 		void GetKey()
@@ -76,13 +79,11 @@ namespace StupidHumanGames
 					if (canSwing) return;
 					damagePower = ability.attackPower;
 					StartCoroutine(Attacking(ability));
-					
 				}
 			}
 		}
 		void TriggerAction(Ability ability)
 		{
-			
 			if (_animIntName != null) _animator.SetInteger(_animIntName, ability._int);
 			if (_animTriggerName != null) _animator.SetTrigger(_animTriggerName);
 		}
@@ -112,15 +113,12 @@ namespace StupidHumanGames
 				}
 			}
 		}
-		void Update()
-		{
-			GetKey();
-		}
+		
 		void OnDrawGizmos()
 		{
 			Gizmos.color = Color.red;
 			Gizmos.matrix = transform.localToWorldMatrix;
-			Gizmos.DrawWireCube(Vector3.zero + colliderCenter, colliderSize);
+			Gizmos.DrawWireSphere(Vector3.zero, colSize);
 		}
 		IEnumerator Attacking(Ability ability)
 		{
@@ -134,13 +132,6 @@ namespace StupidHumanGames
 			yield return new WaitForSeconds(.5f);
 			canHit = false;
 			canSwing = false;
-		}
-		IEnumerator PauseAnimator()
-		{
-			_animator.SetFloat("ChopSpeed", -.2f);
-			yield return new WaitForSeconds(.5f);
-			_animator.SetFloat("ChopSpeed", 1f);
-			_animator.SetTrigger("Interrupt");
 		}
 	}
 }

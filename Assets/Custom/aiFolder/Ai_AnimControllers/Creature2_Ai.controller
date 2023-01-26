@@ -29,12 +29,12 @@ AnimatorStateMachine:
   - {fileID: 614180173797032632}
   m_EntryTransitions: []
   m_StateMachineTransitions:
-  - first: {fileID: -139356603793972646}
-    second:
-    - {fileID: 1004877069199586771}
   - first: {fileID: 1080286843909954419}
     second:
     - {fileID: -5773378774739003899}
+  - first: {fileID: -139356603793972646}
+    second:
+    - {fileID: 1004877069199586771}
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: -260, y: 320, z: 0}
   m_EntryPosition: {x: -330, y: 100, z: 0}
@@ -172,7 +172,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Creature2_Right
-  m_Speed: 1.5
+  m_Speed: 2
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -904329451494508332}
@@ -322,7 +322,7 @@ AnimatorStateMachine:
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: 5892438387634261571}
-    m_Position: {x: 365.22083, y: 118.64572, z: 0}
+    m_Position: {x: 370, y: 120, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 3368606351531193283}
     m_Position: {x: 370, y: 210, z: 0}
@@ -558,7 +558,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Creature2_Left
-  m_Speed: 1.5
+  m_Speed: 2
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -5544415661239438934}

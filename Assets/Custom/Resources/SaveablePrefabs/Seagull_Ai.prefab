@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 8503313627084961529}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 4.6265974, y: 4.6265974, z: 4.6265974}
+  m_LocalScale: {x: 4.0543036, y: 4.0543036, z: 4.0543036}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8181756077974035174}
@@ -51,12 +51,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackAnimTrigger: {fileID: 0}
   canTame: 0
-  player: {fileID: 0}
+  playerAttackPoint: {fileID: 0}
   scale: 4.95
   randomScale: 1
   minScale: 4
   maxScale: 6
-  meshSize: 1.1460634
+  meshSize: 1.0042994
   _animator: {fileID: 0}
   randomSound:
   - {fileID: 8300000, guid: d2f726ca27378bb40a2399e673e9004d, type: 3}
@@ -86,8 +86,6 @@ MonoBehaviour:
     m_Bits: 21504
   _turnSpeed: 3
   _moveSpeed: 3
-  _attackDelay: 0.1
-  _afterAttackDelay: 1
   _attackRange: 0.67
   _obstacleRange: 1.38
   _sightRange: 3.29

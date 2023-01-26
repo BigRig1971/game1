@@ -2,59 +2,68 @@ using FirstGearGames.SmoothCameraShaker;
 using StupidHumanGames;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace StupidHumanGames
 {
 	public class EnemyAttackAnimTrigger : MonoBehaviour
 	{
-
 		[SerializeField] AudioSource _audioSource;
-		Rigidbody rb;
-		public Vector3 colliderSize = Vector3.one;
-		public Vector3 colliderCenter = Vector3.zero;
+		[SerializeField] LayerMask playerMask;
+		DamageInterface _damage;
+		[SerializeField] float colliderSize = 1f;
 		int damagePower = 5;
-		public string _animTriggerName;
+		[SerializeField] Vector3 colliderCenter;
+		[SerializeField] string _animTriggerName;
 		public string _animIntName;
+		public float animLength;
+		public float afterAnimDelay;
 		[SerializeField] Animator _animator;
-		bool canHit = false;
-		bool canAttack = false;
 		AudioClip attackSound;
 		float attackSoundVolume = 1;
 		[System.Serializable]
 		public class Ability
 		{
 			public int _attackInt;
-			public float delayCollider = .3f;
+			public float _animLength = 1f;
+			public float _animMultiplier = 1f;
+			public float _soundDelay = .3f;
+			public float _hitTime = .5f;
+			public float _afterAnimDelay = .1f;
 			public int _attackPower = 5;
 			public AudioClip attackAudio;
 		}
 		public List<Ability> abilities;
-		private void Start()
+
+
+		void HitColliders()
 		{
-			BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
-			boxCollider.size = colliderSize;
-			boxCollider.center = (Vector3.zero + colliderCenter);
-			boxCollider.isTrigger = true;
-		}
-		private void OnTriggerEnter(Collider other)
-		{
-			if (other.TryGetComponent<DamageInterface>(out var damage) && canHit)
+			Collider[] hitColliders = Physics.OverlapSphere(transform.position + transform.forward * colliderCenter.z, colliderSize, playerMask);
+			foreach (var col in hitColliders)
 			{
-				canHit = false;
-				damage.Damage(damagePower);
-				_animator.SetTrigger("Interrupt");
+				//Debug.Log("test");
+				_damage = col.GetComponent<DamageInterface>();
 			}
+		}
+		void OnDrawGizmos()
+		{
+			Gizmos.color = Color.red;
+			//Gizmos.matrix = transform.localToWorldMatrix;
+			Gizmos.DrawWireSphere(transform.position + transform.forward * colliderCenter.z, colliderSize);
 		}
 		public void OnAttack(int _int)
 		{
+			
 			foreach (var ability in abilities)
 			{
+				
 				if (ability._attackInt == _int)
 				{
-					if (canAttack) return;
 					damagePower = ability._attackPower;
 					attackSound = ability.attackAudio;
+					animLength = ability._animLength;
+					afterAnimDelay= ability._afterAnimDelay;
 					StartCoroutine(Attacking(ability));
 				}
 			}
@@ -64,23 +73,16 @@ namespace StupidHumanGames
 			if (_animIntName != null) _animator.SetInteger(_animIntName, ability._attackInt);
 			if (_animTriggerName != null) _animator.SetTrigger(_animTriggerName);
 		}
-		void OnDrawGizmos()
-		{
-			Gizmos.color = Color.red;
-			Gizmos.matrix = transform.localToWorldMatrix;
-			Gizmos.DrawWireCube(Vector3.zero + colliderCenter, colliderSize);
-		}
 		IEnumerator Attacking(Ability ability)
 		{
-			canAttack = true;
-			TriggerAction(ability);
 			if (InventoryManager.IsOpen()) yield break;
-			yield return new WaitForSeconds(ability.delayCollider);
-			canHit = true;
+			HitColliders();
+			TriggerAction(ability);
+			yield return new WaitForSeconds(ability._soundDelay / ability._animMultiplier);
 			if (attackSound != null) _audioSource?.PlayOneShot(attackSound, attackSoundVolume);
-			yield return new WaitForSeconds(.5f);
-			canHit = false;
-			canAttack = false;
+			yield return new WaitForSeconds((ability._hitTime / ability._animMultiplier)- (ability._soundDelay / ability._animMultiplier));
+			_damage?.Damage(damagePower);
+			_damage = null;
 		}
 	}
 }

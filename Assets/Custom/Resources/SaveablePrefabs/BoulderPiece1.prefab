@@ -105,8 +105,9 @@ MonoBehaviour:
   damageDropScale: 0.5
   spawnLoot: 1
   spawnLootOffset: 1
-  _impactSound: {fileID: 8300000, guid: 4c991488ad132924092130a25c056bb7, type: 3}
-  _impactVolume: 1
+  _listOfImpactSounds:
+  - impactSound: {fileID: 8300000, guid: 4c991488ad132924092130a25c056bb7, type: 3}
+    impactVolume: 1
   _deathSound: {fileID: 8300000, guid: ce7d868d12bef064f9996eef55b4d90d, type: 3}
   _deathVolume: 1
   isDamagable: 1

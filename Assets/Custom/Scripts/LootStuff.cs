@@ -4,7 +4,11 @@ namespace StupidHumanGames
 {
     public class LootStuff : MonoBehaviour
     {
-        [SerializeField] AudioSource _audioSource;
+        bool canDo = true;
+        [SerializeField] float lootDelay = .3f;
+        [SerializeField] LayerMask mask;
+        [SerializeField] float colliderSize = 1f;
+		[SerializeField] AudioSource _audioSource;
         public AudioClip lootSound;
         public float lootSoundVolume;
         Animator anim;
@@ -13,31 +17,49 @@ namespace StupidHumanGames
         private void Start()
         {
             anim = GetComponent<Animator>();
-            
         }
-        private void OnTriggerEnter(Collider other)
-        {
-            
-            if (other.CompareTag("Lootable"))            
-            {
-                lootableItem = other.gameObject.GetComponent<LootableItem>();
-               
-				droppedItemPickup = other.gameObject.GetComponent<ItemPickupable>();
-                if (lootableItem != null && !lootableItem.isDamagable) LootItem();
-                if (droppedItemPickup != null) PickupItem();
-            }
-        }
-	
+		private void FixedUpdate()
+		{
+			HitColliders();
+		}
+		
+		void HitColliders()
+		{
+			Collider[] hitColliders = Physics.OverlapSphere(transform.position, colliderSize, mask);
+
+			int i = 0;
+			while (i < hitColliders.Length)
+			{
+				lootableItem = hitColliders[i].GetComponent<LootableItem>();
+				droppedItemPickup = hitColliders[i].GetComponent<ItemPickupable>();
+                if (lootableItem != null && !lootableItem.isDamagable)
+                {
+                    if (!canDo) return;
+                    canDo = false;
+					anim.SetTrigger("PickupItem");
+					Invoke(nameof(LootItem), lootDelay);
+                }
+                if (droppedItemPickup != null)
+                {
+					if (!canDo) return;
+					canDo = false;
+					anim.SetTrigger("PickupItem");
+					Invoke(nameof(PickupItem), lootDelay);
+                }
+				i++;
+			}		
+		}
 		void LootItem()
         {
-            lootableItem.LootableItems();
-            if (lootSound != null) _audioSource.PlayOneShot(lootSound, lootSoundVolume);
-            anim.SetTrigger("PickupItem");
+			if (lootSound != null) _audioSource.PlayOneShot(lootSound, lootSoundVolume);
+			lootableItem.LootableItems();
+            canDo = true;
         }
         void PickupItem()
         {
-            droppedItemPickup.LootableItems();
-        }
-
+			if (lootSound != null) _audioSource.PlayOneShot(lootSound, lootSoundVolume);
+			droppedItemPickup.LootableItems();
+			canDo = true;
+		}
     }
 }

@@ -225,7 +225,7 @@ Transform:
   - {fileID: 3791460955678734080}
   - {fileID: 5193173975499123929}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!205 &2400964102181658867
 LODGroup:
@@ -439,8 +439,9 @@ MonoBehaviour:
   damageDropScale: 1
   spawnLoot: 1
   spawnLootOffset: 20
-  _impactSound: {fileID: 8300000, guid: 6b885f963858bf044bf8adaa85dd3d4f, type: 3}
-  _impactVolume: 1
+  _listOfImpactSounds:
+  - impactSound: {fileID: 8300000, guid: 6b885f963858bf044bf8adaa85dd3d4f, type: 3}
+    impactVolume: 1
   _deathSound: {fileID: 8300000, guid: 01c28f0b412295a4594d97ad4b4f680f, type: 3}
   _deathVolume: 1
   isDamagable: 1

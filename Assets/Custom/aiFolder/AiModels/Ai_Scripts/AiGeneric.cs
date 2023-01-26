@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditorInternal.VersionControl;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -18,7 +16,7 @@ namespace StupidHumanGames
 		float posY;
 		float _previousTurnSpeed, _previousSpeed, _wayPointDistance, _blendMultiplier = 1f;
 		bool wayPointIsSet = false;
-		[SerializeField] Transform player;
+		[SerializeField] Transform playerAttackPoint;
 		public enum state { Patrol, Chase, Attack, Lost, Idle };
 		[SerializeField] float scale = 1f;
 		[SerializeField] bool randomScale;
@@ -38,7 +36,6 @@ namespace StupidHumanGames
 		[SerializeField] bool patrol = true, chase = true, attack = true, idle = true, die = true;
 		[SerializeField] LayerMask groundLayer, playerLayer, obstacleLayer;
 		[SerializeField] float _turnSpeed = 3f, _moveSpeed = 3f;
-		[SerializeField] float _attackDelay = .1f, _afterAttackDelay = 1f;
 		[SerializeField] float _attackRange = 2f;
 		[SerializeField] float _obstacleRange = 3f;
 		[SerializeField] float _sightRange = 5f;
@@ -61,11 +58,11 @@ namespace StupidHumanGames
 		{
 			SetScale();
 			
-			player = FindObjectOfType<ThirdPersonController>().transform;
+			if(playerAttackPoint == null) playerAttackPoint = FindObjectOfType<ThirdPersonController>().transform;
 			_audioSource = GetComponent<AudioSource>();
 			_previousSpeed = _moveSpeed;
 			_previousTurnSpeed = _turnSpeed;
-			_animator = GetComponent<Animator>();
+			if(_animator == null) _animator = GetComponent<Animator>();
 
 			transform.rotation = Quaternion.Euler(new Vector3(0, Random.Range(0f, 360f), 0));
 			if (_animator != null) _animator.SetFloat("BlendMultiplier", _blendMultiplier);
@@ -130,7 +127,7 @@ namespace StupidHumanGames
 
 		private void OnValidate()
 		{
-			SetScale();
+			//SetScale();
 		}
 #endif
 		#region Movement
@@ -180,9 +177,7 @@ namespace StupidHumanGames
 					{
 						transform.position += new Vector3(0, .1f, 0);
 						wayPoint = transform.position + transform.forward * 10 + transform.up * 10; //up
-						
 					}
-
 				}
 				else
 				{
@@ -353,7 +348,7 @@ namespace StupidHumanGames
 				{
 					SetAnimation(0, 1, 0);
 				}
-				wayPoint = player.position;
+				wayPoint = playerAttackPoint.position;
 				if (RandomBool(200))
 				{
 					if (RNDSound() != null) _audioSource.PlayOneShot(RNDSound(), randomSoundvolume);
@@ -367,27 +362,37 @@ namespace StupidHumanGames
 		{
 			while (OnCanAttack() && IsFacingObject())
 			{
-				wayPoint = player.position;
+				wayPoint = playerAttackPoint.position;
 				SetAnimation(0, 0, 3);
 				RandomAttackAnimations();
-				yield return new WaitForSeconds(_attackDelay);
+				//yield return new WaitForSeconds(_attackDelay);
 
-
+				
 				if (!canSwimOrFly)
 				{
+					
+					yield return new WaitForSeconds(attackAnimTrigger.animLength);
+					yield return new WaitForSeconds(attackAnimTrigger.afterAnimDelay);
 					yield break;
-				}
-				SetAnimation(1, 1, 3);
-				if (RandomBool(2))
-				{
-					wayPoint = transform.position - transform.right * 100f;
-					yield return new WaitForSeconds(_afterAttackDelay);
+					
 				}
 				else
 				{
-					wayPoint = transform.position + transform.right * 100f;
-					yield return new WaitForSeconds(_afterAttackDelay);
+					yield return new WaitForSeconds(.5f);
+					if (RandomBool(2))
+					{
+						wayPoint = transform.position - transform.right * 100f;
+						yield return new WaitForSeconds(attackAnimTrigger.animLength);
+						yield return new WaitForSeconds(attackAnimTrigger.afterAnimDelay);
+					}
+					else
+					{
+						wayPoint = transform.position + transform.right * 100f;
+						yield return new WaitForSeconds(attackAnimTrigger.animLength);
+						yield return new WaitForSeconds(attackAnimTrigger.afterAnimDelay);
+					}
 				}
+				SetAnimation(1, 1, 3);
 				yield return null;
 			}
 			
@@ -435,7 +440,7 @@ namespace StupidHumanGames
 		private bool IsFacingObject()
 		{
 			Vector3 forward = transform.TransformDirection(Vector3.forward);
-			Vector3 toOther = transform.position - player.position;
+			Vector3 toOther = transform.position - playerAttackPoint.position;
 			if (Vector3.Dot(forward, toOther) > 0)
 			{
 				return false; //behind

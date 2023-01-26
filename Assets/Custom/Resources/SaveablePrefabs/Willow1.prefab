@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5841132577319575997}
   - component: {fileID: 6976466467420253538}
   - component: {fileID: 7876383028700048701}
-  m_Layer: 3
+  m_Layer: 14
   m_Name: Willow1
   m_TagString: Lootable
   m_Icon: {fileID: 0}
@@ -30,12 +30,12 @@ Transform:
   m_GameObject: {fileID: 5010806264853274522}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 408.8109, y: 100.00001, z: 577.9745}
-  m_LocalScale: {x: 2.051548, y: 2.051548, z: 2.051548}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5420749964427733961}
   m_Father: {fileID: 0}
-  m_RootOrder: 17
+  m_RootOrder: 19
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1940196102628264444
 MonoBehaviour:
@@ -56,13 +56,14 @@ MonoBehaviour:
   damageDropScale: 1
   spawnLoot: 0
   spawnLootOffset: 5
-  _impactSound: {fileID: 8300000, guid: b15e2679af8cc55489cc7ef271a3769d, type: 3}
-  _impactVolume: 1
+  _listOfImpactSounds:
+  - impactSound: {fileID: 8300000, guid: b15e2679af8cc55489cc7ef271a3769d, type: 3}
+    impactVolume: 1
   _deathSound: {fileID: 0}
   _deathVolume: 0
   isDamagable: 1
   health: 5
-  deathDelay: 0
+  deathDelay: 0.3
   _listOfItems:
   - _item: {fileID: 11400000, guid: 52b75efa773e2cb4fb63b89e11f4e35b, type: 2}
     _itemAmount: 10
@@ -248,16 +249,32 @@ PrefabInstance:
       value: grey_willow_04
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: ab62159611683b747bdb81618f0d20d0, type: 3}
+      propertyPath: m_Layer
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: ab62159611683b747bdb81618f0d20d0, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 100002, guid: ab62159611683b747bdb81618f0d20d0, type: 3}
+      propertyPath: m_Layer
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 100002, guid: ab62159611683b747bdb81618f0d20d0, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 100004, guid: ab62159611683b747bdb81618f0d20d0, type: 3}
+      propertyPath: m_Layer
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 100004, guid: ab62159611683b747bdb81618f0d20d0, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 100006, guid: ab62159611683b747bdb81618f0d20d0, type: 3}
+      propertyPath: m_Layer
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 100006, guid: ab62159611683b747bdb81618f0d20d0, type: 3}
       propertyPath: m_StaticEditorFlags
