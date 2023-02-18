@@ -134,15 +134,19 @@ namespace StupidHumanGames
 		void SwimOrFly()
 		{
 			var step = _moveSpeed * Time.deltaTime;
-			var qto = Quaternion.LookRotation(wayPoint - transform.position).normalized;
+			var v3 = (wayPoint - transform.position).normalized;
+			if (v3.sqrMagnitude <= 0) return;
+			var qto = Quaternion.LookRotation(v3);
 			transform.rotation = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * _turnSpeed);
 			transform.position = Vector3.MoveTowards(transform.position + transform.forward * .05f, wayPoint, step);
 		}
 		void MoveOnGround()
 		{
 			var step = _moveSpeed * Time.deltaTime;
+			var v3 = (wayPoint - transform.position).normalized;
+			if (v3.sqrMagnitude <= 0) return;
 			OnYPosition();
-			var qto = Quaternion.LookRotation(wayPoint - transform.position).normalized;
+			var qto = Quaternion.LookRotation(v3);
 			transform.rotation = Quaternion.Slerp(transform.rotation, qto, Time.deltaTime * _turnSpeed);
 
 			if (!rootMotion) transform.position = Vector3.MoveTowards(transform.position + transform.forward * .05f, wayPoint, step);
@@ -308,7 +312,7 @@ namespace StupidHumanGames
 		}
 		IEnumerator Patrol()
 		{
-			yield return new WaitForSeconds(2f);
+			yield return new WaitForSeconds(.5f);
 			wayPointIsSet = false;
 			if (OnCanPatrol()) SetAnimation(1, 1, 1);
 			while (OnCanPatrol() && !OutOfBounds())
@@ -363,16 +367,17 @@ namespace StupidHumanGames
 			while (OnCanAttack() && IsFacingObject())
 			{
 				wayPoint = playerAttackPoint.position;
-				SetAnimation(0, 0, 3);
+				
 				RandomAttackAnimations();
 				//yield return new WaitForSeconds(_attackDelay);
 
 				
 				if (!canSwimOrFly)
 				{
-					
+					SetAnimation(0, 0, 3);
 					yield return new WaitForSeconds(attackAnimTrigger.animLength);
 					yield return new WaitForSeconds(attackAnimTrigger.afterAnimDelay);
+					
 					yield break;
 					
 				}
@@ -381,18 +386,20 @@ namespace StupidHumanGames
 					yield return new WaitForSeconds(.5f);
 					if (RandomBool(2))
 					{
+						SetAnimation(1, 1, 3);
 						wayPoint = transform.position - transform.right * 100f;
 						yield return new WaitForSeconds(attackAnimTrigger.animLength);
 						yield return new WaitForSeconds(attackAnimTrigger.afterAnimDelay);
 					}
 					else
 					{
+						SetAnimation(1, 1, 3);
 						wayPoint = transform.position + transform.right * 100f;
 						yield return new WaitForSeconds(attackAnimTrigger.animLength);
 						yield return new WaitForSeconds(attackAnimTrigger.afterAnimDelay);
 					}
 				}
-				SetAnimation(1, 1, 3);
+				
 				yield return null;
 			}
 			

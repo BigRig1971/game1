@@ -318,7 +318,7 @@ public partial class @StarterAssets : IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""c1048837-84d2-413e-afff-9840b92bf6ef"",
-                    ""path"": ""<Keyboard>/ctrl"",
+                    ""path"": ""<Keyboard>/tab"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

@@ -3,6 +3,7 @@ using System.Collections;
 using StupidHumanGames;
 using static Kalagaan.VertExmotionSensorBase.Parameter;
 using System;
+using Unity.VisualScripting;
 
 
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
@@ -538,13 +539,20 @@ namespace StupidHumanGames
                 {
 					if (OnfootStep.animatorClipInfo.weight > .8f) _audioSource.PlayOneShot(SplashAudioClip, FootstepAudioVolume);
 				}
-				
-
-
-
-
 			}
         }
+        public void OnWeaponSwing()
+        {
+            GameObject.FindObjectOfType<PlayerAttackAnimTrigger>().OnSwing();
+        }
+        public void OnWeaponHit()
+        {
+			GameObject.FindObjectOfType<PlayerAttackAnimTrigger>().OnHit();
+		}
+        public void OnWeaponEnd()
+        {
+			GameObject.FindObjectOfType<PlayerAttackAnimTrigger>().OnCoolDown();
+		}
         public void OnPlayerRoll()
         {
             _audioSource.PlayOneShot(rollAudioClip, rollVolume);

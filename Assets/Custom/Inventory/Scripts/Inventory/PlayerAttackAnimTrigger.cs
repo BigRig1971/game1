@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using FirstGearGames.SmoothCameraShaker;
 using UnityEngine.InputSystem;
 using System;
 using UnityEngine.InputSystem.Utilities;
@@ -11,6 +10,9 @@ namespace StupidHumanGames
 {
 	public class PlayerAttackAnimTrigger : MonoBehaviour
 	{
+		enum weaponType { Machete, PickAxe, Hatchet, Axe };
+		[SerializeField] weaponType currentWeaponType;
+		[SerializeField] Transform hitPoint;
 		[SerializeField] LayerMask mask;
 		[SerializeField] bool groundHugging = false;
 		[SerializeField] Transform cameraRoot;
@@ -18,7 +20,7 @@ namespace StupidHumanGames
 		[SerializeField] AudioSource _audioSource;
 		[SerializeField] float _globalCooldown = .5f;
 		[SerializeField] GameObject[] clothesToRemove;
-		[SerializeField] float colSize = .2f;
+		[SerializeField] Vector3 colSize = Vector3.one;
 		int damagePower = 5;
 		public string _animTriggerName;
 		public string _animIntName;
@@ -27,8 +29,7 @@ namespace StupidHumanGames
 		[SerializeField] Animator _animator;
 		[SerializeField] ThirdPersonController _tpc;
 		bool canHit = false;
-		bool canSwing = false;
-		public ShakeData MyShake;
+		bool canSwing = true;
 		public AudioClip weaponSwingSound;
 		[SerializeField, Range(0f, 1f)] float swingVolume = 1;
 		bool toggle = false;
@@ -36,9 +37,10 @@ namespace StupidHumanGames
 		[System.Serializable]
 		public class Ability
 		{
-			public KeyCode _key;
 			public int _int;
-			public float delayCollider = .3f;
+			public float swingTime = .1f;
+			public float hitTime = .4f;
+			public float animationLength = 1f;
 			public int attackPower = 5;
 		}
 		public List<Ability> abilities;
@@ -47,48 +49,73 @@ namespace StupidHumanGames
 			_tpc = GameObject.FindObjectOfType<ThirdPersonController>();
 			previousCamOffset = cameraRoot.transform.position.y;
 		}
-		private void FixedUpdate()
+		private void Update()
 		{
-			GetKey();
-			HitColliders();
+			KeyPress();
+			BoolAction();
 		}
 		void HitColliders()
 		{
-			Collider[] hitColliders = Physics.OverlapSphere(transform.position, colSize, mask);
+			Collider[] hitColliders = Physics.OverlapBox(hitPoint.position, colSize, Quaternion.identity, mask);
 			foreach (var other in hitColliders)
 			{
-				if (other.TryGetComponent<DamageInterface>(out var damage))
-				{
-					if (other.CompareTag("Player")) return;
-					if (!canHit) return;
-					canHit = false;
-					//var _animName = _animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
-					CameraShakerHandler.Shake(MyShake);
-					damage.Damage(damagePower);
-					_animator.SetTrigger("Interrupt");
-				}
+				if (!other.TryGetComponent<DamageInterface>(out var damage)) return;
+				damage.Damage(damagePower);
+				canSwing = true;
+				_animator.SetTrigger("Interrupt");
 			}
 		}
-		void GetKey()
+		void KeyPress()
 		{
-			foreach (var ability in abilities)
+
+			if (InventoryManager.IsOpen()) return;
+
+			if (currentWeaponType == weaponType.Machete)
 			{
-				if (Input.GetKeyDown(ability._key))
+				foreach (var ability in abilities)
 				{
-					BoolAction();
-					if (canSwing) return;
-					damagePower = ability.attackPower;
-					StartCoroutine(Attacking(ability));
+					if (!Input.GetKey(KeyCode.Mouse0)) return;
+					if (!canSwing) return;
+					canSwing = false;
+					TriggerAction(ability);
+					_animator.SetTrigger("Machete");
+					if (ability._int < abilities.Count)
+					{
+						ability._int++;
+					}
+					else
+					{
+						ability._int = 0;
+					}
 				}
 			}
+			if (currentWeaponType == weaponType.Axe)
+			{
+				_animator.SetTrigger("Axe");
+			}
+			if (currentWeaponType == weaponType.PickAxe)
+			{
+				_animator.SetTrigger("PickAxe");
+			}
+			if (currentWeaponType == weaponType.Hatchet)
+			{
+				_animator.SetTrigger("Hatchet");
+			}
+
 		}
+
 		void TriggerAction(Ability ability)
 		{
+			damagePower = ability.attackPower;
 			if (_animIntName != null) _animator.SetInteger(_animIntName, ability._int);
-			if (_animTriggerName != null) _animator.SetTrigger(_animTriggerName);
+		//	Invoke(nameof(OnSwing), ability.swingTime);
+		//	Invoke(nameof(OnHit), ability.hitTime);
+		//	Invoke(nameof(OnCoolDown), ability.animationLength);
 		}
+
 		void BoolAction()
 		{
+			if (!Input.GetKeyDown(KeyCode.H)) return;
 			if (!groundHugging) return;
 			toggle = !toggle;
 			if (toggle)
@@ -109,29 +136,29 @@ namespace StupidHumanGames
 				_tpc._canMove = true;
 				foreach (GameObject go in clothesToRemove)
 				{
-					go.GetComponentInChildren <SkinnedMeshRenderer>().enabled = true;
+					go.GetComponentInChildren<SkinnedMeshRenderer>().enabled = true;
 				}
 			}
 		}
-		
+
 		void OnDrawGizmos()
 		{
+			if (hitPoint == null) return;
 			Gizmos.color = Color.red;
-			Gizmos.matrix = transform.localToWorldMatrix;
-			Gizmos.DrawWireSphere(Vector3.zero, colSize);
+			//Gizmos.matrix = transform.localToWorldMatrix;
+			Gizmos.DrawWireCube(hitPoint.position, colSize);
 		}
-		IEnumerator Attacking(Ability ability)
+		public void OnSwing()
+		{
+			if (weaponSwingSound != null) _audioSource.PlayOneShot(weaponSwingSound, swingVolume);
+		}
+		public void OnHit()
+		{
+			HitColliders();
+		}
+		public void OnCoolDown()
 		{
 			canSwing = true;
-			TriggerAction(ability);
-			if (InventoryManager.IsOpen()) yield break;
-			yield return new WaitForSeconds(ability.delayCollider);
-			canHit = true;
-			if (weaponSwingSound == null) yield break;
-			_audioSource.PlayOneShot(weaponSwingSound, swingVolume);
-			yield return new WaitForSeconds(.5f);
-			canHit = false;
-			canSwing = false;
 		}
 	}
 }

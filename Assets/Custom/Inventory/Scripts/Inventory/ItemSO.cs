@@ -21,7 +21,7 @@ namespace StupidHumanGames
         public GameObject equipPrefab;
         public GameObject buildPreview;
         public GameObject spawnPrefab;
-        public ItemStatSO[] stat;
+        
 
         
         

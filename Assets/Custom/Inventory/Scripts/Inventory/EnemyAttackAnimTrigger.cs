@@ -42,7 +42,6 @@ namespace StupidHumanGames
 			Collider[] hitColliders = Physics.OverlapSphere(transform.position + transform.forward * colliderCenter.z, colliderSize, playerMask);
 			foreach (var col in hitColliders)
 			{
-				//Debug.Log("test");
 				_damage = col.GetComponent<DamageInterface>();
 			}
 		}
@@ -76,11 +75,12 @@ namespace StupidHumanGames
 		IEnumerator Attacking(Ability ability)
 		{
 			if (InventoryManager.IsOpen()) yield break;
-			HitColliders();
+			
 			TriggerAction(ability);
 			yield return new WaitForSeconds(ability._soundDelay / ability._animMultiplier);
 			if (attackSound != null) _audioSource?.PlayOneShot(attackSound, attackSoundVolume);
 			yield return new WaitForSeconds((ability._hitTime / ability._animMultiplier)- (ability._soundDelay / ability._animMultiplier));
+			HitColliders();
 			_damage?.Damage(damagePower);
 			_damage = null;
 		}

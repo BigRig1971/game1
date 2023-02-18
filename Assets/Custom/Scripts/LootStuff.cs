@@ -1,65 +1,70 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 namespace StupidHumanGames
 {
-    public class LootStuff : MonoBehaviour
-    {
-        bool canDo = true;
-        [SerializeField] float lootDelay = .3f;
-        [SerializeField] LayerMask mask;
-        [SerializeField] float colliderSize = 1f;
+	public class LootStuff : MonoBehaviour
+	{
+		bool canDo = true;
+		[SerializeField] float lootDelay = .3f;
+		[SerializeField] LayerMask mask;
+		[SerializeField] float colliderSize = 1.5f;
 		[SerializeField] AudioSource _audioSource;
-        public AudioClip lootSound;
-        public float lootSoundVolume;
-        Animator anim;
-        LootableItem lootableItem;
-        ItemPickupable droppedItemPickup;
-        private void Start()
-        {
-            anim = GetComponent<Animator>();
-        }
+		public AudioClip lootSound;
+		public float lootSoundVolume;
+		Animator anim;
+		LootableItem lootableItem;
+		ItemPickupable droppedItemPickup;
+		private void Start()
+		{
+			anim = GetComponent<Animator>();
+		}
 		private void FixedUpdate()
 		{
-			HitColliders();
+			EnableLootableItems();
+			PickupLootableItems();
 		}
-		
-		void HitColliders()
+		void EnableLootableItems()
 		{
-			Collider[] hitColliders = Physics.OverlapSphere(transform.position, colliderSize, mask);
+			Collider[] _colliders = Physics.OverlapSphere(transform.position, 10f, mask);
 
-			int i = 0;
-			while (i < hitColliders.Length)
+			foreach (Collider collider in _colliders)
 			{
-				lootableItem = hitColliders[i].GetComponent<LootableItem>();
-				droppedItemPickup = hitColliders[i].GetComponent<ItemPickupable>();
-                if (lootableItem != null && !lootableItem.isDamagable)
-                {
-                    if (!canDo) return;
-                    canDo = false;
-					anim.SetTrigger("PickupItem");
-					Invoke(nameof(LootItem), lootDelay);
-                }
-                if (droppedItemPickup != null)
-                {
+				if (collider.TryGetComponent<LootableItem>(out LootableItem healthBar))
+				{
+					healthBar.enabled = true;
+				}
+				
+			}
+		}
+		void PickupLootableItems()
+		{
+			if (!Input.GetKey(KeyCode.E)) return;
+			Collider[] _colliders = Physics.OverlapSphere(transform.position, colliderSize, mask);
+			foreach (Collider collider in _colliders)
+			{
+				if (collider.TryGetComponent<LootableItem>(out lootableItem))
+				{
+					if (lootableItem.isDamagable) return;
 					if (!canDo) return;
 					canDo = false;
 					anim.SetTrigger("PickupItem");
-					Invoke(nameof(PickupItem), lootDelay);
-                }
-				i++;
-			}		
+					Invoke(nameof(LootItem), lootDelay);
+				}
+			}
 		}
+
 		void LootItem()
-        {
+		{
 			if (lootSound != null) _audioSource.PlayOneShot(lootSound, lootSoundVolume);
 			lootableItem.LootableItems();
-            canDo = true;
-        }
-        void PickupItem()
-        {
+			canDo = true;
+		}
+		void PickupItem()
+		{
 			if (lootSound != null) _audioSource.PlayOneShot(lootSound, lootSoundVolume);
 			droppedItemPickup.LootableItems();
 			canDo = true;
 		}
-    }
+	}
 }

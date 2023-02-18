@@ -97,6 +97,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cc15dfc05bdc1742b2cc362979d493f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  healthBar: {fileID: 0}
+  _color: {r: 0, g: 0, b: 0, a: 0}
+  health: 0
+  delayHealthRegen: 0.5
   randomItems: []
   randomSize: 1
   _audioSource: {fileID: 0}
@@ -104,12 +108,10 @@ MonoBehaviour:
   damageDropScale: 1
   spawnLoot: 0
   spawnLootOffset: 1
-  _impactSound: {fileID: 0}
-  _impactVolume: 0
+  _listOfImpactSounds: []
   _deathSound: {fileID: 0}
   _deathVolume: 0
   isDamagable: 0
-  health: 0
   deathDelay: 0
   _listOfItems:
   - _item: {fileID: 11400000, guid: 5798043884458524da5b651b1519cf74, type: 2}
@@ -150,7 +152,7 @@ GameObject:
   - component: {fileID: 7366689224574424889}
   m_Layer: 14
   m_Name: BoulderPiece2
-  m_TagString: Lootable
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647

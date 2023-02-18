@@ -98,6 +98,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cc15dfc05bdc1742b2cc362979d493f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  healthBar: {fileID: 0}
+  _color: {r: 1, g: 0.7206769, b: 0, a: 0}
+  health: 30
+  delayHealthRegen: 5
   randomItems: []
   randomSize: 1
   _audioSource: {fileID: 4678371224276987799}
@@ -111,7 +115,6 @@ MonoBehaviour:
   _deathSound: {fileID: 8300000, guid: ce7d868d12bef064f9996eef55b4d90d, type: 3}
   _deathVolume: 1
   isDamagable: 1
-  health: 30
   deathDelay: 0
   _listOfItems:
   - _item: {fileID: 11400000, guid: 5798043884458524da5b651b1519cf74, type: 2}
